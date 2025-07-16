@@ -1,5 +1,8 @@
 import fs from 'fs';
-import pkg from '../package.json' assert { type: 'json' };
+import path from 'path';
+
+const pkgPath = path.resolve(process.cwd(), 'package.json');
+const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
 
 const envPath = '.env.local';
 const version = pkg.version;

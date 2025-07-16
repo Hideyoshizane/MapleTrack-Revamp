@@ -1,0 +1,26 @@
+.navBody {
+    position: sticky;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100vw;
+    height: 12.3vh;
+    background-color: #424242;
+    align-self: center;
+}
+
+.logoDiv {
+    position: relative;
+    width: 200px;
+    height: 80px;
+    margin-left: 2.083vw;
+}
+
+.version {
+    position: absolute;
+    right: 0;
+    bottom: -6%;
+    font-size: 16px;
+    font-weight: 500;
+    color: #f6f6f6;
+}
