@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectToDatabase from '@lib/mongooseConect';
 import User, { LASTVERSION } from '@models/user';
 import { validateUsername, validateEmail, validatePassword } from '@utils/validationUtils';
-import { sanitizeInputBackend } from '@/utils/sanitizeInputBackEnd';
+import sanitizeInputBackend from '@/utils/sanitizeInputBackEnd';
 
 import bcrypt from 'bcrypt';
 //import { createBossList } from '@/services/bossList';
@@ -59,12 +59,14 @@ export async function POST(req: NextRequest) {
 			email,
 			password: hashedPassword,
 			version: LASTVERSION,
+			resetPasswordToken: null,
+			resetPasswordExpires: null,
 		});
 
-		//save user
+		// Save user
 		await newUser.save();
 
-		//DB populate functions
+		// DB populate functions
 		//await searchServersAndCreateMissing(newUser.username, newUser._id);
 		//await createMissingCharacters(newUser._id, newUser.username);
 		//await createBossList(newUser.username);

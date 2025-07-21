@@ -17,7 +17,7 @@ const Navbar: React.FC<MyComponentProps> = () => {
 		<nav className={styles.navBody}>
 			<Link href="/home">
 				<div className={styles.logoDiv}>
-					<Image src="/assets/logo/logo.webp" width={200} height={80} alt="MapleTrack Logo" />
+					<Image src="/assets/logo/logo.webp" fill alt="MapleTrack Logo" />
 					<p className={styles.version}>{version}</p>
 				</div>
 			</Link>

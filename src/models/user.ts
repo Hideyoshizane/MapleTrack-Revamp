@@ -9,6 +9,8 @@ export interface IUser extends Document {
 	version?: number;
 	date?: Date;
 	servers: mongoose.Types.ObjectId[];
+	resetPasswordToken?: string;
+	resetPasswordExpires?: Date;
 }
 
 const userSchema = new Schema<IUser>({
@@ -46,6 +48,12 @@ const userSchema = new Schema<IUser>({
 			ref: 'Server',
 		},
 	],
+	resetPasswordToken: {
+		type: String,
+	},
+	resetPasswordExpires: {
+		type: Date,
+	},
 });
 
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);

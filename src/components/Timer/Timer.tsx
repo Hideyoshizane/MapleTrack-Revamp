@@ -1,13 +1,17 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import duration from 'dayjs/plugin/duration';
 
 import styles from './Timer.module.css';
 
+// Extend dayjs with UTC and Duration plugins for accurate time calculations
 dayjs.extend(utc);
+dayjs.extend(duration);
 
+// Type definition for the time left
 type TimeLeft = {
 	days?: number;
 	hours: number;
@@ -16,57 +20,73 @@ type TimeLeft = {
 };
 
 interface TimerProps {
-	target: 'daily' | 'weekly';
+	target: 'daily' | 'weekly'; // Determines which type of reset. Daily = UTC 12AM. Weekly = Thursday UTC 12AM
 }
 
 const Timer: React.FC<TimerProps> = ({ target }) => {
-	const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => {
-		return target === 'daily' ? getDailyReset() : getWeeklyReset();
-	});
-
-	function getDailyReset(): TimeLeft {
+	const calculateTimeLeft = useCallback((): TimeLeft => {
+		// Get current UTC time
 		const now = dayjs.utc();
-		const nextMidnight = now.add(1, 'day').startOf('day');
-		const diff = nextMidnight.diff(now);
 
-		const hours = Math.floor(diff / (1000 * 60 * 60));
-		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-		const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+		let targetTime: dayjs.Dayjs;
 
-		return { hours, minutes, seconds };
-	}
+		if (target === 'daily') {
+			targetTime = now.add(1, 'day').startOf('day');
+		} else {
+			// Sunday = 0, Thursday = 4
+			const currentDay = now.day();
 
-	function getWeeklyReset(): TimeLeft {
-		const now = dayjs.utc();
-		const todayDay = now.day();
-		let daysUntilThursday = 4 - todayDay;
-		if (daysUntilThursday < 0 || (daysUntilThursday === 0 && now.isAfter(now.startOf('day')))) {
-			daysUntilThursday += 7;
+			let daysUntilThursday = (4 - currentDay + 7) % 7;
+
+			// If today is Thursday and we're past midnight, count 7 days ahead
+			if (daysUntilThursday === 0 && now.isAfter(now.startOf('day'))) {
+				daysUntilThursday = 7;
+			}
+
+			targetTime = now.add(daysUntilThursday, 'day').startOf('day');
 		}
-		const nextThursdayMidnight = now.add(daysUntilThursday, 'day').startOf('day');
-		const diff = nextThursdayMidnight.diff(now);
 
-		const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-		const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-		const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+		// Difference between now and the next reset
+		const diffMs = targetTime.diff(now);
+		const d = dayjs.duration(diffMs);
 
-		return { days, hours, minutes, seconds };
-	}
+		// Construct the time left object
+		const timeLeft: TimeLeft = {
+			hours: d.hours(),
+			minutes: d.minutes(),
+			seconds: d.seconds(),
+		};
 
-	useEffect(() => {
-		const interval = setInterval(() => {
-			setTimeLeft(target === 'daily' ? getDailyReset() : getWeeklyReset());
-		}, 1000);
+		// For weekly reset, also include number of full days remaining
+		if (target === 'weekly') {
+			timeLeft.days = Math.floor(d.asDays());
+		}
 
-		return () => clearInterval(interval);
+		return timeLeft;
 	}, [target]);
 
+	const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft);
+
+	// Update countdown every second
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setTimeLeft(calculateTimeLeft());
+		}, 1000);
+
+		// Cleanup interval on unmount
+		return () => clearInterval(interval);
+	}, [calculateTimeLeft]);
+
+	// Helper function to pad numbers with leading zeros
 	const pad = (num: number) => num.toString().padStart(2, '0');
 
 	return (
 		<div>
+			{/* Display reset type */}
 			<h2 className={styles.timer}>{target === 'daily' ? 'Until Daily Reset' : 'Until Weekly Reset'}</h2>
+
+			{/* Format timer string depending on reset type */}
+			{/* format: DD:HH:MM:SS*/}
 			<h2 className={styles.timer}>
 				{target === 'weekly' && timeLeft.days !== undefined
 					? `${pad(timeLeft.days)}:${pad(timeLeft.hours)}:${pad(timeLeft.minutes)}:${pad(timeLeft.seconds)}`
@@ -75,5 +95,4 @@ const Timer: React.FC<TimerProps> = ({ target }) => {
 		</div>
 	);
 };
-
 export default Timer;
