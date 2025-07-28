@@ -9,7 +9,7 @@ export async function updateLastLogin(userID: string): Promise<void> {
 	const userData = await User.findById(userID);
 	if (!userData) throw new Error('User not found');
 
-	userData.date = dayjs().utc().toDate();
+	userData.lastLogin = dayjs().utc().toDate();
 	await userData.save();
 }
 

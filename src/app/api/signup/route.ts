@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import connectToDatabase from '@lib/mongooseConect';
 import User, { LASTVERSION } from '@models/user';
-import { validateUsername, validateEmail, validatePassword } from '@utils/validationUtils';
-import sanitizeInputBackend from '@/utils/sanitizeInputBackEnd';
+import { validateUsername, validateEmail, validatePassword } from '@/utils/validation';
+import { sanitizeInputBackend } from '@/utils/sanitize/sanitizeInputBackEnd';
 
 import bcrypt from 'bcrypt';
 //import { createBossList } from '@/services/bossList';
@@ -14,7 +14,13 @@ export async function POST(req: NextRequest) {
 	try {
 		await connectToDatabase();
 
-		const body = await req.json();
+		let body;
+		// Parse JSON body and fail early if malformed
+		try {
+			body = await req.json();
+		} catch {
+			return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+		}
 
 		// Sanitize inputs
 		const username = sanitizeInputBackend(body.username);
@@ -30,6 +36,7 @@ export async function POST(req: NextRequest) {
 		const emailValidation = validateEmail(email);
 		const passwordValidation = validatePassword(password);
 
+		// If any validation fails, return early
 		if (!usernameValidation.isValid || !emailValidation.isValid || !passwordValidation.isValid) {
 			return NextResponse.json(
 				{
@@ -44,15 +51,14 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		// Check if username already exists AFTER validation
+		// Check if username or email already exists after validation
 		const existingUser = await User.findOne({ $or: [{ username }, { email }] });
 		if (existingUser) {
-			return NextResponse.json({ error: 'This user or email is not avaiable.' }, { status: 400 });
+			return NextResponse.json({ error: 'This username or email is not avaiable.' }, { status: 400 });
 		}
 
-		// Hash password
-		const salt = await bcrypt.genSalt(10);
-		const hashedPassword = await bcrypt.hash(password, salt);
+		// Hash password with auto-generated salt (10 rounds)
+		const hashedPassword = await bcrypt.hash(password, 10);
 
 		const newUser = new User({
 			username,

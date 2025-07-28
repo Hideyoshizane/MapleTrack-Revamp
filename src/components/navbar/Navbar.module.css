@@ -5,7 +5,7 @@
     justify-content: space-between;
     width: 100vw;
     height: 120px;
-    background-color: #424242;
+    background-color: var(--default-black);
     align-self: center;
 }
 
@@ -23,5 +23,5 @@
     font-size: 16px;
     font-weight: 500;
     text-align: end;
-    color: #f6f6f6;
+    color: var(--default-white);
 }

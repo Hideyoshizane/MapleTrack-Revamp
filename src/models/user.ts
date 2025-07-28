@@ -3,14 +3,14 @@ import mongoose, { Document, Model, Schema } from 'mongoose';
 const LASTVERSION = 3;
 
 export interface IUser extends Document {
-	username: string;
-	email: string;
-	password: string;
-	version?: number;
-	date?: Date;
-	servers: mongoose.Types.ObjectId[];
-	resetPasswordToken?: string;
-	resetPasswordExpires?: Date;
+	username: string; // Username of the user (must be unique)
+	email: string; // Email address (must be unique)
+	password: string; // Hashed password
+	version?: number; // Maybe will be deleted
+	lastLogin: Date; // Last time user Logged in
+	servers: mongoose.Types.ObjectId[]; // Maybe will be deleted
+	resetPasswordToken?: string; //  Token for password reset
+	resetPasswordExpires?: Date; // Expiration date for the reset token
 }
 
 const userSchema = new Schema<IUser>({
@@ -39,7 +39,7 @@ const userSchema = new Schema<IUser>({
 	version: {
 		type: Number,
 	},
-	date: {
+	lastLogin: {
 		type: Date,
 	},
 	servers: [
@@ -55,7 +55,7 @@ const userSchema = new Schema<IUser>({
 		type: Date,
 	},
 });
-
+// Create the User model if it doesn't already exist (to avoid model overwrite in dev)
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
 
 export default User;

@@ -65,7 +65,7 @@ const Timer: React.FC<TimerProps> = ({ target }) => {
 		return timeLeft;
 	}, [target]);
 
-	const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft);
+	const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
 	// Update countdown every second
 	useEffect(() => {
@@ -79,6 +79,10 @@ const Timer: React.FC<TimerProps> = ({ target }) => {
 
 	// Helper function to pad numbers with leading zeros
 	const pad = (num: number) => num.toString().padStart(2, '0');
+
+	if (!timeLeft) {
+		return null;
+	}
 
 	return (
 		<div>

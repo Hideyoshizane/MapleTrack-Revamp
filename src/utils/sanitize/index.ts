@@ -1,0 +1,1 @@
+export { sanitizeInputFrontend } from './sanitizeInputFrontEnd';

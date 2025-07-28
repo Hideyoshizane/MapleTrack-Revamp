@@ -1,0 +1,19 @@
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    font-size: 0.75rem;
+    text-align: center;
+    color: var(--default-white);
+    padding-bottom: 8px;
+}
+
+.footer a {
+    color: #64B5F6;
+    text-decoration: underline;
+}
+
+.footer a:hover {
+    color: #40C4FF;
+}
