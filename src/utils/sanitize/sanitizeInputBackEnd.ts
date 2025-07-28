@@ -5,7 +5,7 @@ import { JSDOM } from 'jsdom';
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
 
-export function sanitizeInputBackend(input: string): string {
+export function sanitizeInputBackEnd(input: string): string {
 	try {
 		return DOMPurify.sanitize(input);
 	} catch (error) {

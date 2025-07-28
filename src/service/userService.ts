@@ -1,32 +1,16 @@
-import User, { LASTVERSION } from '@models/user';
+import { LASTVERSION } from '@models/user';
+import type { IUser } from '@models/user';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import bcrypt from 'bcrypt';
 
 dayjs.extend(utc);
 
-export async function updateLastLogin(userID: string): Promise<void> {
-	const userData = await User.findById(userID);
-	if (!userData) throw new Error('User not found');
-
-	userData.lastLogin = dayjs().utc().toDate();
-	await userData.save();
+// Update the lastLogin timestamp to current UTC time
+export function updateLastLogin(user: IUser): void {
+	user.lastLogin = dayjs().utc().toDate();
 }
 
-export async function updateUserVersion(userID: string): Promise<void> {
-	const userData = await User.findById(userID);
-	if (!userData) throw new Error('User not found');
-
-	userData.version = LASTVERSION;
-	await userData.save();
-}
-
-export async function resetPasswordEmptyUser(username: string): Promise<void> {
-	const userData = await User.findOne({ username });
-	if (!userData) throw new Error('User not found');
-
-	const salt = await bcrypt.genSalt(10);
-	const hashedPassword = await bcrypt.hash('123456', salt);
-	userData.password = hashedPassword;
-	await userData.save();
+// Set the version to the latest defined constant
+export function updateUserVersion(user: IUser): void {
+	user.version = LASTVERSION;
 }

@@ -10,10 +10,10 @@
 }
 
 .footer a {
-    color: #64B5F6;
+    color: var(--link-color);
     text-decoration: underline;
 }
 
 .footer a:hover {
-    color: #40C4FF;
+    color: var(--link-color-hover);
 }

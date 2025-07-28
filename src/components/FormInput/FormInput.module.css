@@ -1,7 +1,10 @@
-.container {
+.inputContainer {
     display: flex;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 16px;
+}
+
+.marginSignUp {
     margin-left: 32px;
 }
 

@@ -1,8 +1,9 @@
-import mongoose, { Document, Model, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 
 const LASTVERSION = 3;
 
 export interface IUser extends Document {
+	_id: Types.ObjectId;
 	username: string; // Username of the user (must be unique)
 	email: string; // Email address (must be unique)
 	password: string; // Hashed password

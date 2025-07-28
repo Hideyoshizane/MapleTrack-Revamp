@@ -33,6 +33,19 @@ export function validateUsername(username: unknown): ValidationResult {
 	return result.success ? { isValid: true } : { isValid: false, error: extractErrorMessage(result).join('\n') };
 }
 
+// Used for the login only
+export function validateUsernameLogin(username: unknown): ValidationResult {
+	if (typeof username !== 'string' || username.trim() === '') {
+		return { isValid: false, error: 'Please enter your username.' };
+	}
+	// Optionally simple pattern check, e.g., only letters, numbers, underscores
+	const simplePattern = /^[a-zA-Z0-9_]+$/;
+	if (!simplePattern.test(username)) {
+		return { isValid: false, error: 'Username contains invalid characters.' };
+	}
+	return { isValid: true };
+}
+
 export function validateEmail(email: unknown): ValidationResult {
 	if (typeof email !== 'string') {
 		return { isValid: false, error: 'Email must be a string.' };
@@ -71,6 +84,14 @@ export function validatePassword(password: unknown): ValidationResult {
 	return allErrors.length > 0
 		? { isValid: false, error: allErrors.map((e) => `- ${e}`).join('\n') }
 		: { isValid: true };
+}
+
+// Used for the login only
+export function validatePasswordLogin(password: unknown): ValidationResult {
+	if (typeof password !== 'string' || password.trim() === '') {
+		return { isValid: false, error: 'Please enter your password.' };
+	}
+	return { isValid: true };
 }
 
 export function validatePasswordConfirmation(password: unknown, confirmPassword: unknown): ValidationResult {

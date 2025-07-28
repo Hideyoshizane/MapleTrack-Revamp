@@ -4,8 +4,8 @@ import bcrypt from 'bcrypt';
 import User from '@models/user';
 import connectToDatabase from '@lib/mongooseConect';
 
-import { validatePassword } from '@/utils/validation/validationUtils';
-import sanitizeInputBackEnd from '@/utils/sanitize/sanitizeInputBackEnd';
+import { validatePassword } from '@/utils/validation/';
+import { sanitizeInputBackEnd } from '@/utils/sanitize/sanitizeInputBackEnd';
 
 export async function POST(req: NextRequest) {
 	await connectToDatabase();

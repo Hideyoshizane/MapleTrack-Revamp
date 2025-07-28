@@ -3,8 +3,8 @@ import crypto from 'crypto';
 import User from '@models/user';
 import connectToDatabase from '@lib/mongooseConect';
 
-import { validateEmail } from '@/utils/validation/validationUtils';
-import sanitizeInputBackEnd from '@/utils/sanitize/sanitizeInputBackEnd';
+import { validateEmail } from '@/utils/validation/';
+import { sanitizeInputBackEnd } from '@/utils/sanitize/sanitizeInputBackEnd';
 
 import sendEmail from '@lib/sendEmail';
 import getForgotPasswordTemplate from '@lib/resetPasswordEmail';

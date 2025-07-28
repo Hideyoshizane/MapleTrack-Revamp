@@ -1,0 +1,109 @@
+import CredentialsProvider from 'next-auth/providers/credentials';
+import bcrypt from 'bcrypt';
+import UserMongo from '@models/user';
+import connectToDatabase from '@lib/mongooseConect';
+
+import type { IUser } from '@models/user';
+import type { User, Session } from 'next-auth';
+import type { JWT } from 'next-auth/jwt';
+import NextAuth, { type AuthOptions } from 'next-auth';
+
+import { validateUsernameLogin, validatePasswordLogin } from '@/utils/validation';
+import { sanitizeInputBackEnd } from '@/utils/sanitize/sanitizeInputBackEnd';
+
+export const authOptions: AuthOptions = {
+	session: {
+		strategy: 'jwt',
+		maxAge: 60 * 60 * 24 * 60, // 60 days (session expiration time)
+	},
+	jwt: {
+		maxAge: 60 * 60 * 24 * 60, // 60 days (token expiration)
+	},
+	providers: [
+		CredentialsProvider({
+			name: 'Credentials',
+			credentials: {
+				username: { label: 'Username', type: 'text', placeholder: 'your username' },
+				password: { label: 'Password', type: 'password' },
+			},
+			async authorize(credentials): Promise<{ id: string; username: string } | null> {
+				await connectToDatabase();
+
+				// Sanitize inputs
+				const username = sanitizeInputBackEnd(credentials?.username ?? '');
+				const password = sanitizeInputBackEnd(credentials?.password ?? '');
+
+				if (!username || !password) {
+					throw new Error('Missing username or password');
+				}
+
+				// Validate sanitized inputs
+				const usernameValidation = validateUsernameLogin(username);
+				const passwordValidation = validatePasswordLogin(password);
+
+				if (!usernameValidation.isValid || !passwordValidation.isValid) {
+					throw new Error('Invalid username or password');
+				}
+
+				// Find user in DB
+				const user = (await UserMongo.findOne({ username })) as IUser | null;
+				if (!user) {
+					throw new Error('Wrong username or password');
+				}
+
+				// Compare password hash
+				const isValid = await bcrypt.compare(password, user.password);
+				if (!isValid) {
+					throw new Error('Wrong username or password');
+				}
+
+				// Optionally update last login timestamp here
+				//User specific functions.
+				/*if (user.version < LASTVERSION) {
+			await searchServersAndCreateMissing(user, user._id);
+			await createMissingCharacters(user._id, user.username);
+			await updateCharacters(user._id);
+			await updateUserVersion(user._id); 	
+		        }*/
+
+				// await updateLastLogin(user);
+				//await user.save();
+
+				// Return user object (will be saved in JWT token)
+				return {
+					id: user._id.toString(),
+					username: user.username,
+					// you can add more fields here, but avoid sensitive info
+				};
+			},
+		}),
+	],
+	callbacks: {
+		// Customize JWT token content
+		async jwt({ token, user }: { token: JWT; user?: User | undefined }) {
+			if (user) {
+				token.id = user.id;
+				token.username = user.username;
+			}
+			return token;
+		},
+		// Customize session object returned to client
+		async session({ session, token }: { session: Session; token: JWT }) {
+			if (token) {
+				session.user = {
+					id: token.id as string,
+					username: token.username as string,
+				};
+			}
+			return session;
+		},
+	},
+	pages: {
+		signIn: '/login', // your login page route
+		// signOut, error pages can be customized as well
+	},
+	secret: process.env.NEXTAUTH_SECRET, // set a strong secret env variable
+};
+
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };

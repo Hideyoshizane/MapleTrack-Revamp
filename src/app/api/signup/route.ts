@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectToDatabase from '@lib/mongooseConect';
 import User, { LASTVERSION } from '@models/user';
 import { validateUsername, validateEmail, validatePassword } from '@/utils/validation';
-import { sanitizeInputBackend } from '@/utils/sanitize/sanitizeInputBackEnd';
+import { sanitizeInputBackEnd } from '@/utils/sanitize/sanitizeInputBackEnd';
 
 import bcrypt from 'bcrypt';
 //import { createBossList } from '@/services/bossList';
@@ -19,13 +19,13 @@ export async function POST(req: NextRequest) {
 		try {
 			body = await req.json();
 		} catch {
-			return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+			return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
 		}
 
 		// Sanitize inputs
-		const username = sanitizeInputBackend(body.username);
-		const email = sanitizeInputBackend(body.email);
-		const password = sanitizeInputBackend(body.password);
+		const username = sanitizeInputBackEnd(body.username);
+		const email = sanitizeInputBackEnd(body.email);
+		const password = sanitizeInputBackEnd(body.password);
 
 		if (!username || !email || !password) {
 			return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });

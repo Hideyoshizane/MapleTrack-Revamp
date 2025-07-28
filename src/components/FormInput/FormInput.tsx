@@ -4,24 +4,21 @@ import React, { useState, useEffect, useCallback, InputHTMLAttributes, useRef } 
 import { FieldError, UseFormRegisterReturn, UseFormSetError, UseFormClearErrors } from 'react-hook-form';
 import clsx from 'clsx';
 
-import type { FormData } from '@/sharedTypes/form';
-import Tooltip from '../Tooltip/Tooltip';
-
-import InfoIcon from '@assets/svg/info.svg';
-import OkIcon from '@assets/svg/circle-check.svg';
-import ErrorIcon from '@assets/svg/circle-x.svg';
+import type { SignupFormData } from '@/sharedTypes/form';
 
 import styles from './FormInput.module.css';
+import ValidationIcon from './ValidationIcon';
 
 type FormInputProps = {
 	label: string;
-	id: keyof FormData;
+	id: keyof SignupFormData;
 	error?: FieldError;
 	register: UseFormRegisterReturn;
 	validation?: (value: string) => { isValid: boolean; error?: string };
-	setError?: UseFormSetError<FormData>;
-	clearErrors?: UseFormClearErrors<FormData>;
+	setError?: UseFormSetError<SignupFormData>;
+	clearErrors?: UseFormClearErrors<SignupFormData>;
 	isSubmitted?: boolean;
+	isLogin?: boolean;
 } & InputHTMLAttributes<HTMLInputElement>;
 
 export default function FormInput({
@@ -34,6 +31,7 @@ export default function FormInput({
 	setError,
 	clearErrors,
 	isSubmitted = false,
+	isLogin = false,
 	...rest
 }: FormInputProps) {
 	const [touched, setTouched] = useState(false);
@@ -56,7 +54,11 @@ export default function FormInput({
 	//Validates the input value and updates internal state and optionally sets or clears RHF errors.
 	const runValidation = useCallback(
 		(value: string) => {
-			if (!validation) return;
+			if (!validation) {
+				setIsLocallyValid(null);
+				setLocalErrorMessage(null);
+				return;
+			}
 
 			try {
 				const result = validation(value);
@@ -148,35 +150,26 @@ export default function FormInput({
 			? localErrorMessage ?? error?.message ?? 'Invalid input'
 			: rest.title ?? 'Enter a value';
 
-	const iconSize = 24;
-
-	const inputClass = clsx(styles.input, {
-		[styles.valid]: showValid,
-		[styles.invalid]: showInvalid,
+	// Compute the container class to add margin if is signup
+	const containerClass = clsx(styles.inputContainer, {
+		[styles.marginSignUp]: !isLogin,
 	});
 
-	// Conditionally render icons with tooltip
-	const IconComponent = showValid ? (
-		<OkIcon width={iconSize} height={iconSize} className={styles.validIcon} />
-	) : (
-		<Tooltip content={tooltipMessage} placement="right">
-			{showInvalid ? (
-				<ErrorIcon width={iconSize} height={iconSize} className={styles.invalidIcon} />
-			) : (
-				<InfoIcon width={iconSize} height={iconSize} className={styles.defaultIcon} />
-			)}
-		</Tooltip>
-	);
+	// Compute the input class to add margin color if needed
+	const inputClass = clsx(styles.input, {
+		[styles.valid]: !isLogin && showValid,
+		[styles.invalid]: !isLogin && showInvalid,
+	});
 
 	return (
-		<div className={styles.container}>
+		<div className={containerClass}>
 			<label htmlFor={id} className={styles.label} />
 			<div className={styles.inputRow}>
 				<input
 					id={id}
 					type={type}
-					aria-invalid={showError}
-					aria-describedby={showError ? `${String(id)}-error` : undefined}
+					aria-invalid={!isLogin && showError}
+					aria-describedby={!isLogin && showError ? `${String(id)}-error` : undefined}
 					className={inputClass}
 					placeholder={label}
 					value={inputValue}
@@ -186,7 +179,11 @@ export default function FormInput({
 					{...registerRest}
 				/>
 
-				<div className={styles.icon}>{IconComponent}</div>
+				{!isLogin && (
+					<div className={styles.icon}>
+						<ValidationIcon showValid={showValid} showInvalid={showInvalid} tooltipMessage={tooltipMessage} />
+					</div>
+				)}
 			</div>
 		</div>
 	);

@@ -13,7 +13,7 @@ import Button from '@/components/Button/Button';
 import { validateUsername, validateEmail, validatePassword, validatePasswordConfirmation } from '@/utils/validation';
 import { sanitizeInputFrontend } from '@/utils/sanitize';
 
-import type { FormData } from '@/sharedTypes/form';
+import type { SignupFormData } from '@/sharedTypes/form';
 
 import styles from './page.module.css';
 
@@ -25,15 +25,15 @@ export default function SignupPage() {
 		setError,
 		clearErrors,
 		getValues,
-	} = useForm<FormData>({
+	} = useForm<SignupFormData>({
 		mode: 'onBlur', // Validate on blur for better UX
 	});
 
 	const router = useRouter();
-	const onSubmit = async (data: FormData) => {
+	const onSubmit = async (data: SignupFormData) => {
 		try {
 			// Sanitize inputs to avoid XSS
-			const sanitizedData: FormData = {
+			const sanitizedData: SignupFormData = {
 				username: sanitizeInputFrontend(data.username),
 				email: sanitizeInputFrontend(data.email),
 				password: sanitizeInputFrontend(data.password),
@@ -52,7 +52,7 @@ export default function SignupPage() {
 			let hasErrors = false;
 			for (const [field, result] of Object.entries(validations)) {
 				if (!result.isValid) {
-					setError(field as keyof FormData, { message: result.error });
+					setError(field as keyof SignupFormData, { message: result.error });
 					hasErrors = true;
 				}
 			}
@@ -90,7 +90,7 @@ export default function SignupPage() {
 				// Set field-specific errors if provided
 				if (result.details && typeof result.details === 'object') {
 					for (const [field, msg] of Object.entries(result.details)) {
-						setError(field as keyof FormData, { message: msg as string });
+						setError(field as keyof SignupFormData, { message: msg as string });
 					}
 				}
 			}
