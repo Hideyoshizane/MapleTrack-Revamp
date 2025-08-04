@@ -1,11 +1,12 @@
 'use client';
 
 import React from 'react';
-import Tooltip from '../Tooltip/Tooltip';
 
 import OkIcon from '@assets/svg/circle-check.svg';
 import ErrorIcon from '@assets/svg/circle-x.svg';
 import InfoIcon from '@assets/svg/info.svg';
+
+import Tooltip from '../Tooltip/Tooltip';
 
 import styles from './FormInput.module.css';
 

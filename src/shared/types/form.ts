@@ -1,0 +1,22 @@
+import type {
+	Credentials,
+	SignupRequestBody,
+	ResetPasswordRequestBody,
+	ForgotPasswordRequestBody,
+} from '@sharedTypes/api/auth';
+
+// Login just reuses credentials
+export type LoginFormData = Credentials;
+
+// Signup form: backend props + confirmPassword (frontend-only)
+export type SignupFormData = SignupRequestBody & {
+	confirmPassword: string;
+};
+
+// Forgot password form: identical to backend
+export type ForgotPasswordFormData = ForgotPasswordRequestBody;
+
+// Reset password form: backend props + confirmPassword (frontend-only)
+export type ResetPasswordFormData = ResetPasswordRequestBody & {
+	confirmPassword: string;
+};

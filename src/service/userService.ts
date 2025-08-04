@@ -1,7 +1,9 @@
-import { LASTVERSION } from '@models/user';
-import type { IUser } from '@models/user';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+
+import { LASTVERSION } from '@models/user';
+
+import type { IUser } from '@models/user';
 
 dayjs.extend(utc);
 

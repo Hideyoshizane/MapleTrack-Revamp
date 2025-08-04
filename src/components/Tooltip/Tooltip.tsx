@@ -1,9 +1,10 @@
 'use client';
 
 import * as RadixTooltip from '@radix-ui/react-tooltip';
-import React from 'react';
-import styles from './Tooltip.module.css';
 import Cookies from 'js-cookie';
+import React from 'react';
+
+import styles from './Tooltip.module.css';
 
 type CustomTooltipProps = {
 	content: React.ReactNode;

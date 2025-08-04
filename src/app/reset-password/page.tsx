@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 
@@ -11,13 +11,7 @@ import FooterOutside from '@components/FooterOutside/FooterOutside';
 import FormInput from '@components/FormInput/FormInput';
 import { fetchWithTimeout } from '@utils/fetch/withTimeout';
 import { sanitizeInputFrontend } from '@utils/sanitize';
-import {
-	validateUsername,
-	validateEmail,
-	validatePassword,
-	validatePasswordConfirmation,
-	handleFieldValidation,
-} from '@utils/validation';
+import { validatePassword, validatePasswordConfirmation, handleFieldValidation } from '@utils/validation';
 
 import styles from './page.module.css';
 
@@ -25,7 +19,7 @@ import type { SignupApiResponse } from '@sharedTypes/api/auth';
 import type { SignupFormData } from '@sharedTypes/form';
 import type { ValidationResult } from '@utils/validation';
 
-export default function SignupPage() {
+export default function ResetPasswordPage() {
 	const {
 		register,
 		handleSubmit,
@@ -37,21 +31,26 @@ export default function SignupPage() {
 		mode: 'onBlur', // Validate on blur for better UX
 	});
 
+	const searchParams = useSearchParams();
+	const token = searchParams.get('token');
+
 	const router = useRouter();
 	const onSubmit = async (data: SignupFormData) => {
 		try {
+			if (!token) {
+				toast.error('Invalid or missing token.');
+				return;
+			}
+
 			// Sanitize inputs to avoid XSS
-			const sanitizedData: SignupFormData = {
-				username: sanitizeInputFrontend(data.username),
-				email: sanitizeInputFrontend(data.email),
+			const sanitizedData = {
+				sanitizedToken: sanitizeInputFrontend(token),
 				password: sanitizeInputFrontend(data.password),
 				confirmPassword: sanitizeInputFrontend(data.confirmPassword),
 			};
 
 			// Client-side validation results
 			const validations = {
-				username: validateUsername(sanitizedData.username),
-				email: validateEmail(sanitizedData.email),
 				password: validatePassword(sanitizedData.password),
 				confirmPassword: validatePasswordConfirmation(sanitizedData.password, sanitizedData.confirmPassword),
 			};
@@ -66,12 +65,11 @@ export default function SignupPage() {
 
 			// Prepare payload for API, excluding confirmPassword as it's only client-side
 			const payload = {
-				username: sanitizedData.username,
-				email: sanitizedData.email,
 				password: sanitizedData.password,
+				token: sanitizedData.sanitizedToken,
 			};
 
-			const response = await fetchWithTimeout('/api/auth/signup', {
+			const response = await fetchWithTimeout('/api/auth/reset-password', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(payload),
@@ -80,9 +78,9 @@ export default function SignupPage() {
 			const result = (await response.json()) as SignupApiResponse;
 
 			if (response.ok && result.success) {
-				router.push('/login?success=1');
+				router.push('/login?reset=1');
 			} else if (!result.success) {
-				toast.error(result.error || 'Failed to create user');
+				toast.error(result.error || 'Failed to reset the password');
 
 				if (result.details) {
 					for (const [field, msg] of Object.entries(result.details)) {
@@ -91,7 +89,7 @@ export default function SignupPage() {
 				}
 			} else {
 				// Fallback safety net (shouldn't normally hit this)
-				toast.error('Failed to create user');
+				toast.error('Failed to reset the password');
 			}
 		} catch (error: unknown) {
 			// Handle fetch errors or aborts gracefully
@@ -99,7 +97,7 @@ export default function SignupPage() {
 				toast.error('Request timed out. Please try again.');
 			} else {
 				toast.error('Unexpected error occurred');
-				console.error('Signup error:', error);
+				console.error('Reset Password error:', error);
 			}
 		}
 	};
@@ -118,33 +116,10 @@ export default function SignupPage() {
 				</div>
 			</Link>
 
-			<h1 className={styles.title}>Create a new account</h1>
+			<h1 className={styles.title}>Create a new password</h1>
+			<h1 className={styles.text}>Your new password must be different from previous used password.</h1>
 
 			<form onSubmit={(e) => void handleSubmit(onSubmit)(e)} noValidate>
-				<FormInput<SignupFormData>
-					id="username"
-					label="Username"
-					type="text"
-					register={register('username')}
-					error={errors.username}
-					validation={(value) => validateUsername(value)}
-					setError={setError}
-					clearErrors={clearErrors}
-					isSubmitted={isSubmitted}
-				/>
-
-				<FormInput<SignupFormData>
-					id="email"
-					label="Email"
-					type="email"
-					register={register('email')}
-					error={errors.email}
-					validation={(value) => validateEmail(value)}
-					setError={setError}
-					clearErrors={clearErrors}
-					isSubmitted={isSubmitted}
-				/>
-
 				<FormInput<SignupFormData>
 					id="password"
 					label="Password"
@@ -178,7 +153,7 @@ export default function SignupPage() {
 					loaderColor="#121212"
 					loaderBorderWidth={3}
 					aria-label="Submit form">
-					Sign Up
+					Reset Password
 				</Button>
 			</form>
 

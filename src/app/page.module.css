@@ -6,12 +6,12 @@
   --button-secondary-hover: #f2f2f2;
 
   display: grid;
-  place-items: center center;
   padding: 80px;
   font-family: var(--font-geist-sans);
   gap: 64px;
   grid-template-rows: 20px 1fr 20px;
   min-height: 100svh;
+  place-items: center center;
 }
 
 @media (prefers-color-scheme: dark) {

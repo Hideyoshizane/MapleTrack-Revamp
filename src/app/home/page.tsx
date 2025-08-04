@@ -1,7 +1,8 @@
 // app/page.tsx
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+
+import { authOptions } from '@/lib/authOptions';
 
 export default async function HomePage() {
 	// Check for session on the server

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+
 import styles from './page.module.css';
 
 const version = process.env.APP_VERSION;

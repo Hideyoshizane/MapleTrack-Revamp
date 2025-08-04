@@ -1,10 +1,13 @@
-import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
+import { clsx } from 'clsx';
 import { Roboto } from 'next/font/google';
+import { cookies } from 'next/headers';
 
-import CustomToaster from '@components/Toaster/Toaster';
 import { type Theme } from '@/lib/theme';
-import clsx from 'clsx';
+import CustomToaster from '@components/Toaster/Toaster';
+
+import { Providers } from './providers';
+
+import type { Metadata } from 'next';
 
 import './globals.css';
 
@@ -30,7 +33,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 		<html lang="en">
 			<body className={clsx(roboto.className, theme)}>
 				<CustomToaster theme={theme} reverseOrder={false} />
-				<main>{children}</main>
+				<Providers>
+					<main>{children}</main>
+				</Providers>
 			</body>
 		</html>
 	);

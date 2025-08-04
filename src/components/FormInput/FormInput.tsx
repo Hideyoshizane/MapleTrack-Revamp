@@ -1,41 +1,53 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, InputHTMLAttributes, useRef } from 'react';
-import { FieldError, UseFormRegisterReturn, UseFormSetError, UseFormClearErrors } from 'react-hook-form';
-import clsx from 'clsx';
-
-import type { SignupFormData } from '@/sharedTypes/form';
+import { clsx } from 'clsx';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import styles from './FormInput.module.css';
 import ValidationIcon from './ValidationIcon';
 
-type FormInputProps = {
-	label: string;
-	id: keyof SignupFormData;
-	error?: FieldError;
-	register: UseFormRegisterReturn;
-	validation?: (value: string) => { isValid: boolean; error?: string };
-	setError?: UseFormSetError<SignupFormData>;
-	clearErrors?: UseFormClearErrors<SignupFormData>;
-	isSubmitted?: boolean;
-	isLogin?: boolean;
-} & InputHTMLAttributes<HTMLInputElement>;
+import type { HTMLInputTypeAttribute } from 'react';
+import type {
+	Path,
+	FieldError,
+	UseFormClearErrors,
+	UseFormRegisterReturn,
+	UseFormSetError,
+	FieldValues,
+} from 'react-hook-form';
 
-export default function FormInput({
-	label,
+interface FormInputProps<TFieldValues extends FieldValues> {
+	id: Path<TFieldValues>;
+	label: string;
+	type: HTMLInputTypeAttribute;
+	register: UseFormRegisterReturn;
+	error?: FieldError;
+	validation?: (value: string) => { isValid: boolean; error?: string };
+	setError: UseFormSetError<TFieldValues>;
+	clearErrors: UseFormClearErrors<TFieldValues>;
+	isSubmitted: boolean;
+	isLogin?: boolean;
+	defaultValue?: string;
+}
+
+export default function FormInput<TFieldValues extends FieldValues>({
 	id,
-	type = 'text',
-	error,
+	label,
+	type,
 	register,
+	error,
 	validation,
 	setError,
 	clearErrors,
-	isSubmitted = false,
-	isLogin = false,
-	...rest
-}: FormInputProps) {
+	isSubmitted,
+	isLogin,
+	defaultValue,
+}: FormInputProps<TFieldValues>) {
+	// Destructure built-in React Hook Form events, spreading the rest into <input>
+	const { onBlur: rhfOnBlur, onChange: rhfOnChange, ref, name, ...registerRest } = register;
+
+	const [inputValue, setInputValue] = useState<string>(defaultValue ?? '');
 	const [touched, setTouched] = useState(false);
-	const [inputValue, setInputValue] = useState<string>((rest.value as string) ?? (rest.defaultValue as string) ?? '');
 	const [isLocallyValid, setIsLocallyValid] = useState<boolean | null>(null);
 	const [localErrorMessage, setLocalErrorMessage] = useState<string | null>(null);
 
@@ -47,9 +59,6 @@ export default function FormInput({
 
 	// Track previous submission state to prevent redundant validations
 	const prevIsSubmitted = useRef(false);
-
-	// Destructure built-in React Hook Form events, spreading the rest into <input>
-	const { onBlur: rhfOnBlur, onChange: rhfOnChange, ...registerRest } = register;
 
 	//Validates the input value and updates internal state and optionally sets or clears RHF errors.
 	const runValidation = useCallback(
@@ -111,7 +120,6 @@ export default function FormInput({
 			setTouched(true);
 			runValidation(inputValue);
 		}
-		// Only run once on mount
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -128,7 +136,7 @@ export default function FormInput({
 	const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
 		setTouched(true);
 		runValidation(e.target.value);
-		rhfOnBlur?.(e);
+		void rhfOnBlur?.(e);
 	};
 
 	// Handle change: mark as touched, update state, validate
@@ -137,7 +145,7 @@ export default function FormInput({
 		const newValue = e.target.value;
 		setInputValue(newValue);
 		runValidation(newValue);
-		rhfOnChange?.(e);
+		void rhfOnChange?.(e);
 	};
 
 	// Flags to control rendering of validation status
@@ -146,9 +154,7 @@ export default function FormInput({
 	const showInvalid = touched && (Boolean(error) || isLocallyValid === false);
 
 	const tooltipMessage =
-		showError || isLocallyValid === false
-			? localErrorMessage ?? error?.message ?? 'Invalid input'
-			: rest.title ?? 'Enter a value';
+		showError || isLocallyValid === false ? (localErrorMessage ?? error?.message ?? 'Invalid input') : 'Enter a value';
 
 	// Compute the container class to add margin if is signup
 	const containerClass = clsx(styles.inputContainer, {
@@ -175,7 +181,8 @@ export default function FormInput({
 					value={inputValue}
 					onBlur={handleBlur}
 					onChange={handleChange}
-					{...rest}
+					ref={ref}
+					name={name}
 					{...registerRest}
 				/>
 

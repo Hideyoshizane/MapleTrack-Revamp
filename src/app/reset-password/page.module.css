@@ -12,35 +12,41 @@
     margin-top: 5%;
 }
 
-.forgotPassword {
-    font-size: 1rem;
-    text-align: end;
-    color: var(--default-white);
-    cursor: pointer;
-    margin-bottom: 32px;
+.titleDiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 320px;
+    margin-bottom: 16px;
 }
 
-.signupText {
-    font-size: 1rem;
+.icon {
+    color: var(--default-white);
+    margin-right: 16px;
+}
+
+.title {
+    font-size: 2rem;
     text-align: center;
     color: var(--default-white);
-    margin-top: 32px;
+    margin-bottom: 8px;
+
 }
 
-.signupLink {
-    color: var(--link-color);
-    cursor: pointer;
-    text-decoration: underline;
+.text {
+    width: 320px;
+    font-size: 0.875rem;
+    font-weight: 300;
+    line-height: 1.4;
+    color: var(--background-white);
+    margin-bottom: 24px;
 }
-
-.signupLink:hover {
-    color: var(--link-color-hover);
-}
-
 
 .submitButton {
     width: 320px;
     height: 48px;
     border: 1px solid var(--primary-color-button);
     background-color: var(--primary-color-button);
+    margin-left: 32px;
+    margin-top: 8px;
 }

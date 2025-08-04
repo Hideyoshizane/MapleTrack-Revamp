@@ -26,8 +26,8 @@
 			"@service/*": ["./src/service/*"],
 			"@utils/*": ["./src/utils/*"],
 			"@schemas/*": ["./src/schemas/*"],
-			"@types/*": ["./src/sharedTypes/*"],
-			"@assets/*": ["./src/assets/*"]
+			"@assets/*": ["./src/assets/*"],
+			"@sharedTypes/*": ["./src/shared/types/*"]
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next.config.js"],

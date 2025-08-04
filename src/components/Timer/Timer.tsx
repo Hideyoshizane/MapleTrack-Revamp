@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import duration from 'dayjs/plugin/duration';
+import utc from 'dayjs/plugin/utc';
+import React, { useEffect, useState, useCallback } from 'react';
 
 import styles from './Timer.module.css';
 

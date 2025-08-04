@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 // Validate the environment variable and fallback to local DB
-const MONGODB_URI = process.env.DB_URLXXXXX || 'mongodb://localhost:27017/MapleTrack';
+const MONGODB_URL = process.env.DB_URLXXXXX || 'mongodb://localhost:27017/MapleTrack';
 
 // Define a custom global type to preserve the connection across hot reloads
 type MongooseGlobal = typeof globalThis & {
@@ -31,7 +31,7 @@ async function connectToDatabase(): Promise<mongoose.Mongoose> {
 
 	// If a connection promise doesn't exist, create one
 	if (!globalWithMongoose.mongoose.promise) {
-		globalWithMongoose.mongoose.promise = mongoose.connect(MONGODB_URI, {
+		globalWithMongoose.mongoose.promise = mongoose.connect(MONGODB_URL, {
 			bufferCommands: false, // Disable mongoose buffering to avoid unexpected behavior
 			serverSelectionTimeoutMS: 10000, // Fail if cannot connect in 10s
 			socketTimeoutMS: 20000, // Cancel requests if no response in 20s

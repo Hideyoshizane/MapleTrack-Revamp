@@ -57,7 +57,7 @@ const userSchema = new Schema<IUser>({
 	},
 });
 // Create the User model if it doesn't already exist (to avoid model overwrite in dev)
-const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
+const User: Model<IUser> = (mongoose.models.User as Model<IUser>) || mongoose.model<IUser>('User', userSchema);
 
 export default User;
 export { LASTVERSION };

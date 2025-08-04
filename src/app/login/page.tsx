@@ -2,44 +2,72 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-
+import { useSearchParams, useRouter } from 'next/navigation';
+import { signIn, useSession } from 'next-auth/react';
 import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { signIn } from 'next-auth/react';
 
+import Button from '@components/Button/Button';
+import FooterOutside from '@components/FooterOutside/FooterOutside';
 import FormInput from '@components/FormInput/FormInput';
-import FooterOutside from '@/components/FooterOutside/FooterOutside';
-import Button from '@/components/Button/Button';
-
-import { validateUsernameLogin, validatePasswordLogin } from '@/utils/validation';
-import { sanitizeInputFrontend } from '@/utils/sanitize';
-
-import type { LoginFormData } from '@/sharedTypes/form';
+import { sanitizeInputFrontend } from '@utils/sanitize';
+import { validateUsernameLogin, validatePasswordLogin, handleFieldValidation } from '@utils/validation';
 
 import styles from './page.module.css';
 
-export default function LoginPage() {
-	const searchParams = useSearchParams();
-	const router = useRouter();
+import type { LoginFormData } from '@sharedTypes/form';
+import type { ValidationResult } from '@utils/validation';
 
-	// prevents duplicate toasts on rerender
+export default function LoginPage() {
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const { status } = useSession();
+
+	// Prevents duplicate toasts on rerender
 	const hasShownToast = useRef(false);
 
+	// Redirect to /home if user is already authenticated
 	useEffect(() => {
-		const success = searchParams.get('success');
-		const unauthorized = searchParams.get('unauthorized');
+		if (status === 'authenticated') {
+			router.push('/home');
+		}
+	}, [status, router]);
 
-		if (!hasShownToast.current) {
-			if (success === '1') {
-				toast.success('Account created! Please log in.');
+	useEffect(() => {
+		// Prevent duplicate toast messages
+		if (hasShownToast.current) return;
+
+		// Define inside the effect to avoid dependency warnings
+		const toastMessages: Record<string, { message: string; type: 'success' | 'error' }> = {
+			success: {
+				message: 'Account created! Please log in.',
+				type: 'success',
+			},
+			reset: {
+				message: 'Reset password successfully! Please log in.',
+				type: 'success',
+			},
+			unauthorized: {
+				message: 'You must be logged in to access that page.',
+				type: 'error',
+			},
+		};
+
+		for (const [param, { message, type }] of Object.entries(toastMessages)) {
+			const value = searchParams.get(param);
+			if (value === '1') {
+				if (type === 'success') {
+					toast.success(message);
+				} else {
+					toast.error(message);
+				}
+
 				hasShownToast.current = true;
+
+				// Redirect to login and remove query params
 				router.replace('/login');
-			} else if (unauthorized === '1') {
-				toast.error('You must be logged in to access that page.');
-				hasShownToast.current = true;
-				router.replace('/login');
+				break;
 			}
 		}
 	}, [searchParams, router]);
@@ -49,6 +77,7 @@ export default function LoginPage() {
 		handleSubmit,
 		formState: { errors, isSubmitting, isSubmitted },
 		setError,
+		clearErrors,
 	} = useForm<LoginFormData>({
 		mode: 'onBlur', // Validate when field loses focus
 	});
@@ -60,20 +89,17 @@ export default function LoginPage() {
 			const password = sanitizeInputFrontend(data.password);
 
 			// Client-side validation
-			const usernameValidation = validateUsernameLogin(username);
-			const passwordValidation = validatePasswordLogin(password);
+			const validations = {
+				username: validateUsernameLogin(username),
+				password: validatePasswordLogin(password),
+			};
 
+			// If any validation fails, set errors and abort submission
 			let hasErrors = false;
-			if (!usernameValidation.isValid) {
-				setError('username', { message: usernameValidation.error });
-				toast.error(usernameValidation.error ?? 'Invalid username');
-				hasErrors = true;
-			}
-			if (!passwordValidation.isValid) {
-				setError('password', { message: passwordValidation.error });
-				toast.error(passwordValidation.error ?? 'Invalid password');
-				hasErrors = true;
-			}
+			(Object.entries(validations) as [keyof typeof validations, ValidationResult][]).forEach(([field, result]) => {
+				const errorFound = handleFieldValidation(field, result, setError);
+				if (errorFound) hasErrors = true;
+			});
 			if (hasErrors) return;
 
 			// Use NextAuth signIn with credentials
@@ -108,23 +134,27 @@ export default function LoginPage() {
 				/>
 			</div>
 
-			<form onSubmit={handleSubmit(onSubmit)} noValidate>
-				<FormInput
+			<form onSubmit={(e) => void handleSubmit(onSubmit)(e)} noValidate>
+				<FormInput<LoginFormData>
 					id="username"
 					label="Username"
 					type="text"
 					register={register('username')}
 					error={errors.username}
+					setError={setError}
+					clearErrors={clearErrors}
 					isSubmitted={isSubmitted}
 					isLogin
 				/>
 
-				<FormInput
+				<FormInput<LoginFormData>
 					id="password"
 					label="Password"
 					type="password"
 					register={register('password')}
 					error={errors.password}
+					setError={setError}
+					clearErrors={clearErrors}
 					isSubmitted={isSubmitted}
 					isLogin
 				/>

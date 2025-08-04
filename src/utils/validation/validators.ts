@@ -1,11 +1,15 @@
-import { userSchema } from '@/schemas/user';
+import toast from 'react-hot-toast';
 import reserved from 'reserved-usernames';
+
+import { userSchema } from '@schemas/user';
+
 import { normalizeEmail, normalizeUsername } from './normalize';
+
 
 const CUSTOM_RESERVED = ['mapletrack', 'maple-track'];
 const RESERVED_USERNAMES = new Set([...reserved, ...CUSTOM_RESERVED.map((u) => u.toLowerCase())]);
 
-type ValidationResult = {
+export type ValidationResult = {
 	isValid: boolean;
 	error?: string;
 };
@@ -108,4 +112,18 @@ export function validatePasswordConfirmation(password: unknown, confirmPassword:
 	}
 
 	return { isValid: true };
+}
+
+export function handleFieldValidation<T extends string>(
+	field: T,
+	validationResult: ValidationResult,
+	setError: (field: T, error: { message: string }) => void
+): boolean {
+	if (!validationResult.isValid) {
+		const errorMessage = validationResult.error ?? `Invalid ${field}`;
+		setError(field, { message: errorMessage });
+		toast.error(errorMessage);
+		return true;
+	}
+	return false;
 }

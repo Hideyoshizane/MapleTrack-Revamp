@@ -1,6 +1,8 @@
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+
 import { themeFromPath } from '@lib/theme';
+
+import type { NextRequest } from 'next/server';
 
 // Middleware function to set a 'theme' cookie based on the current pathname
 export function middleware(req: NextRequest) {

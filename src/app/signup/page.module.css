@@ -6,8 +6,8 @@
 
 .logoDiv {
     position: relative;
-    width: 880px;
-    height: 293px;
+    width: 750px;
+    height: 250px;
     margin-bottom: 32px;
     margin-top: 5%;
 }
@@ -19,7 +19,7 @@
 }
 
 .submitButton {
-    width: 300px;
+    width: 320px;
     height: 48px;
     border: 1px solid var(--primary-color-button);
     background-color: var(--primary-color-button);
