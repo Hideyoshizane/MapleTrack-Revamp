@@ -4,7 +4,7 @@ export const userSchema = z.object({
 	username: z
 		.string()
 		.min(3, 'Username must be at least 3 characters.')
-		.max(32, 'Username must be at most 32 characters.'),
+		.max(16, 'Username must be at most 32 characters.'),
 	email: z.email('Invalid email format.').max(100, 'Email must be at most 100 characters.'),
 	password: z
 		.string()

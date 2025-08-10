@@ -3,6 +3,8 @@ import type {
 	SignupRequestBody,
 	ResetPasswordRequestBody,
 	ForgotPasswordRequestBody,
+	ChangePasswordRequestBody,
+	DeleteAccountRequestBody,
 } from '@sharedTypes/api/auth';
 
 // Login just reuses credentials
@@ -20,3 +22,11 @@ export type ForgotPasswordFormData = ForgotPasswordRequestBody;
 export type ResetPasswordFormData = ResetPasswordRequestBody & {
 	confirmPassword: string;
 };
+
+// Change password frontend form data extends backend + confirmPassword
+export type ChangePasswordFormData = ChangePasswordRequestBody & {
+	confirmPassword: string;
+};
+
+// Delete Account frontend form data extends backend
+export type deleteAccountData = DeleteAccountRequestBody;

@@ -28,6 +28,7 @@ interface FormInputProps<TFieldValues extends FieldValues> {
 	isSubmitted: boolean;
 	isLogin?: boolean;
 	defaultValue?: string;
+	isLightmode?: boolean;
 }
 
 export default function FormInput<TFieldValues extends FieldValues>({
@@ -42,6 +43,7 @@ export default function FormInput<TFieldValues extends FieldValues>({
 	isSubmitted,
 	isLogin,
 	defaultValue,
+	isLightmode = false,
 }: FormInputProps<TFieldValues>) {
 	// Destructure built-in React Hook Form events, spreading the rest into <input>
 	const { onBlur: rhfOnBlur, onChange: rhfOnChange, ref, name, ...registerRest } = register;
@@ -154,7 +156,7 @@ export default function FormInput<TFieldValues extends FieldValues>({
 	const showInvalid = touched && (Boolean(error) || isLocallyValid === false);
 
 	const tooltipMessage =
-		showError || isLocallyValid === false ? (localErrorMessage ?? error?.message ?? 'Invalid input') : 'Enter a value';
+		showError || isLocallyValid === false ? localErrorMessage ?? error?.message ?? 'Invalid input' : 'Enter a value';
 
 	// Compute the container class to add margin if is signup
 	const containerClass = clsx(styles.inputContainer, {
@@ -165,11 +167,11 @@ export default function FormInput<TFieldValues extends FieldValues>({
 	const inputClass = clsx(styles.input, {
 		[styles.valid]: !isLogin && showValid,
 		[styles.invalid]: !isLogin && showInvalid,
+		[styles.lightModeInput]: isLightmode,
 	});
 
 	return (
 		<div className={containerClass}>
-			<label htmlFor={id} className={styles.label} />
 			<div className={styles.inputRow}>
 				<input
 					id={id}
@@ -188,7 +190,12 @@ export default function FormInput<TFieldValues extends FieldValues>({
 
 				{!isLogin && (
 					<div className={styles.icon}>
-						<ValidationIcon showValid={showValid} showInvalid={showInvalid} tooltipMessage={tooltipMessage} />
+						<ValidationIcon
+							showValid={showValid}
+							showInvalid={showInvalid}
+							tooltipMessage={tooltipMessage}
+							isLightmode={isLightmode}
+						/>
 					</div>
 				)}
 			</div>

@@ -19,7 +19,7 @@ const userSchema = new Schema<IUser>({
 		type: String,
 		required: true,
 		minlength: 3,
-		maxlength: 32,
+		maxlength: 16,
 		unique: true,
 		trim: true,
 	},

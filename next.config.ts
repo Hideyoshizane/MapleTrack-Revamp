@@ -1,15 +1,15 @@
 import withBundleAnalyzer from '@next/bundle-analyzer';
 
 import type { NextConfig } from 'next';
+import type { Configuration } from 'webpack';
 
-// Enable bundle analyzer only when ANALYZE env var is true
 const bundleAnalyzer = withBundleAnalyzer({
 	enabled: process.env.ANALYZE === 'true',
-});
+}) as (config: NextConfig) => NextConfig;
 
 const nextConfig: NextConfig = {
-	webpack(config) {
-		config.module.rules.push({
+	webpack(config: Configuration) {
+		config.module!.rules.push({
 			test: /\.svg$/,
 			issuer: /\.[jt]sx?$/,
 			use: [

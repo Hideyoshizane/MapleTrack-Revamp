@@ -19,9 +19,11 @@
 }
 
 .arrowDark {
+    transform: translateY(-0.5px);
     fill: var(--default-black);
 }
 
 .arrowLight {
+    transform: translateY(-0.5px);
     fill: var(--default-white);
 }

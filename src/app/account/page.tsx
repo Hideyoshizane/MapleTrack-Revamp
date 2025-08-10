@@ -4,13 +4,13 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import Navbar from '@components/Navbar/Navbar';
 
-import HomePageClient from './HomePageClient';
+import AccountPageClient from './AccountPageClient';
 
-interface HomePageProps {
+interface AccountPage {
 	searchParams?: Record<string, string | undefined>;
 }
 
-export default async function HomePage({ searchParams }: HomePageProps) {
+export default async function AccountPage({ searchParams }: AccountPage) {
 	const session = await getServerSession(authOptions);
 
 	// If no session, redirect to login with a query param
@@ -21,7 +21,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 	return (
 		<main className="container">
 			<Navbar username={session.user.username} />
-			<HomePageClient searchParams={searchParams} username={session.user.username} />
+			<AccountPageClient searchParams={searchParams} username={session.user.username} />
 		</main>
 	);
 }

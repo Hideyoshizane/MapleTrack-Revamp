@@ -27,6 +27,12 @@
     transition: border-color 0.2s;
 }
 
+.lightModeInput {
+    border: 2px solid var(--placeholder-color-text);
+    background-color: #FFF;
+    border-radius: 5px;
+}
+
 .input::placeholder {
     color: var(--placeholder-color-text);
 }
@@ -55,16 +61,4 @@
 
 .invalid {
     border-color: var(--icon-danger-color);
-}
-
-.validIcon {
-    color: var(--icon-cta-color);
-}
-
-.invalidIcon {
-    color: var(--icon-danger-color);
-}
-
-.defaultIcon {
-    color: var(--default-white);
 }

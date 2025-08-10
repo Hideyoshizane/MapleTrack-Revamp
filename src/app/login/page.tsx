@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 
@@ -20,23 +20,27 @@ import type { LoginFormData } from '@sharedTypes/form';
 import type { ValidationResult } from '@utils/validation';
 
 export default function LoginPage() {
+	const { status } = useSession();
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const { status } = useSession();
+
+	// Track if the user just logged in successfully on this page
+	const [justLoggedIn, setJustLoggedIn] = useState(false);
 
 	// Prevents duplicate toasts on rerender
-	const hasShownToast = useRef(false);
+	const [hasShownToast, setHasShownToast] = useState(false);
 
-	// Redirect to /home if user is already authenticated
+	// Redirect only if user is authenticated AND NOT just logged in here
 	useEffect(() => {
-		if (status === 'authenticated') {
-			router.push('/home');
+		if (status === 'authenticated' && !justLoggedIn) {
+			// Use replace to avoid adding extra history entries
+			router.replace('/home?logged=1');
 		}
-	}, [status, router]);
+	}, [status, justLoggedIn, router]);
 
 	useEffect(() => {
 		// Prevent duplicate toast messages
-		if (hasShownToast.current) return;
+		if (hasShownToast) return;
 
 		// Define inside the effect to avoid dependency warnings
 		const toastMessages: Record<string, { message: string; type: 'success' | 'error' }> = {
@@ -52,6 +56,10 @@ export default function LoginPage() {
 				message: 'You must be logged in to access that page.',
 				type: 'error',
 			},
+			accountDeleted: {
+				message: 'Account deleted successfully.',
+				type: 'success',
+			},
 		};
 
 		for (const [param, { message, type }] of Object.entries(toastMessages)) {
@@ -63,14 +71,14 @@ export default function LoginPage() {
 					toast.error(message);
 				}
 
-				hasShownToast.current = true;
+				setHasShownToast(true);
 
-				// Redirect to login and remove query params
+				// Remove query params by replacing URL with clean path to prevent duplicate toasts on reload
 				router.replace('/login');
 				break;
 			}
 		}
-	}, [searchParams, router]);
+	}, [searchParams, hasShownToast, router]);
 
 	const {
 		register,
@@ -111,10 +119,12 @@ export default function LoginPage() {
 
 			if (res?.error) {
 				toast.error(res.error);
-				// Optionally map error to field errors if possible
 			} else {
+				// Mark fresh login to avoid redirect in effect
+				setJustLoggedIn(true);
+
 				toast.success('Login successful!');
-				router.push('/home'); // redirect after login success
+				window.location.href = '/home'; // redirect after login success
 			}
 		} catch (err) {
 			toast.error('Unexpected error occurred');
@@ -123,15 +133,9 @@ export default function LoginPage() {
 	};
 
 	return (
-		<main className={styles.container}>
+		<div className={styles.container}>
 			<div className={styles.logoDiv}>
-				<Image
-					src="/assets/logo/logo.webp"
-					priority
-					fill
-					sizes="(max-width: 1024px) 100vw, 880px"
-					alt="MapleTrack Logo"
-				/>
+				<Image src="/assets/logo/logo.webp" priority fill sizes="750px" alt="MapleTrack Logo" />
 			</div>
 
 			<form onSubmit={(e) => void handleSubmit(onSubmit)(e)} noValidate>
@@ -162,8 +166,16 @@ export default function LoginPage() {
 					<p className={styles.forgotPassword}>Forgot password?</p>
 				</Link>
 
-				<Button type="submit" disabled={isSubmitting} className={styles.submitButton} aria-busy={isSubmitting}>
-					{isSubmitting ? 'Submitting...' : 'Login'}
+				<Button
+					type="submit"
+					className={styles.submitButton}
+					isLoading={isSubmitting}
+					loadingText="Loading..."
+					loaderSize={16}
+					loaderColor="#121212"
+					loaderBorderWidth={3}
+					aria-label="Submit form">
+					Login
 				</Button>
 
 				<p className={styles.signupText}>
@@ -175,6 +187,6 @@ export default function LoginPage() {
 			</form>
 
 			<FooterOutside />
-		</main>
+		</div>
 	);
 }

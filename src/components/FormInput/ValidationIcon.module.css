@@ -1,0 +1,15 @@
+.validIcon {
+    color: var(--icon-cta-color);
+}
+
+.invalidIcon {
+    color: var(--icon-danger-color);
+}
+
+.defaultIcon {
+    color: var(--default-white);
+}
+
+.lightModeDefaultIcon {
+    color: var(--placeholder-color-text);
+}

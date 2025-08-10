@@ -57,3 +57,35 @@ export interface ResetPasswordRequestBody {
 export interface ForgotPasswordRequestBody {
 	email: string;
 }
+
+export interface ChangePasswordRequestBody {
+	username: string;
+	currentPassword: string;
+	newPassword: string;
+}
+
+export type ChangePasswordFormData = ChangePasswordRequestBody & {
+	confirmPassword: string;
+};
+
+// Success response type for change password
+export type ChangePasswordSuccessResponse = BaseSuccessResponse;
+
+// Error response type with optional field-level errors on ChangePasswordFormData
+export type ChangePasswordErrorResponse = BaseErrorResponse<ChangePasswordFormData>;
+
+// Union type for ChangePassword API response
+export type ChangePasswordApiResponse = ChangePasswordSuccessResponse | ChangePasswordErrorResponse;
+
+//Delete account
+export interface DeleteAccountRequestBody {
+	username: string;
+}
+// Success response type for delete account
+export type DeleteAccountSuccessResponse = BaseSuccessResponse;
+
+// Error response type with optional field-level errors on ChangePasswordFormData
+export type DeleteAccountErrorResponse = BaseErrorResponse<ChangePasswordFormData>;
+
+// Union type for ChangePassword API response
+export type DeleteAccountApiResponse = DeleteAccountSuccessResponse | DeleteAccountErrorResponse;

@@ -16,10 +16,16 @@ const compat = new FlatCompat({
 
 // Dynamically import plugins because `require()` doesn't work in .mjs
 const eslintConfig = async () => {
-	const [{ default: importPlugin }, { default: tsPlugin }, { default: unusedImportsPlugin }] = await Promise.all([
+	const [
+		{ default: importPlugin },
+		{ default: tsPlugin },
+		{ default: unusedImportsPlugin },
+		{ default: cssModulesPlugin },
+	] = await Promise.all([
 		import('eslint-plugin-import'),
 		import('@typescript-eslint/eslint-plugin'),
 		import('eslint-plugin-unused-imports'),
+		import('eslint-plugin-css-modules'),
 	]);
 
 	return [
@@ -51,6 +57,7 @@ const eslintConfig = async () => {
 			plugins: {
 				'@typescript-eslint': tsPlugin,
 				'unused-imports': unusedImportsPlugin,
+				'css-modules': cssModulesPlugin,
 			},
 			rules: {
 				'unused-imports/no-unused-imports': 'error',
@@ -63,6 +70,7 @@ const eslintConfig = async () => {
 						argsIgnorePattern: '^_',
 					},
 				],
+				'css-modules/no-unused-class': [2, { camelCase: true }],
 			},
 		},
 
@@ -75,6 +83,7 @@ const eslintConfig = async () => {
 			plugins: {
 				import: importPlugin,
 				'unused-imports': unusedImportsPlugin,
+				'css-modules': cssModulesPlugin,
 			},
 			rules: {
 				'unused-imports/no-unused-imports': 'error',
@@ -87,6 +96,7 @@ const eslintConfig = async () => {
 						argsIgnorePattern: '^_',
 					},
 				],
+				'css-modules/no-unused-class': [2, { camelCase: true }],
 			},
 		},
 

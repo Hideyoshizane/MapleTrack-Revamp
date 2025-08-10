@@ -35,6 +35,7 @@ export default function ResetPasswordPage() {
 	const token = searchParams.get('token');
 
 	const router = useRouter();
+
 	const onSubmit = async (data: SignupFormData) => {
 		try {
 			if (!token) {
@@ -103,16 +104,10 @@ export default function ResetPasswordPage() {
 	};
 
 	return (
-		<main className={styles.container}>
+		<div className={styles.container}>
 			<Link href="/login" aria-label="Go to login page">
 				<div className={styles.logoDiv}>
-					<Image
-						src="/assets/logo/logo.webp"
-						priority
-						fill
-						sizes="(max-width: 1024px) 100vw, 880px"
-						alt="MapleTrack Logo"
-					/>
+					<Image src="/assets/logo/logo.webp" priority fill sizes="750px" alt="MapleTrack Logo" />
 				</div>
 			</Link>
 
@@ -158,6 +153,6 @@ export default function ResetPasswordPage() {
 			</form>
 
 			<FooterOutside />
-		</main>
+		</div>
 	);
 }

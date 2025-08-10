@@ -1,0 +1,45 @@
+.menuOpener {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 280px;
+    height: 120px;
+    border: none;
+    font-size: 32px;
+    color: var(--default-white);
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+    padding-left: 8px;
+    text-decoration: none;
+}
+
+.usernameText {
+    flex-shrink: 1;
+    max-width: 200px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.icon {
+    color: var(--default-white);
+    flex-shrink: 0;
+    margin-right: 16px;
+}
+
+
+.dropdownContent {
+    z-index: 1001;
+    background-color: var(--default-black);
+    border-radius: 8px;
+    margin-right: 8px;
+    overflow: hidden;
+}
+
+.separator {
+    height: 1px;
+    margin: 0;
+    background-color: var(--default-white);
+}

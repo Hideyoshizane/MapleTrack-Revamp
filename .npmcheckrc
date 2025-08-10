@@ -13,7 +13,8 @@
 			"eslint-plugin-react-hooks",
 			"stylelint",
 			"stylelint-config-standard",
-			"stylelint-order"
+			"stylelint-order",
+			"cross-env"
 		]
 	}
 }

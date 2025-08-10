@@ -12,18 +12,6 @@
     margin-top: 5%;
 }
 
-.titleDiv {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 320px;
-    margin-bottom: 16px;
-}
-
-.icon {
-    color: var(--default-white);
-    margin-right: 16px;
-}
 
 .title {
     font-size: 2rem;

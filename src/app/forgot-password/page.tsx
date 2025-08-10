@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
 	};
 
 	return (
-		<main className={styles.container}>
+		<div className={styles.container}>
 			<Link href="/login" aria-label="Go to login page">
 				<div className={styles.logoDiv}>
 					<Image
@@ -120,8 +120,16 @@ export default function ForgotPasswordPage() {
 					isLogin
 				/>
 
-				<Button type="submit" disabled={isSubmitting} className={styles.submitButton} aria-busy={isSubmitting}>
-					{isSubmitting ? 'Submitting...' : 'Send Reset Link'}
+				<Button
+					type="submit"
+					className={styles.submitButton}
+					isLoading={isSubmitting}
+					loadingText="Submitting..."
+					loaderSize={16}
+					loaderColor="#121212"
+					loaderBorderWidth={3}
+					aria-label="Submit form">
+					Send Reset Link
 				</Button>
 
 				<div className={styles.orDiv}>
@@ -136,6 +144,6 @@ export default function ForgotPasswordPage() {
 			</form>
 
 			<FooterOutside />
-		</main>
+		</div>
 	);
 }
