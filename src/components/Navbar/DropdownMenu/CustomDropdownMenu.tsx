@@ -6,7 +6,7 @@ import { Textfit } from 'react-textfit';
 
 import MenuIcon from '@assets/svg/menu.svg';
 
-import styles from './DropdownMenu.module.css';
+import styles from './CustomDropdownMenu.module.css';
 import DropdownMenuButton from './DropdownMenuButton/DropdownMenuButton';
 import LogoutButton from './DropdownMenuButton/LogoutButton';
 

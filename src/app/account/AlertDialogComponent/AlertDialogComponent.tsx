@@ -16,10 +16,10 @@ export default function AlertDialogComponent({ open, onOpenChange, onConfirm }: 
 		<AlertDialog.Root open={open} onOpenChange={onOpenChange}>
 			<AlertDialog.Portal>
 				<AlertDialog.Overlay className={styles.overlay} />
-				<AlertDialog.Content className={styles.content} aria-describedby="alert-dialog-description">
+				<AlertDialog.Content className={styles.content}>
 					<AlertDialog.Title className={styles.title}>{'Are you absolutely sure?'}</AlertDialog.Title>
 
-					<AlertDialog.Description id="alert-dialog-description" className={styles.description}>
+					<AlertDialog.Description className={styles.description}>
 						This action cannot be undone. This will permanently delete your account and remove your data from our
 						servers.
 					</AlertDialog.Description>
@@ -28,6 +28,8 @@ export default function AlertDialogComponent({ open, onOpenChange, onConfirm }: 
 						<AlertDialog.Cancel asChild>
 							<button className={styles.cancelButton}>Cancel</button>
 						</AlertDialog.Cancel>
+
+						{/* Confirm button */}
 						<AlertDialog.Action asChild>
 							<button
 								className={styles.dangerButton}

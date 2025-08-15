@@ -58,6 +58,14 @@ const eslintConfig = async () => {
 				'@typescript-eslint': tsPlugin,
 				'unused-imports': unusedImportsPlugin,
 				'css-modules': cssModulesPlugin,
+				import: importPlugin,
+			},
+			settings: {
+				'import/resolver': {
+					typescript: {
+						project: './tsconfig.json',
+					},
+				},
 			},
 			rules: {
 				'unused-imports/no-unused-imports': 'error',
@@ -84,6 +92,13 @@ const eslintConfig = async () => {
 				import: importPlugin,
 				'unused-imports': unusedImportsPlugin,
 				'css-modules': cssModulesPlugin,
+			},
+			settings: {
+				'import/resolver': {
+					typescript: {
+						project: './tsconfig.json',
+					},
+				},
 			},
 			rules: {
 				'unused-imports/no-unused-imports': 'error',

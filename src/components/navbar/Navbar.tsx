@@ -4,7 +4,7 @@ import React from 'react';
 
 import Timer from '@components/Timer/Timer';
 
-import { CustomDropdownMenu } from './DropdownMenu/DropdownMenu';
+import { CustomDropdownMenu } from './DropdownMenu/CustomDropdownMenu';
 import styles from './Navbar.module.css';
 import SearchBar from './SearchBar/SearchBar';
 
@@ -19,7 +19,7 @@ const Navbar: React.FC<NavbarProps> = ({ username }) => {
 		<nav className={styles.navBody}>
 			<Link href="/home">
 				<div className={styles.logoDiv}>
-					<Image src="/assets/logo/logo.webp" priority fill sizes="312px" alt="MapleTrack Logo" />
+					<Image src="/assets/logo/logo-nav.webp" priority fill sizes="312px" alt="MapleTrack Logo" />
 					<p className={styles.version}>{version}</p>
 				</div>
 			</Link>

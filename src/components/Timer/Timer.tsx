@@ -1,5 +1,6 @@
 'use client';
 
+import Skeleton from '@mui/material/Skeleton';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import utc from 'dayjs/plugin/utc';
@@ -81,7 +82,17 @@ const Timer: React.FC<TimerProps> = ({ target }) => {
 	const pad = (num: number) => num.toString().padStart(2, '0');
 
 	if (!timeLeft) {
-		return null;
+		return (
+			<div>
+				<Skeleton
+					variant="text"
+					animation="wave"
+					sx={{ bgcolor: 'rgba(255,255,255,0.2)' }}
+					className={styles.timer}
+					height={58}
+				/>
+			</div>
+		);
 	}
 
 	return (
