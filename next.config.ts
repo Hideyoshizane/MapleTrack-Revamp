@@ -8,6 +8,20 @@ const bundleAnalyzer = withBundleAnalyzer({
 }) as (config: NextConfig) => NextConfig;
 
 const nextConfig: NextConfig = {
+	images: {
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: 'www.nexon.com',
+				pathname: '/api/maplestory/**', // match your API image path
+			},
+			{
+				protocol: 'https',
+				hostname: 'msavatar1.nexon.net',
+				pathname: '/Character/**', // allow all character images
+			},
+		],
+	},
 	webpack(config: Configuration) {
 		config.module!.rules.push({
 			test: /\.svg$/,

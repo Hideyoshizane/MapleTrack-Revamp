@@ -1,20 +1,29 @@
 import { useState, useEffect } from 'react';
 
-import { getServerCookie, setServerCookie as setCookie } from '@utils/cookies/serverCookie';
+import { serverCookie, SERVER_OPTIONS, type ServerOption } from '@utils/cookies/serverCookie';
 
 export const useServerCookie = () => {
-	const [server, setServer] = useState<string | undefined>(undefined);
+	// State typed to exact allowed server names
+	const [server, setServer] = useState<ServerOption>('Scania');
 
 	useEffect(() => {
-		const current = getServerCookie() || 'Scania';
-		setServer(current);
-		setCookie(current);
+		// Get current cookie (returns array or undefined in new CookieManager)
+		const current = serverCookie.get();
+		const firstValue = Array.isArray(current) ? current[0] : current;
+
+		// Validate cookie: if invalid or missing, fallback to 'Scania'
+		const validServer: ServerOption = SERVER_OPTIONS.includes(firstValue ?? '')
+			? (firstValue as ServerOption)
+			: 'Scania';
+
+		setServer(validServer);
+		serverCookie.set([validServer]); // store as single-value array
 	}, []);
 
-	const setServerCookie = (name: string) => {
+	const setServerStateAndCookie = (name: ServerOption) => {
 		setServer(name);
-		setCookie(name);
+		serverCookie.set([name]); // store as single-value array
 	};
 
-	return { server, setServerCookie };
+	return { server, setServerCookie: setServerStateAndCookie };
 };

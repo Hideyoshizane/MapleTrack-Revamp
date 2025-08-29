@@ -1,11 +1,11 @@
 'use client';
 
-import Skeleton from '@mui/material/Skeleton';
 import { clsx } from 'clsx';
 import Image from 'next/image';
 import { useRef, useEffect, useState, useMemo } from 'react';
 
 import ChevronIcon from '@assets/svg/chevron-down.svg';
+import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 import serversJson from '@data/servers/servers.json';
 
 import styles from './ServerDropdown.module.css';
@@ -49,7 +49,7 @@ export default function ServerDropdown({ serverCookie, setServerCookie }: Server
 
 	// Skeleton placeholder while selectedServer is not ready
 	if (!selectedServer) {
-		return <Skeleton width={256} height={56} animation="wave" sx={{ bgcolor: 'rgba(0,0,0,0.3)' }} />;
+		return <SkeletonWrapper width={502} height={368} color="light" />;
 	}
 
 	return (
@@ -68,6 +68,7 @@ export default function ServerDropdown({ serverCookie, setServerCookie }: Server
 				<p className={styles.serverName}>{selectedServer.name}</p>
 				<ChevronIcon className={clsx(styles.icon, { [styles.rotatedActive]: isOpen, [styles.rotated]: true })} />
 			</div>
+			<hr className={styles.hr} />
 
 			{/* Dropdown list */}
 			<div className={styles.serversList}>

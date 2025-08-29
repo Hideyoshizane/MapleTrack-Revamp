@@ -1,40 +1,15 @@
-.logoDiv {
+.serverDropdown {
     position: relative;
-    width: 880px;
-    height: 293px;
-    margin-bottom: 32px;
-    margin-top: 5%;
+    z-index: 1000;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    height: 56px;
+    margin-top: 16px;
+    padding-right: 32px;
 }
 
-.forgotPassword {
-    font-size: 1rem;
-    text-align: end;
-    color: var(--default-white);
-    cursor: pointer;
-    margin-bottom: 32px;
-}
-
-.signupText {
-    font-size: 1rem;
-    text-align: center;
-    color: var(--default-white);
-    margin-top: 32px;
-}
-
-.signupLink {
-    color: var(--link-color);
-    cursor: pointer;
-    text-decoration: underline;
-}
-
-.signupLink:hover {
-    color: var(--link-color-hover);
-}
-
-
-.submitButton {
-    width: 300px;
-    height: 48px;
-    border: 1px solid var(--primary-color-button);
-    background-color: var(--primary-color-button);
+.classFilter {
+    width: 100%;
+    margin-top: 16px;
 }

@@ -1,10 +1,11 @@
-import Cookies from 'js-cookie';
+import servers from '@data/servers/servers.json';
 
-const SERVER_COOKIE_KEY = 'server';
-const COOKIE_EXPIRES_DAYS = 60;
+import { COOKIE_EXPIRES_DAYS } from './constants';
+import { CookieManager } from './CookieManager';
 
-export const getServerCookie = (): string | undefined => Cookies.get(SERVER_COOKIE_KEY);
+// Derive server names as a readonly tuple
+export const SERVER_OPTIONS = servers.map((s) => s.name) as readonly string[];
 
-export const setServerCookie = (serverName: string) => {
-	Cookies.set(SERVER_COOKIE_KEY, serverName, { expires: COOKIE_EXPIRES_DAYS });
-};
+export type ServerOption = (typeof SERVER_OPTIONS)[number];
+
+export const serverCookie = new CookieManager<ServerOption>('server', SERVER_OPTIONS, COOKIE_EXPIRES_DAYS);

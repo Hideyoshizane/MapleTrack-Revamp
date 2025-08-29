@@ -2,10 +2,11 @@
   --default-black: #212121;
   --default-white: #EDEDED;
   --background-white: #DADADA;
-  --primary-color-button: #7BD96D;
+  --primary-color-button: #96E4A5;
   --default-button-text: #121212;
   --placeholder-color-text: #474747;
   --server-color-button: #3C6997;
+  --filter-color-button: #ADBFEB;
   --default-color-button: #D7D7D7;
   --danger-color-button: #C33232;
   --event-color-button: #73DCE7;
@@ -15,7 +16,15 @@
   --link-color: #64B5F6;
   --link-color-hover: #40C4FF;
   --disabled: #ADADAD;
+  --bar-default: #9EE493;
+  --bar-mage: #91BBE3;
+  --bar-warrior: #E39294;
+  --bar-bowman: #9EE493;
+  --bar-thief: #B992E3;
+  --bar-pirate: #E3C192;
+  --bar-complete: #48AA39;
 }
+
 
 html,
 body {
@@ -41,9 +50,10 @@ body.light {
   flex-direction: column;
   align-items: center;
   width: 1600px;
-  height: 100vh;
+  height: auto;
   background-color: var(--default-white);
   box-shadow: 0 3px 250px 0 rgb(0 0 0 / 25%);
+  min-height: 100vh;
   padding-top: 120px;
 }
 
@@ -58,6 +68,8 @@ body.light {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  scrollbar-color: var(--default-black) var(--default-white);
+  scrollbar-width: thin;
 }
 
 a {

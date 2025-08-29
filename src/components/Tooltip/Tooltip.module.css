@@ -5,6 +5,7 @@
     color: var(--default-white);
     background-color: var(--default-black);
     border-radius: 4px;
+    max-width: 350px;
     white-space: pre-wrap;
 }
 
@@ -15,6 +16,7 @@
     color: var(--default-black);
     background-color: var(--default-white);
     border-radius: 4px;
+    max-width: 350px;
     white-space: pre-wrap;
 }
 

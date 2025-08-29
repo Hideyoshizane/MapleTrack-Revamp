@@ -1,10 +1,11 @@
 'use client';
 
-import Skeleton from '@mui/material/Skeleton';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import utc from 'dayjs/plugin/utc';
 import React, { useEffect, useState, useCallback } from 'react';
+
+import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 
 import styles from './Timer.module.css';
 
@@ -82,17 +83,7 @@ const Timer: React.FC<TimerProps> = ({ target }) => {
 	const pad = (num: number) => num.toString().padStart(2, '0');
 
 	if (!timeLeft) {
-		return (
-			<div>
-				<Skeleton
-					variant="text"
-					animation="wave"
-					sx={{ bgcolor: 'rgba(255,255,255,0.2)' }}
-					className={styles.timer}
-					height={58}
-				/>
-			</div>
-		);
+		return <SkeletonWrapper width={200} height={58} color="dark" />;
 	}
 
 	return (

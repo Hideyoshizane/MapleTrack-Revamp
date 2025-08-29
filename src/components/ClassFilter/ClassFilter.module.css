@@ -1,0 +1,54 @@
+.classFilter {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-left: 32px;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: var(--default-button-text);
+}
+
+.options {
+    height: 56px;
+    border: 1px solid var(--default-black);
+    border-radius: 25px;
+    overflow: hidden;
+}
+
+.optionWrapper {
+    display: inline-flex;
+    align-items: center;
+}
+
+.separator {
+    width: 1px;
+    height: 56px;
+    background-color: var(--default-black);
+}
+
+.option {
+    width: 180px;
+    height: 56px;
+    border: none;
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: var(--default-button-text);
+    background-color: var(--default-white);
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.option:hover {
+    background-color: #E0E0E0;
+}
+
+.active {
+    background-color: var(--filter-color-button);
+}
+
+.active:hover {
+    background-color: #8CA5E3;
+}

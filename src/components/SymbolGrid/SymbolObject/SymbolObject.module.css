@@ -1,0 +1,53 @@
+.symbolContainer {
+    display: flex;
+    width: 298px;
+    height: 100px;
+}
+
+.imageContainer {
+    display: flex;
+    align-items: center;
+    height: 100px;
+}
+
+.off {
+    filter: brightness(25%) saturate(0%);
+}
+
+.symbolInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100px
+}
+
+.levelInfo {
+    display: flex;
+    justify-content: space-between;
+    width: 231px;
+    height: 23px;
+}
+
+.symbolLevel,
+.symbolExp {
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--default-button-text);
+}
+
+.unlockLevel {
+    width: 231px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--default-button-text);
+    margin-top: 4px;
+}
+
+.daysTo {
+    width: 231px;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--default-button-text);
+    margin-top: 4px;
+}
