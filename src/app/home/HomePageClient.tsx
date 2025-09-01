@@ -36,6 +36,13 @@ export default function HomePageClient({ username }: HomePageClientProps) {
 			// Remove query params
 			router.replace('/home');
 		}
+		// If URL has ?unauthorized=1, show toast and remove param
+		if (searchParams?.get('unauthorized') === '1') {
+			toast.error('Unauthorized access');
+			hasShownToast.current = true;
+			// Remove query params
+			router.replace('/home');
+		}
 	}, [searchParams, router]);
 
 	return (

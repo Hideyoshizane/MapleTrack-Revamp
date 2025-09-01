@@ -25,7 +25,7 @@ export interface CharacterDocument extends Document {
 	legion?: string;
 	linkSkill?: string;
 	bossing: boolean;
-	syncing?: boolean;
+	syncing: boolean;
 	server?: string;
 	userOrigin?: string;
 	lastUpdate?: Date;
@@ -45,6 +45,7 @@ const CharacterSchema = new Schema<CharacterDocument>(
 		legion: String,
 		linkSkill: String,
 		bossing: { type: Boolean, default: false },
+		syncing: { type: Boolean, default: false },
 		server: String,
 		userOrigin: String,
 		lastUpdate: Date,

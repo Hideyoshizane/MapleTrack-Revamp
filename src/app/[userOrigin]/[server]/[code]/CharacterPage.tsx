@@ -1,6 +1,5 @@
 'use client';
 import Image from 'next/image';
-import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import LegionBlock from '@/components/LegionBlock/LegionBlock';
@@ -18,6 +17,12 @@ import { fetchWithTimeout } from '@utils/fetch/withTimeout';
 import DropdownEventMenu from './DropdownEventMenu/DropdownEventMenu';
 import styles from './page.module.css';
 
+interface CharacterPageProps {
+	userOrigin: string;
+	server: string;
+	code: string;
+}
+
 async function fetchCharacterApi(payload: GetCharacterDataRequestBody): Promise<GetCharacterDataApiResponse> {
 	const res = await fetchWithTimeout('/api/characters/getCharacterData', {
 		method: 'POST',
@@ -28,29 +33,19 @@ async function fetchCharacterApi(payload: GetCharacterDataRequestBody): Promise<
 	return (await res.json()) as GetCharacterDataApiResponse;
 }
 
-export default function HomePageClient() {
-	const params = useParams();
-
+export default function CharacterPage({ userOrigin, server, code }: CharacterPageProps) {
 	const [character, setCharacter] = useState<CharacterDocument>();
 	const [extraData, setExtraData] = useState<ExtraCharacterData | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 
-	const username = Array.isArray(params.userOrigin) ? params.userOrigin[0] : params.userOrigin;
-	const serverName = Array.isArray(params.server) ? params.server[0] : params.server;
-	const charCode = Array.isArray(params.code) ? params.code[0] : params.code;
-
 	useEffect(() => {
-		if (!username || !serverName || !charCode) return;
+		if (!userOrigin || !server || !code) return;
 
 		// Async function inside useEffect
 		const fetchData = async () => {
 			try {
-				const data = await fetchCharacterApi({
-					userOrigin: username,
-					server: serverName,
-					code: charCode,
-				});
+				const data = await fetchCharacterApi({ userOrigin, server, code });
 
 				if (data.success) {
 					setCharacter(data.data);
@@ -65,14 +60,16 @@ export default function HomePageClient() {
 		};
 
 		void fetchData();
-	}, [username, serverName, charCode]);
+	}, [userOrigin, server, code]);
 
 	useEffect(() => {
-		if (!character) return;
+		if (!character || !character.syncing) return;
 
 		const fetchExtraData = async () => {
 			try {
-				const res = await fetch('/api/characters/getAPICharacterImage');
+				const res = await fetch(
+					`/api/characters/getAPICharacterImage?character_name=${character.name}&server=${server}`
+				);
 				if (!res.ok) throw new Error('Failed to fetch extra data');
 
 				const extra: ExtraCharacterData = (await res.json()) as ExtraCharacterData;
@@ -83,7 +80,7 @@ export default function HomePageClient() {
 		};
 
 		void fetchExtraData();
-	}, [character]);
+	}, [character, server]);
 
 	if (error) return <p>Error: {error}</p>;
 	if (!character) return null;
