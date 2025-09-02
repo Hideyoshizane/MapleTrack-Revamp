@@ -9,14 +9,14 @@ import LockIcon from '@assets/svg/lock.svg';
 import Button from '@components/Button/Button';
 import FooterOutside from '@components/FooterOutside/FooterOutside';
 import FormInput from '@components/FormInput/FormInput';
+import { ApiResponse } from '@sharedTypes/api/api';
 import { fetchWithTimeout } from '@utils/fetch/withTimeout';
 import { sanitizeInputFrontend } from '@utils/sanitize';
 import { validateEmail, handleFieldValidation } from '@utils/validation';
 
 import styles from './page.module.css';
 
-import type { ForgotPasswordApiResponse } from '@sharedTypes/api/auth';
-import type { ForgotPasswordFormData } from '@sharedTypes/form';
+import type { ForgotPasswordFormData } from '@/shared/types/form/form';
 import type { ValidationResult } from '@utils/validation';
 
 export default function ForgotPasswordPage() {
@@ -57,10 +57,10 @@ export default function ForgotPasswordPage() {
 				body: JSON.stringify(payload),
 			});
 
-			const result = (await response.json()) as ForgotPasswordApiResponse;
+			const result = (await response.json()) as ApiResponse;
 
 			if (response.ok && result.success) {
-				toast.success(result.message);
+				toast.success(result.message!);
 			} else if (!result.success) {
 				toast.success(result.error || 'Failed to process your request');
 

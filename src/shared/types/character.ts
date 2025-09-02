@@ -1,3 +1,4 @@
+import type { ApiResponse } from './api/api';
 import type { CharacterDocument } from '@models/character';
 
 // Request payload
@@ -6,45 +7,11 @@ export interface GetAllCharactersRequestBody {
 	server: string;
 }
 
-// Success response
-export interface GetAllCharactersSuccessResponse {
-	success: true;
-	data: CharacterDocument[];
-	message: string;
-}
-
-// Error response
-export interface GetAllCharactersErrorResponse {
-	success: false;
-	error: string;
-	details?: Partial<Record<keyof GetAllCharactersRequestBody, string>>;
-}
-
-// Union type
-export type GetAllCharactersApiResponse = GetAllCharactersSuccessResponse | GetAllCharactersErrorResponse;
-
 export interface GetCharacterDataRequestBody {
 	userOrigin: string;
 	server: string;
 	code: string;
 }
-
-// Success response
-export interface GetCharacterDataSuccessResponse {
-	success: true;
-	data: CharacterDocument;
-	message: string;
-}
-
-// Error response
-export interface GetCharacterDataErrorResponse {
-	success: false;
-	error: string;
-	details?: Partial<Record<keyof GetCharacterDataRequestBody, string>>;
-}
-
-// Union type
-export type GetCharacterDataApiResponse = GetCharacterDataSuccessResponse | GetCharacterDataErrorResponse;
 
 // Type representing the extra character data from external API
 export interface ExtraCharacterData {
@@ -66,3 +33,9 @@ export interface ExtraCharacterData {
 	tierName: string;
 	score: number;
 }
+
+export type GetAllCharactersApiResponse = ApiResponse<CharacterDocument[]>;
+
+export type GetCharacterDataApiResponse = ApiResponse<CharacterDocument>;
+
+export type GetExtraCharacterDataApiResponse = ApiResponse<ExtraCharacterData>;

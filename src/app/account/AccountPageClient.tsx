@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast';
 
 import Button from '@components/Button/Button';
 import FormInput from '@components/FormInput/FormInput';
+import { ApiResponse } from '@sharedTypes/api/api';
 import { fetchWithTimeout } from '@utils/fetch/withTimeout';
 import { sanitizeInputFrontend } from '@utils/sanitize';
 import { validatePassword, validatePasswordConfirmation, handleFieldValidation } from '@utils/validation';
@@ -14,8 +15,7 @@ import { validatePassword, validatePasswordConfirmation, handleFieldValidation }
 import AlertDialogComponent from './AlertDialogComponent/AlertDialogComponent';
 import styles from './page.module.css';
 
-import type { ChangePasswordApiResponse, DeleteAccountApiResponse } from '@sharedTypes/api/auth';
-import type { ChangePasswordFormData } from '@sharedTypes/form';
+import type { ChangePasswordFormData } from '@/shared/types/form/form';
 import type { ValidationResult } from '@utils/validation';
 
 interface AccountClientProps {
@@ -69,7 +69,7 @@ export default function AccountPageClient({ username }: AccountClientProps) {
 				body: JSON.stringify(payload),
 			});
 
-			const result = (await response.json()) as ChangePasswordApiResponse;
+			const result = (await response.json()) as ApiResponse;
 
 			if (response.ok && result.success) {
 				toast.success('Password changed successfully.');
@@ -109,7 +109,7 @@ export default function AccountPageClient({ username }: AccountClientProps) {
 				body: JSON.stringify(payload),
 			});
 
-			const result = (await response.json()) as DeleteAccountApiResponse;
+			const result = (await response.json()) as ApiResponse;
 
 			if (response.ok && result.success) {
 				await signOut({ callbackUrl: '/login?accountDeleted=1' });

@@ -5,28 +5,28 @@ import type {
 	ForgotPasswordRequestBody,
 	ChangePasswordRequestBody,
 	DeleteAccountRequestBody,
-} from '@sharedTypes/api/auth';
+} from '@schemas/authSchemas';
 
-// Login just reuses credentials
+// --- Login ---
 export type LoginFormData = Credentials;
 
-// Signup form: backend props + confirmPassword (frontend-only)
+// --- Signup (adds confirmPassword) ---
 export type SignupFormData = SignupRequestBody & {
 	confirmPassword: string;
 };
 
-// Forgot password form: identical to backend
+// --- Forgot Password ---
 export type ForgotPasswordFormData = ForgotPasswordRequestBody;
 
-// Reset password form: backend props + confirmPassword (frontend-only)
+// --- Reset Password (adds confirmPassword) ---
 export type ResetPasswordFormData = ResetPasswordRequestBody & {
 	confirmPassword: string;
 };
 
-// Change password frontend form data extends backend + confirmPassword
+// --- Change Password (adds confirmPassword) ---
 export type ChangePasswordFormData = ChangePasswordRequestBody & {
 	confirmPassword: string;
 };
 
-// Delete Account frontend form data extends backend
-export type deleteAccountData = DeleteAccountRequestBody;
+// --- Delete Account ---
+export type DeleteAccountData = DeleteAccountRequestBody;

@@ -30,7 +30,6 @@ export const ClassFilter = ({ selectedClasses, setSelectedClasses, loading = fal
 
 	if (loading) {
 		// Show skeleton for entire component
-
 		return (
 			<div className={styles.classFilter}>
 				<SkeletonWrapper width={1243} height={56} color="light" />

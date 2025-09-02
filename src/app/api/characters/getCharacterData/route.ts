@@ -1,61 +1,61 @@
 import { NextRequest } from 'next/server';
 
-import { GetCharacterDataRequestBody } from '@/shared/types/character';
 import { JobClasses } from '@data/classes/classes';
 import connectToDatabase from '@lib/mongooseConect';
 import { Character } from '@models/character';
+import { getCharacterDataRequestSchema } from '@schemas/characterRequestSchema';
 import { generateCharacterObject } from '@service/characterService';
+import { ApiResponse } from '@sharedTypes/api/api';
 import { createResponse } from '@utils/api/createResponse';
 import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
-import { isString } from '@utils/guards/isString';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 
 export async function POST(req: NextRequest) {
 	try {
 		await connectToDatabase();
 
+		// Parse JSON body
 		let rawBody: unknown;
-
-		// Parse JSON body and fail early if malformed
 		try {
 			rawBody = await req.json();
 		} catch {
-			return createResponse({ success: false, error: 'Invalid JSON payload' }, 400);
+			return createResponse<ApiResponse>({ success: false, error: 'Invalid JSON payload' }, 400);
 		}
-		// Assert rawBody shape as GetAllCharactersRequestBody
-		const body = rawBody as GetCharacterDataRequestBody;
 
-		// Validate that the properties are strings
-		if (!isString(body.userOrigin) || !isString(body.server) || !isString(body.code)) {
-			return createResponse({ success: false, error: 'Invalid request body' }, 400);
+		// Validate request body using Zod
+		const parseResult = getCharacterDataRequestSchema.safeParse(rawBody);
+		if (!parseResult.success) {
+			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
+		}
+
+		const { userOrigin: rawUserOrigin, server: rawServer, code: rawCode } = parseResult.data;
+
+		// Sanitize inputs
+		const username = sanitizeInputBackEnd(rawUserOrigin);
+		const server = sanitizeInputBackEnd(rawServer);
+		const code = sanitizeInputBackEnd(rawCode);
+		if (!username || !server || !code) {
+			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
 		}
 
 		// Validate allowed server
-		if (!SERVER_OPTIONS.includes(body.server)) {
-			return createResponse({ success: false, error: 'Invalid server' }, 400);
-		}
-
-		// Sanitize inputs
-		const username = sanitizeInputBackEnd(body.userOrigin);
-		const server = sanitizeInputBackEnd(body.server);
-		const code = sanitizeInputBackEnd(body.code);
-
-		if (!username || !server || !code) {
-			return createResponse({ success: false, error: 'Missing required fields' }, 400);
+		if (!SERVER_OPTIONS.includes(server)) {
+			return createResponse<ApiResponse>({ success: false, error: 'Invalid server' }, 400);
 		}
 
 		// Search for the character
 		const character = await Character.findOne({
 			userOrigin: username,
-			server: server,
-			code: code,
+			server,
+			code,
 		});
+
 		//if not in database, return a generic object.
 		if (!character) {
 			const job = JobClasses.find((job) => job.code === code);
 
 			if (!job) {
-				throw new Error(`Job with code ${code} not found`);
+				return createResponse<ApiResponse>({ success: false, error: `Job with code ${code} not found` }, 404);
 			}
 
 			const genericCharacter = generateCharacterObject({
@@ -67,21 +67,19 @@ export async function POST(req: NextRequest) {
 				server: server,
 				userOrigin: username,
 			});
-			return createResponse({ success: true, message: 'Character not found', data: genericCharacter }, 404);
+			return createResponse<ApiResponse<typeof genericCharacter>>(
+				{ success: true, message: 'Character not found, returning generic object', data: genericCharacter },
+				200
+			);
 		}
 
-		// Success response with data
-
-		return createResponse(
-			{
-				success: true,
-				message: 'Found character.',
-				data: character,
-			},
+		// Success response
+		return createResponse<ApiResponse<typeof character>>(
+			{ success: true, message: 'Found character', data: character },
 			200
 		);
 	} catch (error) {
 		console.error('Search error:', error);
-		return createResponse({ success: false, error: 'Internal Server Error' }, 500);
+		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
 	}
 }

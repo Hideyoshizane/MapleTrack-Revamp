@@ -16,7 +16,7 @@ import { validateUsernameLogin, validatePasswordLogin, handleFieldValidation } f
 
 import styles from './page.module.css';
 
-import type { LoginFormData } from '@sharedTypes/form';
+import type { LoginFormData } from '@/shared/types/form/form';
 import type { ValidationResult } from '@utils/validation';
 
 export default function LoginPage() {

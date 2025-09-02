@@ -4,13 +4,13 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { NextRequest } from 'next/server';
 
-import { ForgotPasswordRequestBody } from '@/shared/types/api/auth';
 import connectToDatabase from '@lib/mongooseConect';
 import getForgotPasswordTemplate from '@lib/resetPasswordEmail';
 import sendEmail from '@lib/sendEmail';
 import User from '@models/user';
+import { forgotPasswordRequestSchema } from '@schemas/authSchemas';
+import { ApiResponse } from '@sharedTypes/api/api';
 import { createResponse } from '@utils/api/createResponse';
-import { isString } from '@utils/guards/isString';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 import { validateEmail } from '@utils/validation/';
 
@@ -20,41 +20,34 @@ export async function POST(req: NextRequest) {
 
 		await connectToDatabase();
 
+		// Parse JSON safely
 		let rawBody: unknown;
-
-		// Parse JSON body and fail early if malformed
 		try {
 			rawBody = await req.json();
 		} catch {
-			return createResponse({ success: false, error: 'Invalid JSON payload' }, 400);
+			return createResponse<ApiResponse>({ success: false, error: 'Invalid JSON payload' }, 400);
 		}
 
-		// Assert rawBody shape as ForgotPasswordRequestBody
-		const body = rawBody as ForgotPasswordRequestBody;
-
-		// Validate that the properties are strings
-		if (!isString(body.email)) {
-			return createResponse({ success: false, error: 'Invalid request body' }, 400);
+		// Validate request body with zod
+		const parseResult = forgotPasswordRequestSchema.safeParse(rawBody);
+		if (!parseResult.success) {
+			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
 
 		// Sanitize input
-		const email = sanitizeInputBackEnd(body.email);
-
+		const email = sanitizeInputBackEnd(parseResult.data.email);
 		if (!email) {
-			return createResponse({ success: false, error: 'Missing required fields' }, 400);
+			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
 		}
 
-		const emailValidation = validateEmail(email);
-
 		// If validation fails, return early
+		const emailValidation = validateEmail(email);
 		if (!emailValidation.isValid) {
-			return createResponse(
+			return createResponse<ApiResponse>(
 				{
 					success: false,
 					error: 'Validation failed',
-					details: {
-						email: emailValidation.error,
-					},
+					details: { email: emailValidation.error },
 				},
 				400
 			);
@@ -62,12 +55,11 @@ export async function POST(req: NextRequest) {
 
 		// search for user by the sanitized email
 		const user = await User.findOne({ email: email });
-
 		if (!user) {
-			return createResponse(
+			return createResponse<ApiResponse>(
 				{
-					success: false,
-					error: 'If the email exists, we sent a reset link.',
+					success: true,
+					message: 'If the email exists, we sent a reset link.',
 				},
 				200
 			);
@@ -93,7 +85,7 @@ export async function POST(req: NextRequest) {
 			html,
 		});
 
-		return createResponse(
+		return createResponse<ApiResponse>(
 			{
 				success: true,
 				message: 'If the email exists, we sent a reset link.',
@@ -102,6 +94,6 @@ export async function POST(req: NextRequest) {
 		);
 	} catch (error) {
 		console.error('Signup error:', error);
-		return createResponse({ success: false, error: 'Internal Server Error' }, 500);
+		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
 	}
 }

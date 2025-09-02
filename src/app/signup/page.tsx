@@ -9,6 +9,7 @@ import { toast } from 'react-hot-toast';
 import Button from '@components/Button/Button';
 import FooterOutside from '@components/FooterOutside/FooterOutside';
 import FormInput from '@components/FormInput/FormInput';
+import { ApiResponse } from '@sharedTypes/api/api';
 import { fetchWithTimeout } from '@utils/fetch/withTimeout';
 import { sanitizeInputFrontend } from '@utils/sanitize';
 import {
@@ -21,8 +22,7 @@ import {
 
 import styles from './page.module.css';
 
-import type { SignupApiResponse } from '@sharedTypes/api/auth';
-import type { SignupFormData } from '@sharedTypes/form';
+import type { SignupFormData } from '@/shared/types/form/form';
 import type { ValidationResult } from '@utils/validation';
 
 export default function SignupPage() {
@@ -78,7 +78,7 @@ export default function SignupPage() {
 				body: JSON.stringify(payload),
 			});
 
-			const result = (await response.json()) as SignupApiResponse;
+			const result = (await response.json()) as ApiResponse;
 
 			if (response.ok && result.success) {
 				router.push('/login?success=1');
