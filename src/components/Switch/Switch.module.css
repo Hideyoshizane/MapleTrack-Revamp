@@ -1,0 +1,48 @@
+.title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--default-button-text);
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.root {
+    position: relative;
+    width: 42px;
+    height: 25px;
+    border: 1px solid var(--default-black);
+    background-color: transparent;
+    border-radius: 9999px;
+    transition: background-color 200ms;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.root[data-state='checked'] {
+    background-color: var(--icon-cta-color);
+}
+
+.root[disabled] {
+    background-color: var(--disabled);
+    cursor: not-allowed;
+}
+
+.thumb {
+    display: block;
+    width: 21px;
+    height: 21px;
+    background-color: white;
+    border-radius: 9999px;
+    transition: transform 200ms;
+    transform: translateX(2px);
+    will-change: transform;
+}
+
+.root[data-state='checked'] .thumb {
+    transform: translateX(19px);
+}

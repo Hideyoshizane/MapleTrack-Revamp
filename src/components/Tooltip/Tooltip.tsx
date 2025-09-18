@@ -10,9 +10,15 @@ type CustomTooltipProps = {
 	content: React.ReactNode;
 	children: React.ReactElement;
 	placement?: 'top' | 'bottom' | 'left' | 'right';
+	enabled?: boolean;
 };
 
-export default function Tooltip({ content, children, placement = 'top' }: CustomTooltipProps) {
+export default function Tooltip({ content, children, placement = 'top', enabled = true }: CustomTooltipProps) {
+	// Render children directly if tooltip is disabled
+	if (!enabled) {
+		return children;
+	}
+
 	// Read theme cookie
 	const themeCookie = Cookies.get('theme');
 

@@ -3,8 +3,8 @@
 import React from 'react';
 
 import Button from '@/components/Button/Button';
-import { getSymbolValueByName, SymbolCategory } from '@data/symbols/symbolMappings';
-import { CharacterContent } from '@models/character';
+import { SymbolCategory, computeDailyWeeklyValues } from '@data/symbols/symbolMappings';
+import { Symbol, CharacterContent } from '@models/character';
 
 import { useBonusContext } from '../../../../app/[userOrigin]/[server]/[code]/BonusContext';
 
@@ -12,20 +12,17 @@ import styles from './SymbolButtons.module.css';
 
 export interface SymbolButtonsProps {
 	type: SymbolCategory;
-	symbolName: string;
+	symbol: Symbol;
 	content: CharacterContent[];
 	onValueChange?: (dailyValue: number, weeklyValue: number) => void;
 }
 
-const SymbolButtons: React.FC<SymbolButtonsProps> = ({ type, symbolName, content, onValueChange }) => {
+const SymbolButtons: React.FC<SymbolButtonsProps> = ({ type, symbol, content, onValueChange }) => {
 	const { arcaneBonus, sacredBonus } = useBonusContext();
-	// Get the base daily value
-	let dailyValue = content[0]?.checked ? getSymbolValueByName(symbolName) : 0;
+	// Get the base daily value and weekly value
+	const { dailyValue: initialDaily, weeklyValue } = computeDailyWeeklyValues(symbol, content);
 
-	// If there is a third content item, add its value to dailyValue
-	if (content[2]) {
-		dailyValue += content[2]?.checked ? getSymbolValueByName(content[2].contentType) : 0;
-	}
+	let dailyValue = initialDaily;
 
 	// Add bonus depending on type
 	if (type === 'arcane') {
@@ -33,9 +30,6 @@ const SymbolButtons: React.FC<SymbolButtonsProps> = ({ type, symbolName, content
 	} else {
 		dailyValue += sacredBonus;
 	}
-
-	// Weekly value from content[1]
-	const weeklyValue = content[1]?.checked ? getSymbolValueByName('Weekly') : 0;
 
 	// Notify parent of current values
 	React.useEffect(() => {

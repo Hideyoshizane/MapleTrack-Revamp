@@ -18,3 +18,11 @@
     margin-bottom: 8px;
     margin-top: 4px;
 }
+
+.activeEntry {
+    font-weight: 600;
+}
+
+.entry {
+    font-weight: 300;
+}

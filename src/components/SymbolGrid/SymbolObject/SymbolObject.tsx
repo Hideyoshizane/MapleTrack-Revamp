@@ -4,7 +4,7 @@ import Image from 'next/image';
 import React, { useState } from 'react';
 
 import ProgressBar, { JobType } from '@components/ProgressBar/ProgressBar';
-import { getExpForLevel, getRemainingExp } from '@data/symbols/exp/expTable';
+import { getExpForLevel } from '@data/symbols/exp/expTable';
 import {
 	getSymbolImagePath,
 	canUseSymbol,
@@ -12,6 +12,7 @@ import {
 	SymbolName,
 	getSymbolMaxLevel,
 	SymbolMinLevel,
+	calculateDaysToCompleteSymbol,
 } from '@data/symbols/symbolMappings';
 import { Symbol } from '@models/character';
 
@@ -25,42 +26,6 @@ export interface SymbolObjectProps {
 	characterJobType: string;
 	size?: number;
 }
-
-const someFunctionUsing = (
-	daily: number,
-	weekly: number,
-	type: SymbolCategory,
-	symbolLevel: number,
-	symbolExp: number
-): number => {
-	const remaining = getRemainingExp(type, symbolLevel, symbolExp);
-	if (remaining <= 0) return 0;
-	if (daily <= 0 && weekly <= 0) return Infinity; // cannot progress
-
-	const weeklyTotal = weekly * 3; // total weekly gain
-	const dailyGainPerWeek = daily * 7; // total daily gain per week
-
-	const totalExpPerWeek = dailyGainPerWeek + weeklyTotal;
-
-	// calculate full weeks needed
-	const weeksNeeded = Math.floor(remaining / totalExpPerWeek);
-	let expAfterFullWeeks = remaining - weeksNeeded * totalExpPerWeek;
-
-	// remaining days in last partial week
-	let remainingDays = 0;
-	while (expAfterFullWeeks > 0) {
-		remainingDays++;
-		const dayOfWeek = remainingDays % 7;
-		// Add daily EXP
-		expAfterFullWeeks -= daily;
-		// Add weekly EXP on the 7th day
-		if (dayOfWeek === 0) {
-			expAfterFullWeeks -= weeklyTotal;
-		}
-	}
-
-	return weeksNeeded * 7 + remainingDays;
-};
 
 const SymbolObject: React.FC<SymbolObjectProps> = ({ type, symbol, characterLevel, characterJobType, size = 24 }) => {
 	// Make the variable reactive
@@ -113,10 +78,10 @@ const SymbolObject: React.FC<SymbolObjectProps> = ({ type, symbol, characterLeve
 					<div className={styles.buttonLines}>
 						<SymbolButtons
 							type={type}
-							symbolName={symbol.name}
+							symbol={symbol}
 							content={symbol.content}
 							onValueChange={(daily, weekly) => {
-								const computedValue = someFunctionUsing(daily, weekly, type, symbol.exp, symbol.level);
+								const computedValue = calculateDaysToCompleteSymbol(daily, weekly, type, symbol.level, symbol.exp);
 								setDaysToLevel(computedValue);
 							}}
 						/>

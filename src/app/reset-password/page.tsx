@@ -9,7 +9,6 @@ import { toast } from 'react-hot-toast';
 import Button from '@components/Button/Button';
 import FooterOutside from '@components/FooterOutside/FooterOutside';
 import FormInput from '@components/FormInput/FormInput';
-import { ApiResponse } from '@sharedTypes/api/api';
 import { fetchWithTimeout } from '@utils/fetch/withTimeout';
 import { sanitizeInputFrontend } from '@utils/sanitize';
 import { validatePassword, validatePasswordConfirmation, handleFieldValidation } from '@utils/validation';
@@ -17,6 +16,7 @@ import { validatePassword, validatePasswordConfirmation, handleFieldValidation }
 import styles from './page.module.css';
 
 import type { SignupFormData } from '@/shared/types/form/form';
+import type { ApiResponse } from '@sharedTypes/api/api';
 import type { ValidationResult } from '@utils/validation';
 
 export default function ResetPasswordPage() {

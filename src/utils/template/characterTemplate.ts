@@ -5,6 +5,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 	level: 0,
 	targetLevel: 10,
 	bossing: false,
+	syncing: false,
 	ArcaneSymbol: [
 		{
 			name: 'Vanishing Journey',

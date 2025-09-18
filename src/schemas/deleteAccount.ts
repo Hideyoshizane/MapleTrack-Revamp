@@ -1,8 +1,5 @@
 import { z } from 'zod';
 
-// Base response schemas (assuming you already have BaseSuccessResponse and BaseErrorResponse types)
-// You can adapt them to Zod as well if you want runtime validation on base responses
-
 // --- 1. Request body schema ---
 export const deleteAccountRequestSchema = z.object({
 	username: z.string(),

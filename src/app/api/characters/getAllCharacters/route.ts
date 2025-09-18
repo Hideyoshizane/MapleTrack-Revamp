@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 		}
 
 		// Query characters by userOrigin and server
-		const characters = await Character.find({ userOrigin: username, server: server }).exec();
+		const characters = await Character.find({ userOrigin: username, server: server }).lean().exec();
 
 		const response: ApiResponse<typeof characters> = {
 			success: true,

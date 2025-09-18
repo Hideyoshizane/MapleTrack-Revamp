@@ -25,18 +25,27 @@ interface ProgressBarProps {
 	jobType: JobType; // required now
 	width: number;
 	height: number;
+	forceFull?: boolean;
 }
 
 type IndicatorStyle = React.CSSProperties & { '--progress-value'?: string | number };
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ value, maxValue, jobType, width = 300, height = 32 }) => {
+const ProgressBar: React.FC<ProgressBarProps> = ({
+	value,
+	maxValue,
+	jobType,
+	width = 300,
+	height = 32,
+	forceFull = false,
+}) => {
 	const percentage = React.useMemo(() => {
+		if (forceFull) return 100;
 		if (maxValue <= 0) return 0;
 		if (value === 0) return 0;
 
 		const rawPercent = (value / maxValue) * 100;
 		return Math.min(Math.max(rawPercent, 5.35), 100);
-	}, [value, maxValue]);
+	}, [value, maxValue, forceFull]);
 
 	// Force 'complete' when fully filled
 	const appliedJobType: JobType = value >= maxValue ? 'complete' : jobType;

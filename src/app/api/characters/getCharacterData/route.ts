@@ -48,7 +48,9 @@ export async function POST(req: NextRequest) {
 			userOrigin: username,
 			server,
 			code,
-		});
+		})
+			.lean()
+			.exec();
 
 		//if not in database, return a generic object.
 		if (!character) {

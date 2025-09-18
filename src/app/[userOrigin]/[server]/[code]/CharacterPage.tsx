@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import LegionBlock from '@/components/LegionBlock/LegionBlock';
@@ -34,6 +35,8 @@ async function fetchCharacterApi(payload: GetCharacterDataRequestBody): Promise<
 }
 
 export default function CharacterPage({ userOrigin, server, code }: CharacterPageProps) {
+	const router = useRouter();
+
 	const [character, setCharacter] = useState<CharacterDocument>();
 	const [extraData, setExtraData] = useState<ExtraCharacterData | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -50,7 +53,7 @@ export default function CharacterPage({ userOrigin, server, code }: CharacterPag
 				if (data.success) {
 					setCharacter(data.data);
 				} else {
-					setError(data.error);
+					setError(data.error ?? null);
 				}
 			} catch (err: unknown) {
 				console.error('Error fetching characters:', err);
@@ -104,7 +107,11 @@ export default function CharacterPage({ userOrigin, server, code }: CharacterPag
 					<div className={styles.buttonLine}>
 						<DropdownEventMenu />
 						<Button className={styles.increaseAllButton}>Increase All</Button>
-						<Button className={styles.editCharacterButton}>Edit Character</Button>
+						<Button
+							className={styles.editCharacterButton}
+							onClick={() => router.push(`${window.location.pathname}/edit`)}>
+							Edit Character
+						</Button>
 					</div>
 					<div className={styles.usernameLine}>
 						<div className={styles.characterImgDiv}>

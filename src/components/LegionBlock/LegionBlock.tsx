@@ -5,9 +5,8 @@ import Image from 'next/image';
 import React from 'react';
 
 import { getRank } from '@/utils/legion/getRank';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { getLegionData } from '@data/legion/legionSystems';
-
-import Tooltip from '../Tooltip/Tooltip';
 
 import styles from './LegionBlock.module.css';
 
@@ -37,16 +36,22 @@ const normalizeRank = (rank: string): string => {
 	}
 };
 
-const TooltipData = (legionRank: string, legionData: ReturnType<typeof getLegionData>) => {
+const TooltipData = (legionRank: string, legionData: ReturnType<typeof getLegionData>): React.JSX.Element | string => {
 	if (!legionData?.ranking) return 'No bonus available';
 
 	const normalizedRank = normalizeRank(legionRank);
 
 	return (
 		<div>
-			{legionData.ranking.map((entry) => (
-				<p key={entry.rank}>{entry.rank === normalizedRank ? <b>{entry.description}</b> : entry.description}</p>
-			))}
+			{legionData.ranking.map((entry) => {
+				const isActive = entry.rank === normalizedRank;
+
+				return (
+					<p key={entry.rank} className={isActive ? styles.activeEntry : styles.entry}>
+						{entry.description}
+					</p>
+				);
+			})}
 		</div>
 	);
 };
@@ -92,12 +97,10 @@ const LegionBlock: React.FC<LegionBlockProps> = ({
 		</div>
 	);
 
-	return showTooltip ? (
-		<Tooltip content={tooltipContent} placement="bottom">
+	return (
+		<Tooltip content={tooltipContent} placement="bottom" enabled={showTooltip}>
 			{content}
 		</Tooltip>
-	) : (
-		content
 	);
 };
 

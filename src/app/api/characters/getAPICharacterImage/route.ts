@@ -1,8 +1,10 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
-import { ExtraCharacterData } from '@/shared/types/character';
 import { isRebootServer, getRegion, servers } from '@data/servers/servers';
-import { ApiResponse } from '@sharedTypes/api/api';
+
+import type { ExtraCharacterData } from '@/shared/types/character';
+import type { ApiResponse } from '@sharedTypes/api/api';
+import type { NextRequest } from 'next/server';
 
 interface ExternalApiResponse {
 	totalCount: number;
@@ -79,12 +81,18 @@ export async function GET(request: NextRequest) {
 			);
 		}
 
+		// Success response — only return characterImgURL and level
+		const simplifiedData = {
+			characterImgURL: character.characterImgURL,
+			level: character.level,
+		};
+
 		// Success response
 		return NextResponse.json<ApiResponse<ExtraCharacterData>>(
 			{
 				success: true,
 				message: 'Character fetched successfully',
-				data: character,
+				data: simplifiedData,
 			},
 			{ status: 200 }
 		);

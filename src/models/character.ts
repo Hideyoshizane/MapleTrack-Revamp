@@ -1,20 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
-export interface CharacterContent {
-	contentType: string;
-	checked: boolean;
-	date?: Date | null;
-	tries?: number;
-	maxTries?: number;
-}
-
-export interface Symbol {
-	name: string;
-	level: number;
-	exp: number;
-	content: CharacterContent[];
-}
-
 export interface CharacterDocument extends Document {
 	name: string;
 	level: number;
@@ -32,6 +17,21 @@ export interface CharacterDocument extends Document {
 	ArcaneSymbol: Symbol[];
 	SacredSymbol: Symbol[];
 	GrandSacredSymbol: Symbol[];
+}
+
+export interface Symbol {
+	name: string;
+	level: number;
+	exp: number;
+	content: CharacterContent[];
+}
+
+export interface CharacterContent {
+	contentType: string;
+	checked: boolean;
+	date?: Date | null;
+	tries?: number;
+	maxTries?: number;
 }
 
 const CharacterSchema = new Schema<CharacterDocument>(

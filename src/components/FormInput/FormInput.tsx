@@ -26,7 +26,7 @@ interface FormInputProps<TFieldValues extends FieldValues> {
 	setError: UseFormSetError<TFieldValues>;
 	clearErrors: UseFormClearErrors<TFieldValues>;
 	isSubmitted: boolean;
-	isLogin?: boolean;
+	isLogin: boolean;
 	defaultValue?: string;
 	isLightmode?: boolean;
 }
@@ -41,7 +41,7 @@ export default function FormInput<TFieldValues extends FieldValues>({
 	setError,
 	clearErrors,
 	isSubmitted,
-	isLogin,
+	isLogin = false,
 	defaultValue,
 	isLightmode = false,
 }: FormInputProps<TFieldValues>) {
@@ -195,6 +195,7 @@ export default function FormInput<TFieldValues extends FieldValues>({
 							showInvalid={showInvalid}
 							tooltipMessage={tooltipMessage}
 							isLightmode={isLightmode}
+							showTooltip={!isLogin}
 						/>
 					</div>
 				)}

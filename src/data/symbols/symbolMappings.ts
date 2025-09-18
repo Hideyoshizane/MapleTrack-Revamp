@@ -1,3 +1,6 @@
+import { getRemainingExp } from '@data/symbols/exp/expTable';
+import { Symbol, CharacterContent } from '@models/character';
+
 import { allSymbols } from './dailyExp';
 
 // --- Symbol Name Types ---
@@ -85,8 +88,74 @@ export function getSymbolMaxLevel(input: SymbolCategory | SymbolName): number {
 	return SYMBOL_MAP[input as SymbolName].maxLevel;
 }
 
-// --- Get symbol value by name ---
-export function getSymbolValueByName(name: string): number {
-	const symbol = allSymbols.find((s) => s.name === name);
-	return symbol ? Number(symbol.value) || 0 : 0;
+// --- Get symbol value ---
+export const getContentValue = (symbolName: string, contentType: string): number => {
+	// Helper to resolve values safely
+	const resolve = (name: string): number => {
+		const symbol = allSymbols.find((s) => s.name === name);
+		return symbol ? Number(symbol.value) || 0 : 0;
+	};
+
+	if (contentType === 'Daily Quest') {
+		return resolve(symbolName);
+	}
+
+	const value = resolve(contentType);
+	return value !== 0 ? value : resolve('Weekly');
+};
+// --- Return Days to max Symbol ---
+/**
+ * Computes daily and weekly values for a given symbol.
+ * Follows the same structure used in multiple components.
+ */
+export const computeDailyWeeklyValues = (symbol: Symbol, content: CharacterContent[]) => {
+	// Base daily value
+	let dailyValue = content[0]?.checked ? getContentValue(symbol.name, content[0].contentType) : 0;
+
+	// If there's a third content item, add its value
+	if (content[2]) {
+		dailyValue += content[2]?.checked ? getContentValue(symbol.name, content[2].contentType) : 0;
+	}
+
+	// Weekly value comes from second content item
+	const weeklyValue = content[1]?.checked ? getContentValue(symbol.name, 'Weekly') : 0;
+
+	return { dailyValue, weeklyValue };
+};
+
+// --- Return Days to max Symbol ---
+export function calculateDaysToCompleteSymbol(
+	daily: number,
+	weekly: number,
+	type: SymbolCategory,
+	symbolLevel: number,
+	symbolExp: number
+): number {
+	const remaining = getRemainingExp(type, symbolLevel, symbolExp);
+	if (remaining <= 0) return 0;
+	if (daily <= 0 && weekly <= 0) return Infinity; // cannot progress
+
+	const weeklyTotal = weekly * 3; // total weekly gain
+	const dailyGainPerWeek = daily * 7; // total daily gain per week
+
+	const totalExpPerWeek = dailyGainPerWeek + weeklyTotal;
+
+	// calculate full weeks needed
+	const weeksNeeded = Math.floor(remaining / totalExpPerWeek);
+	let expAfterFullWeeks = remaining - weeksNeeded * totalExpPerWeek;
+
+	// remaining days in last partial week
+	let remainingDays = 0;
+	while (expAfterFullWeeks > 0) {
+		remainingDays++;
+		const dayOfWeek = remainingDays % 7;
+		// Add daily EXP
+		expAfterFullWeeks -= daily;
+		// Add weekly EXP on the 7th day
+		if (dayOfWeek === 0) {
+			expAfterFullWeeks -= weeklyTotal;
+		}
+	}
+
+	return weeksNeeded * 7 + remainingDays;
 }

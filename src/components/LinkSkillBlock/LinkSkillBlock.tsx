@@ -4,9 +4,8 @@ import { clsx } from 'clsx';
 import Image from 'next/image';
 import React from 'react';
 
+import Tooltip from '@components/Tooltip/Tooltip';
 import { getLinkSkillByName, getLinkSkillDescription } from '@data/linkSkill/linkSkill';
-
-import Tooltip from '../Tooltip/Tooltip';
 
 import styles from './LinkSkillBlock.module.css';
 
@@ -44,12 +43,10 @@ const LinkSkillBlock: React.FC<LinkSkillProps> = ({
 		</div>
 	);
 
-	return showTooltip ? (
-		<Tooltip content={tooltipContent} placement="bottom">
+	return (
+		<Tooltip content={tooltipContent} placement="bottom" enabled={showTooltip}>
 			{content}
 		</Tooltip>
-	) : (
-		content
 	);
 };
 

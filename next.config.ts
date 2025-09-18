@@ -13,12 +13,12 @@ const nextConfig: NextConfig = {
 			{
 				protocol: 'https',
 				hostname: 'www.nexon.com',
-				pathname: '/api/maplestory/**', // match your API image path
+				pathname: '/api/maplestory/**',
 			},
 			{
 				protocol: 'https',
 				hostname: 'msavatar1.nexon.net',
-				pathname: '/Character/**', // allow all character images
+				pathname: '/Character/**',
 			},
 		],
 	},

@@ -1,6 +1,6 @@
 import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 
-const LASTVERSION = 3;
+const LASTVERSION = 1;
 
 export interface IUser extends Document {
 	_id: Types.ObjectId;

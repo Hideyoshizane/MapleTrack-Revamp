@@ -1,11 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 
+import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 import { JobClasses } from '@data/classes/classes';
 import { generateCharacterObject } from '@service/characterService';
 import { fetchWithTimeout } from '@utils/fetch/withTimeout';
-
-import { SkeletonWrapper } from '../SkeletonWrapper/SkeletonWrapper';
 
 import ClassCard from './ClassCard';
 import styles from './ClassGrid.module.css';
