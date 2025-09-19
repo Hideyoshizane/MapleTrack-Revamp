@@ -32,7 +32,7 @@ import type {
 import type { JobClass } from '@/utils/jobs/getJob';
 import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { CharacterDocument } from '@models/character';
-import type { ApiResponse } from '@sharedTypes/api/api';
+import type { ApiResponse } from '@/shared/types/api';
 
 interface CharacterPageProps {
 	userOrigin: string;

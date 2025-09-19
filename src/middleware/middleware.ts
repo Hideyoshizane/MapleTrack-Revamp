@@ -6,7 +6,7 @@ import { DARK_PATHS, themeFromPath, type Theme } from '@lib/theme';
 import type { NextRequest } from 'next/server';
 
 // Middleware function to set 'theme' cookie and handle auth redirects
-export async function middleware(req: NextRequest) {
+export const middleware = async (req: NextRequest) => {
 	// Extract the current pathname from the request URL
 	const { pathname } = req.nextUrl;
 
@@ -43,7 +43,7 @@ export async function middleware(req: NextRequest) {
 
 	// Otherwise, continue as normal
 	return res;
-}
+};
 
 // Only match real pages, excluding static assets, APIs, and files with extensions
 export const config = {

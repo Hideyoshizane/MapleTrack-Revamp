@@ -47,6 +47,9 @@ export default [
 			'react-refresh': reactRefreshPlugin,
 		},
 		settings: {
+			'css-modules': {
+				extensions: ['.css', '.scss', '.module.css', '.module.scss'],
+			},
 			'import/resolver': {
 				typescript: { project: './tsconfig.json' },
 			},
@@ -58,7 +61,10 @@ export default [
 			'@typescript-eslint/no-unsafe-member-access': 'off',
 			'@typescript-eslint/no-unsafe-return': 'off',
 
-			'@typescript-eslint/explicit-function-return-type': ['warn', { allowExpressions: true }],
+			'@typescript-eslint/explicit-function-return-type': [
+				'warn',
+				{ allowExpressions: true, allowTypedFunctionExpressions: false, allowHigherOrderFunctions: false },
+			],
 			'@typescript-eslint/no-floating-promises': 'error',
 			'@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
 			'@typescript-eslint/prefer-optional-chain': 'warn',
@@ -95,6 +101,9 @@ export default [
 			'css-modules': cssModulesPlugin,
 		},
 		settings: {
+			'css-modules': {
+				extensions: ['.css', '.scss', '.module.css', '.module.scss'],
+			},
 			'import/resolver': { typescript: { project: './tsconfig.json' } },
 		},
 		rules: {

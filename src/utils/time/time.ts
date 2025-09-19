@@ -26,7 +26,7 @@ const WEEKDAYS = {
 	THURSDAY: 4,
 } as const;
 
-function getNextResetTime(date: string | Date | dayjs.Dayjs, targetWeekday: number): dayjs.Dayjs {
+const getNextResetTime = (date: string | Date | Dayjs, targetWeekday: number): Dayjs => {
 	const givenDate = toUtc(date);
 
 	// Calculate how many days until the target weekday
@@ -34,19 +34,31 @@ function getNextResetTime(date: string | Date | dayjs.Dayjs, targetWeekday: numb
 
 	// Move to the target weekday and reset to midnight
 	return givenDate.add(daysUntil, 'day').startOf('day');
-}
+};
 
-export function hasDailyResetOccurred(date: string | Date | dayjs.Dayjs): boolean {
+export const hasDailyResetOccurred = (date: string | Date | Dayjs): boolean => {
+	if (!date) {
+		return false;
+	}
+
 	const resetTime = toUtc(date).add(1, 'day').startOf('day');
 	return nowUtc().isAfter(resetTime);
-}
+};
 
-export function hasBossResetOccurred(date: string | Date | dayjs.Dayjs): boolean {
+export const hasBossResetOccurred = (date: string | Date | Dayjs): boolean => {
+	if (!date) {
+		return false;
+	}
+
 	const resetTime = getNextResetTime(date, WEEKDAYS.THURSDAY);
 	return nowUtc().isAfter(resetTime);
-}
+};
 
-export function hasWeeklyQuestResetOccurred(date: string | Date | dayjs.Dayjs): boolean {
+export const hasWeeklyQuestResetOccurred = (date: string | Date | Dayjs): boolean => {
+	if (!date) {
+		return false;
+	}
+
 	const resetTime = getNextResetTime(date, WEEKDAYS.MONDAY);
 	return nowUtc().isAfter(resetTime);
-}
+};

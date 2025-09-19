@@ -92,6 +92,7 @@ const LegionBlock: React.FC<LegionBlockProps> = ({
 				src={getImageSrc()}
 				width={iconSize}
 				height={iconSize}
+				quality={100}
 				alt={`${characterJobType} legion ${legionRank} Icon`}
 			/>
 		</div>

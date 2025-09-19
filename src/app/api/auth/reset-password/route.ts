@@ -8,7 +8,7 @@ import { NextRequest } from 'next/server';
 import connectToDatabase from '@lib/mongooseConect';
 import User from '@models/user';
 import { resetPasswordRequestSchema } from '@schemas/authSchemas';
-import { ApiResponse } from '@sharedTypes/api/api';
+import { ApiResponse } from '@/shared/types/api';
 import { createResponse } from '@utils/api/createResponse';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 import { validatePassword } from '@utils/validation/';

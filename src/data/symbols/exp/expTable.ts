@@ -27,41 +27,30 @@ const expTables: Record<ForceType, ExpData> = {
 	grand: grandSacredExp,
 };
 
-export function getExpForLevel(type: ForceType, level: number): number {
-	try {
-		const table = expTables[type];
-		const expEntry = table.level[level.toString()];
-		return expEntry?.EXP ?? 0;
-	} catch (error) {
-		console.error(`Error fetching EXP for ${type} at level ${level}:`, error);
-		return 0;
-	}
-}
+// Get EXP required for a specific level
+export const getExpForLevel = (type: ForceType, level: number): number => {
+	const table = expTables[type];
+	return table.level[level.toString()]?.EXP ?? 0;
+};
 
-export function getLastLevel(type: ForceType): number {
-	try {
-		const table = expTables[type];
-		const levels = Object.keys(table.level).map(Number);
-		return levels.length > 0 ? Math.max(...levels) : 0;
-	} catch (error) {
-		console.error(`Error fetching last level for ${type}:`, error);
-		return 0;
-	}
-}
+// Get the last level in the table
+export const getLastLevel = (type: ForceType): number => {
+	const table = expTables[type];
+	const levels = Object.keys(table.level).map(Number);
+	return levels.length > 0 ? Math.max(...levels) : 0;
+};
 
-export function getRemainingExp(type: ForceType, currentLevel: number, currentExp: number): number {
+// Get remaining EXP to reach max level
+export const getRemainingExp = (type: ForceType, currentLevel: number, currentExp: number): number => {
 	try {
 		const lastLevel = getLastLevel(type);
 
 		if (currentLevel >= lastLevel) return 0;
 
-		let remaining = 0;
+		// EXP needed to finish current level
+		let remaining = Math.max(getExpForLevel(type, currentLevel) - currentExp, 0);
 
-		// Add EXP needed for current level to reach next level
-		const currentLevelExp = getExpForLevel(type, currentLevel);
-		remaining += currentLevelExp - currentExp;
-
-		// Add EXP for all remaining levels after current
+		// Add EXP for all remaining levels
 		for (let lvl = currentLevel + 1; lvl <= lastLevel; lvl++) {
 			remaining += getExpForLevel(type, lvl);
 		}
@@ -71,4 +60,4 @@ export function getRemainingExp(type: ForceType, currentLevel: number, currentEx
 		console.error(`Error calculating remaining EXP for ${type}:`, error);
 		return 0;
 	}
-}
+};

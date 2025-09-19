@@ -7,7 +7,8 @@ interface SendEmailParams {
 	html?: string;
 }
 
-export default async function sendEmail({ to, subject, text, html }: SendEmailParams) {
+export const sendEmail = async ({ to, subject, text, html }: SendEmailParams): Promise<nodemailer.SentMessageInfo> => {
+	// Create transporter using Gmail service
 	const transporter = nodemailer.createTransport({
 		service: 'gmail',
 		auth: {
@@ -16,6 +17,7 @@ export default async function sendEmail({ to, subject, text, html }: SendEmailPa
 		},
 	});
 
+	// Mail options including sender, recipient, subject, and body
 	const mailOptions = {
 		from: `"MapleTrack" <${process.env.GMAIL_USER}>`,
 		to,
@@ -24,6 +26,7 @@ export default async function sendEmail({ to, subject, text, html }: SendEmailPa
 		html,
 	};
 
+	// Send the email
 	const info = await transporter.sendMail(mailOptions);
 	return info;
-}
+};

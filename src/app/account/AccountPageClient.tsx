@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast';
 
 import Button from '@components/Button/Button';
 import FormInput from '@components/FormInput/FormInput';
-import { ApiResponse } from '@sharedTypes/api/api';
+import { ApiResponse } from '@/shared/types/api';
 import { fetchWithTimeout } from '@utils/fetch/withTimeout';
 import { sanitizeInputFrontend } from '@utils/sanitize';
 import { validatePassword, validatePasswordConfirmation, handleFieldValidation } from '@utils/validation';
@@ -15,7 +15,7 @@ import { validatePassword, validatePasswordConfirmation, handleFieldValidation }
 import AlertDialogComponent from './AlertDialogComponent/AlertDialogComponent';
 import styles from './page.module.css';
 
-import type { ChangePasswordFormData } from '@/shared/types/form/form';
+import type { ChangePasswordFormData } from '@/shared/types/form';
 import type { ValidationResult } from '@utils/validation';
 
 interface AccountClientProps {

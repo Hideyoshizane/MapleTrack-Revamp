@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react';
 
-import { classFilterCookie } from '@/utils/cookies/classFilterCookie';
+import { classFilterCookie, type ClassFilterOption } from '@/utils/cookies/classFilterCookie';
 
-import type { ClassFilterOption } from '@/utils/cookies/classFilterCookie';
-
-export const useClassFilterCookie = () => {
+export const useClassFilterCookie = (): {
+	selectedClasses: ClassFilterOption[];
+	setClasses: (values: ClassFilterOption[]) => void;
+	loading: boolean;
+} => {
 	// State: array of selected classes
 	const [selectedClasses, setSelectedClasses] = useState<ClassFilterOption[]>([]);
 	const [loading, setLoading] = useState(true);

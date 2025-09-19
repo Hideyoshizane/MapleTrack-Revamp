@@ -1,129 +1,51 @@
-import toast from 'react-hot-toast';
-import reserved from 'reserved-usernames';
-
 import { userSchema } from '@schemas/user';
+import { validateField, extractErrorMessage, type ValidationResult } from './validateField';
 
-import { normalizeEmail, normalizeUsername } from './normalize';
+export const validateUsername = (username: unknown): ValidationResult =>
+	validateField(userSchema, 'username', username);
 
+export const validateEmail = (email: unknown): ValidationResult => validateField(userSchema, 'email', email);
 
-const CUSTOM_RESERVED = ['mapletrack', 'maple-track'];
-const RESERVED_USERNAMES = new Set([...reserved, ...CUSTOM_RESERVED.map((u) => u.toLowerCase())]);
+export const validatePassword = (password: unknown): ValidationResult =>
+	validateField(userSchema, 'password', password);
 
-export type ValidationResult = {
-	isValid: boolean;
-	error?: string;
+// Validate password confirmation (handled at object level)
+export const validatePasswordConfirmation = (password: unknown, confirmPassword: unknown): ValidationResult => {
+	const result = userSchema
+		.pick({ password: true, confirmPassword: true })
+		.refine((data) => data.password === data.confirmPassword, {
+			message: 'Passwords do not match.',
+			path: ['confirmPassword'],
+		})
+		.safeParse({ password, confirmPassword });
+
+	return result.success ? { isValid: true } : { isValid: false, error: extractErrorMessage(result) };
 };
 
-// Extract first error messages from Zod parse results
-function extractErrorMessage(result: ReturnType<typeof userSchema.shape.username.safeParse>): string[] {
-	if (result.success) return [];
-	return result.error.issues.map((issue) => issue.message) || ['Invalid input.'];
-}
-
-export function validateUsername(username: unknown): ValidationResult {
-	if (typeof username !== 'string') {
-		return { isValid: false, error: 'Username must be a string.' };
-	}
-	// Normalize usernames by trimming, removing accents, filtering unwanted characters and lowercasing
-	const cleaned = normalizeUsername(username);
-
-	// Check for reserved usernames.
-	if (RESERVED_USERNAMES.has(cleaned)) {
-		return { isValid: false, error: 'This username is reserved and cannot be used.' };
-	}
-
-	// Validate cleaned username against Zod schema
-	const result = userSchema.shape.username.safeParse(cleaned);
-	return result.success ? { isValid: true } : { isValid: false, error: extractErrorMessage(result).join('\n') };
-}
-
-// Used for the login only
-export function validateUsernameLogin(username: unknown): ValidationResult {
+// Login-only helpers (looser rules than schema)
+export const validateUsernameLogin = (username: unknown): ValidationResult => {
 	if (typeof username !== 'string' || username.trim() === '') {
 		return { isValid: false, error: 'Please enter your username.' };
 	}
-	// Optionally simple pattern check, e.g., only letters, numbers, underscores
-	const simplePattern = /^[a-zA-Z0-9_]+$/;
-	if (!simplePattern.test(username)) {
+	// Trim and normalize username like in signup
+	const normalized = username
+		.trim()
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.replace(/[^a-zA-Z0-9_-]/g, '');
+
+	if (!/^[a-zA-Z0-9_-]+$/.test(normalized)) {
 		return { isValid: false, error: 'Username contains invalid characters.' };
 	}
+
+	if (normalized.length < 3 || normalized.length > 16) {
+		return { isValid: false, error: 'Username must be between 3 and 16 characters.' };
+	}
+
 	return { isValid: true };
-}
+};
 
-export function validateEmail(email: unknown): ValidationResult {
-	if (typeof email !== 'string') {
-		return { isValid: false, error: 'Email must be a string.' };
-	}
-	// Normalize emails by trimming and lowercasing
-	const cleaned = normalizeEmail(email);
-
-	// Validate cleaned email against Zod schema
-	const result = userSchema.shape.email.safeParse(cleaned);
-	return result.success ? { isValid: true } : { isValid: false, error: extractErrorMessage(result).join('\n') };
-}
-
-const passwordRules = [
-	{ regex: /[A-Z]/, error: 'Password must contain at least one uppercase letter.' },
-	{ regex: /[a-z]/, error: 'Password must contain at least one lowercase letter.' },
-	{ regex: /[0-9]/, error: 'Password must contain at least one number.' },
-	{ regex: /[^A-Za-z0-9]/, error: 'Password must contain at least one special character.' },
-];
-
-export function validatePassword(password: unknown): ValidationResult {
-	if (typeof password !== 'string') {
-		return { isValid: false, error: 'Password must be a string.' };
-	}
-
-	const cleaned = password.trim();
-
-	// Validate password length and base rules via schema
-	const result = userSchema.shape.password.safeParse(cleaned);
-	// Collect schema errors (array)
-	const schemaErrors = result.success ? [] : extractErrorMessage(result);
-
-	// Collect all failed rule messages
-	const ruleErrors = passwordRules.filter((rule) => !rule.regex.test(cleaned)).map((rule) => rule.error);
-	const allErrors = [...schemaErrors, ...ruleErrors];
-
-	return allErrors.length > 0
-		? { isValid: false, error: allErrors.map((e) => `- ${e}`).join('\n') }
+export const validatePasswordLogin = (password: unknown): ValidationResult =>
+	typeof password !== 'string' || password.trim() === ''
+		? { isValid: false, error: 'Please enter your password.' }
 		: { isValid: true };
-}
-
-// Used for the login only
-export function validatePasswordLogin(password: unknown): ValidationResult {
-	if (typeof password !== 'string' || password.trim() === '') {
-		return { isValid: false, error: 'Please enter your password.' };
-	}
-	return { isValid: true };
-}
-
-export function validatePasswordConfirmation(password: unknown, confirmPassword: unknown): ValidationResult {
-	if (typeof password !== 'string' || typeof confirmPassword !== 'string') {
-		return { isValid: false, error: 'Passwords must be strings.' };
-	}
-
-	if (!password.trim() || !confirmPassword.trim()) {
-		return { isValid: false, error: 'Password and confirmation cannot be empty.' };
-	}
-
-	if (password !== confirmPassword) {
-		return { isValid: false, error: 'Passwords do not match.' };
-	}
-
-	return { isValid: true };
-}
-
-export function handleFieldValidation<T extends string>(
-	field: T,
-	validationResult: ValidationResult,
-	setError: (field: T, error: { message: string }) => void
-): boolean {
-	if (!validationResult.isValid) {
-		const errorMessage = validationResult.error ?? `Invalid ${field}`;
-		setError(field, { message: errorMessage });
-		toast.error(errorMessage);
-		return true;
-	}
-	return false;
-}

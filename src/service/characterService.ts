@@ -1,6 +1,4 @@
-// adjust type if needed
-import { templateCharacter } from '@utils/template/characterTemplate';
-
+import { templateCharacter } from '@lib/template/characterTemplate';
 import type { CharacterDocument } from '@models/character';
 
 interface GenerateCharacterOptions {
@@ -13,6 +11,7 @@ interface GenerateCharacterOptions {
 	userOrigin: string;
 	lastUpdate?: Date;
 }
+
 export const generateCharacterObject = ({
 	jobClassName,
 	jobType,
@@ -21,10 +20,10 @@ export const generateCharacterObject = ({
 	server,
 	userOrigin,
 	code,
-	lastUpdate = undefined,
+	lastUpdate,
 }: GenerateCharacterOptions): CharacterDocument => {
 	// Deep clone template to avoid mutating the original
-	const clonedTemplate: Partial<CharacterDocument> = structuredClone(templateCharacter);
+	const clonedTemplate = structuredClone(templateCharacter) as Partial<CharacterDocument>;
 
 	return {
 		...clonedTemplate,

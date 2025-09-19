@@ -21,8 +21,8 @@ import {
 
 import styles from './page.module.css';
 
-import type { SignupFormData } from '@/shared/types/form/form';
-import type { ApiResponse } from '@sharedTypes/api/api';
+import type { SignupFormData } from '@/shared/types/form';
+import type { ApiResponse } from '@/shared/types/api';
 import type { ValidationResult } from '@utils/validation';
 
 export default function SignupPage() {

@@ -1,5 +1,3 @@
 import { NextResponse } from 'next/server';
 
-export function createResponse<T>(body: T, status = 200) {
-	return NextResponse.json(body, { status });
-}
+export const createResponse = <T>(body: T, status = 200): NextResponse => NextResponse.json(body, { status });

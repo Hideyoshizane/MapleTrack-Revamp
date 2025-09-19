@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-import { sanitizeInputFrontend } from '@/utils/sanitize';
+import { sanitizeInputFrontend } from '@/utils/sanitize/sanitizeInputFrontEnd';
+import { validateField } from '@utils/validation/';
+
 // Schema for validating character name
 export const characterNameSchema = z.object({
 	name: z
@@ -10,22 +12,26 @@ export const characterNameSchema = z.object({
 		.max(12, 'Name must be at most 12 characters.')
 		.regex(/^[a-zA-Z0-9_-]+$/, 'Name can only contain letters, numbers, underscores, or dashes.'),
 });
-
+// TypeScript type inferred from schema
 export type CharacterNameSchema = z.infer<typeof characterNameSchema>;
 
+// Type for validation result
 export type CharacterNameValidationResult = { success: true; value: string } | { success: false; error: string };
 
-export function validateCharacterName(name: string): CharacterNameValidationResult {
+export const validateCharacterName = (name: string): CharacterNameValidationResult => {
 	// Sanitize first to remove malicious input
 	const sanitizedName = sanitizeInputFrontend(name);
-	const result = characterNameSchema.safeParse({ name: sanitizedName });
-	if (!result.success) {
-		return { success: false, error: result.error.issues[0].message };
-	}
-	return { success: true, value: result.data.name };
-}
 
-export function checkCharacterName(name: string): string | null {
+	const result = validateField(characterNameSchema, 'name', sanitizedName);
+
+	if (!result.isValid) {
+		return { success: false, error: result.error ?? 'Invalid name' } as const;
+	}
+
+	return { success: true, value: sanitizedName } as const;
+};
+
+export const checkCharacterName = (name: string): string | null => {
 	if (name === 'Character Name') {
 		return 'This name is not allowed.';
 	}
@@ -34,7 +40,5 @@ export function checkCharacterName(name: string): string | null {
 	const validation = validateCharacterName(name);
 
 	// If invalid, return the error message
-	if (!validation.success) return validation.error;
-
-	return null;
-}
+	return validation.success ? null : validation.error;
+};

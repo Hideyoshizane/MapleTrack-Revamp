@@ -5,11 +5,11 @@ import utc from 'dayjs/plugin/utc';
 import { NextRequest } from 'next/server';
 
 import connectToDatabase from '@lib/mongooseConect';
-import getForgotPasswordTemplate from '@lib/resetPasswordEmail';
+import getForgotPasswordTemplate from '@/lib/template/resetPasswordEmailTemplate';
 import sendEmail from '@lib/sendEmail';
 import User from '@models/user';
 import { forgotPasswordRequestSchema } from '@schemas/authSchemas';
-import { ApiResponse } from '@sharedTypes/api/api';
+import { ApiResponse } from '@/shared/types/api';
 import { createResponse } from '@utils/api/createResponse';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 import { validateEmail } from '@utils/validation/';

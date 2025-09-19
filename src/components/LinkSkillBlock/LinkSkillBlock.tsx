@@ -39,7 +39,7 @@ const LinkSkillBlock: React.FC<LinkSkillProps> = ({
 				})}>
 				Link Skill:
 			</p>
-			<Image src={linkSkill.image} width={iconSize} height={iconSize} alt={linkSkill.name} />
+			<Image src={linkSkill.image} width={iconSize} height={iconSize} quality={100} alt={linkSkill.name} />
 		</div>
 	);
 

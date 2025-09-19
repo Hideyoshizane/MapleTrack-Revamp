@@ -5,7 +5,7 @@ import connectToDatabase from '@lib/mongooseConect';
 import { Character } from '@models/character';
 import { getCharacterDataRequestSchema } from '@schemas/characterRequestSchema';
 import { generateCharacterObject } from '@service/characterService';
-import { ApiResponse } from '@sharedTypes/api/api';
+import { ApiResponse } from '@/shared/types/api';
 import { createResponse } from '@utils/api/createResponse';
 import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';

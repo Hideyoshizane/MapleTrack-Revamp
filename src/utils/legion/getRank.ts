@@ -1,6 +1,6 @@
 export type Rank = 'rank_b' | 'rank_a' | 'rank_s' | 'rank_ss' | 'rank_sss' | 'no_rank';
 
-export function getRank(level: number, characterCode?: string): Rank {
+export const getRank = (level: number, characterCode?: string): Rank => {
 	if (!characterCode) return 'no_rank';
 
 	if (characterCode === 'zero') {
@@ -18,4 +18,4 @@ export function getRank(level: number, characterCode?: string): Rank {
 	}
 
 	return 'no_rank';
-}
+};

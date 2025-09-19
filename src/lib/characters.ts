@@ -1,26 +1,22 @@
 import connectToDatabase from '@lib/mongooseConect';
-import { Character, CharacterDocument, Symbol } from '@models/character';
+import { Character, CharacterDocument, CharacterSymbol } from '@models/character';
 import { createResponse } from '@utils/api/createResponse';
 import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
-import { isString } from '@utils/guards/isString';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
-import { hasDailyResetOccurred, hasWeeklyQuestResetOccurred } from '@utils/time/time';
+import { hasDailyResetOccurred, hasWeeklyQuestResetOccurred, nowUtc } from '@utils/time/time';
+import { NextResponse } from 'next/server';
 
-export function validadeUserAcess(
-	params: {
-		userOrigin: string;
-		server: string;
-		code: string;
-	},
+export const validateUserAccess = (
+	params: { userOrigin: string; server: string; code: string },
 	sessionUsername: string
-) {
+): boolean => {
 	try {
 		// Validate that the properties are strings
 		if (
-			!isString(sessionUsername) ||
-			!isString(params.userOrigin) ||
-			!isString(params.server) ||
-			!isString(params.code)
+			typeof sessionUsername !== 'string' ||
+			typeof params.userOrigin !== 'string' ||
+			typeof params.server !== 'string' ||
+			typeof params.code !== 'string'
 		) {
 			return false;
 		}
@@ -40,23 +36,24 @@ export function validadeUserAcess(
 			return false;
 		}
 
-		if (username !== userOrigin) {
-			return false;
-		}
-
-		return true;
+		// Ensure the session user matches the character owner
+		return username === userOrigin;
 	} catch (error) {
 		console.error('Delete account error:', error);
 		return false;
 	}
-}
+};
 
-export async function syncCharacterInfo(params: { userOrigin: string; server: string; code: string }) {
+export const syncCharacterInfo = async (params: {
+	userOrigin: unknown;
+	server: unknown;
+	code: unknown;
+}): Promise<NextResponse> => {
 	try {
 		await connectToDatabase();
 
-		// Validate that the properties are strings
-		if (!isString(params.userOrigin) || !isString(params.server) || !isString(params.code)) {
+		// Simple string type check
+		if (typeof params.userOrigin !== 'string' || typeof params.server !== 'string' || typeof params.code !== 'string') {
 			return createResponse({ success: false, error: 'Invalid request body' }, 400);
 		}
 
@@ -64,6 +61,7 @@ export async function syncCharacterInfo(params: { userOrigin: string; server: st
 		const userOrigin = sanitizeInputBackEnd(params.userOrigin);
 		const server = sanitizeInputBackEnd(params.server);
 		const code = sanitizeInputBackEnd(params.code);
+
 		if (!userOrigin || !server || !code) {
 			return createResponse({ success: false, error: 'Missing required fields' }, 400);
 		}
@@ -74,11 +72,7 @@ export async function syncCharacterInfo(params: { userOrigin: string; server: st
 		}
 
 		// Search for the character
-		const character = await Character.findOne({
-			userOrigin: userOrigin,
-			server: server,
-			code: code,
-		});
+		const character = await Character.findOne({ userOrigin, server, code });
 		// Check if character exists
 		if (!character) {
 			return createResponse({ success: false, error: 'Character not found' }, 404);
@@ -86,9 +80,16 @@ export async function syncCharacterInfo(params: { userOrigin: string; server: st
 
 		// Check if sync on, then sync with Maplestory API
 		if (character.syncing) {
-			const baseUrl = process.env.NEXT_PUBLIC_BASE_URLxx || 'http://localhost:3000';
+			const baseURL =
+				process.env.NEXT_PUBLIC_BASE_URL ||
+				(process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : undefined);
+
+			if (!baseURL) {
+				return createResponse({ success: false, error: 'URL not defined' }, 500);
+			}
+
 			const res = await fetch(
-				`${baseUrl}/api/characters/getAPICharacterImage?character_name=${character.name}&server=${server}`,
+				`${baseURL}/api/characters/getAPICharacterImage?character_name=${character.name}&server=${server}`,
 				{ cache: 'no-store' }
 			);
 
@@ -101,62 +102,76 @@ export async function syncCharacterInfo(params: { userOrigin: string; server: st
 					200
 				);
 			}
+			const json = await res.json();
+
+			// Access level from the data
+			const syncedLevel = json?.data?.level;
+
+			if (typeof syncedLevel === 'number') {
+				character.level = syncedLevel;
+			}
 		}
 
-		// Sync Daily
+		// Reset quests
 		resetDailyQuests(character);
-
-		// Sync Weekly
 		resetWeeklyQuests(character);
 
 		await character.save();
+
+		return createResponse({ success: true, message: 'Character synced successfully' }, 200);
 	} catch (error) {
 		console.error('Delete account error:', error);
 		return createResponse({ success: false, error: 'Internal Server Error' }, 500);
 	}
-}
+};
 
 export const resetDailyQuests = (character: CharacterDocument): void => {
-	// Helper function to process symbol arrays
-	const processSymbolArray = (symbolArray: Symbol[]): void => {
-		for (const symbol of symbolArray) {
-			for (const quest of symbol.content) {
-				// Only process Daily Quests that have a date
+	// Helper to process one symbol array
+	const processSymbolArray = (symbolArray: CharacterSymbol[]): void => {
+		symbolArray.forEach((symbol) => {
+			symbol.content.forEach((quest) => {
+				// Only process daily quests that were previously interacted with
 				if (quest.contentType === 'Daily Quest' && quest.date) {
 					try {
 						if (hasDailyResetOccurred(quest.date)) {
-							quest.date = null; // reset the date
+							quest.date = nowUtc().toDate();
 						}
 					} catch (error) {
 						console.error(`Error checking daily reset for ${symbol.name} (${quest.contentType}):`, error);
 					}
 				}
-			}
-		}
+			});
+		});
 	};
 
-	processSymbolArray(character.ArcaneSymbol);
-	processSymbolArray(character.SacredSymbol);
-	processSymbolArray(character.GrandSacredSymbol);
+	// Run across all symbol arrays
+	[character.ArcaneSymbol, character.SacredSymbol, character.GrandSacredSymbol].forEach(processSymbolArray);
 };
 
 export const resetWeeklyQuests = (character: CharacterDocument): void => {
-	// Only ArcaneSymbol has content with 'tries'
-	const arcaneSymbols: Symbol[] = character.ArcaneSymbol;
+	try {
+		// All symbol arrays that could have weekly quests
+		const symbolsToReset: CharacterSymbol[][] = [
+			character.ArcaneSymbol,
+			character.SacredSymbol,
+			character.GrandSacredSymbol,
+		];
 
-	for (const symbol of arcaneSymbols) {
-		for (const quest of symbol.content) {
-			// Only process items that have 'tries' defined
-			if (quest.tries !== undefined) {
-				try {
-					// Only run if the date exists
-					if (quest.date && hasWeeklyQuestResetOccurred(quest.date)) {
-						quest.tries = quest.maxTries ?? quest.tries;
+		symbolsToReset.forEach((symbolArray) => {
+			symbolArray.forEach((symbol: CharacterSymbol) => {
+				symbol.content.forEach((quest) => {
+					// Only process quests that have 'tries'
+					if (quest.tries !== undefined) {
+						if (!quest.date || hasWeeklyQuestResetOccurred(quest.date)) {
+							quest.tries = quest.maxTries ?? quest.tries;
+							quest.date = nowUtc().toDate();
+						}
 					}
-				} catch (error) {
-					console.error(`Error checking weekly reset for ${symbol.name} (${quest.contentType}):`, error);
-				}
-			}
-		}
+				});
+			});
+		});
+	} catch (error) {
+		console.error('Error resetting weekly quests:', error);
+		throw error; // propagate for higher-level handling
 	}
 };

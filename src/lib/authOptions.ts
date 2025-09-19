@@ -22,8 +22,8 @@ export const authOptions: AuthOptions = {
 		CredentialsProvider({
 			name: 'Credentials',
 			credentials: {
-				username: { label: 'Username', type: 'text', placeholder: 'your username' },
-				password: { label: 'Password', type: 'password' },
+				username: { label: 'Username', type: 'text', placeholder: 'Your Username' },
+				password: { label: 'Password', type: 'Password' },
 			},
 			async authorize(credentials): Promise<{ id: string; username: string } | null> {
 				await connectToDatabase();
@@ -47,6 +47,7 @@ export const authOptions: AuthOptions = {
 				// Find user in DB
 				const user = await UserMongo.findOne({ username });
 				if (!user) {
+					await bcrypt.compare(password, '$2b$10$invalidhashstring0000000000000000000000');
 					throw new Error('Wrong username or password');
 				}
 
@@ -97,8 +98,7 @@ export const authOptions: AuthOptions = {
 		},
 	},
 	pages: {
-		signIn: '/login', // your login page route
-		// signOut, error pages can be customized as well
+		signIn: '/login',
 	},
-	secret: process.env.NEXTAUTH_SECRET, // set a strong secret env variable
+	secret: process.env.NEXTAUTH_SECRET,
 };

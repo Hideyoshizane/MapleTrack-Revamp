@@ -9,14 +9,14 @@ import LockIcon from '@assets/svg/lock.svg';
 import Button from '@components/Button/Button';
 import FooterOutside from '@components/FooterOutside/FooterOutside';
 import FormInput from '@components/FormInput/FormInput';
-import { ApiResponse } from '@sharedTypes/api/api';
+import { ApiResponse } from '@/shared/types/api';
 import { fetchWithTimeout } from '@utils/fetch/withTimeout';
 import { sanitizeInputFrontend } from '@utils/sanitize';
 import { validateEmail, handleFieldValidation } from '@utils/validation';
 
 import styles from './page.module.css';
 
-import type { ForgotPasswordFormData } from '@/shared/types/form/form';
+import type { ForgotPasswordFormData } from '@/shared/types/form';
 import type { ValidationResult } from '@utils/validation';
 
 export default function ForgotPasswordPage() {
