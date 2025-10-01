@@ -1,8 +1,10 @@
 import React from 'react';
 
-import styles from './FooterOutside.module.css';
+import styles from './FooterOutside.module.scss';
 
-const FooterOutside = () => {
+import type { JSX } from 'react';
+
+const FooterOutside = (): JSX.Element => {
 	return (
 		<footer className={styles.footer}>
 			<p>MapleTrack is an unofficial, fan-made project and not associated with Nexon.</p>

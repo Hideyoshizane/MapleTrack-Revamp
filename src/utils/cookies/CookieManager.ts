@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie';
 
+import { COOKIE_EXPIRES_DAYS, MIN_VALUE_BONUS_COOKIE, MAX_VALUE_BONUS_COOKIE } from './constants';
 // Generic typed cookie helper for enums or fixed option sets.
 export class CookieManager<T extends string> {
 	key: string;
@@ -19,13 +20,13 @@ export class CookieManager<T extends string> {
 
 		const values = value.split(',') as T[];
 		// Filter to only allowed values
-		return values.filter((v) => this.allowedValues.includes(v));
+		return values.filter((v): boolean => this.allowedValues.includes(v));
 	};
 
 	//  Sets the cookie value if it's valid.
 	set = (values: T[]): void => {
 		// Validate all values
-		const invalid = values.filter((v) => !this.allowedValues.includes(v));
+		const invalid = values.filter((v): boolean => !this.allowedValues.includes(v));
 		if (invalid.length > 0) {
 			throw new Error(`Invalid value(s) for ${this.key}: "${invalid.join(',')}"`);
 		}
@@ -41,7 +42,12 @@ export class NumericCookieManager {
 	max: number;
 	expiresDays: number;
 
-	constructor(key: string, min = 0, max = 10, expiresDays = 60) {
+	constructor(
+		key: string,
+		min = MIN_VALUE_BONUS_COOKIE,
+		max = MAX_VALUE_BONUS_COOKIE,
+		expiresDays = COOKIE_EXPIRES_DAYS
+	) {
 		this.key = key;
 		this.min = min;
 		this.max = max;

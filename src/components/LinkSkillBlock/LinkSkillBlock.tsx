@@ -7,7 +7,9 @@ import React from 'react';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { getLinkSkillByName, getLinkSkillDescription } from '@data/linkSkill/linkSkill';
 
-import styles from './LinkSkillBlock.module.css';
+import styles from './LinkSkillBlock.module.scss';
+
+import type { JSX } from 'react';
 
 interface LinkSkillProps {
 	characterLevel: number;
@@ -21,11 +23,11 @@ const LinkSkillBlock: React.FC<LinkSkillProps> = ({
 	characterLinkSkill,
 	iconSize = 48,
 	showTooltip = false,
-}) => {
+}): JSX.Element => {
 	const linkSkill = characterLinkSkill ? getLinkSkillByName(characterLinkSkill) : null;
 
 	if (!linkSkill) {
-		return null;
+		return <></>;
 	}
 
 	const tooltipContent = linkSkill ? getLinkSkillDescription(linkSkill, characterLevel) : '';

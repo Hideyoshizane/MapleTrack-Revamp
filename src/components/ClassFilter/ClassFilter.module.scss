@@ -1,0 +1,58 @@
+$fontSize: 1.75rem;
+$fontWeight: 500;
+$height: 56px;
+
+.classFilter {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding-left: 32px;
+
+	.title {
+		font-size: $fontSize;
+		font-weight: $fontWeight;
+		color: var(--default-button-text);
+	}
+
+	.options {
+		height: $height;
+		overflow: hidden;
+		border: 1px solid var(--default-black);
+		border-radius: 25px;
+
+		.optionWrapper {
+			display: inline-flex;
+			align-items: center;
+
+			.option {
+				width: 180px;
+				height: $height;
+				border: none;
+				background-color: var(--default-white);
+				font-size: $fontSize;
+				font-weight: $fontWeight;
+				color: var(--default-button-text);
+				transition: background-color 0.2s ease;
+				cursor: pointer;
+
+				&:hover {
+					background-color: #e0e0e0;
+				}
+
+				&.active {
+					background-color: var(--filter-color-button);
+
+					&:hover {
+						background-color: #8ca5e3;
+					}
+				}
+			}
+
+			.separator {
+				width: 1px;
+				height: $height;
+				background-color: var(--default-black);
+			}
+		}
+	}
+}

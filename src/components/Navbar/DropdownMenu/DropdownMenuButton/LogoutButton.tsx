@@ -7,10 +7,12 @@ import React from 'react';
 import LogOutIcon from '@assets/svg/log-out.svg';
 
 import { DROPDOWN_ICON_SIZE } from './constants';
-import styles from './DropdownMenuCommon.module.css';
+import styles from './DropdownMenuCommon.module.scss';
 
-const LogoutButton: React.FC = () => {
-	const handleLogout = async () => {
+import type { JSX } from 'react';
+
+const LogoutButton: React.FC = (): JSX.Element => {
+	const handleLogout = async (): Promise<void> => {
 		try {
 			await signOut({ callbackUrl: '/login' });
 		} catch (error) {
@@ -19,7 +21,10 @@ const LogoutButton: React.FC = () => {
 	};
 
 	return (
-		<DropdownMenu.Item className={styles.dropdownItem} onSelect={() => void handleLogout()} aria-label="Logout">
+		<DropdownMenu.Item
+			className={styles.dropdownItem}
+			onSelect={(): undefined => void handleLogout()}
+			aria-label="Logout">
 			<LogOutIcon width={DROPDOWN_ICON_SIZE} height={DROPDOWN_ICON_SIZE} className={styles.icon} />
 			<span className={styles.text}>Logout</span>
 		</DropdownMenu.Item>

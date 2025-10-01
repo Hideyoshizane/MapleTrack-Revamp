@@ -2,9 +2,11 @@ import Image from 'next/image';
 
 import styles from './page.module.css';
 
+import type { JSX } from 'react';
+
 const version = process.env.APP_VERSION;
 
-export default function Home() {
+const Home = (): JSX.Element => {
 	return (
 		<div className={styles.page}>
 			<main className={styles.main}>
@@ -59,4 +61,6 @@ export default function Home() {
 			</footer>
 		</div>
 	);
-}
+};
+
+export default Home;

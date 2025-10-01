@@ -1,29 +1,21 @@
-import { NextRequest } from 'next/server';
-
 import { JobClasses } from '@data/classes/classes';
 import connectToDatabase from '@lib/mongooseConect';
 import { Character } from '@models/character';
 import { getCharacterDataRequestSchema } from '@schemas/characterRequestSchema';
 import { generateCharacterObject } from '@service/characterService';
-import { ApiResponse } from '@/shared/types/api';
 import { createResponse } from '@utils/api/createResponse';
 import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 
-export async function POST(req: NextRequest) {
+import type { ApiResponse } from '@sharedTypes/api';
+import type { NextResponse, NextRequest } from 'next/server';
+
+export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
 		await connectToDatabase();
 
-		// Parse JSON body
-		let rawBody: unknown;
-		try {
-			rawBody = await req.json();
-		} catch {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid JSON payload' }, 400);
-		}
-
 		// Validate request body using Zod
-		const parseResult = getCharacterDataRequestSchema.safeParse(rawBody);
+		const parseResult = getCharacterDataRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
@@ -54,7 +46,7 @@ export async function POST(req: NextRequest) {
 
 		//if not in database, return a generic object.
 		if (!character) {
-			const job = JobClasses.find((job) => job.code === code);
+			const job = JobClasses.find((job): boolean => job.code === code);
 
 			if (!job) {
 				return createResponse<ApiResponse>({ success: false, error: `Job with code ${code} not found` }, 404);
@@ -70,18 +62,18 @@ export async function POST(req: NextRequest) {
 				userOrigin: username,
 			});
 			return createResponse<ApiResponse<typeof genericCharacter>>(
-				{ success: true, message: 'Character not found, returning generic object', data: genericCharacter },
+				{ success: true, message: 'Character not found, returning new Character.', data: genericCharacter },
 				200
 			);
 		}
 
 		// Success response
 		return createResponse<ApiResponse<typeof character>>(
-			{ success: true, message: 'Found character', data: character },
+			{ success: true, message: 'Found character.', data: character },
 			200
 		);
 	} catch (error) {
 		console.error('Search error:', error);
 		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
 	}
-}
+};

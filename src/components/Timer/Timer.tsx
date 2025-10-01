@@ -6,8 +6,11 @@ import utc from 'dayjs/plugin/utc';
 import React, { useEffect, useState, useCallback } from 'react';
 
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
+import { nowUtc, getNextResetTime, toUtc, WEEKDAYS } from '@utils/time/time';
 
-import styles from './Timer.module.css';
+import styles from './Timer.module.scss';
+
+import type { JSX } from 'react';
 
 // Extend dayjs with UTC and Duration plugins for accurate time calculations
 dayjs.extend(utc);
@@ -25,27 +28,17 @@ interface TimerProps {
 	target: 'daily' | 'weekly'; // Determines which type of reset. Daily = UTC 12AM. Weekly = Thursday UTC 12AM
 }
 
-const Timer: React.FC<TimerProps> = ({ target }) => {
+const Timer = ({ target }: TimerProps): JSX.Element => {
+	// Calculate time left until next reset
 	const calculateTimeLeft = useCallback((): TimeLeft => {
-		// Get current UTC time
-		const now = dayjs.utc();
+		const now = nowUtc();
 
 		let targetTime: dayjs.Dayjs;
 
 		if (target === 'daily') {
-			targetTime = now.add(1, 'day').startOf('day');
+			targetTime = toUtc(now).add(1, 'day').startOf('day');
 		} else {
-			// Sunday = 0, Thursday = 4
-			const currentDay = now.day();
-
-			let daysUntilThursday = (4 - currentDay + 7) % 7;
-
-			// If today is Thursday and we're past midnight, count 7 days ahead
-			if (daysUntilThursday === 0 && now.isAfter(now.startOf('day'))) {
-				daysUntilThursday = 7;
-			}
-
-			targetTime = now.add(daysUntilThursday, 'day').startOf('day');
+			targetTime = getNextResetTime(now, WEEKDAYS.THURSDAY);
 		}
 
 		// Difference between now and the next reset
@@ -70,18 +63,17 @@ const Timer: React.FC<TimerProps> = ({ target }) => {
 	const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
 	// Update countdown every second
-	useEffect(() => {
-		const interval = setInterval(() => {
+	useEffect((): (() => void) => {
+		const interval: ReturnType<typeof setInterval> = setInterval((): void => {
 			setTimeLeft(calculateTimeLeft());
 		}, 1000);
 
-		// Cleanup interval on unmount
-		return () => clearInterval(interval);
+		const cleanup = (): void => clearInterval(interval);
+		return cleanup;
 	}, [calculateTimeLeft]);
 
 	// Helper function to pad numbers with leading zeros
-	const pad = (num: number) => num.toString().padStart(2, '0');
-
+	const pad = (num: number): string => num.toString().padStart(2, '0');
 	if (!timeLeft) {
 		return <SkeletonWrapper width={200} height={58} color="dark" />;
 	}

@@ -1,0 +1,13 @@
+$divHeight: 827px;
+
+.mainDiv {
+	display: flex;
+	flex-direction: row;
+
+	.characterContent {
+		display: flex;
+		flex-direction: column;
+		width: 950px;
+		height: $divHeight;
+	}
+}

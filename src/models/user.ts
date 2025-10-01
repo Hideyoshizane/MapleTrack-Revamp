@@ -1,4 +1,6 @@
-import mongoose, { Document, Model, Schema, Types } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+
+import type { Document, Model, Types } from 'mongoose';
 
 const LASTVERSION = 1;
 
@@ -45,7 +47,7 @@ const userSchema = new Schema<IUser>(
 		},
 		lastLogin: {
 			type: Date,
-			default: () => new Date(),
+			default: (): Date => new Date(),
 		},
 		characters: [
 			{
@@ -67,8 +69,6 @@ const userSchema = new Schema<IUser>(
 );
 
 // Indexes
-userSchema.index({ username: 1 }, { unique: true });
-userSchema.index({ email: 1 }, { unique: true });
 userSchema.index({ resetPasswordToken: 1, resetPasswordExpires: 1 });
 
 // Create the User model if it doesn't already exist (to avoid model overwrite in dev)

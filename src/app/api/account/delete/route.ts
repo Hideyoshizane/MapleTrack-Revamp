@@ -1,68 +1,87 @@
-import { NextRequest } from 'next/server';
+import mongoose from 'mongoose';
 import { getToken } from 'next-auth/jwt';
 
 import connectToDatabase from '@lib/mongooseConect';
+import { Character } from '@models/character';
 import User from '@models/user';
-import { deleteAccountRequestSchema, DeleteAccountApiResponse } from '@schemas/deleteAccount';
+import { deleteAccountRequestSchema } from '@schemas/authSchemas';
 import { createResponse } from '@utils/api/createResponse';
-import { isString } from '@utils/guards/isString';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 
-export async function DELETE(req: NextRequest) {
+import type { ApiResponse } from '@sharedTypes/api';
+import type { NextRequest, NextResponse } from 'next/server';
+
+export const DELETE = async (request: NextRequest): Promise<NextResponse> => {
 	try {
 		await connectToDatabase();
 
-		let rawBody: unknown;
-
-		// Parse JSON body and fail early if malformed
-		try {
-			rawBody = await req.json();
-		} catch {
-			return createResponse<DeleteAccountApiResponse>({ success: false, error: 'Invalid JSON payload' }, 400);
-		}
-
-		// Extract token from the request cookies
-		const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-		if (!token) {
-			return createResponse<DeleteAccountApiResponse>({ success: false, error: 'Unauthorized' }, 401);
-		}
-
 		// Validate request body using Zod
-		const parseResult = deleteAccountRequestSchema.safeParse(rawBody);
+		const parseResult = deleteAccountRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
-			return createResponse<DeleteAccountApiResponse>({ success: false, error: 'Invalid request body' }, 400);
+			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
 
-		const { username: rawUsername } = parseResult.data;
+		const rawUsername = parseResult.data.username;
 
 		// Validate that the properties are strings
-		if (!isString(rawUsername)) {
-			return createResponse({ success: false, error: 'Invalid request body' }, 400);
+		if (typeof rawUsername !== 'string') {
+			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
 
 		// Sanitize input
 		const username = sanitizeInputBackEnd(rawUsername);
 		if (!username) {
-			return createResponse<DeleteAccountApiResponse>({ success: false, error: 'Missing required fields' }, 400);
+			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
+		}
+
+		// Extract token from the request cookies
+		const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+		if (!token) {
+			return createResponse<ApiResponse>({ success: false, error: 'Unauthorized' }, 401);
 		}
 
 		// Ensure the authenticated user matches the username being deleted
 		if (token.username !== username) {
-			return createResponse<DeleteAccountApiResponse>({ success: false, error: 'Forbidden' }, 403);
+			return createResponse<ApiResponse>({ success: false, error: 'Forbidden' }, 403);
 		}
 
 		// Find user by username
 		const user = await User.findOne({ username });
 		if (!user) {
-			return createResponse<DeleteAccountApiResponse>({ success: false, error: 'Invalid username' }, 404);
+			return createResponse<ApiResponse>({ success: false, error: 'Invalid username' }, 404);
 		}
 
-		// Delete the user
-		await User.deleteOne({ _id: user._id });
+		// Start a session for transactional safety
+		const session = await mongoose.startSession();
+		session.startTransaction();
 
-		return createResponse<DeleteAccountApiResponse>({ success: true, message: 'Account deleted successfully.' }, 200);
+		try {
+			// Delete characters owned by user
+			await Character.deleteMany({ userOrigin: username }, { session });
+
+			// TODO: Delete BossList when model is added (inside same session)
+
+			// Delete the user
+			await User.deleteOne({ _id: user._id }, { session });
+
+			// Commit the transaction
+			await session.commitTransaction();
+			await session.endSession();
+
+			return createResponse<ApiResponse>(
+				{ success: true, message: 'Account and related data deleted successfully.' },
+				200
+			);
+		} catch (err) {
+			// Rollback if anything fails
+			await session.abortTransaction();
+			await session.endSession();
+
+			console.error('Delete account transaction failed:', err);
+			return createResponse<ApiResponse>({ success: false, error: 'A error has occurred.' }, 500);
+		}
 	} catch (error) {
 		console.error('Delete account error:', error);
-		return createResponse<DeleteAccountApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
+		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
 	}
-}
+};

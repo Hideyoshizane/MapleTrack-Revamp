@@ -2,28 +2,29 @@
 
 import * as RadixTooltip from '@radix-ui/react-tooltip';
 import Cookies from 'js-cookie';
-import React from 'react';
+import { useEffect, useState } from 'react';
 
-import styles from './Tooltip.module.css';
+import styles from './Tooltip.module.scss';
+
+import type { ReactElement, ReactNode, JSX } from 'react';
 
 type CustomTooltipProps = {
-	content: React.ReactNode;
-	children: React.ReactElement;
+	content: ReactNode;
+	children: ReactElement;
 	placement?: 'top' | 'bottom' | 'left' | 'right';
 	enabled?: boolean;
 };
 
-export default function Tooltip({ content, children, placement = 'top', enabled = true }: CustomTooltipProps) {
-	// Render children directly if tooltip is disabled
-	if (!enabled) {
-		return children;
-	}
+const Tooltip = ({ content, children, placement = 'top', enabled = true }: CustomTooltipProps): JSX.Element => {
+	const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
 	// Read theme cookie
-	const themeCookie = Cookies.get('theme');
-
-	// Validate theme, fallback to 'light' if invalid or undefined
-	const theme = themeCookie === 'dark' || themeCookie === 'light' ? themeCookie : 'light';
+	useEffect((): void => {
+		const themeCookie = Cookies.get('theme');
+		if (themeCookie === 'dark' || themeCookie === 'light') {
+			setTheme(themeCookie);
+		}
+	}, []);
 
 	// Determine opposite theme
 	const oppositeTheme = theme === 'dark' ? 'light' : 'dark';
@@ -31,6 +32,9 @@ export default function Tooltip({ content, children, placement = 'top', enabled 
 	// Choose styles based on opposite theme
 	const tooltipClass = oppositeTheme === 'dark' ? styles.tooltipDark : styles.tooltipLight;
 	const arrowClass = oppositeTheme === 'dark' ? styles.arrowDark : styles.arrowLight;
+
+	// Render children directly if tooltip is disabled
+	if (!enabled) return children;
 
 	return (
 		<RadixTooltip.Provider delayDuration={50}>
@@ -46,4 +50,6 @@ export default function Tooltip({ content, children, placement = 'top', enabled 
 			</RadixTooltip.Root>
 		</RadixTooltip.Provider>
 	);
-}
+};
+
+export default Tooltip;

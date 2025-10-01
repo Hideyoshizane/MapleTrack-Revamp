@@ -2,33 +2,24 @@ import { clsx } from 'clsx';
 import { Roboto } from 'next/font/google';
 import { cookies } from 'next/headers';
 
-import { type Theme } from '@/lib/theme';
 import CustomToaster from '@components/Toaster/Toaster';
+import { type Theme } from '@lib/theme';
 
-import { Providers } from './providers';
+import Providers from './providers';
 
-import type { Metadata } from 'next';
+import type { JSX } from 'react';
 
-import './globals.css';
+import './globals.scss';
 
 const roboto = Roboto({
 	subsets: ['latin'],
 	weight: ['300', '400', '500', '700'],
 });
 
-export const metadata: Metadata = {
-	title: 'MapleTrack',
-	icons: {
-		icon: '/favicon.ico',
-		apple: '/apple-icon.png',
-		shortcut: '/favicon.ico',
-	},
-	manifest: '/manifest.json',
-};
-
-export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+const RootLayout = async ({ children }: Readonly<{ children: React.ReactNode }>): Promise<JSX.Element> => {
 	const cookieStore = await cookies();
 	const theme = (cookieStore.get('theme')?.value ?? 'light') as Theme;
+
 	return (
 		<html lang="en">
 			<body className={clsx(roboto.className, theme)}>
@@ -39,4 +30,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 			</body>
 		</html>
 	);
-}
+};
+
+export default RootLayout;

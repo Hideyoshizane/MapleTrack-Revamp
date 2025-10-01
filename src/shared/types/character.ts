@@ -20,8 +20,19 @@ export interface ExtraCharacterData {
 	characterImgURL: string;
 }
 
-export type GetAllCharactersApiResponse = ApiResponse<CharacterDocument[]>;
+export interface UpdateCharacterRequestBody {
+	userOrigin: string;
+	server: string;
+	code: string;
+	data: Character;
+}
 
-export type GetCharacterDataApiResponse = ApiResponse<CharacterDocument>;
+export type Character = Omit<CharacterDocument, keyof Document>;
+
+export type GetAllCharactersApiResponse = ApiResponse<Character[]>;
+
+export type GetCharacterDataApiResponse = ApiResponse<Character>;
 
 export type GetExtraCharacterDataApiResponse = ApiResponse<ExtraCharacterData>;
+
+export type GetUpdateCharacterDataApiResponse = ApiResponse;

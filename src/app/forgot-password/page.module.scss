@@ -1,0 +1,82 @@
+$containerWidth: 320px;
+$marginTop: 40px;
+$textFontSize: 1.25rem;
+
+.container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	.logoDiv {
+		position: relative;
+		width: 750px;
+		height: 250px;
+		margin-bottom: 32px;
+		margin-top: 5%;
+	}
+
+	.titleDiv {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: $containerWidth;
+		margin-bottom: 16px;
+
+		.icon {
+			color: var(--default-white);
+			margin-right: 16px;
+		}
+
+		.title {
+			font-size: 2rem;
+			text-align: center;
+			color: var(--default-white);
+		}
+	}
+
+	.text {
+		width: $containerWidth;
+		font-size: 0.875rem;
+		line-height: 1.4;
+		color: var(--background-white);
+		margin-bottom: 24px;
+	}
+
+	.submitButton {
+		width: $containerWidth;
+		height: 48px;
+		border: 1px solid var(--primary-color-button);
+		background-color: var(--primary-color-button);
+		margin-top: 8px;
+	}
+
+	.orDiv {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: $marginTop;
+
+		.bar {
+			width: 135px;
+			height: 1px;
+			background-color: var(--default-white);
+		}
+
+		.textBar {
+			width: 50px;
+			font-size: $textFontSize;
+			text-align: center;
+			color: var(--default-white);
+		}
+	}
+
+	.newAccount {
+		display: flex;
+		justify-content: center;
+		font-size: $textFontSize;
+		text-align: center;
+		color: var(--default-white);
+		cursor: pointer;
+		margin-top: $marginTop;
+	}
+}

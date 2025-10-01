@@ -1,8 +1,18 @@
 {
-	"extends": ["stylelint-config-standard"],
+	"extends": ["stylelint-config-standard-scss", "stylelint-config-css-modules"],
 	"plugins": ["stylelint-order"],
 	"rules": {
-		"selector-class-pattern": "^[a-z][a-zA-Z0-9]+$",
+		"scss/percent-placeholder-pattern": "^[a-z][a-zA-Z0-9]+$",
+		"scss/dollar-variable-pattern": "^[a-z][a-zA-Z0-9]+$",
+		"scss/at-mixin-pattern": "^[a-z][a-zA-Z0-9]+$",
+
+		"selector-class-pattern": [
+			"^[a-z][a-zA-Z0-9]+$",
+			{
+				"message": "Class names should be written in camelCase (for CSS Modules)."
+			}
+		],
+
 		"order/properties-order": [
 			[
 				"position",
@@ -14,15 +24,30 @@
 				"display",
 				"flex",
 				"flex-direction",
+				"flex-wrap",
 				"align-items",
 				"justify-content",
+				"gap",
 				"width",
+				"min-width",
+				"max-width",
 				"height",
+				"min-height",
+				"max-height",
 				"margin",
 				"padding",
-				"border",
+				"overflow",
 				"box-sizing",
+				"border",
+				"border-radius",
+				"box-shadow",
+				"background",
+				"background-color",
+				"background-image",
+				"background-repeat",
+				"background-size",
 				"font",
+				"font-family",
 				"font-size",
 				"font-weight",
 				"line-height",
@@ -30,18 +55,20 @@
 				"text-align",
 				"text-transform",
 				"color",
-				"background",
-				"background-color",
-				"box-shadow",
-				"border-radius",
 				"transition",
 				"transform",
+				"animation",
 				"cursor",
 				"user-select"
 			],
 			{
 				"unspecified": "bottomAlphabetical"
 			}
-		]
+		],
+		"at-rule-no-unknown": null,
+		"scss/at-rule-no-unknown": true,
+
+		"no-descending-specificity": null,
+		"declaration-empty-line-before": null
 	}
 }

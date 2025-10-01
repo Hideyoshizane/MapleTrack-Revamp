@@ -1,11 +1,12 @@
 'use client';
 
-import { classFilterCookie } from '@/utils/cookies/classFilterCookie';
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
+import { classFilterCookie } from '@utils/cookies/classFilterCookie';
 
-import styles from './ClassFilter.module.css';
+import styles from './ClassFilter.module.scss';
 
-import type { ClassFilterOption } from '@/utils/cookies/classFilterCookie';
+import type { ClassFilterOption } from '@utils/cookies/classFilterCookie';
+import type { JSX } from 'react';
 
 interface ClassFilterProps {
 	selectedClasses: ClassFilterOption[];
@@ -13,15 +14,19 @@ interface ClassFilterProps {
 	loading?: boolean;
 }
 
-const toCapitalCase = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+const toCapitalCase = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
 // Toggle a class selection. Updates parent state via `setSelectedClasses`
-export const ClassFilter = ({ selectedClasses, setSelectedClasses, loading = false }: ClassFilterProps) => {
-	const toggleClass = (className: ClassFilterOption) => {
+export const ClassFilter = ({
+	selectedClasses,
+	setSelectedClasses,
+	loading = false,
+}: ClassFilterProps): JSX.Element => {
+	const toggleClass = (className: ClassFilterOption): void => {
 		const lowerName = className.toLowerCase() as ClassFilterOption;
 
 		const updated = selectedClasses.includes(lowerName)
-			? selectedClasses.filter((c) => c !== lowerName)
+			? selectedClasses.filter((c): boolean => c !== lowerName)
 			: [...selectedClasses, lowerName];
 
 		// update parent state & cookie
@@ -41,14 +46,14 @@ export const ClassFilter = ({ selectedClasses, setSelectedClasses, loading = fal
 		<div className={styles.classFilter}>
 			<h3 className={styles.title}>Class Filter</h3>
 			<div className={styles.options}>
-				{classFilterCookie['allowedValues'].map((className, index, arr) => {
+				{classFilterCookie['allowedValues'].map((className, index, arr): JSX.Element => {
 					const lowerName = className.toLowerCase() as ClassFilterOption;
 					return (
 						<span key={lowerName} className={styles.optionWrapper}>
 							<button
 								type="button"
 								className={`${styles.option} ${selectedClasses.includes(lowerName) ? styles.active : ''}`}
-								onClick={() => toggleClass(lowerName)}>
+								onClick={(): void => toggleClass(lowerName)}>
 								{toCapitalCase(lowerName)}
 							</button>
 							{index < arr.length - 1 && <span className={styles.separator}></span>}

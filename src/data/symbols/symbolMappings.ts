@@ -1,7 +1,8 @@
-import { getRemainingExp } from '@data/symbols/exp/expTable';
-import { CharacterSymbol, CharacterContent } from '@models/character';
+import { getRemainingExp, getExpForLevel, getLastLevel } from '@data/symbols/exp/expTable';
 
 import { allSymbols } from './dailyExp';
+
+import type { CharacterSymbol, CharacterContent } from '@models/character';
 
 // Symbol Name Types
 export type ArcaneSymbolName = 'Vanishing Journey' | 'Chu Chu Island' | 'Lachelein' | 'Arcana' | 'Morass' | 'Esfera';
@@ -11,7 +12,7 @@ export type SymbolCategory = 'arcane' | 'sacred' | 'grand';
 export type SymbolName = ArcaneSymbolName | SacredSymbolName | GrandSacredSymbolName;
 
 // Maps category to names
-const SYMBOL_NAMES: Record<SymbolCategory, readonly string[]> = {
+export const SYMBOL_NAMES: Record<SymbolCategory, readonly string[]> = {
 	arcane: ['Vanishing Journey', 'Chu Chu Island', 'Lachelein', 'Arcana', 'Morass', 'Esfera'],
 	sacred: ['Cernium', 'Arcus', 'Odium', 'Shangri-La', 'Arteria', 'Carcion'],
 	grand: ['Tallahart'],
@@ -41,11 +42,11 @@ interface SymbolInfo {
 
 // Build a single lookup map
 const SYMBOL_MAP: Record<SymbolName, SymbolInfo> = Object.fromEntries(
-	Object.entries(SYMBOL_NAMES).flatMap(([category, names]) =>
-		names.map((name) => {
-			const symbol = allSymbols.find((s) => s.name === name);
+	Object.entries(SYMBOL_NAMES).flatMap(([category, names]): [SymbolName, SymbolInfo][] =>
+		names.map((name): [SymbolName, SymbolInfo] => {
+			const symbol = allSymbols.find((s): boolean => s.name === name);
 			return [
-				name,
+				name as SymbolName,
 				{
 					category: category as SymbolCategory,
 					file: name.toLowerCase().replace(/ /g, '_'),
@@ -82,7 +83,7 @@ export const getSymbolMaxLevel = (input: SymbolCategory | SymbolName): number =>
 export const getContentValue = (symbolName: string, contentType: string): number => {
 	// Helper to resolve values safely
 	const resolve = (name: string): number => {
-		const symbol = allSymbols.find((s) => s.name === name);
+		const symbol = allSymbols.find((s): boolean => s.name === name);
 		return symbol ? Number(symbol.value) || 0 : 0;
 	};
 
@@ -138,4 +139,37 @@ export const calculateDaysToCompleteSymbol = (
 	}
 
 	return weeksNeeded * 7 + remainingDays;
+};
+
+export type LevelUpResult = {
+	currentLevel: number;
+	currentExp: number;
+};
+
+export const calculateNewLevelFromExp = (
+	type: SymbolCategory,
+	currentLevel: number,
+	currentExp: number
+): LevelUpResult => {
+	const lastLevel = getLastLevel(type);
+
+	let level = currentLevel;
+	let exp = currentExp;
+
+	// Loop until we reach max level or can't level up anymore
+	while (level < lastLevel) {
+		const expForNextLevel = getExpForLevel(type, level);
+
+		if (exp >= expForNextLevel) {
+			exp -= expForNextLevel;
+			level += 1;
+		} else {
+			break;
+		}
+	}
+
+	return {
+		currentLevel: level,
+		currentExp: exp,
+	};
 };

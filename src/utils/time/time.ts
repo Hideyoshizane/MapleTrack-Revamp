@@ -1,6 +1,8 @@
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+
+import type { Dayjs } from 'dayjs';
 
 // Extend dayjs with UTC and timezone support
 dayjs.extend(utc);
@@ -11,7 +13,7 @@ dayjs.tz.setDefault('UTC');
 export const nowUtc = (): dayjs.Dayjs => dayjs.utc();
 
 // Normalize input into a UTC Dayjs object
-const toUtc = (date: string | Date | Dayjs): Dayjs => {
+export const toUtc = (date: string | Date | Dayjs): Dayjs => {
 	try {
 		return dayjs.utc(date);
 	} catch (error) {
@@ -21,12 +23,12 @@ const toUtc = (date: string | Date | Dayjs): Dayjs => {
 };
 
 // Weekday constants for clarity (0 = Sunday, 1 = Monday, ... 6 = Saturday)
-const WEEKDAYS = {
+export const WEEKDAYS = {
 	MONDAY: 1,
 	THURSDAY: 4,
-} as const;
+};
 
-const getNextResetTime = (date: string | Date | Dayjs, targetWeekday: number): Dayjs => {
+export const getNextResetTime = (date: string | Date | Dayjs, targetWeekday: number): Dayjs => {
 	const givenDate = toUtc(date);
 
 	// Calculate how many days until the target weekday
@@ -36,29 +38,25 @@ const getNextResetTime = (date: string | Date | Dayjs, targetWeekday: number): D
 	return givenDate.add(daysUntil, 'day').startOf('day');
 };
 
-export const hasDailyResetOccurred = (date: string | Date | Dayjs): boolean => {
+// Utility to check if reset has occurred
+const hasResetOccurred = (date: string | Date | Dayjs, resetTime: Dayjs): boolean => {
 	if (!date) {
 		return false;
 	}
-
-	const resetTime = toUtc(date).add(1, 'day').startOf('day');
 	return nowUtc().isAfter(resetTime);
+};
+
+export const hasDailyResetOccurred = (date: string | Date | Dayjs): boolean => {
+	const resetTime = toUtc(date).add(1, 'day').startOf('day');
+	return hasResetOccurred(date, resetTime);
 };
 
 export const hasBossResetOccurred = (date: string | Date | Dayjs): boolean => {
-	if (!date) {
-		return false;
-	}
-
 	const resetTime = getNextResetTime(date, WEEKDAYS.THURSDAY);
-	return nowUtc().isAfter(resetTime);
+	return hasResetOccurred(date, resetTime);
 };
 
 export const hasWeeklyQuestResetOccurred = (date: string | Date | Dayjs): boolean => {
-	if (!date) {
-		return false;
-	}
-
 	const resetTime = getNextResetTime(date, WEEKDAYS.MONDAY);
-	return nowUtc().isAfter(resetTime);
+	return hasResetOccurred(date, resetTime);
 };

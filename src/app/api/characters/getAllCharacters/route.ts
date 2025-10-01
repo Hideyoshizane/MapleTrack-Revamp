@@ -1,27 +1,19 @@
-import { NextRequest } from 'next/server';
-
 import connectToDatabase from '@lib/mongooseConect';
 import { Character } from '@models/character';
 import { getAllCharactersRequestSchema } from '@schemas/characterRequestSchema';
-import { ApiResponse } from '@/shared/types/api';
 import { createResponse } from '@utils/api/createResponse';
 import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 
-export async function POST(req: NextRequest) {
+import type { ApiResponse } from '@sharedTypes/api';
+import type { NextResponse, NextRequest } from 'next/server';
+
+export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
 		await connectToDatabase();
 
-		// Parse JSON body
-		let rawBody: unknown;
-		try {
-			rawBody = await req.json();
-		} catch {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid JSON payload' }, 400);
-		}
-
 		// Validate request body using Zod
-		const parseResult = getAllCharactersRequestSchema.safeParse(rawBody);
+		const parseResult = getAllCharactersRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
@@ -54,4 +46,4 @@ export async function POST(req: NextRequest) {
 		console.error('Search error:', error);
 		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
 	}
-}
+};

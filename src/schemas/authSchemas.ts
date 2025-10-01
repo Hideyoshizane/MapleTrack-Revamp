@@ -6,7 +6,6 @@ import { userSchema } from '@schemas/user';
 const usernameSchema = userSchema.shape.username;
 const emailSchema = userSchema.shape.email;
 const passwordSchema = userSchema.shape.password;
-const confirmPasswordSchema = userSchema.shape.confirmPassword;
 
 // Shared
 export const credentialsSchema = z.object({
@@ -21,7 +20,7 @@ export const signupRequestSchema = credentialsSchema
 		email: emailSchema,
 		confirmPassword: passwordSchema,
 	})
-	.refine((data) => data.password === data.confirmPassword, {
+	.refine((data: { password: string; confirmPassword: string }): boolean => data.password === data.confirmPassword, {
 		path: ['confirmPassword'],
 		message: 'Passwords do not match.',
 	});
@@ -50,10 +49,13 @@ export const changePasswordRequestSchema = z
 		currentPassword: passwordSchema,
 		newPassword: passwordSchema,
 	})
-	.refine((data) => data.currentPassword !== data.newPassword, {
-		path: ['newPassword'],
-		message: 'New password must be different from current password.',
-	});
+	.refine(
+		(data: { currentPassword: string; newPassword: string }): boolean => data.currentPassword !== data.newPassword,
+		{
+			path: ['newPassword'],
+			message: 'New password must be different from current password.',
+		}
+	);
 export type ChangePasswordRequestBody = z.infer<typeof changePasswordRequestSchema>;
 
 // Delete Account

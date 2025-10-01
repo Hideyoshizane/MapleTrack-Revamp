@@ -6,7 +6,7 @@ export const servers: Server[] = serversJson as Server[];
 
 // Check if a server is a Reboot server
 export const isRebootServer = (serverName: string): boolean => {
-	const server = servers.find((s) => s.name.toLowerCase() === serverName.toLowerCase());
+	const server = servers.find((s): boolean => s.name.toLowerCase() === serverName.toLowerCase());
 
 	// If server exists, return its Reboot status, otherwise return false
 	return server?.Reboot ?? false;

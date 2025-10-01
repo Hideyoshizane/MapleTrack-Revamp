@@ -1,16 +1,18 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 
-import { authOptions } from '@/lib/authOptions';
 import Navbar from '@components/Navbar/Navbar';
+import { authOptions } from '@lib/authOptions';
 
 import HomePageClient from './HomePageClient';
+
+import type { JSX } from 'react';
 
 interface HomePageProps {
 	searchParams?: Record<string, string | undefined>;
 }
 
-export default async function HomePage({ searchParams }: HomePageProps) {
+const HomePage = async ({ searchParams }: HomePageProps): Promise<JSX.Element> => {
 	const session = await getServerSession(authOptions);
 
 	// If no session, redirect to login with a query param
@@ -24,4 +26,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 			<HomePageClient searchParams={searchParams} username={session.user.username} />
 		</main>
 	);
-}
+};
+
+export default HomePage;

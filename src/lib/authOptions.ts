@@ -1,13 +1,13 @@
 import bcrypt from 'bcrypt';
-import { type AuthOptions, User, Session } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
-import { updateLastLogin } from '@/service/userService';
 import connectToDatabase from '@lib/mongooseConect';
 import UserMongo from '@models/user';
+import { updateLastLogin } from '@service/userService';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 import { validateUsernameLogin, validatePasswordLogin } from '@utils/validation';
 
+import type { AuthOptions, User, Session } from 'next-auth';
 import type { JWT } from 'next-auth/jwt';
 
 export const authOptions: AuthOptions = {
@@ -79,7 +79,7 @@ export const authOptions: AuthOptions = {
 	],
 	callbacks: {
 		// Customize JWT token content
-		jwt({ token, user }: { token: JWT; user?: User | undefined }) {
+		jwt({ token, user }: { token: JWT; user?: User | undefined }): JWT {
 			if (user) {
 				token.id = user.id;
 				token.username = user.username;
@@ -87,7 +87,7 @@ export const authOptions: AuthOptions = {
 			return token;
 		},
 		// Customize session object returned to client
-		session({ session, token }: { session: Session; token: JWT }) {
+		session({ session, token }: { session: Session; token: JWT }): Session {
 			if (token) {
 				session.user = {
 					id: token.id as string,
@@ -95,6 +95,13 @@ export const authOptions: AuthOptions = {
 				};
 			}
 			return session;
+		},
+		// Prevent redirects for API routes
+		redirect({ url, baseUrl }): string {
+			if (url.startsWith('/api')) {
+				return baseUrl; // don’t redirect API calls
+			}
+			return url.startsWith(baseUrl) ? url : baseUrl;
 		},
 	},
 	pages: {

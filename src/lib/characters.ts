@@ -1,10 +1,14 @@
 import connectToDatabase from '@lib/mongooseConect';
-import { Character, CharacterDocument, CharacterSymbol } from '@models/character';
+import { Character } from '@models/character';
 import { createResponse } from '@utils/api/createResponse';
 import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 import { hasDailyResetOccurred, hasWeeklyQuestResetOccurred, nowUtc } from '@utils/time/time';
-import { NextResponse } from 'next/server';
+
+import { fetchCharacterExternal } from './fetchCharacterExternal';
+
+import type { CharacterDocument, CharacterSymbol } from '@models/character';
+import type { NextResponse } from 'next/server';
 
 export const validateUserAccess = (
 	params: { userOrigin: string; server: string; code: string },
@@ -12,6 +16,7 @@ export const validateUserAccess = (
 ): boolean => {
 	try {
 		// Validate that the properties are strings
+
 		if (
 			typeof sessionUsername !== 'string' ||
 			typeof params.userOrigin !== 'string' ||
@@ -73,43 +78,14 @@ export const syncCharacterInfo = async (params: {
 
 		// Search for the character
 		const character = await Character.findOne({ userOrigin, server, code });
-		// Check if character exists
 		if (!character) {
 			return createResponse({ success: false, error: 'Character not found' }, 404);
 		}
 
 		// Check if sync on, then sync with Maplestory API
 		if (character.syncing) {
-			const baseURL =
-				process.env.NEXT_PUBLIC_BASE_URL ||
-				(process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : undefined);
-
-			if (!baseURL) {
-				return createResponse({ success: false, error: 'URL not defined' }, 500);
-			}
-
-			const res = await fetch(
-				`${baseURL}/api/characters/getAPICharacterImage?character_name=${character.name}&server=${server}`,
-				{ cache: 'no-store' }
-			);
-
-			if (!res.ok) {
-				return createResponse(
-					{
-						success: false,
-						message: 'Failed to fetch external character',
-					},
-					200
-				);
-			}
-			const json = await res.json();
-
-			// Access level from the data
-			const syncedLevel = json?.data?.level;
-
-			if (typeof syncedLevel === 'number') {
-				character.level = syncedLevel;
-			}
+			const externalData = await fetchCharacterExternal(character.name, server);
+			character.level = externalData.level;
 		}
 
 		// Reset quests
@@ -120,7 +96,7 @@ export const syncCharacterInfo = async (params: {
 
 		return createResponse({ success: true, message: 'Character synced successfully' }, 200);
 	} catch (error) {
-		console.error('Delete account error:', error);
+		console.error('Character Sync error:', error);
 		return createResponse({ success: false, error: 'Internal Server Error' }, 500);
 	}
 };
@@ -128,8 +104,8 @@ export const syncCharacterInfo = async (params: {
 export const resetDailyQuests = (character: CharacterDocument): void => {
 	// Helper to process one symbol array
 	const processSymbolArray = (symbolArray: CharacterSymbol[]): void => {
-		symbolArray.forEach((symbol) => {
-			symbol.content.forEach((quest) => {
+		symbolArray.forEach((symbol: CharacterSymbol): void => {
+			symbol.content.forEach((quest): void => {
 				// Only process daily quests that were previously interacted with
 				if (quest.contentType === 'Daily Quest' && quest.date) {
 					try {
@@ -157,9 +133,9 @@ export const resetWeeklyQuests = (character: CharacterDocument): void => {
 			character.GrandSacredSymbol,
 		];
 
-		symbolsToReset.forEach((symbolArray) => {
-			symbolArray.forEach((symbol: CharacterSymbol) => {
-				symbol.content.forEach((quest) => {
+		symbolsToReset.forEach((symbolArray: CharacterSymbol[]): void => {
+			symbolArray.forEach((symbol: CharacterSymbol): void => {
+				symbol.content.forEach((quest): void => {
 					// Only process quests that have 'tries'
 					if (quest.tries !== undefined) {
 						if (!quest.date || hasWeeklyQuestResetOccurred(quest.date)) {

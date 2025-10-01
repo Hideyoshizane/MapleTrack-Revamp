@@ -3,18 +3,21 @@ import Link from 'next/link';
 import React from 'react';
 
 import Timer from '@components/Timer/Timer';
+import { APP_VERSION } from '@lib/version';
 
-import { CustomDropdownMenu } from './DropdownMenu/CustomDropdownMenu';
-import styles from './Navbar.module.css';
+import CustomDropdownMenu from './DropdownMenu/CustomDropdownMenu';
+import styles from './Navbar.module.scss';
 import SearchBar from './SearchBar/SearchBar';
 
-const version = process.env.APP_VERSION;
+import type { JSX } from 'react';
+
+const version = APP_VERSION;
 
 interface NavbarProps {
 	username: string;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ username }) => {
+const Navbar: React.FC<NavbarProps> = ({ username }): JSX.Element => {
 	return (
 		<nav className={styles.navBody}>
 			<Link href="/home">

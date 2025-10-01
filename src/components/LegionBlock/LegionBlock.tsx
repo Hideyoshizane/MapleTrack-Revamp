@@ -1,14 +1,15 @@
 'use client';
 
-import { clsx } from 'clsx';
 import Image from 'next/image';
 import React from 'react';
 
-import { getRank } from '@/utils/legion/getRank';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { getLegionData } from '@data/legion/legionSystems';
+import { getRank } from '@utils/legion/getRank';
 
-import styles from './LegionBlock.module.css';
+import styles from './LegionBlock.module.scss';
+
+import type { JSX } from 'react';
 
 interface LegionBlockProps {
 	characterLevel: number;
@@ -36,14 +37,14 @@ const normalizeRank = (rank: string): string => {
 	}
 };
 
-const TooltipData = (legionRank: string, legionData: ReturnType<typeof getLegionData>): React.JSX.Element | string => {
-	if (!legionData?.ranking) return 'No bonus available';
+const getTooltipContent = (legionRank: string, legionData: ReturnType<typeof getLegionData>): JSX.Element => {
+	if (!legionData?.ranking) return <p>No bonus available</p>;
 
 	const normalizedRank = normalizeRank(legionRank);
 
 	return (
 		<div>
-			{legionData.ranking.map((entry) => {
+			{legionData.ranking.map((entry): JSX.Element => {
 				const isActive = entry.rank === normalizedRank;
 
 				return (
@@ -63,31 +64,21 @@ const LegionBlock: React.FC<LegionBlockProps> = ({
 	characterLegionType,
 	iconSize = 48,
 	showTooltip = false,
-}) => {
+}): JSX.Element => {
 	const legionRank = getRank(characterLevel, characterCode);
-	const LegionData = getLegionData(characterLegionType);
+	const legionData = getLegionData(characterLegionType);
 
-	const tooltipContent = TooltipData(legionRank, LegionData);
+	const tooltipContent = getTooltipContent(legionRank, legionData);
 
 	const getImageSrc = (): string => {
-		if (legionRank === 'no_rank') {
-			return '/assets/legion/no_rank.webp';
-		}
-		if (characterJobType === 'xenon') {
-			return `/assets/legion/xenon/${legionRank}.webp`;
-		}
-		return `/assets/legion/${characterJobType}/${legionRank}.webp`;
+		if (legionRank === 'no_rank') return '/assets/legion/no_rank.webp';
+		const jobFolder = characterJobType === 'xenon' ? 'xenon' : characterJobType;
+		return `/assets/legion/${jobFolder}/${legionRank}.webp`;
 	};
 
 	const content = (
 		<div className={styles.iconDiv}>
-			<p
-				className={clsx({
-					[styles.iconDivText]: showTooltip,
-					[styles.iconDivTextWhite]: !showTooltip,
-				})}>
-				Legion:
-			</p>
+			<p className={showTooltip ? styles.iconDivText : styles.iconDivTextWhite}>Legion:</p>
 			<Image
 				src={getImageSrc()}
 				width={iconSize}

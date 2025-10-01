@@ -1,7 +1,7 @@
 import withBundleAnalyzer from '@next/bundle-analyzer';
 
 import type { NextConfig } from 'next';
-import type { Configuration } from 'webpack';
+import type { Configuration, RuleSetRule } from 'webpack';
 
 const bundleAnalyzer = withBundleAnalyzer({
 	enabled: process.env.ANALYZE === 'true',
@@ -21,20 +21,21 @@ const nextConfig: NextConfig = {
 				pathname: '/Character/**',
 			},
 		],
+		qualities: [75, 100],
 	},
-	webpack(config: Configuration) {
-		config.module!.rules.push({
-			test: /\.svg$/,
-			issuer: /\.[jt]sx?$/,
-			use: [
-				{
-					loader: '@svgr/webpack',
-					options: {
-						icon: true,
+	webpack(config: Configuration): Configuration {
+		if (config.module) {
+			(config.module.rules as RuleSetRule[]).push({
+				test: /\.svg$/,
+				issuer: /\.[jt]sx?$/,
+				use: [
+					{
+						loader: '@svgr/webpack',
+						options: { icon: true },
 					},
-				},
-			],
-		});
+				],
+			});
+		}
 
 		return config;
 	},

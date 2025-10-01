@@ -1,0 +1,26 @@
+$characterImgSize: 80px;
+
+.characterImgSwitch {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	width: 252px;
+	height: $characterImgSize;
+	margin-right: 20px;
+
+	.characterImgDiv {
+		width: $characterImgSize;
+		height: $characterImgSize;
+
+		.loadedImage {
+			border: 1px solid var(--default-black);
+			border-radius: 8px;
+			background-color: var(--background-white);
+		}
+
+		.errorIcon {
+			color: var(--icon-danger-color);
+		}
+	}
+}

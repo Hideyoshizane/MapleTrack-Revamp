@@ -1,0 +1,74 @@
+$inputHeight: 48px;
+$inputPadding: 1rem;
+$borderRadius: 5px;
+$borderWidth: 2px;
+$gapRow: 0.5rem;
+$marginBottomContainer: 16px;
+$marginLeftSignup: 32px;
+
+@mixin inputBase($bgColor: #fff, $borderColor: #fff) {
+	flex: 1;
+	width: 320px;
+	height: $inputHeight;
+	padding: $inputPadding;
+	border: $borderWidth solid $borderColor;
+	border-radius: $borderRadius;
+	background-color: $bgColor;
+	font-size: 1rem;
+	color: var(--default-button-text);
+	transition: border-color 0.2s;
+
+	&::placeholder {
+		color: var(--placeholder-color-text);
+	}
+
+	&:focus {
+		box-shadow: none;
+		outline: none;
+	}
+}
+
+.inputContainer {
+	display: flex;
+	align-items: center;
+	margin-bottom: 16px;
+
+	&.marginSignUp {
+		margin-left: $marginLeftSignup;
+	}
+
+	.inputRow {
+		display: flex;
+		align-items: center;
+		gap: $gapRow;
+	}
+
+	.input {
+		@include inputBase;
+
+		&.lightModeInput {
+			@include inputBase(#fff, #ccc);
+		}
+
+		&.valid {
+			border-color: var(--icon-cta-color);
+		}
+
+		&.invalid {
+			border-color: var(--icon-danger-color);
+		}
+	}
+}
+
+.icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	visibility: hidden;
+
+	&:has(svg) {
+		visibility: visible;
+	}
+}

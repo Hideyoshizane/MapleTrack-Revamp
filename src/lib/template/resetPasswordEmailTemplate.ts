@@ -1,4 +1,4 @@
-export default function getForgotPasswordTemplate(resetLink: string, username?: string) {
+const getForgotPasswordTemplate = (resetLink: string, username?: string): string => {
 	return `
 <!DOCTYPE html>
 <html>
@@ -69,4 +69,6 @@ export default function getForgotPasswordTemplate(resetLink: string, username?: 
 </html>
 
   `;
-}
+};
+
+export default getForgotPasswordTemplate;

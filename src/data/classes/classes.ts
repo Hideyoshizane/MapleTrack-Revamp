@@ -1,4 +1,4 @@
-import classesJson from './classes.json'; // your JSON file
+import classesJson from './classes.json';
 
 import type { Classes } from '@sharedTypes/classes';
 

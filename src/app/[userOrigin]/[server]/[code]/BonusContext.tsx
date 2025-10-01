@@ -1,10 +1,12 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 
 import { arcaneBonusCookie, sacredBonusCookie } from '@utils/cookies/bonusCookie';
 
-interface BonusContextType {
+import type { ReactNode, JSX } from 'react';
+
+export interface BonusContextType {
 	arcaneBonus: number;
 	sacredBonus: number;
 	setArcaneBonus: (value: number) => void;
@@ -17,30 +19,27 @@ interface BonusProviderProps {
 	children: ReactNode;
 }
 
-export const BonusProvider: React.FC<BonusProviderProps> = ({ children }) => {
+export const BonusProvider: React.FC<BonusProviderProps> = ({ children }): JSX.Element => {
 	const [arcaneBonus, setArcaneBonusState] = useState<number>(0);
 	const [sacredBonus, setSacredBonusState] = useState<number>(0);
 
-	// Initialize state from cookies on mount
-	useEffect(() => {
+	useEffect((): void => {
 		const arcane = arcaneBonusCookie.get() ?? 0;
 		const sacred = sacredBonusCookie.get() ?? 0;
 
 		setArcaneBonusState(arcane);
 		setSacredBonusState(sacred);
 
-		// Ensure cookies are set
 		arcaneBonusCookie.set(arcane);
 		sacredBonusCookie.set(sacred);
 	}, []);
 
-	// Functions to update state + cookies
-	const setArcaneBonus = (value: number) => {
+	const setArcaneBonus = (value: number): void => {
 		setArcaneBonusState(value);
 		arcaneBonusCookie.set(value);
 	};
 
-	const setSacredBonus = (value: number) => {
+	const setSacredBonus = (value: number): void => {
 		setSacredBonusState(value);
 		sacredBonusCookie.set(value);
 	};
@@ -52,11 +51,4 @@ export const BonusProvider: React.FC<BonusProviderProps> = ({ children }) => {
 	);
 };
 
-// Custom hook for easier access
-export const useBonusContext = (): BonusContextType => {
-	const context = useContext(BonusContext);
-	if (!context) {
-		throw new Error('useBonusContext must be used within a BonusProvider');
-	}
-	return context;
-};
+export { BonusContext };

@@ -1,115 +1,44 @@
-import { NextResponse } from 'next/server';
+import { fetchCharacterExternal } from '@lib/fetchCharacterExternal';
+import { characterNameSchema } from '@schemas/characterNameSchema';
+import { createResponse } from '@utils/api/createResponse';
+import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
+import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
+import { validateField } from '@utils/validation/';
 
-import { isRebootServer, getRegion, servers } from '@data/servers/servers';
+import type { ApiResponse } from '@sharedTypes/api';
+import type { ExtraCharacterData } from '@sharedTypes/character';
+import type { NextResponse, NextRequest } from 'next/server';
 
-import type { ExtraCharacterData } from '@/shared/types/character';
-import type { ApiResponse } from '@/shared/types/api';
-import type { NextRequest } from 'next/server';
-import { sanitizeInputBackEnd } from '@/utils/sanitize/sanitizeInputBackEnd';
-interface ExternalApiResponse {
-	totalCount: number;
-	ranks: ExtraCharacterData[];
-}
-
-export async function GET(request: NextRequest) {
+export const GET = async (request: NextRequest): Promise<NextResponse> => {
 	try {
 		// Validate user query parameter
 		const characterName = request.nextUrl.searchParams.get('character_name');
-		if (!characterName) {
-			return NextResponse.json<ApiResponse>(
-				{
-					success: false,
-					error: 'Character name not provided',
-				},
-				{ status: 400 }
-			);
-		}
-
-		const sanitizedCharacterName = sanitizeInputBackEnd(characterName);
-
-		// Validate server query parameter
 		const server = request.nextUrl.searchParams.get('server');
-		if (!server) {
-			return NextResponse.json<ApiResponse>(
-				{
-					success: false,
-					error: 'Server not provided',
-				},
-				{ status: 400 }
-			);
+
+		// Early return if missing
+		if (!characterName || !server) {
+			return createResponse<ApiResponse>({ success: false, error: 'Missing parameters.' }, 400);
 		}
 
+		// Validate name
+		const validation = validateField(characterNameSchema, 'name', characterName);
+		if (!validation.isValid) {
+			return createResponse<ApiResponse>({ success: false, error: 'Invalid username.' }, 400);
+		}
+
+		// Validate allowed server
+		if (!SERVER_OPTIONS.includes(server)) {
+			return createResponse<ApiResponse>({ success: false, error: 'Invalid server' }, 400);
+		}
+
+		// Sanitize inputs
+		const sanitizedCharacterName = sanitizeInputBackEnd(characterName);
 		const sanitizedServer = sanitizeInputBackEnd(server);
 
-		// Find server object
-		const serverObj = servers.find((s) => s.name.toLowerCase() === sanitizedServer.toLowerCase());
-		if (!serverObj) {
-			return NextResponse.json<ApiResponse>(
-				{
-					success: false,
-					error: 'Server not found',
-				},
-				{ status: 404 }
-			);
-		}
-
-		const reboot_index = isRebootServer(sanitizedServer) ? 1 : 0;
-		const serverLocation = getRegion(serverObj);
-
-		// Fetch external API
-		const res = await fetch(
-			`https://www.nexon.com/api/maplestory/no-auth/ranking/v2/${serverLocation}?type=overall&id=weekly&reboot_index=${reboot_index}&page_index=41&character_name=${sanitizedCharacterName}`,
-			{ cache: 'no-store' }
-		);
-
-		if (!res.ok) {
-			return NextResponse.json<ApiResponse>(
-				{
-					success: false,
-					error: 'Failed to fetch external character',
-				},
-				{ status: res.status }
-			);
-		}
-
-		const data: ExternalApiResponse = (await res.json()) as ExternalApiResponse;
-		const character = data.ranks?.[0] ?? null;
-
-		if (!character) {
-			return NextResponse.json<ApiResponse>(
-				{
-					success: false,
-					error: 'Character not found',
-				},
-				{ status: 404 }
-			);
-		}
-
-		// Success response — only return characterImgURL and level
-		const simplifiedData = {
-			characterImgURL: character.characterImgURL,
-			level: character.level,
-		};
-
-		// Success response
-		return NextResponse.json<ApiResponse<ExtraCharacterData>>(
-			{
-				success: true,
-				message: 'Character fetched successfully',
-				data: simplifiedData,
-			},
-			{ status: 200 }
-		);
-	} catch (err: unknown) {
-		if (err instanceof Error) console.error('Network error:', err.message);
-		else console.error('Unknown network error:', err);
-
-		return NextResponse.json<ApiResponse>(
-			{
-				success: false,
-				error: 'Internal server error',
-			},
-			{ status: 500 }
-		);
+		const data = await fetchCharacterExternal(sanitizedCharacterName, sanitizedServer);
+		return createResponse<ApiResponse<ExtraCharacterData>>({ success: true, message: 'Character fetched.', data }, 200);
+	} catch (error: unknown) {
+		console.error('Error fetching character:', error);
+		return createResponse<ApiResponse>({ success: false, error: 'Internal server error' }, 400);
 	}
-}
+};

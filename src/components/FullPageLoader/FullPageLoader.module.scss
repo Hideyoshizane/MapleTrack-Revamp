@@ -1,0 +1,11 @@
+.mainDiv {
+	display: flex;
+	flex-direction: row;
+
+	.loaderDiv {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 827px;
+	}
+}

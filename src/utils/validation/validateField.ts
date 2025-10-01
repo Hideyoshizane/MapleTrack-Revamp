@@ -1,5 +1,6 @@
-import { z, type ZodObject, type ZodType, ZodRawShape } from 'zod';
 import { toast } from 'react-hot-toast';
+
+import type { z, ZodObject, ZodType, ZodRawShape } from 'zod';
 
 export type ValidationResult = {
 	isValid: boolean;
@@ -12,7 +13,9 @@ type SafeParseResult<I, O> = { success: true; data: O } | { success: false; erro
 export const extractErrorMessage = <I, O>(result: SafeParseResult<I, O>): string =>
 	result.success
 		? ''
-		: result.error.issues.map((issue: z.ZodError<I>['issues'][number]) => issue.message ?? 'Invalid input.').join('\n');
+		: result.error.issues
+				.map((issue: z.ZodError<I>['issues'][number]): string => issue.message ?? 'Invalid input.')
+				.join('\n');
 
 // Generic validator: runs safeParse on a field schema
 export const validateField = <Schema extends ZodObject<ZodRawShape>, Field extends keyof z.infer<Schema>>(

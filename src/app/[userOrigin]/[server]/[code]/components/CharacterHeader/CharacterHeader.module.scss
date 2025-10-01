@@ -1,0 +1,61 @@
+$fontSizeButton: 32px;
+$buttonWidth: 284px;
+$buttonHeight: 56px;
+$buttonRadius: 50px;
+$fontWeightButton: 500;
+$characterImgSize: 80px;
+
+.buttonLine {
+	display: flex;
+	justify-content: center;
+	gap: 24px;
+	width: inherit;
+	padding-top: 24px;
+
+	.increaseAllButton {
+		width: $buttonWidth;
+		height: $buttonHeight;
+		border-radius: $buttonRadius;
+		background-color: var(--primary-color-button);
+		font-size: $fontSizeButton;
+		font-weight: $fontWeightButton;
+		color: var(--default-button-text);
+	}
+
+	.editCharacterButton {
+		width: $buttonWidth;
+		height: $buttonHeight;
+		border-radius: $buttonRadius;
+		background-color: var(--default-color-button);
+		font-size: $fontSizeButton;
+		font-weight: $fontWeightButton;
+		color: var(--default-button-text);
+	}
+}
+
+.usernameLine {
+	display: flex;
+	justify-content: flex-end;
+	gap: 16px;
+	width: inherit;
+	height: 80px;
+	margin-top: 16px;
+	padding-right: 24px;
+
+	.characterImgDiv {
+		width: $characterImgSize;
+		height: $characterImgSize;
+	}
+
+	.characterName {
+		font-size: 72px;
+		font-weight: 600;
+		color: var(--default-button-text);
+	}
+
+	.loadedImage {
+		border: 1px solid var(--default-black);
+		border-radius: 8px;
+		background-color: var(--background-white);
+	}
+}

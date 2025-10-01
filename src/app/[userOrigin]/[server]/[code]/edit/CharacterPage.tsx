@@ -2,37 +2,32 @@
 import { clsx } from 'clsx';
 import Image from 'next/image';
 import { notFound, useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { useState, useEffect } from 'react';
 
-import EditPageSymbolGrid from '@/components/EditPageSymbolGrid/EditPageSymbolGrid';
-import LegionBlock from '@/components/LegionBlock/LegionBlock';
-import LinkSkillBlock from '@/components/LinkSkillBlock/LinkSkillBlock';
-import Loader from '@/components/Loader/Loader';
-import Switch from '@/components/Switch/Switch';
-import { sanitizeInputFrontend } from '@/utils/sanitize';
+// Assets
 import BossIcon from '@assets/svg/boss_slayer.svg';
-import ErrorIcon from '@assets/svg/circle-x.svg';
-import Button from '@components/Button/Button';
-import ProgressBar from '@components/ProgressBar/ProgressBar';
-import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
+import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
+// Components
+import LegionBlock from '@components/LegionBlock/LegionBlock';
+import LinkSkillBlock from '@components/LinkSkillBlock/LinkSkillBlock';
 import Tooltip from '@components/Tooltip/Tooltip';
-import { checkCharacterName } from '@schemas/characterNameSchema';
-import { fetchWithTimeout } from '@utils/fetch/withTimeout';
-import { getJob } from '@utils/jobs/getJob';
 
-import styles from './page.module.css';
+// Local Components
+import { CharacterHeader } from './components/CharacterHeader/CharacterHeader';
+import { CharacterImageAndSync } from './components/CharacterImageAndSync/CharacterImageAndSync';
+import CharacterStats from './components/CharacterStats/CharacterStats';
+import CharacterSymbol from './components/CharacterSymbol/CharacterSymbol';
+// Hooks
+import { useCharacterDerived } from './hooks/useCharacterDerived';
+import { useCharacterInputs } from './hooks/useCharacterInputs';
+import { useCharacterPageData } from './hooks/useCharacterPageData';
+// Styling
+import styles from './page.module.scss';
 
-import type {
-	GetCharacterDataRequestBody,
-	GetCharacterDataApiResponse,
-	ExtraCharacterData,
-	GetExtraCharacterDataApiResponse,
-} from '@/shared/types/character';
-import type { JobClass } from '@/utils/jobs/getJob';
+// Types
 import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { CharacterDocument } from '@models/character';
-import type { ApiResponse } from '@/shared/types/api';
+import type { Character } from '@sharedTypes/character';
+import type { JSX } from 'react';
 
 interface CharacterPageProps {
 	userOrigin: string;
@@ -40,427 +35,225 @@ interface CharacterPageProps {
 	code: string;
 }
 
-const fetchCharacterApi = async (payload: GetCharacterDataRequestBody): Promise<GetCharacterDataApiResponse> => {
-	const res = await fetchWithTimeout('/api/characters/getCharacterData', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(payload),
-	});
+const BOSS_ICON_SIZE = 90;
+const ICON_SIZE = 64;
 
-	return (await res.json()) as GetCharacterDataApiResponse;
+// Helper Components
+interface ValidatedInputProps {
+	value?: string;
+	placeholder?: string;
+	error?: string | null;
+	onBlur?: (value: string) => void;
+	onCommit?: (value: string) => void;
+}
+
+const ValidatedInput = ({ value, placeholder, error, onBlur, onCommit }: ValidatedInputProps): JSX.Element => {
+	// State to track current input value
+	const [inputValue, setInputValue] = useState(value ?? '');
+
+	// State to remember the original value before editing
+	const [originalValue, setOriginalValue] = useState(value ?? '');
+
+	useEffect((): void => {
+		setInputValue(value ?? '');
+		setOriginalValue(value ?? '');
+	}, [value]);
+
+	const handleChange = (val: string): void => {
+		setInputValue(val);
+	};
+	// When user focuses the input: clear the field
+	const handleFocus = (): void => {
+		setInputValue('');
+	};
+
+	const handleBlur = (): void => {
+		// If user left it empty, restore original value
+		const finalValue = inputValue.trim() === '' ? originalValue : inputValue;
+
+		setInputValue(finalValue);
+		setOriginalValue(finalValue);
+
+		// Call external handlers
+		onBlur?.(finalValue);
+		onCommit?.(finalValue);
+	};
+
+	return (
+		<Tooltip content={error} placement="left" enabled={!!error}>
+			<input
+				className={clsx(styles.characterName, { [styles.invalid]: !!error })}
+				value={inputValue}
+				placeholder={placeholder}
+				onChange={(e): void => handleChange(e.target.value)}
+				onFocus={handleFocus}
+				onBlur={handleBlur}
+			/>
+		</Tooltip>
+	);
 };
 
-export default function CharacterPage({ userOrigin, server, code }: CharacterPageProps) {
+interface CharacterBossLegionProps {
+	character: Character;
+	toggleBossing: () => void;
+	linkSkill: string;
+	code: string;
+	jobType: JobType;
+	legion: string;
+}
+
+const CharacterBossLegion = ({
+	character,
+	toggleBossing,
+	linkSkill,
+	code,
+	jobType,
+	legion,
+}: CharacterBossLegionProps): JSX.Element => (
+	<div className={styles.characterBossLinkLegion}>
+		<div className={styles.bossSlot}>
+			<Tooltip content="Click to toggle Boss Slayer status" placement="bottom">
+				<div onClick={toggleBossing} style={{ cursor: 'pointer' }}>
+					<BossIcon
+						width={BOSS_ICON_SIZE}
+						height={BOSS_ICON_SIZE}
+						className={clsx(styles.bossIcon, {
+							[styles.on]: character.bossing,
+							[styles.off]: !character.bossing,
+						})}
+					/>
+				</div>
+			</Tooltip>
+		</div>
+		<LinkSkillBlock characterLevel={character.level} characterLinkSkill={linkSkill} iconSize={ICON_SIZE} showTooltip />
+		<LegionBlock
+			characterLevel={character.level}
+			characterCode={code}
+			characterJobType={jobType}
+			characterLegionType={legion}
+			iconSize={ICON_SIZE}
+			showTooltip
+		/>
+	</div>
+);
+
+const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.Element => {
 	const router = useRouter();
 	const pathname = usePathname();
 
-	const [character, setCharacter] = useState<CharacterDocument>();
-	const [editableCharacter, setEditableCharacter] = useState<Partial<CharacterDocument>>({});
-	const [extraData, setExtraData] = useState<ExtraCharacterData | null>(null);
-	const [extraDataFailed, setExtraDataFailed] = useState(false);
+	const {
+		character: fetchedCharacter,
+		committedName,
+		setCommittedName,
+		loading: pageLoading,
+		error,
+		extraData,
+		extraDataFailed,
+		handleSyncToggle,
+	} = useCharacterPageData({
+		userOrigin,
+		server,
+		code,
+	});
 
-	// Local state for input value
-	const [levelInput, setLevelInput] = useState<string>(character?.level?.toString() ?? '');
-	const [targetLevelInput, setTargetLevelInput] = useState<string>(character?.targetLevel?.toString() ?? '');
-	const [job, setJob] = useState<JobClass>('No Job');
+	const inputsReady = !!fetchedCharacter;
 
-	const [nameError, setNameError] = useState<string | null>(null);
-	const [error, setError] = useState<string | null>(null);
+	const {
+		character,
+		setCharacter,
+		levelInput,
+		setLevelInput,
+		targetLevelInput,
+		setTargetLevelInput,
+		nameError,
+		handleNameBlur,
+		toggleBossing,
+	} = useCharacterInputs(inputsReady ? fetchedCharacter : undefined);
 
-	const [characterLoading, setCharacterLoading] = useState(true);
-	const [extraDataLoading, setExtraDataLoading] = useState(false);
-	const [isFirstLoad, setIsFirstLoad] = useState(true);
-	const [committedName, setCommittedName] = useState<string | undefined>(character?.name);
-	const [submitLoading, setSubmitLoading] = useState(false);
+	const derived = useCharacterDerived({ character });
+	const { level, targetLevel, jobType, charClass, legion, linkSkill, job } = derived;
 
-	// Fetch character
-	useEffect(() => {
-		if (!userOrigin || !server || !code) return;
-
-		const fetchData = async () => {
-			try {
-				const data = await fetchCharacterApi({ userOrigin, server, code });
-
-				if (data.success) {
-					setCharacter(data.data);
-				} else {
-					setError(data.error ?? null);
-				}
-			} catch (err: unknown) {
-				console.error('Error fetching characters:', err);
-				setError('Failed to fetch character data');
-			} finally {
-				setCharacterLoading(false);
-			}
-		};
-
-		void fetchData();
-	}, [userOrigin, server, code]);
-
-	// Run validation on mount
-	useEffect(() => {
-		if (!character) return;
-
-		const value = editableCharacter.name ?? character?.name;
-		if (!value) return;
-
-		const error = checkCharacterName(value);
-		setNameError(error);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [character]);
-
-	// Update job whenever level changes
-	useEffect(() => {
-		const level = editableCharacter.level ?? character?.level;
-		if (level) setJob(getJob(level));
-	}, [editableCharacter.level, character]);
-
-	useEffect(() => {
-		const isSyncing = editableCharacter.syncing ?? character?.syncing;
-		const charName = committedName ?? character?.name;
-
-		// Clear previous state before refetch
-		setExtraData(null);
-		setExtraDataFailed(false);
-
-		// Run only if syncing is enabled and character has a valid name
-		if (!isSyncing || !charName) return;
-
-		setExtraDataLoading(true);
-
-		const fetchExtraData = async () => {
-			try {
-				const res = await fetch(`/api/characters/getAPICharacterImage?character_name=${charName}&server=${server}`);
-
-				if (!res.ok) {
-					setExtraDataFailed(true);
-					return;
-				}
-
-				const apiResponse: GetExtraCharacterDataApiResponse = await res.json();
-
-				if (apiResponse.success && apiResponse.data) {
-					setExtraData(apiResponse.data);
-					setExtraDataFailed(false);
-				} else {
-					setExtraDataFailed(true);
-				}
-			} catch (err) {
-				console.error('Error fetching extra character data', err);
-				setExtraDataFailed(true);
-			} finally {
-				setExtraDataLoading(false);
-			}
-		};
-
-		void fetchExtraData();
-	}, [editableCharacter.syncing, committedName, character?.syncing, character?.name, server]);
-
-	// Unified loading
-	const loading = isFirstLoad && (characterLoading || extraDataLoading);
-
-	useEffect(() => {
-		if (!characterLoading && !extraDataLoading && isFirstLoad) {
-			setIsFirstLoad(false);
-		}
-	}, [characterLoading, extraDataLoading, isFirstLoad]);
-
-	if (error) {
-		throw new Error(error);
-	}
-
-	if (loading) {
-		return (
-			<section className="mainContent">
-				<div className={styles.mainDiv}>
-					<div className={styles.loaderDiv}>
-						<Loader width={120} height={120} color={'var(--default-black)'} borderWidth={12} />
-					</div>
-				</div>
-			</section>
-		);
-	}
-
-	if (!character) {
-		notFound();
-	}
-
-	// Fallback helper values
-	const safeCharacter = character;
-
-	const level = editableCharacter.level ?? safeCharacter.level;
-	const targetLevel = editableCharacter.targetLevel ?? safeCharacter.targetLevel;
-	const jobType: JobType = (editableCharacter.jobType ?? safeCharacter.jobType ?? 'default') as JobType;
-	const charClass = editableCharacter.class ?? safeCharacter.class;
-	const codeChar = editableCharacter.code ?? safeCharacter.code ?? '';
-	const legion = editableCharacter.legion ?? safeCharacter.legion ?? '';
-	const linkSkill = editableCharacter.linkSkill ?? safeCharacter.linkSkill ?? '';
-	const ArcaneSymbol = editableCharacter.ArcaneSymbol ?? safeCharacter.ArcaneSymbol;
-	const SacredSymbol = editableCharacter.SacredSymbol ?? safeCharacter.SacredSymbol;
-	const GrandSacredSymbol = editableCharacter.GrandSacredSymbol ?? safeCharacter.GrandSacredSymbol;
-
-	const BOSS_ICON_SIZE = 90;
-	const ICON_SIZE = 64;
-	const CHARACTER_IMG_SIZE = 80;
-
-	// Submit user changes
-	const onSubmit = async () => {
-		try {
-			setSubmitLoading(true);
-			// Sanitize input to avoid XSS
-			const sanitizedUser = sanitizeInputFrontend(userOrigin);
-			const sanitizedServer = sanitizeInputFrontend(server);
-			const sanitizedCode = sanitizeInputFrontend(code);
-
-			// Prepare payload for API
-			const payload = {
-				userOrigin: sanitizedUser,
-				server: sanitizedServer,
-				code: sanitizedCode,
-				characterData: editableCharacter,
-			};
-
-			const response = await fetchWithTimeout('/api/characters/updateCharacter', {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
-			});
-			const result = (await response.json()) as ApiResponse;
-
-			if (response.ok && result.success) {
-				router.push('/login?reset=1');
-			} else if (!result.success) {
-				toast.error(result.error || 'Failed to update the character');
-			} else {
-				// Fallback safety net (shouldn't normally hit this)
-				toast.error('Failed to update the character');
-			}
-		} catch (error: unknown) {
-			if ((error as DOMException).name === 'AbortError') {
-				toast.error('Request timed out. Please try again.');
-			} else {
-				toast.error('Unexpected error occurred');
-				console.error('Update Character error:', error);
-			}
-		} finally {
-			// Always reset loading state
-			setSubmitLoading(false);
-		}
-	};
-
+	if (pageLoading || !character) return <FullPageLoader />;
+	if (error) throw new Error(error);
+	if (!character) notFound();
+	console.log(character);
 	return (
 		<section className="mainContent">
 			<div className={styles.mainDiv}>
 				<Image
-					src={`/assets/profile/${safeCharacter.code}.webp`}
+					src={`/assets/profile/${character.code}.webp`}
 					width={650}
 					height={827}
 					priority
-					alt={`${safeCharacter.class} class profile Icon`}
+					alt={`${character.class} class profile Icon`}
 				/>
-				<div className={styles.characterContent}>
-					<div className={styles.buttonLine}>
-						<Button className={styles.discardButton} onClick={() => router.push(pathname.replace(/\/edit$/, ''))}>
-							Discard Changes
-						</Button>
-						<Tooltip content="Please input a valid character name." placement="bottom" enabled={!!nameError}>
-							<Button
-								className={styles.saveChangesButton}
-								disabled={!!nameError}
-								isLoading={submitLoading}
-								loaderSize={16}
-								loaderColor="#121212"
-								loaderBorderWidth={3}
-								onClick={onSubmit}>
-								Save Changes
-							</Button>
-						</Tooltip>
-					</div>
-					<div className={styles.usernameLine}>
-						<div className={styles.characterImgSwitch}>
-							<div className={styles.characterImgDiv}>
-								<div className={styles.characterImgDiv}>
-									{(editableCharacter.syncing ?? safeCharacter.syncing) &&
-										(extraData?.characterImgURL ? (
-											<Image
-												src={extraData.characterImgURL}
-												alt="Fetched from API"
-												width={CHARACTER_IMG_SIZE}
-												height={CHARACTER_IMG_SIZE}
-											/>
-										) : extraDataFailed ? (
-											<Tooltip content={'Character not found.'} placement="top">
-												<ErrorIcon
-													width={CHARACTER_IMG_SIZE}
-													height={CHARACTER_IMG_SIZE}
-													className={styles.errorIcon}
-												/>
-											</Tooltip>
-										) : (
-											<SkeletonWrapper
-												width={CHARACTER_IMG_SIZE}
-												height={CHARACTER_IMG_SIZE}
-												color="light"
-												variant="rectangular"
-											/>
-										))}
-								</div>
-							</div>
-							<Switch
-								title={'Sync Character'}
-								checked={editableCharacter.syncing ?? safeCharacter.syncing}
-								tooltipMessage={'Automatically update level from MapleStory API.'}
-								onCheckedChange={() =>
-									setEditableCharacter((prev) => ({
-										...prev,
-										syncing: !(prev.syncing ?? safeCharacter.syncing),
-									}))
-								}
-							/>
-						</div>
-						<Tooltip content={nameError} placement="left" enabled={!!nameError}>
-							<input
-								className={clsx(styles.characterName, { [styles.invalid]: !!nameError })}
-								type="text"
-								value={editableCharacter.name ?? ''}
-								placeholder={safeCharacter.name}
-								onChange={(e) => {
-									const value = e.target.value;
-									setEditableCharacter((prev) => ({ ...prev, name: value }));
-								}}
-								onBlur={(e) => {
-									const value = e.target.value;
-									const error = checkCharacterName(value);
-									setNameError(error);
 
-									if (!error) {
-										setCommittedName(value);
-									}
-								}}
-							/>
-						</Tooltip>
+				<div className={styles.characterContent}>
+					<CharacterHeader
+						character={character}
+						userOrigin={userOrigin}
+						server={server}
+						code={code}
+						nameError={nameError}
+						submitLoading={false}
+						setSubmitLoading={(): void => {}}
+						onDiscard={(): void => router.push(pathname.replace(/\/edit$/, ''))}
+					/>
+
+					<div className={styles.usernameLine}>
+						<CharacterImageAndSync
+							character={character}
+							extraData={extraData}
+							extraDataFailed={extraDataFailed}
+							onSyncToggle={handleSyncToggle}
+						/>
+						<ValidatedInput
+							value={committedName}
+							placeholder="Character Name"
+							error={nameError}
+							onBlur={handleNameBlur}
+							onCommit={setCommittedName}
+						/>
 					</div>
+
 					<div className={styles.bigBlock}>
-						<div className={styles.characterBossLinkLegion}>
-							<div className={styles.bossSlot}>
-								<Tooltip content={'Click to toggle Boss Slayer status'} placement="bottom">
-									<div
-										onClick={() =>
-											setEditableCharacter((prev) => ({
-												...prev,
-												bossing: !(prev.bossing ?? safeCharacter.bossing),
-											}))
-										}
-										style={{ cursor: 'pointer' }}>
-										<BossIcon
-											width={BOSS_ICON_SIZE}
-											height={BOSS_ICON_SIZE}
-											className={clsx(styles.bossIcon, {
-												[styles.on]: editableCharacter.bossing ?? safeCharacter.bossing,
-												[styles.off]: !(editableCharacter.bossing ?? safeCharacter.bossing),
-											})}
-										/>
-									</div>
-								</Tooltip>
-							</div>
-							<LinkSkillBlock characterLevel={level} characterLinkSkill={linkSkill} iconSize={ICON_SIZE} showTooltip />
-							<LegionBlock
-								characterLevel={level}
-								characterCode={codeChar}
-								characterJobType={jobType}
-								characterLegionType={legion}
-								iconSize={ICON_SIZE}
-								showTooltip
-							/>
-						</div>
+						<CharacterBossLegion
+							character={character}
+							toggleBossing={toggleBossing}
+							linkSkill={linkSkill}
+							code={character.code ?? ''}
+							jobType={jobType}
+							legion={legion}
+						/>
+
 						<div className={styles.characterClassJob}>
 							<p className={styles.characterClass}>{charClass}</p>
 							<p className={styles.characterJob}>{job}</p>
 						</div>
 					</div>
-					<div className={styles.levelDiv}>
-						<div className={styles.levelArea}>
-							<p className={styles.levelText}>Level:</p>
-							<input
-								className={styles.levelInput}
-								type="number"
-								min={0}
-								value={levelInput}
-								placeholder={character?.level?.toString()}
-								onChange={(e) => setLevelInput(e.target.value)}
-								onBlur={() =>
-									setEditableCharacter((prev) => ({
-										...prev,
-										level: levelInput === '' ? undefined : Number(levelInput),
-									}))
-								}
-							/>
-							<span className={styles.levelSpan}>/</span>
-							<input
-								className={styles.levelInput}
-								type="number"
-								min={0}
-								value={targetLevelInput}
-								placeholder={character?.targetLevel?.toString()}
-								onChange={(e) => setTargetLevelInput(e.target.value)}
-								onBlur={() =>
-									setEditableCharacter((prev) => ({
-										...prev,
-										targetLevel: targetLevelInput === '' ? undefined : Number(targetLevelInput),
-									}))
-								}
-							/>
-						</div>
-						<ProgressBar height={32} width={900} value={level} maxValue={targetLevel} jobType={jobType} />
-					</div>
-					<div className={styles.symbols}>
-						<p className={styles.title}>Arcane Symbols</p>
-						<EditPageSymbolGrid
-							type="arcane"
-							symbols={ArcaneSymbol}
-							characterLevel={level}
-							characterJobType={jobType}
-							size={56}
-							onChange={(updatedSymbols) =>
-								setEditableCharacter((prev) => ({
-									...prev,
-									ArcaneSymbol: updatedSymbols,
-								}))
-							}
-						/>
 
-						<p className={styles.title}>Sacred Symbols</p>
-						<EditPageSymbolGrid
-							type="sacred"
-							symbols={SacredSymbol}
-							characterLevel={level}
-							characterJobType={jobType}
-							size={56}
-							onChange={(updatedSymbols) =>
-								setEditableCharacter((prev) => ({
-									...prev,
-									SacredSymbol: updatedSymbols,
-								}))
-							}
-						/>
+					<CharacterStats
+						levelInput={levelInput}
+						setLevelInput={setLevelInput}
+						targetLevelInput={targetLevelInput}
+						setTargetLevelInput={setTargetLevelInput}
+						character={character}
+						setCharacter={setCharacter}
+						level={level}
+						targetLevel={targetLevel}
+						jobType={jobType}
+					/>
 
-						<p className={styles.title}>Grand Sacred Symbols</p>
-						<EditPageSymbolGrid
-							type="grand"
-							symbols={GrandSacredSymbol}
-							characterLevel={level}
-							characterJobType={jobType}
-							size={56}
-							onChange={(updatedSymbols) =>
-								setEditableCharacter((prev) => ({
-									...prev,
-									GrandSacredSymbol: updatedSymbols,
-								}))
-							}
-						/>
-					</div>
+					<CharacterSymbol
+						characterLevel={level}
+						characterJobType={jobType}
+						character={character}
+						setCharacter={setCharacter}
+					/>
 				</div>
 			</div>
 		</section>
 	);
-}
+};
+
+export default CharacterPage;

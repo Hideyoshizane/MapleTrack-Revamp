@@ -1,0 +1,47 @@
+$fontSmall: 48px;
+
+.levelDiv {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: inherit;
+	margin-top: 16px;
+
+	.levelArea {
+		display: flex;
+		align-items: flex-end;
+		justify-content: flex-end;
+		gap: 8px;
+		width: inherit;
+		padding-right: 24px;
+
+		.levelText {
+			font-size: 32px;
+			font-weight: 300;
+			color: var(--default-button-text);
+		}
+
+		.levelInput {
+			width: 85px;
+			border: none;
+			background-color: transparent;
+			font-size: $fontSmall;
+			text-align: end;
+			color: var(--default-button-text);
+			appearance: textfield;
+
+			&:focus {
+				outline: none;
+			}
+
+			&::placeholder {
+				color: var(--placeholder-color-text);
+			}
+		}
+
+		.levelSpan {
+			font-size: $fontSmall;
+			color: var(--default-button-text);
+		}
+	}
+}

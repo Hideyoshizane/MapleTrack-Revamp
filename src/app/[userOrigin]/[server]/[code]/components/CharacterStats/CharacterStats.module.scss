@@ -1,0 +1,76 @@
+$bigBlockHeight: 115px;
+$bossIconSize: 90px;
+
+.bigBlock {
+	display: flex;
+	justify-content: flex-end;
+	width: inherit;
+	height: $bigBlockHeight;
+	margin-top: 16px;
+	padding-right: 24px;
+
+	.characterBossLinkLegion {
+		display: flex;
+		justify-content: space-between;
+		width: 377px;
+		height: 98px;
+
+		.bossSlot {
+			width: $bossIconSize;
+			height: $bossIconSize;
+
+			.bossIcon {
+				color: var(--default-button-text);
+				margin-top: 8px;
+			}
+		}
+	}
+
+	.characterClassJob {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		width: 515px;
+		height: $bigBlockHeight;
+
+		.characterClass {
+			font-size: 56px;
+			color: var(--default-button-text);
+		}
+
+		.characterJob {
+			font-size: 40px;
+			font-weight: 300;
+			color: var(--default-button-text);
+		}
+	}
+}
+
+.levelDiv {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: inherit;
+	margin-top: 16px;
+
+	.levelInput {
+		display: flex;
+		align-items: flex-end;
+		justify-content: flex-end;
+		gap: 8px;
+		width: inherit;
+		padding-right: 24px;
+
+		.levelText {
+			font-size: 32px;
+			font-weight: 300;
+			color: var(--default-button-text);
+		}
+
+		.levelTextBlack {
+			font-size: 48px;
+			font-weight: 500;
+			color: var(--default-button-text);
+		}
+	}
+}

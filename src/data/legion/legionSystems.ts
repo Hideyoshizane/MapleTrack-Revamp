@@ -6,4 +6,5 @@ import type { LegionBonus } from '@sharedTypes/Legion';
 export const Legion: LegionBonus[] = legionSystemsJson as LegionBonus[];
 
 // Get Legion data by name
-export const getLegionData = (name: string): LegionBonus | undefined => Legion.find((group) => group.name === name);
+export const getLegionData = (name: string): LegionBonus | undefined =>
+	Legion.find((group): boolean => group.name === name);

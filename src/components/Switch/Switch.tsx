@@ -5,7 +5,9 @@ import React from 'react';
 
 import Tooltip from '@components/Tooltip/Tooltip';
 
-import styles from './Switch.module.css';
+import styles from './Switch.module.scss';
+
+import type { JSX } from 'react';
 
 export interface SwitchProps {
 	title?: string;
@@ -15,7 +17,7 @@ export interface SwitchProps {
 	disabled?: boolean;
 }
 
-const Switch: React.FC<SwitchProps> = ({ title, checked, tooltipMessage, onCheckedChange, disabled }) => {
+const Switch: React.FC<SwitchProps> = ({ title, checked, tooltipMessage, onCheckedChange, disabled }): JSX.Element => {
 	return (
 		<Tooltip content={tooltipMessage} placement="bottom" enabled={!!tooltipMessage}>
 			<div className={styles.wrapper}>

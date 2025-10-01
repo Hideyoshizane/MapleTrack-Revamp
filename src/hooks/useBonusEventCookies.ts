@@ -12,7 +12,7 @@ export const useBonusEventCookies = (): {
 	const [arcaneBonus, setArcaneBonus] = useState<number>(0);
 	const [sacredBonus, setSacredBonus] = useState<number>(0);
 
-	useEffect(() => {
+	useEffect((): void => {
 		// Arcane
 		const arcaneCurrent = arcaneBonusCookie.get();
 		const validArcane = arcaneCurrent ?? 0;

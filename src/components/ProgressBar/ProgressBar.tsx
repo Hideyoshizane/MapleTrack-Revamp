@@ -4,7 +4,9 @@ import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { clsx } from 'clsx';
 import * as React from 'react';
 
-import styles from './ProgressBar.module.css';
+import styles from './ProgressBar.module.scss';
+
+import type { JSX } from 'react';
 
 export type JobType = 'default' | 'mage' | 'warrior' | 'bowman' | 'thief' | 'xenon' | 'pirate' | 'complete';
 
@@ -22,7 +24,7 @@ const jobTypeClassMap: Record<JobType, string> = {
 interface ProgressBarProps {
 	value: number;
 	maxValue: number;
-	jobType: JobType; // required now
+	jobType: JobType;
 	width: number;
 	height: number;
 	forceFull?: boolean;
@@ -37,8 +39,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 	width = 300,
 	height = 32,
 	forceFull = false,
-}) => {
-	const percentage = React.useMemo(() => {
+}): JSX.Element => {
+	const percentage = React.useMemo((): number => {
 		if (forceFull) return 100;
 		if (maxValue <= 0) return 0;
 		if (value === 0) return 0;

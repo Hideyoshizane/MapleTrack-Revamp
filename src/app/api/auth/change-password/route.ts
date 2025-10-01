@@ -1,42 +1,30 @@
 import bcrypt from 'bcrypt';
-import { NextRequest } from 'next/server';
 
 import connectToDatabase from '@lib/mongooseConect';
 import User from '@models/user';
 import { changePasswordRequestSchema } from '@schemas/authSchemas';
-import { ApiResponse } from '@/shared/types/api';
 import { createResponse } from '@utils/api/createResponse';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 import { validatePassword } from '@utils/validation/';
 
-export async function POST(req: NextRequest) {
+import type { ApiResponse } from '@sharedTypes/api';
+import type { NextRequest, NextResponse } from 'next/server';
+
+export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
 		await connectToDatabase();
 
-		// Parse JSON safely
-		let rawBody: unknown;
-		try {
-			rawBody = await req.json();
-		} catch {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid JSON payload' }, 400);
-		}
-
 		// Validate request body using Zod
-		const parseResult = changePasswordRequestSchema.safeParse(rawBody);
+		const parseResult = changePasswordRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
 
-		const {
-			username: rawUsername,
-			currentPassword: rawCurrentPassword,
-			newPassword: rawNewPassword,
-		} = parseResult.data;
-
 		// Sanitize input
-		const username = sanitizeInputBackEnd(rawUsername);
-		const currentPassword = sanitizeInputBackEnd(rawCurrentPassword);
-		const newPassword = sanitizeInputBackEnd(rawNewPassword);
+		const username = sanitizeInputBackEnd(parseResult.data.username);
+		const currentPassword = sanitizeInputBackEnd(parseResult.data.currentPassword);
+		const newPassword = sanitizeInputBackEnd(parseResult.data.newPassword);
+
 		if (!username || !currentPassword || !newPassword) {
 			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
 		}
@@ -61,20 +49,16 @@ export async function POST(req: NextRequest) {
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid username' }, 404);
 		}
 
-		// Verify current password
+		// Check if current password matches
 		const isCurrentPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
 		if (!isCurrentPasswordCorrect) {
 			return createResponse<ApiResponse>({ success: false, error: 'Current password is incorrect' }, 401);
 		}
 
-		// Ensure new password is not the same as old
-		const isNewPasswordSameAsOld = await bcrypt.compare(newPassword, user.password);
-		if (isNewPasswordSameAsOld) {
+		// Compare new password with hashed current password
+		if (await bcrypt.compare(newPassword, user.password)) {
 			return createResponse<ApiResponse>(
-				{
-					success: false,
-					error: 'New password must be different from the current password',
-				},
+				{ success: false, error: 'New password must be different from the current password' },
 				400
 			);
 		}
@@ -91,4 +75,4 @@ export async function POST(req: NextRequest) {
 		console.error('Signup error:', error);
 		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
 	}
-}
+};

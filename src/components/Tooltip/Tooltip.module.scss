@@ -1,0 +1,30 @@
+@mixin tooltipBase {
+	max-width: 350px;
+	padding: 6px 10px;
+	border-radius: 4px;
+	font-size: 1rem;
+	font-weight: 400;
+	white-space: pre-wrap;
+}
+
+.tooltipDark {
+	@include tooltipBase;
+	background-color: var(--default-black);
+	color: var(--default-white);
+}
+
+.tooltipLight {
+	@include tooltipBase;
+	background-color: var(--default-white);
+	color: var(--default-black);
+}
+
+.arrowDark {
+	transform: translateY(-0.5px);
+	fill: var(--default-black);
+}
+
+.arrowLight {
+	transform: translateY(-0.5px);
+	fill: var(--default-white);
+}

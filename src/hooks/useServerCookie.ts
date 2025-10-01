@@ -9,7 +9,7 @@ export const useServerCookie = (): {
 	// State typed to exact allowed server names
 	const [server, setServer] = useState<ServerOption>('Scania');
 
-	useEffect(() => {
+	useEffect((): void => {
 		// Get current cookie (can be array or undefined)
 		const current = serverCookie.get();
 		const firstValue = Array.isArray(current) ? current[0] : current;

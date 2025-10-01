@@ -1,42 +1,33 @@
 import bcrypt from 'bcrypt';
-import { NextRequest } from 'next/server';
 
 import connectToDatabase from '@lib/mongooseConect';
 import User, { LASTVERSION } from '@models/user';
 import { signupRequestSchema } from '@schemas/authSchemas';
-import { ApiResponse } from '@/shared/types/api';
 import { createResponse } from '@utils/api/createResponse';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 import { validateUsername, validateEmail, validatePassword } from '@utils/validation';
+
+import type { ApiResponse } from '@sharedTypes/api';
+import type { NextRequest, NextResponse } from 'next/server';
 
 //import { createBossList } from '@/services/bossList';
 //import { createMissingCharacters } from '@/services/character';
 //import { searchServersAndCreateMissing } from '@/services/server';
 
-export async function POST(req: NextRequest) {
+export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
 		await connectToDatabase();
 
-		// Parse JSON safely
-		let rawBody: unknown;
-		try {
-			rawBody = await req.json();
-		} catch {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid JSON payload' }, 400);
-		}
-
 		// Validate request body using Zod
-		const parseResult = signupRequestSchema.safeParse(rawBody);
+		const parseResult = signupRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
 
-		const { username: rawUsername, email: rawEmail, password: rawPassword } = parseResult.data;
-
 		// Sanitize inputs
-		const username = sanitizeInputBackEnd(rawUsername);
-		const email = sanitizeInputBackEnd(rawEmail);
-		const password = sanitizeInputBackEnd(rawPassword);
+		const username = sanitizeInputBackEnd(parseResult.data.username);
+		const email = sanitizeInputBackEnd(parseResult.data.email);
+		const password = sanitizeInputBackEnd(parseResult.data.password);
 		if (!username || !email || !password) {
 			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
 		}
@@ -100,4 +91,4 @@ export async function POST(req: NextRequest) {
 		console.error('Signup error:', error);
 		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
 	}
-}
+};

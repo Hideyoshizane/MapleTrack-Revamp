@@ -3,4 +3,6 @@ export const DARK_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset
 export type Theme = 'light' | 'dark';
 
 export const themeFromPath = (pathname: string): Theme =>
-	DARK_PATHS.some((darkPath) => pathname === darkPath || pathname.startsWith(`${darkPath}/`)) ? 'dark' : 'light';
+	DARK_PATHS.some((darkPath: string): boolean => pathname === darkPath || pathname.startsWith(`${darkPath}/`))
+		? 'dark'
+		: 'light';

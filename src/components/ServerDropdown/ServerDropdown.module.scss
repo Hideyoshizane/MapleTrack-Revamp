@@ -1,0 +1,66 @@
+$dropdownHeight: 56px;
+$dropdownRadius: 15px;
+$iconSize: 32px;
+$spacingSmall: 4px;
+$spacingMedium: 8px;
+
+.serverDropdownWrapper {
+	position: absolute;
+	width: 256px;
+	max-height: $dropdownHeight;
+	overflow: hidden;
+	border-radius: 15px;
+	background-color: var(--server-color-button);
+	transition: max-height 0.3s ease;
+
+	&.open {
+		position: absolute;
+		max-height: 394px;
+	}
+}
+
+.selectedServerWrapper {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: $dropdownHeight;
+	cursor: pointer;
+
+	.iconWrapper {
+		margin-left: $spacingSmall;
+		margin-right: $spacingMedium;
+	}
+
+	.serverName {
+		width: 140px;
+		font-size: 32px;
+		color: var(--default-white);
+	}
+
+	.icon {
+		width: $iconSize;
+		height: $iconSize;
+		color: var(--default-white);
+		margin-left: $spacingMedium;
+		margin-right: $spacingSmall;
+	}
+
+	&.rotated {
+		transition: transform 0.3s ease;
+		transform: rotate(0deg);
+	}
+
+	&.rotatedActive {
+		transform: rotate(180deg);
+	}
+}
+
+.hr {
+	border: none;
+	border-bottom: 2px solid #294766;
+}
+
+.serversList {
+	display: flex;
+	flex-direction: column;
+}

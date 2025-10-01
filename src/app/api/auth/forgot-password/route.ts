@@ -2,34 +2,27 @@ import crypto from 'crypto';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { NextRequest } from 'next/server';
 
 import connectToDatabase from '@lib/mongooseConect';
-import getForgotPasswordTemplate from '@/lib/template/resetPasswordEmailTemplate';
-import sendEmail from '@lib/sendEmail';
+import { sendEmail } from '@lib/sendEmail';
+import getForgotPasswordTemplate from '@lib/template/resetPasswordEmailTemplate';
 import User from '@models/user';
 import { forgotPasswordRequestSchema } from '@schemas/authSchemas';
-import { ApiResponse } from '@/shared/types/api';
 import { createResponse } from '@utils/api/createResponse';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 import { validateEmail } from '@utils/validation/';
 
-export async function POST(req: NextRequest) {
+import type { ApiResponse } from '@sharedTypes/api';
+import type { NextRequest, NextResponse } from 'next/server';
+
+export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
 		dayjs.extend(utc);
 
 		await connectToDatabase();
 
-		// Parse JSON safely
-		let rawBody: unknown;
-		try {
-			rawBody = await req.json();
-		} catch {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid JSON payload' }, 400);
-		}
-
 		// Validate request body with zod
-		const parseResult = forgotPasswordRequestSchema.safeParse(rawBody);
+		const parseResult = forgotPasswordRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
@@ -75,9 +68,13 @@ export async function POST(req: NextRequest) {
 		await user.save();
 
 		// Send email here
-		const domainURL = req.nextUrl.origin;
-		const username = user.username;
-		const html = getForgotPasswordTemplate(`${domainURL}/reset-password?token=${token}`, username);
+		const domainURL = process.env.NEXT_PUBLIC_BASE_URL;
+
+		if (!domainURL) {
+			throw new Error('NEXT_PUBLIC_BASE_URL is not defined in production');
+		}
+
+		const html = getForgotPasswordTemplate(`${domainURL}/reset-password?token=${token}`, user.username);
 
 		await sendEmail({
 			to: email,
@@ -96,4 +93,4 @@ export async function POST(req: NextRequest) {
 		console.error('Signup error:', error);
 		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
 	}
-}
+};

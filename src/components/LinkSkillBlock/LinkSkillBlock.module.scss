@@ -1,0 +1,26 @@
+$fontSize: 16px;
+$fontWeight: 500;
+$marginBottom: 8px;
+
+@mixin iconTextBase {
+	font-size: $fontSize;
+	font-weight: $fontWeight;
+	margin-bottom: $marginBottom;
+}
+
+.iconDiv {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	.iconDivText {
+		@include iconTextBase;
+		color: var(--default-black);
+	}
+
+	.iconDivTextWhite {
+		@include iconTextBase;
+		color: var(--default-white);
+		margin-top: 4px;
+	}
+}

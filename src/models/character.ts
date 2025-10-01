@@ -1,8 +1,7 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
-import { SymbolCategory, CATEGORY_MAX_LEVEL } from '@data/symbols/symbolMappings';
+import mongoose, { Schema } from 'mongoose';
 
-export const DEFAULT_WEEKLY_TRIES = 3;
-export const CHARACTER_MAX_LEVEL = 300;
+import type { SymbolCategory } from '@data/symbols/symbolMappings';
+import type { Document, Model } from 'mongoose';
 
 export interface CharacterContent {
 	contentType: string;
@@ -50,24 +49,13 @@ const CharacterContentSchema = new Schema<CharacterContent>(
 	{ _id: false, versionKey: false }
 );
 
-const SymbolSchema = new Schema<CharacterSymbol>(
+export const SymbolSchema = new Schema<CharacterSymbol>(
 	{
 		name: { type: String, required: true },
-		level: {
-			type: Number,
-			required: true,
-			min: 1,
-			validate: {
-				validator: function (value: number) {
-					// `this` refers to the current document
-					const category = (this as CharacterSymbol).category;
-					return value <= CATEGORY_MAX_LEVEL[category];
-				},
-				message: (props) => `Level ${props.value} exceeds max level for category.`,
-			},
-		},
-		exp: { type: Number, required: true, min: 0 },
+		level: { type: Number, required: true },
+		exp: { type: Number, required: true },
 		content: { type: [CharacterContentSchema], default: [] },
+		category: { type: String, required: true },
 	},
 	{ _id: false, versionKey: false }
 );
@@ -75,8 +63,8 @@ const SymbolSchema = new Schema<CharacterSymbol>(
 const CharacterSchema = new Schema<CharacterDocument>(
 	{
 		name: { type: String, required: true },
-		level: { type: Number, required: true, min: 0, max: CHARACTER_MAX_LEVEL },
-		targetLevel: { type: Number, required: true, min: 0, max: CHARACTER_MAX_LEVEL },
+		level: { type: Number, required: true },
+		targetLevel: { type: Number, required: true },
 		class: String,
 		code: String,
 		jobType: String,

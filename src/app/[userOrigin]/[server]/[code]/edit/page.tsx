@@ -2,30 +2,33 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import React from 'react';
 
-import { authOptions } from '@/lib/authOptions';
 import Navbar from '@components/Navbar/Navbar';
-import { validadeUserAcess, syncCharacterInfo } from '@lib/characters';
+import { authOptions } from '@lib/authOptions';
+import { validateUserAccess, syncCharacterInfo } from '@lib/characters';
 
 import CharacterPage from './CharacterPage';
+
+import type { JSX } from 'react';
 
 interface CharactersPageProps {
 	params: Promise<{ userOrigin: string; server: string; code: string }>;
 }
 
-export default async function CharactersPage({ params }: CharactersPageProps) {
+const CharactersPage = async ({ params }: CharactersPageProps): Promise<JSX.Element> => {
 	const { userOrigin, server, code } = await params;
 
+	// Redirect to login if not autenthicated
 	const session = await getServerSession(authOptions);
 	if (!session) {
 		redirect('/login?unauthorized=1');
 	}
 
 	// Validate if user is trying to access its own data
-	const isValid = validadeUserAcess({ userOrigin, server, code }, session.user.username);
+	const isValid = validateUserAccess({ userOrigin, server, code }, session.user.username);
 	if (!isValid) {
 		redirect('/home?unauthorized=1');
-		return;
 	}
+
 	// Fetch character data
 	await syncCharacterInfo({
 		userOrigin: userOrigin,
@@ -39,4 +42,6 @@ export default async function CharactersPage({ params }: CharactersPageProps) {
 			<CharacterPage userOrigin={userOrigin} server={server} code={code} />
 		</main>
 	);
-}
+};
+
+export default CharactersPage;

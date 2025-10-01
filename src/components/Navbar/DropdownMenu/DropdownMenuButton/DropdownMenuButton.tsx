@@ -2,7 +2,7 @@
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import Link from 'next/link';
-import React, { FunctionComponent, SVGProps } from 'react';
+import React from 'react';
 
 import ClassIcon from '@assets/svg/id-card.svg';
 import SwordsIcon from '@assets/svg/swords.svg';
@@ -10,8 +10,10 @@ import TrophyIcon from '@assets/svg/trophy.svg';
 import UserIcon from '@assets/svg/user-round.svg';
 
 import { DROPDOWN_ICON_SIZE } from './constants';
-import buttonStyles from './DropdownMenuButton.module.css';
-import commonStyles from './DropdownMenuCommon.module.css';
+import buttonStyles from './DropdownMenuButton.module.scss';
+import commonStyles from './DropdownMenuCommon.module.scss';
+
+import type { FunctionComponent, SVGProps, JSX } from 'react';
 
 type SvgIconComponent = FunctionComponent<SVGProps<SVGSVGElement>>;
 
@@ -44,7 +46,7 @@ interface DropdownMenuButtonProps {
 	text: DropdownMenuKey;
 }
 
-const DropdownMenuButton: React.FC<DropdownMenuButtonProps> = ({ text }) => {
+const DropdownMenuButton: React.FC<DropdownMenuButtonProps> = ({ text }): JSX.Element => {
 	const { href, label, Icon } = MENU_CONFIG[text];
 
 	return (

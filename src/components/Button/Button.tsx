@@ -3,7 +3,9 @@ import React from 'react';
 
 import Loader from '@components/Loader/Loader';
 
-import styles from './Button.module.css';
+import styles from './Button.module.scss';
+
+import type { JSX } from 'react';
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 	isLoading?: boolean;
@@ -13,7 +15,7 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 	loaderBorderWidth?: number;
 };
 
-export default function Button({
+const Button = ({
 	className = '',
 	isLoading = false,
 	loadingText = 'Loading...',
@@ -23,15 +25,15 @@ export default function Button({
 	children,
 	disabled,
 	...props
-}: ButtonProps) {
+}: ButtonProps): JSX.Element => {
 	return (
 		<button className={clsx(styles.button, className)} disabled={isLoading || disabled} {...props}>
 			{isLoading && (
-				<span className={styles.loaderWrapper}>
-					<Loader width={loaderSize} height={loaderSize} color={loaderColor} borderWidth={loaderBorderWidth} />
-				</span>
+				<Loader width={loaderSize} height={loaderSize} color={loaderColor} borderWidth={loaderBorderWidth} />
 			)}
 			<span className={styles.buttonText}>{isLoading ? loadingText : children}</span>
 		</button>
 	);
-}
+};
+
+export default Button;

@@ -1,5 +1,6 @@
 import { userSchema } from '@schemas/user';
-import { validateField, extractErrorMessage, type ValidationResult } from './validateField';
+
+import { validateField, type ValidationResult, extractErrorMessage } from './validateField';
 
 export const validateUsername = (username: unknown): ValidationResult =>
 	validateField(userSchema, 'username', username);
@@ -11,13 +12,20 @@ export const validatePassword = (password: unknown): ValidationResult =>
 
 // Validate password confirmation (handled at object level)
 export const validatePasswordConfirmation = (password: unknown, confirmPassword: unknown): ValidationResult => {
-	const result = userSchema
+	const schema = userSchema
 		.pick({ password: true, confirmPassword: true })
-		.refine((data) => data.password === data.confirmPassword, {
+		.refine((data: { password: string; confirmPassword: string }): boolean => data.password === data.confirmPassword, {
 			message: 'Passwords do not match.',
 			path: ['confirmPassword'],
-		})
-		.safeParse({ password, confirmPassword });
+		});
+
+	// Ensure values are strings to avoid Zod default "expected string" errors
+	const safeData = {
+		password: typeof password === 'string' ? password : '',
+		confirmPassword: typeof confirmPassword === 'string' ? confirmPassword : '',
+	};
+
+	const result = schema.safeParse(safeData);
 
 	return result.success ? { isValid: true } : { isValid: false, error: extractErrorMessage(result) };
 };

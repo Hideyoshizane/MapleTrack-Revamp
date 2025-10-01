@@ -4,7 +4,7 @@ export const fetchWithTimeout = async (
 	timeout = 10000 // default: 10s
 ): Promise<Response> => {
 	const controller = new AbortController();
-	const id = setTimeout(() => controller.abort(), timeout);
+	const id = setTimeout((): void => controller.abort(), timeout);
 
 	const enhancedOptions: RequestInit = {
 		...options,

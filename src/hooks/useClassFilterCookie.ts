@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-import { classFilterCookie, type ClassFilterOption } from '@/utils/cookies/classFilterCookie';
+import { classFilterCookie, type ClassFilterOption } from '@utils/cookies/classFilterCookie';
 
 export const useClassFilterCookie = (): {
 	selectedClasses: ClassFilterOption[];
@@ -13,14 +13,14 @@ export const useClassFilterCookie = (): {
 	const [selectedClasses, setSelectedClasses] = useState<ClassFilterOption[]>([]);
 	const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
+	useEffect((): void => {
 		const cookieValue = classFilterCookie.get();
 		setSelectedClasses(cookieValue ?? []);
 		setLoading(false);
 	}, []);
 
 	// Update both state and cookie
-	const setClasses = (values: ClassFilterOption[]) => {
+	const setClasses = (values: ClassFilterOption[]): void => {
 		setSelectedClasses(values);
 		classFilterCookie.set(values);
 	};

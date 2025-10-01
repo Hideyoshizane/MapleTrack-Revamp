@@ -6,11 +6,11 @@
   --button-secondary-hover: #f2f2f2;
 
   display: grid;
+  gap: 64px;
+  min-height: 100svh;
   padding: 80px;
   font-family: var(--font-geist-sans);
-  gap: 64px;
   grid-template-rows: 20px 1fr 20px;
-  min-height: 100svh;
   place-items: center center;
 }
 
@@ -33,10 +33,10 @@
 
 .main ol {
   margin: 0;
+  font-family: var(--font-geist-mono);
   font-size: 14px;
   line-height: 24px;
   letter-spacing: -0.01em;
-  font-family: var(--font-geist-mono);
   list-style-position: inside;
   padding-left: 0;
 }
@@ -47,10 +47,10 @@
 
 .main code {
   padding: 2px 4px;
-  font-weight: 600;
-  background: var(--gray-alpha-100);
   border-radius: 4px;
+  background: var(--gray-alpha-100);
   font-family: inherit;
+  font-weight: 600;
 }
 
 .ctas {
@@ -65,10 +65,10 @@
   height: 48px;
   padding: 0 20px;
   border: 1px solid transparent;
+  border-radius: 128px;
   font-size: 16px;
   font-weight: 500;
   line-height: 20px;
-  border-radius: 128px;
   transition:
     background 0.2s,
     color 0.2s,
@@ -78,14 +78,14 @@
 }
 
 a.primary {
-  color: var(--background);
-  background: var(--foreground);
   gap: 8px;
+  background: var(--foreground);
+  color: var(--background);
 }
 
 a.secondary {
-  border-color: var(--gray-alpha-200);
   min-width: 158px;
+  border-color: var(--gray-alpha-200);
 }
 
 .footer {
@@ -151,9 +151,9 @@ a.secondary {
   }
 
   .footer {
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    flex-wrap: wrap;
   }
 }
 

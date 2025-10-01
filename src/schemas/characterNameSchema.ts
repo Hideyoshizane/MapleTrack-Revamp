@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { sanitizeInputFrontend } from '@/utils/sanitize/sanitizeInputFrontEnd';
+import { sanitizeInputFrontend } from '@utils/sanitize/sanitizeInputFrontEnd';
 import { validateField } from '@utils/validation/';
 
 // Schema for validating character name

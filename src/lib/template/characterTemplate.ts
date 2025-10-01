@@ -1,4 +1,4 @@
-import { CharacterDocument } from '@models/character';
+import type { CharacterDocument } from '@models/character';
 
 export const templateCharacter: Partial<CharacterDocument> = {
 	name: 'Character Name',
@@ -11,6 +11,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			name: 'Vanishing Journey',
 			level: 1,
 			exp: 1,
+			category: 'arcane',
 			content: [
 				{ contentType: 'Daily Quest', checked: true, date: null },
 				{ contentType: 'Erda Spectrum', checked: false, tries: 3, maxTries: 3, date: null },
@@ -21,6 +22,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			name: 'Chu Chu Island',
 			level: 1,
 			exp: 1,
+			category: 'arcane',
 			content: [
 				{ contentType: 'Daily Quest', checked: true, date: null },
 				{ contentType: 'Hungry Muto', checked: false, tries: 3, maxTries: 3, date: null },
@@ -31,6 +33,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			name: 'Lachelein',
 			level: 1,
 			exp: 1,
+			category: 'arcane',
 			content: [
 				{
 					contentType: 'Daily Quest',
@@ -50,6 +53,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			name: 'Arcana',
 			level: 1,
 			exp: 1,
+			category: 'arcane',
 			content: [
 				{
 					contentType: 'Daily Quest',
@@ -69,6 +73,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			name: 'Morass',
 			level: 1,
 			exp: 1,
+			category: 'arcane',
 			content: [
 				{
 					contentType: 'Daily Quest',
@@ -88,6 +93,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			name: 'Esfera',
 			level: 1,
 			exp: 1,
+			category: 'arcane',
 			content: [
 				{
 					contentType: 'Daily Quest',
@@ -109,6 +115,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			name: 'Cernium',
 			level: 1,
 			exp: 1,
+			category: 'sacred',
 			content: [
 				{
 					contentType: 'Daily Quest',
@@ -121,6 +128,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			name: 'Arcus',
 			level: 1,
 			exp: 1,
+			category: 'sacred',
 			content: [
 				{
 					contentType: 'Daily Quest',
@@ -133,6 +141,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			name: 'Odium',
 			level: 1,
 			exp: 1,
+			category: 'sacred',
 			content: [
 				{
 					contentType: 'Daily Quest',
@@ -145,6 +154,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			name: 'Shangri-La',
 			level: 1,
 			exp: 1,
+			category: 'sacred',
 			content: [
 				{
 					contentType: 'Daily Quest',
@@ -157,6 +167,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			name: 'Arteria',
 			level: 1,
 			exp: 1,
+			category: 'sacred',
 			content: [
 				{
 					contentType: 'Daily Quest',
@@ -169,6 +180,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			name: 'Carcion',
 			level: 1,
 			exp: 1,
+			category: 'sacred',
 			content: [
 				{
 					contentType: 'Daily Quest',
@@ -183,6 +195,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			name: 'Tallahart',
 			level: 1,
 			exp: 1,
+			category: 'grand',
 			content: [{ contentType: 'Daily Quest', checked: true, date: null }],
 		},
 	],

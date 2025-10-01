@@ -1,22 +1,21 @@
 'use client';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 
-import LegionBlock from '@/components/LegionBlock/LegionBlock';
-import LinkSkillBlock from '@/components/LinkSkillBlock/LinkSkillBlock';
-import SymbolGrid from '@/components/SymbolGrid/SymbolGrid';
-import { GetCharacterDataRequestBody, GetCharacterDataApiResponse, ExtraCharacterData } from '@/shared/types/character';
-import { getJob } from '@/utils/jobs/getJob';
-import BossIcon from '@assets/svg/boss_slayer.svg';
-import Button from '@components/Button/Button';
-import ProgressBar, { JobType } from '@components/ProgressBar/ProgressBar';
-import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
-import { CharacterDocument } from '@models/character';
-import { fetchWithTimeout } from '@utils/fetch/withTimeout';
+import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
+import { useCharacterData } from '@hooks/useCharacterData';
+import { useExtraCharacterData } from '@hooks/useExtraCharacterData';
+import { getJob } from '@utils/jobs/getJob';
 
-import DropdownEventMenu from './DropdownEventMenu/DropdownEventMenu';
-import styles from './page.module.css';
+import CharacterHeader from './components/CharacterHeader/CharacterHeader';
+import CharacterStats from './components/CharacterStats/CharacterStats';
+import SymbolsSection from './components/SymbolsSection/SymbolsSection';
+import styles from './page.module.scss';
+
+import type { JobType } from '@components/ProgressBar/ProgressBar';
+import type { JSX } from 'react';
 
 interface CharacterPageProps {
 	userOrigin: string;
@@ -24,73 +23,41 @@ interface CharacterPageProps {
 	code: string;
 }
 
-async function fetchCharacterApi(payload: GetCharacterDataRequestBody): Promise<GetCharacterDataApiResponse> {
-	const res = await fetchWithTimeout('/api/characters/getCharacterData', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(payload),
+const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.Element => {
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const success = searchParams.get('success');
+
+	useEffect((): void => {
+		if (success === '1') {
+			toast.success('Character updated successfully!');
+			const basePath = window.location.pathname;
+			router.replace(basePath, { scroll: false });
+		}
+	}, [success, router]);
+
+	const { character, loading: characterLoading, error } = useCharacterData({ userOrigin, server, code });
+
+	const { extraData } = useExtraCharacterData({
+		character,
+		server,
+		characterLoading,
 	});
 
-	return (await res.json()) as GetCharacterDataApiResponse;
-}
+	// Redirect to /error if done loading and no character
+	if (!characterLoading && !character) {
+		router.push('/error');
+	}
 
-export default function CharacterPage({ userOrigin, server, code }: CharacterPageProps) {
-	const router = useRouter();
+	if (error) {
+		throw new Error(error);
+	}
 
-	const [character, setCharacter] = useState<CharacterDocument>();
-	const [extraData, setExtraData] = useState<ExtraCharacterData | null>(null);
-	const [error, setError] = useState<string | null>(null);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		if (!userOrigin || !server || !code) return;
-
-		// Async function inside useEffect
-		const fetchData = async () => {
-			try {
-				const data = await fetchCharacterApi({ userOrigin, server, code });
-
-				if (data.success) {
-					setCharacter(data.data);
-				} else {
-					setError(data.error ?? null);
-				}
-			} catch (err: unknown) {
-				console.error('Error fetching characters:', err);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		void fetchData();
-	}, [userOrigin, server, code]);
-
-	useEffect(() => {
-		if (!character || !character.syncing) return;
-
-		const fetchExtraData = async () => {
-			try {
-				const res = await fetch(
-					`/api/characters/getAPICharacterImage?character_name=${character.name}&server=${server}`
-				);
-				if (!res.ok) throw new Error('Failed to fetch extra data');
-
-				const extra: ExtraCharacterData = (await res.json()) as ExtraCharacterData;
-				setExtraData(extra);
-			} catch (err) {
-				console.error('Error fetching extra character data:', err);
-			}
-		};
-
-		void fetchExtraData();
-	}, [character, server]);
-
-	if (error) return <p>Error: {error}</p>;
-	if (!character) return null;
+	if (!character) {
+		return <FullPageLoader />;
+	}
 
 	const job = getJob(character.level);
-	const BOSS_ICON_SIZE = 90;
-	const ICON_SIZE = 64;
 	const jobType: JobType = (character.jobType ?? 'default') as JobType;
 
 	return (
@@ -104,103 +71,13 @@ export default function CharacterPage({ userOrigin, server, code }: CharacterPag
 					alt={`${character.class} class profile Icon`}
 				/>
 				<div className={styles.characterContent}>
-					<div className={styles.buttonLine}>
-						<DropdownEventMenu />
-						<Button className={styles.increaseAllButton}>Increase All</Button>
-						<Button
-							className={styles.editCharacterButton}
-							onClick={() => router.push(`${window.location.pathname}/edit`)}>
-							Edit Character
-						</Button>
-					</div>
-					<div className={styles.usernameLine}>
-						<div className={styles.characterImgDiv}>
-							{character.syncing &&
-								(extraData ? (
-									<Image src={extraData.characterImgURL} alt="Fetched from API" width={80} height={80} />
-								) : (
-									<SkeletonWrapper width={80} height={80} color="light" variant="rectangular" />
-								))}
-						</div>
-						<p className={styles.characterName}>{character.name}</p>
-					</div>
-					<div className={styles.bigBlock}>
-						<div className={styles.characterBossLinkLegion}>
-							<div className={styles.bossSlot}>
-								{loading ? (
-									<SkeletonWrapper width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} color="light" variant="rectangular" />
-								) : (
-									character.bossing && (
-										<BossIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.bossIcon} />
-									)
-								)}
-							</div>
-							<LinkSkillBlock
-								characterLevel={character.level}
-								characterLinkSkill={character.linkSkill!}
-								iconSize={ICON_SIZE}
-								showTooltip={true}
-							/>
-							<LegionBlock
-								characterLevel={character.level}
-								characterCode={character.code!}
-								characterJobType={character.jobType!}
-								characterLegionType={character.legion!}
-								iconSize={ICON_SIZE}
-								showTooltip={true}
-							/>
-						</div>
-						<div className={styles.characterClassJob}>
-							<p className={styles.characterClass}>{character.class}</p>
-							<p className={styles.characterJob}>{job}</p>
-						</div>
-					</div>
-					<div className={styles.levelDiv}>
-						<div className={styles.levelInput}>
-							<p className={styles.levelText}>Level:</p>
-							<p className={styles.levelTextBlack}>
-								{character.level}/{character.targetLevel}
-							</p>
-						</div>
-
-						<ProgressBar
-							height={32}
-							width={900}
-							value={character.level}
-							maxValue={character.targetLevel}
-							jobType={jobType}
-						/>
-					</div>
-					<div className={styles.symbols}>
-						<p className={styles.title}>Arcane Symbols</p>
-						<SymbolGrid
-							type="arcane"
-							symbols={character.ArcaneSymbol}
-							characterLevel={character.level}
-							characterJobType={character.jobType!}
-							size={56}
-						/>
-
-						<p className={styles.title}>Sacred Symbols</p>
-						<SymbolGrid
-							type="sacred"
-							symbols={character.SacredSymbol}
-							characterLevel={character.level}
-							characterJobType={character.jobType!}
-							size={56}
-						/>
-
-						<p className={styles.title}>Grand Sacred Symbols</p>
-						<SymbolGrid
-							type="grand"
-							symbols={character.GrandSacredSymbol}
-							characterLevel={character.level}
-							characterJobType={character.jobType!}
-							size={56}
-						/>
-					</div>
+					<CharacterHeader character={character} extraData={extraData} router={router} />
+					<CharacterStats character={character} job={job} jobType={jobType} />
+					<SymbolsSection character={character} />
 				</div>
 			</div>
 		</section>
 	);
-}
+};
+
+export default CharacterPage;

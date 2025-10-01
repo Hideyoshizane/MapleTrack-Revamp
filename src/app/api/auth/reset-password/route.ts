@@ -3,32 +3,25 @@ import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { NextRequest } from 'next/server';
 
 import connectToDatabase from '@lib/mongooseConect';
 import User from '@models/user';
 import { resetPasswordRequestSchema } from '@schemas/authSchemas';
-import { ApiResponse } from '@/shared/types/api';
 import { createResponse } from '@utils/api/createResponse';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 import { validatePassword } from '@utils/validation/';
 
+import type { ApiResponse } from '@sharedTypes/api';
+import type { NextRequest, NextResponse } from 'next/server';
+
 dayjs.extend(utc);
 
-export async function POST(req: NextRequest) {
+export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
 		await connectToDatabase();
 
-		// Parse JSON safely
-		let rawBody: unknown;
-		try {
-			rawBody = await req.json();
-		} catch {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid JSON payload' }, 400);
-		}
-
 		// Validate request body with Zod
-		const parseResult = resetPasswordRequestSchema.safeParse(rawBody);
+		const parseResult = resetPasswordRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
@@ -83,4 +76,4 @@ export async function POST(req: NextRequest) {
 		console.error('Signup error:', error);
 		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
 	}
-}
+};

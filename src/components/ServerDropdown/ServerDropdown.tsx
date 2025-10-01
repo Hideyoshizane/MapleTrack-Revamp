@@ -2,49 +2,57 @@
 
 import { clsx } from 'clsx';
 import Image from 'next/image';
-import { useRef, useEffect, useState, useMemo } from 'react';
+import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 
 import ChevronIcon from '@assets/svg/chevron-down.svg';
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 import serversJson from '@data/servers/servers.json';
 
-import styles from './ServerDropdown.module.css';
-import ServerItem from './ServerItem';
+import styles from './ServerDropdown.module.scss';
+import ServerItem from './ServerItem/ServerItem';
 
 import type { Server } from '@sharedTypes/server';
+import type { JSX } from 'react';
 
 interface ServerDropdownProps {
 	serverCookie?: string;
 	setServerCookie?: (value: string) => void;
 }
 
-export default function ServerDropdown({ serverCookie, setServerCookie }: ServerDropdownProps) {
+const ServerDropdown = ({ serverCookie, setServerCookie }: ServerDropdownProps): JSX.Element => {
 	const [isOpen, setIsOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	// Cast JSON to typed array of servers
-	const servers: Server[] = serversJson as Server[];
+	const servers: Server[] = useMemo<Server[]>((): Server[] => serversJson as Server[], []);
 
 	// Memoize the currently selected server for performance
-	const selectedServer = useMemo(() => servers.find((s) => s.name === serverCookie), [servers, serverCookie]);
+	const selectedServer: Server | undefined = useMemo<Server | undefined>(
+		(): Server | undefined => servers.find((s): boolean => s.name === serverCookie),
+		[servers, serverCookie]
+	);
 
 	// Toggle dropdown open/close state
-	const handleToggle = () => setIsOpen((prev) => !prev);
+	const handleToggle = useCallback<() => void>((): void => {
+		setIsOpen((prev: boolean): boolean => !prev);
+	}, []);
 
-	const handleSelectServer = (server: Server) => {
-		setServerCookie?.(server.name);
-		setIsOpen(false);
-	};
-
+	const handleSelectServer = useCallback(
+		(server: Server): void => {
+			setServerCookie?.(server.name);
+			setIsOpen(false);
+		},
+		[setServerCookie]
+	);
 	// Close dropdown when clicking outside
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
+	useEffect((): (() => void) => {
+		const handleClickOutside = (event: MouseEvent): void => {
 			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
 				setIsOpen(false);
 			}
 		};
 		document.addEventListener('mousedown', handleClickOutside);
-		return () => document.removeEventListener('mousedown', handleClickOutside);
+		return (): void => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
 
 	// Skeleton placeholder while selectedServer is not ready
@@ -61,26 +69,40 @@ export default function ServerDropdown({ serverCookie, setServerCookie }: Server
 				tabIndex={0}
 				role="button"
 				aria-expanded={isOpen}
-				aria-label={`Selected server: ${selectedServer.name}`}>
+				aria-label={`Selected server: ${selectedServer.name}`}
+				onKeyDown={(e): void => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault();
+						handleToggle();
+					}
+				}}>
 				<div className={styles.iconWrapper}>
 					<Image src={selectedServer.img} alt={selectedServer.name} width={48} height={48} priority />
 				</div>
 				<p className={styles.serverName}>{selectedServer.name}</p>
-				<ChevronIcon className={clsx(styles.icon, { [styles.rotatedActive]: isOpen, [styles.rotated]: true })} />
+				<ChevronIcon
+					className={clsx(styles.icon, styles.rotated, {
+						[styles.rotatedActive]: isOpen,
+					})}
+				/>
 			</div>
 			<hr className={styles.hr} />
 
 			{/* Dropdown list */}
 			<div className={styles.serversList}>
-				{servers.map((server) => (
-					<ServerItem
-						key={server.name}
-						server={server}
-						isSelected={server.name === selectedServer.name}
-						onSelect={handleSelectServer}
-					/>
-				))}
+				{servers.map(
+					(server: Server): JSX.Element => (
+						<ServerItem
+							key={server.name}
+							server={server}
+							isSelected={server.name === selectedServer.name}
+							onSelect={handleSelectServer}
+						/>
+					)
+				)}
 			</div>
 		</div>
 	);
-}
+};
+
+export default ServerDropdown;

@@ -1,9 +1,7 @@
 import NextAuth from 'next-auth';
 
-import { authOptions } from '@/lib/authOptions';
+import { authOptions } from '@lib/authOptions';
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-export const GET = NextAuth(authOptions);
+const handler = NextAuth(authOptions);
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-export const POST = NextAuth(authOptions);
+export { handler as GET, handler as POST };

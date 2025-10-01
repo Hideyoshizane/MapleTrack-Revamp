@@ -6,9 +6,11 @@ import { Textfit } from 'react-textfit';
 
 import MenuIcon from '@assets/svg/menu.svg';
 
-import styles from './CustomDropdownMenu.module.css';
+import styles from './CustomDropdownMenu.module.scss';
 import DropdownMenuButton from './DropdownMenuButton/DropdownMenuButton';
 import LogoutButton from './DropdownMenuButton/LogoutButton';
+
+import type { JSX } from 'react';
 
 interface CustomDropdownMenuProps {
 	username: string;
@@ -22,7 +24,7 @@ const MENU_ITEMS: { type: 'link'; text: Parameters<typeof DropdownMenuButton>[0]
 
 const iconSize = 48;
 
-export const CustomDropdownMenu: React.FC<CustomDropdownMenuProps> = ({ username }) => {
+const CustomDropdownMenu: React.FC<CustomDropdownMenuProps> = ({ username }): JSX.Element => {
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
@@ -36,16 +38,19 @@ export const CustomDropdownMenu: React.FC<CustomDropdownMenuProps> = ({ username
 
 			<DropdownMenu.Portal>
 				<DropdownMenu.Content className={styles.dropdownContent} side="bottom" align="end" sideOffset={5}>
-					{MENU_ITEMS.map((item) => (
-						<React.Fragment key={item.text}>
-							<DropdownMenuButton text={item.text} />
-							<DropdownMenu.Separator className={styles.separator} />
-						</React.Fragment>
-					))}
-
+					{MENU_ITEMS.map(
+						(item): JSX.Element => (
+							<React.Fragment key={item.text}>
+								<DropdownMenuButton text={item.text} />
+								<DropdownMenu.Separator className={styles.separator} />
+							</React.Fragment>
+						)
+					)}
 					<LogoutButton />
 				</DropdownMenu.Content>
 			</DropdownMenu.Portal>
 		</DropdownMenu.Root>
 	);
 };
+
+export default CustomDropdownMenu;
