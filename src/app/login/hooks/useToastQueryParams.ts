@@ -26,6 +26,10 @@ const TOAST_MESSAGES: ToastMessages = {
 		message: 'Account deleted successfully.',
 		type: 'success',
 	},
+	version_update: {
+		message: 'Please log again to update.',
+		type: 'success',
+	},
 };
 
 export const useToastQueryParams = (): void => {

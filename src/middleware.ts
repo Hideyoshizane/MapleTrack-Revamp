@@ -3,6 +3,8 @@ import { getToken } from 'next-auth/jwt';
 
 import { DARK_PATHS, themeFromPath, type Theme } from '@lib/theme';
 
+import { LASTVERSION } from './models/user';
+
 import type { NextRequest } from 'next/server';
 
 // Middleware function to set 'theme' cookie and handle auth redirects
@@ -21,7 +23,6 @@ export const middleware = async (req: NextRequest): Promise<ReturnType<typeof Ne
 	}
 	// Determine theme ('dark' or 'light') based on pathname
 	const theme: Theme = themeFromPath(pathname);
-
 	const res = NextResponse.next();
 	res.cookies.set('theme', theme, { path: '/' });
 
@@ -30,6 +31,18 @@ export const middleware = async (req: NextRequest): Promise<ReturnType<typeof Ne
 
 	// Check if user is authenticated (token is non-null object)
 	const isAuthenticated = !!token;
+
+	// If authenticated, check version
+	if (isAuthenticated && token?.version !== LASTVERSION) {
+		// Clear NextAuth session cookies to log off user
+		const url = new URL('/login', req.url);
+		url.search = 'version_update=1';
+		const logoutResponse = NextResponse.redirect(url);
+		logoutResponse.cookies.delete('next-auth.session-token');
+		logoutResponse.cookies.delete('__Secure-next-auth.session-token');
+
+		return logoutResponse;
+	}
 
 	// Narrow pathname to first segment for safer DARK_PATHS check
 	const topLevelPath = '/' + pathname.split('/')[1];

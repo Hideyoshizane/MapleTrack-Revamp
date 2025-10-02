@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
 import connectToDatabase from '@lib/mongooseConect';
-import UserMongo from '@models/user';
+import UserMongo, { LASTVERSION } from '@models/user';
 import { updateLastLogin } from '@service/userService';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 import { validateUsernameLogin, validatePasswordLogin } from '@utils/validation';
@@ -25,7 +25,7 @@ export const authOptions: AuthOptions = {
 				username: { label: 'Username', type: 'text', placeholder: 'Your Username' },
 				password: { label: 'Password', type: 'Password' },
 			},
-			async authorize(credentials): Promise<{ id: string; username: string } | null> {
+			async authorize(credentials): Promise<User | null> {
 				await connectToDatabase();
 
 				// Sanitize inputs
@@ -69,10 +69,11 @@ export const authOptions: AuthOptions = {
 
 				await user.save();
 
-				// Return user object (will be saved in JWT token)
+				// Return user object stored in JWT
 				return {
 					id: user._id.toString(),
 					username: user.username,
+					version: user.version ?? LASTVERSION,
 				};
 			},
 		}),
@@ -83,6 +84,7 @@ export const authOptions: AuthOptions = {
 			if (user) {
 				token.id = user.id;
 				token.username = user.username;
+				token.version = user.version ?? LASTVERSION;
 			}
 			return token;
 		},
@@ -92,6 +94,7 @@ export const authOptions: AuthOptions = {
 				session.user = {
 					id: token.id as string,
 					username: token.username as string,
+					version: token.version as number,
 				};
 			}
 			return session;
