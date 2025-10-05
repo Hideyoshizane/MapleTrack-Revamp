@@ -1,7 +1,6 @@
 'use client';
 
 import { clsx } from 'clsx';
-import React from 'react';
 
 import OkIcon from '@assets/svg/circle-check.svg';
 import ErrorIcon from '@assets/svg/circle-x.svg';
@@ -13,8 +12,8 @@ import styles from './ValidationIcon.module.scss';
 import type { JSX } from 'react';
 
 type ValidationIconProps = {
-	showValid: boolean; // Show green check icon
-	showInvalid: boolean; // Show red error icon
+	showValid: boolean;
+	showInvalid: boolean;
 	tooltipMessage: string;
 	showTooltip: boolean;
 	iconSize?: number;
@@ -22,7 +21,7 @@ type ValidationIconProps = {
 	isLightmode?: boolean;
 };
 
-const ValidationIcon: React.FC<ValidationIconProps> = ({
+const ValidationIcon = ({
 	showValid,
 	showInvalid,
 	tooltipMessage,
@@ -30,14 +29,14 @@ const ValidationIcon: React.FC<ValidationIconProps> = ({
 	iconSize = 24,
 	className,
 	isLightmode = false,
-}): JSX.Element => {
+}: ValidationIconProps): JSX.Element => {
 	// Show green check without tooltip
 	if (showValid) {
 		return <OkIcon width={iconSize} height={iconSize} className={clsx(styles.validIcon, className)} />;
 	}
 
 	// Determine which icon to render
-	const IconComponent: React.ElementType = showInvalid ? ErrorIcon : InfoIcon;
+	const IconComponent = showInvalid ? ErrorIcon : InfoIcon;
 	const iconClass = clsx(
 		showInvalid ? styles.invalidIcon : styles.defaultIcon,
 		!showInvalid && isLightmode && styles.lightModeDefaultIcon,

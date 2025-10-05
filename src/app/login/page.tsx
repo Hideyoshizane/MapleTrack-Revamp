@@ -25,10 +25,7 @@ const LoginPage = (): JSX.Element => {
 		setError,
 	} = useForm<LoginFormData>({
 		mode: 'onBlur',
-		defaultValues: {
-			username: '',
-			password: '',
-		},
+		defaultValues: { username: '', password: '' },
 	});
 
 	// Track if the user just logged in successfully on this page

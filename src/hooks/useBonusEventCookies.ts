@@ -14,16 +14,14 @@ export const useBonusEventCookies = (): {
 
 	useEffect((): void => {
 		// Arcane
-		const arcaneCurrent = arcaneBonusCookie.get();
-		const validArcane = arcaneCurrent ?? 0;
-		setArcaneBonus(validArcane);
-		arcaneBonusCookie.set(validArcane);
+		const arcane = arcaneBonusCookie.get() ?? 0;
+		setArcaneBonus(arcane);
+		arcaneBonusCookie.set(arcane);
 
 		// Sacred
-		const sacredCurrent = sacredBonusCookie.get();
-		const validSacred = sacredCurrent ?? 0;
-		setSacredBonus(validSacred);
-		sacredBonusCookie.set(validSacred);
+		const sacred = sacredBonusCookie.get() ?? 0;
+		setSacredBonus(sacred);
+		sacredBonusCookie.set(sacred);
 	}, []);
 
 	// Update Arcane cookie + state

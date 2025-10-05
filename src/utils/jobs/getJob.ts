@@ -1,4 +1,4 @@
-export type JobClass = 'No Job' | '1st Class' | '2nd Class' | '3rd Class' | '4th Class' | 'V Class' | 'VI Class';
+type JobClass = 'No Job' | '1st Class' | '2nd Class' | '3rd Class' | '4th Class' | 'V Class' | 'VI Class';
 
 export const getJob = (level: number): JobClass => {
 	if (level === 0) return 'No Job';

@@ -23,10 +23,7 @@ export const toUtc = (date: string | Date | Dayjs): Dayjs => {
 };
 
 // Weekday constants for clarity (0 = Sunday, 1 = Monday, ... 6 = Saturday)
-export const WEEKDAYS = {
-	MONDAY: 1,
-	THURSDAY: 4,
-};
+export const WEEKDAYS = { MONDAY: 1, THURSDAY: 4 };
 
 export const getNextResetTime = (date: string | Date | Dayjs, targetWeekday: number): Dayjs => {
 	const givenDate = toUtc(date);
@@ -39,24 +36,13 @@ export const getNextResetTime = (date: string | Date | Dayjs, targetWeekday: num
 };
 
 // Utility to check if reset has occurred
-const hasResetOccurred = (date: string | Date | Dayjs, resetTime: Dayjs): boolean => {
-	if (!date) {
-		return false;
-	}
-	return nowUtc().isAfter(resetTime);
-};
+const hasResetOccurred = (resetTime: Dayjs): boolean => nowUtc().isAfter(resetTime);
 
-export const hasDailyResetOccurred = (date: string | Date | Dayjs): boolean => {
-	const resetTime = toUtc(date).add(1, 'day').startOf('day');
-	return hasResetOccurred(date, resetTime);
-};
+export const hasDailyResetOccurred = (date: string | Date | Dayjs): boolean =>
+	hasResetOccurred(toUtc(date).add(1, 'day').startOf('day'));
 
-export const hasBossResetOccurred = (date: string | Date | Dayjs): boolean => {
-	const resetTime = getNextResetTime(date, WEEKDAYS.THURSDAY);
-	return hasResetOccurred(date, resetTime);
-};
+export const hasBossResetOccurred = (date: string | Date | Dayjs): boolean =>
+	hasResetOccurred(getNextResetTime(date, WEEKDAYS.THURSDAY));
 
-export const hasWeeklyQuestResetOccurred = (date: string | Date | Dayjs): boolean => {
-	const resetTime = getNextResetTime(date, WEEKDAYS.MONDAY);
-	return hasResetOccurred(date, resetTime);
-};
+export const hasWeeklyQuestResetOccurred = (date: string | Date | Dayjs): boolean =>
+	hasResetOccurred(getNextResetTime(date, WEEKDAYS.MONDAY));

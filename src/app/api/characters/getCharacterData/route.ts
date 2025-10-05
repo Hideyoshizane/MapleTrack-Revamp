@@ -20,12 +20,10 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
 
-		const { userOrigin: rawUserOrigin, server: rawServer, code: rawCode } = parseResult.data;
+		const { userOrigin, server: rawServer, code: rawCode } = parseResult.data;
 
 		// Sanitize inputs
-		const username = sanitizeInputBackEnd(rawUserOrigin);
-		const server = sanitizeInputBackEnd(rawServer);
-		const code = sanitizeInputBackEnd(rawCode);
+		const [username, server, code] = [userOrigin, rawServer, rawCode].map(sanitizeInputBackEnd);
 		if (!username || !server || !code) {
 			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
 		}
@@ -36,13 +34,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		}
 
 		// Search for the character
-		const character = await Character.findOne({
-			userOrigin: username,
-			server,
-			code,
-		})
-			.lean()
-			.exec();
+		const character = await Character.findOne({ userOrigin: username, server, code }).lean().exec();
 
 		//if not in database, return a generic object.
 		if (!character) {

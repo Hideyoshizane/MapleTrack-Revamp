@@ -16,9 +16,9 @@ export const characterNameSchema = z.object({
 export type CharacterNameSchema = z.infer<typeof characterNameSchema>;
 
 // Type for validation result
-export type CharacterNameValidationResult = { success: true; value: string } | { success: false; error: string };
+type CharacterNameValidationResult = { success: true; value: string } | { success: false; error: string };
 
-export const validateCharacterName = (name: string): CharacterNameValidationResult => {
+const validateCharacterName = (name: string): CharacterNameValidationResult => {
 	// Sanitize first to remove malicious input
 	const sanitizedName = sanitizeInputFrontend(name);
 

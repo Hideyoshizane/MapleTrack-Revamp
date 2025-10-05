@@ -40,18 +40,13 @@ export const useLogin = (
 				if (hasErrors) return;
 
 				// Use NextAuth signIn with credentials
-				const res = await signIn('credentials', {
-					redirect: false,
-					username,
-					password,
-				});
+				const res = await signIn('credentials', { redirect: false, username, password });
 
 				if (res?.error) {
 					toast.error(res.error);
 				} else {
 					// Mark fresh login to avoid redirect in effect
 					setJustLoggedIn(true);
-
 					toast.success('Login successful!');
 					// redirect after login success
 					// Used instead of router to force page reload and theme cookie change.

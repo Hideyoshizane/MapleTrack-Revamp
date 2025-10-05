@@ -23,11 +23,17 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		if (!parseResult.success) {
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
-		const symbolName = sanitizeInputBackEnd(parseResult.data.symbolName);
-		const bonus = parseResult.data.bonus;
-		const username = sanitizeInputBackEnd(parseResult.data.userOrigin);
-		const server = sanitizeInputBackEnd(parseResult.data.server);
-		const code = sanitizeInputBackEnd(parseResult.data.code);
+		const {
+			symbolName: rawSymbolName,
+			bonus,
+			userOrigin: rawUsername,
+			server: rawServer,
+			code: rawCode,
+		} = parseResult.data;
+
+		const [symbolName, username, server, code] = [rawSymbolName, rawUsername, rawServer, rawCode].map(
+			sanitizeInputBackEnd
+		);
 		if (!symbolName || !username || !server || !code) {
 			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
 		}

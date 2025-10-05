@@ -1,7 +1,7 @@
 'use client';
 
 import dayjs from 'dayjs';
-import React, { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 
 import Button from '@components/Button/Button';
 import { computeDailyWeeklyValues } from '@data/symbols/symbolMappings';
@@ -15,7 +15,7 @@ import type { SymbolCategory } from '@data/symbols/symbolMappings';
 import type { CharacterContent, CharacterSymbol } from '@models/character';
 import type { JSX } from 'react';
 
-export interface SymbolButtonsProps {
+interface SymbolButtonsProps {
 	type: SymbolCategory;
 	symbol: CharacterSymbol;
 	content: CharacterContent[];
@@ -28,19 +28,13 @@ const SymbolButtons = ({ type, symbol, content, onValueChange }: SymbolButtonsPr
 	const [isWeeklyDone, setIsWeeklyDone] = useState(true);
 
 	// Get the base daily value and weekly value
-	const { dailyValue: initialDaily, weeklyValue } = computeDailyWeeklyValues(symbol, content);
-	const dailyValue = initialDaily + (type === 'arcane' ? arcaneBonus : sacredBonus);
+	const { dailyValue: baseDaily, weeklyValue } = computeDailyWeeklyValues(symbol, content);
+	const dailyValue = baseDaily + (type === 'arcane' ? arcaneBonus : sacredBonus);
 
-	// Compute Daily Button State
+	// Compute Daily Button and Weekly Button
 	useEffect((): void => {
-		const resetDone = content[0]?.date ? hasDailyResetOccurred(dayjs(content[0].date)) : true;
-		setIsResetDone(resetDone);
-	}, [content]);
-
-	// Compute Weekly Button State
-	useEffect((): void => {
-		const resetDone = content[1]?.date ? hasWeeklyQuestResetOccurred(dayjs(content[1].date)) : true;
-		setIsWeeklyDone(resetDone);
+		setIsResetDone(content[0]?.date ? hasDailyResetOccurred(dayjs(content[0].date)) : true);
+		setIsWeeklyDone(content[1]?.date ? hasWeeklyQuestResetOccurred(dayjs(content[1].date)) : true);
 	}, [content]);
 
 	// Notify parent of current values
@@ -71,7 +65,6 @@ const SymbolButtons = ({ type, symbol, content, onValueChange }: SymbolButtonsPr
 			if (data.success) {
 				// Aqui faz conexão com onValueChange.
 			}
-			console.log(data);
 		} catch (error) {
 			console.error('Error updating daily bonus', error);
 		}

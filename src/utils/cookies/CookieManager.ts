@@ -1,79 +1,53 @@
 import Cookies from 'js-cookie';
 
 import { COOKIE_EXPIRES_DAYS, MIN_VALUE_BONUS_COOKIE, MAX_VALUE_BONUS_COOKIE } from './constants';
+
+type StringCookieManager<T extends string> = {
+	get: () => T[] | undefined;
+	set: (values: T[]) => void;
+};
+
+type NumericCookieManager = {
+	get: () => number | undefined;
+	set: (value: number) => void;
+};
+
 // Generic typed cookie helper for enums or fixed option sets.
-export class CookieManager<T extends string> {
-	key: string;
-	allowedValues: readonly T[];
-	expiresDays: number;
+export const createCookieManager = <T extends string>(
+	key: string,
+	allowed: readonly T[],
+	expiresDays = 60
+): StringCookieManager<T> => ({
+	get: (): T[] | undefined => {
+		const value = Cookies.get(key);
+		if (!value) return;
 
-	constructor(key: string, allowedValues: readonly T[], expiresDays = 60) {
-		this.key = key;
-		this.allowedValues = allowedValues;
-		this.expiresDays = expiresDays;
-	}
+		const filtered = value.split(',').filter((v): v is T => allowed.includes(v as T));
+		return filtered;
+	},
 
-	// Get the cookie value as an array of valid items
-	get = (): T[] | undefined => {
-		const value = Cookies.get(this.key);
-		if (!value) return undefined;
+	set: (values: T[]): void => {
+		const invalid = values.filter((v): boolean => !allowed.includes(v));
+		if (invalid.length) throw new Error(`Invalid ${key}: "${invalid.join(',')}"`);
+		Cookies.set(key, values.join(','), { expires: expiresDays });
+	},
+});
 
-		const values = value.split(',') as T[];
-		// Filter to only allowed values
-		return values.filter((v): boolean => this.allowedValues.includes(v));
-	};
+export const createNumericCookieManager = (
+	key: string,
+	min = MIN_VALUE_BONUS_COOKIE,
+	max = MAX_VALUE_BONUS_COOKIE,
+	expiresDays = COOKIE_EXPIRES_DAYS
+): NumericCookieManager => ({
+	get: (): number | undefined => {
+		const value = Cookies.get(key);
+		if (!value) return;
+		const n = Number(value);
+		return Number.isNaN(n) || n < min || n > max ? undefined : n;
+	},
 
-	//  Sets the cookie value if it's valid.
-	set = (values: T[]): void => {
-		// Validate all values
-		const invalid = values.filter((v): boolean => !this.allowedValues.includes(v));
-		if (invalid.length > 0) {
-			throw new Error(`Invalid value(s) for ${this.key}: "${invalid.join(',')}"`);
-		}
-
-		// Store as comma-separated string
-		Cookies.set(this.key, values.join(','), { expires: this.expiresDays });
-	};
-}
-
-export class NumericCookieManager {
-	key: string;
-	min: number;
-	max: number;
-	expiresDays: number;
-
-	constructor(
-		key: string,
-		min = MIN_VALUE_BONUS_COOKIE,
-		max = MAX_VALUE_BONUS_COOKIE,
-		expiresDays = COOKIE_EXPIRES_DAYS
-	) {
-		this.key = key;
-		this.min = min;
-		this.max = max;
-		this.expiresDays = expiresDays;
-	}
-
-	// Get the cookie value as a number if valid, otherwise undefined
-	get = (): number | undefined => {
-		const value = Cookies.get(this.key);
-		if (!value) return undefined;
-
-		const parsed = Number(value);
-		if (Number.isNaN(parsed)) return undefined;
-
-		// Validate range
-		if (parsed < this.min || parsed > this.max) return undefined;
-
-		return parsed;
-	};
-
-	// Set the cookie value if valid
-	set = (value: number): void => {
-		if (value < this.min || value > this.max) {
-			throw new Error(`Invalid value for ${this.key}: ${value}. Must be between ${this.min} and ${this.max}.`);
-		}
-
-		Cookies.set(this.key, String(value), { expires: this.expiresDays });
-	};
-}
+	set: (value: number): void => {
+		if (value < min || value > max) throw new Error(`Invalid ${key}: ${value}. Must be ${min}-${max}.`);
+		Cookies.set(key, String(value), { expires: expiresDays });
+	},
+});

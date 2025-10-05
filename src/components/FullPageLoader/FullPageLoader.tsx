@@ -1,12 +1,10 @@
 'use client';
 
-import React from 'react';
-
 import Loader from '@components/Loader/Loader';
 
 import styles from './FullPageLoader.module.scss';
 
-import type { FC, JSX } from 'react';
+import type { JSX } from 'react';
 
 interface FullPageLoaderProps {
 	width?: number;
@@ -15,12 +13,12 @@ interface FullPageLoaderProps {
 	borderWidth?: number;
 }
 
-const FullPageLoader: FC<FullPageLoaderProps> = ({
+const FullPageLoader = ({
 	width = 120,
 	height = 120,
 	color = 'var(--default-black)',
 	borderWidth = 12,
-}): JSX.Element => {
+}: FullPageLoaderProps): JSX.Element => {
 	return (
 		<section className="mainContent">
 			<div className={styles.mainDiv}>

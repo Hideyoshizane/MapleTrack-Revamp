@@ -22,12 +22,7 @@ const ForgotPasswordPage = (): JSX.Element => {
 		handleSubmit,
 		formState: { isSubmitting, isSubmitted },
 		setError,
-	} = useForm<ForgotPasswordFormData>({
-		mode: 'onBlur',
-		defaultValues: {
-			email: '',
-		},
-	});
+	} = useForm<ForgotPasswordFormData>({ mode: 'onBlur', defaultValues: { email: '' } });
 
 	const { submitForgotPassword } = useForgotPassword(setError);
 	const commonInputProps = { control, isSubmitted, isLogin: false };

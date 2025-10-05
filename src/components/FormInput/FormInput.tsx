@@ -1,7 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Controller, type Control, type Path, type FieldValues } from 'react-hook-form';
 
 import styles from './FormInput.module.scss';
@@ -52,7 +52,6 @@ const FormInput = <TFieldValues extends FieldValues>({
 				const showError = Boolean(fieldState.error);
 				const showValid = touched && !fieldState.error;
 				const showInvalid = touched && showError;
-
 				const tooltipMessage = showError ? fieldState.error?.message ?? 'Invalid input' : 'Enter a value';
 
 				const inputClass = clsx(styles.input, {
@@ -75,7 +74,7 @@ const FormInput = <TFieldValues extends FieldValues>({
 								value={field.value ?? ''}
 								onBlur={(): void => {
 									setTouched(true);
-									field.onBlur(); // let RHF handle blur
+									field.onBlur();
 								}}
 							/>
 
@@ -86,7 +85,7 @@ const FormInput = <TFieldValues extends FieldValues>({
 										showInvalid={showInvalid}
 										tooltipMessage={tooltipMessage}
 										isLightmode={isLightmode}
-										showTooltip={!isLogin}
+										showTooltip
 									/>
 								</div>
 							)}

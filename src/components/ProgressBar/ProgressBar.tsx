@@ -2,7 +2,7 @@
 
 import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { clsx } from 'clsx';
-import * as React from 'react';
+import { useMemo } from 'react';
 
 import styles from './ProgressBar.module.scss';
 
@@ -32,39 +32,23 @@ interface ProgressBarProps {
 
 type IndicatorStyle = React.CSSProperties & { '--progress-value'?: string | number };
 
-const ProgressBar: React.FC<ProgressBarProps> = ({
-	value,
-	maxValue,
-	jobType,
-	width = 300,
-	height = 32,
-	forceFull = false,
-}): JSX.Element => {
-	const percentage = React.useMemo((): number => {
+const ProgressBar = ({ value, maxValue, jobType, width, height, forceFull = false }: ProgressBarProps): JSX.Element => {
+	const percentage = useMemo((): number => {
 		if (forceFull) return 100;
-		if (maxValue <= 0) return 0;
-		if (value === 0) return 0;
+		if (maxValue <= 0 || value === 0) return 0;
 
 		const rawPercent = (value / maxValue) * 100;
 		return Math.min(Math.max(rawPercent, 5.35), 100);
 	}, [value, maxValue, forceFull]);
 
-	// Force 'complete' when fully filled
-	const appliedJobType: JobType = value >= maxValue ? 'complete' : jobType;
-
 	const indicatorStyle: IndicatorStyle = {
 		'--progress-value': percentage,
 	};
 
-	const rootStyle: React.CSSProperties = {
-		width: `${width}px`,
-		height: `${height}px`,
-	};
-
 	return (
-		<ProgressPrimitive.Root className={styles.progressRoot} value={percentage} max={100} style={rootStyle}>
+		<ProgressPrimitive.Root className={styles.progressRoot} value={percentage} max={100} style={{ width, height }}>
 			<ProgressPrimitive.Indicator
-				className={clsx(styles.progressIndicator, jobTypeClassMap[appliedJobType])}
+				className={clsx(styles.progressIndicator, jobTypeClassMap[value >= maxValue ? 'complete' : jobType])}
 				style={indicatorStyle}
 			/>
 		</ProgressPrimitive.Root>

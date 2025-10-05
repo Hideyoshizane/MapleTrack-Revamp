@@ -26,11 +26,10 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
 
-		const { token: rawToken, password: rawPassword } = parseResult.data;
-
 		// Sanitize input
-		const sanitizedToken = sanitizeInputBackEnd(rawToken);
-		const sanitizedPassword = sanitizeInputBackEnd(rawPassword);
+		const [sanitizedToken, sanitizedPassword] = [parseResult.data.token, parseResult.data.password].map(
+			sanitizeInputBackEnd
+		);
 		if (!sanitizedToken || !sanitizedPassword) {
 			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
 		}
@@ -54,21 +53,17 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		}
 
 		// Compare new password with current one
-		const isSamePassword = await bcrypt.compare(sanitizedPassword, user.password);
-		if (isSamePassword) {
+		if (await bcrypt.compare(sanitizedPassword, user.password)) {
 			return createResponse<ApiResponse>(
 				{ success: false, error: 'New password must be different from the current password' },
 				400
 			);
 		}
 
-		// Generate the Token to be send and stored
-		const hashedPassword = await bcrypt.hash(sanitizedPassword, 10);
-
 		// Update user password and remove reset token
-		user.password = hashedPassword;
-		user.set('resetPasswordToken', undefined);
-		user.set('resetPasswordExpires', undefined);
+		user.password = await bcrypt.hash(sanitizedPassword, 10);
+		user.resetPasswordToken = undefined;
+		user.resetPasswordExpires = undefined;
 		await user.save();
 
 		return createResponse<ApiResponse>({ success: true, message: 'Password reset successfully.' }, 200);

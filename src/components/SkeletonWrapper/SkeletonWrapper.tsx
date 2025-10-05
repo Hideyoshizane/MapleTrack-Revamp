@@ -1,7 +1,6 @@
 'use client';
 
 import Skeleton from '@mui/material/Skeleton';
-import React from 'react';
 
 import type { JSX } from 'react';
 

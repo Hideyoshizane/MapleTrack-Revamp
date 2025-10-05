@@ -1,7 +1,7 @@
 'use client';
 
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
-import { classFilterCookie } from '@utils/cookies/classFilterCookie';
+import { classFilterOptions } from '@utils/cookies/classFilterCookie';
 
 import styles from './ClassFilter.module.scss';
 
@@ -46,7 +46,7 @@ export const ClassFilter = ({
 		<div className={styles.classFilter}>
 			<h3 className={styles.title}>Class Filter</h3>
 			<div className={styles.options}>
-				{classFilterCookie['allowedValues'].map((className, index, arr): JSX.Element => {
+				{classFilterOptions.map((className, index, arr): JSX.Element => {
 					const lowerName = className.toLowerCase() as ClassFilterOption;
 					return (
 						<span key={lowerName} className={styles.optionWrapper}>

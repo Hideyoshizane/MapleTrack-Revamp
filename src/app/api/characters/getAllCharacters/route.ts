@@ -18,11 +18,8 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
 
-		const { username: rawUsername, server: rawServer } = parseResult.data;
-
 		// Sanitize inputs
-		const username = sanitizeInputBackEnd(rawUsername);
-		const server = sanitizeInputBackEnd(rawServer);
+		const [username, server] = [parseResult.data.username, parseResult.data.server].map(sanitizeInputBackEnd);
 		if (!username || !server) {
 			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
 		}
@@ -35,13 +32,14 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		// Query characters by userOrigin and server
 		const characters = await Character.find({ userOrigin: username, server: server }).lean().exec();
 
-		const response: ApiResponse<typeof characters> = {
-			success: true,
-			message: characters.length ? 'Characters returned.' : 'No characters found.',
-			data: characters.length ? characters : undefined,
-		};
-
-		return createResponse(response, 200);
+		return createResponse<ApiResponse<typeof characters>>(
+			{
+				success: true,
+				message: characters.length ? 'Characters returned.' : 'No characters found.',
+				data: characters.length ? characters : undefined,
+			},
+			200
+		);
 	} catch (error) {
 		console.error('Search error:', error);
 		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);

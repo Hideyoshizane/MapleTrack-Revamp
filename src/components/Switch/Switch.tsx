@@ -1,7 +1,6 @@
 'use client';
 
 import * as SwitchPrimitive from '@radix-ui/react-switch';
-import React from 'react';
 
 import Tooltip from '@components/Tooltip/Tooltip';
 
@@ -9,7 +8,7 @@ import styles from './Switch.module.scss';
 
 import type { JSX } from 'react';
 
-export interface SwitchProps {
+interface SwitchProps {
 	title?: string;
 	checked: boolean;
 	tooltipMessage?: string;
@@ -17,7 +16,7 @@ export interface SwitchProps {
 	disabled?: boolean;
 }
 
-const Switch: React.FC<SwitchProps> = ({ title, checked, tooltipMessage, onCheckedChange, disabled }): JSX.Element => {
+const Switch = ({ title, checked, tooltipMessage, onCheckedChange, disabled }: SwitchProps): JSX.Element => {
 	return (
 		<Tooltip content={tooltipMessage} placement="bottom" enabled={!!tooltipMessage}>
 			<div className={styles.wrapper}>

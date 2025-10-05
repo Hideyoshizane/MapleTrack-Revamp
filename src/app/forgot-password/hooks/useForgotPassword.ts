@@ -56,12 +56,8 @@ export const useForgotPassword = (
 					toast.error('Unexpected response format');
 				}
 			} catch (err) {
-				if ((err as DOMException).name === 'AbortError') {
-					toast.error('Request timed out. Please try again.');
-				} else {
-					toast.error('Unexpected error occurred');
-					console.error('Forgot password error:', err);
-				}
+				toast.error((err as DOMException)?.name === 'AbortError' ? 'Request timed out.' : 'Unexpected error occurred');
+				console.error('Forgot password error:', err);
 			}
 		},
 		[setError]

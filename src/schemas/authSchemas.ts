@@ -8,7 +8,7 @@ const emailSchema = userSchema.shape.email;
 const passwordSchema = userSchema.shape.password;
 
 // Shared
-export const credentialsSchema = z.object({
+const credentialsSchema = z.object({
 	username: usernameSchema,
 	password: passwordSchema,
 });

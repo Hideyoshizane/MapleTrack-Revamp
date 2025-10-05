@@ -10,26 +10,11 @@ interface ToastMessages {
 }
 
 const TOAST_MESSAGES: ToastMessages = {
-	success: {
-		message: 'Account created! Please log in.',
-		type: 'success',
-	},
-	reset: {
-		message: 'Reset password successfully! Please log in.',
-		type: 'success',
-	},
-	unauthorized: {
-		message: 'You must be logged in to access that page.',
-		type: 'error',
-	},
-	accountDeleted: {
-		message: 'Account deleted successfully.',
-		type: 'success',
-	},
-	version_update: {
-		message: 'Please log again to update.',
-		type: 'success',
-	},
+	success: { message: 'Account created! Please log in.', type: 'success' },
+	reset: { message: 'Reset password successfully! Please log in.', type: 'success' },
+	unauthorized: { message: 'You must be logged in to access that page.', type: 'error' },
+	accountDeleted: { message: 'Account deleted successfully.', type: 'success' },
+	version_update: { message: 'Please log again to update.', type: 'success' },
 };
 
 export const useToastQueryParams = (): void => {

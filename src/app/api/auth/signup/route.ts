@@ -1,7 +1,8 @@
 import bcrypt from 'bcrypt';
 
+import { LASTVERSION } from '@data/user/constants';
 import connectToDatabase from '@lib/mongooseConect';
-import User, { LASTVERSION } from '@models/user';
+import User from '@models/user';
 import { signupRequestSchema } from '@schemas/authSchemas';
 import { createResponse } from '@utils/api/createResponse';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
@@ -24,10 +25,10 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
 
+		const { username: rawUsername, email: rawEmail, password: rawPassword } = parseResult.data;
+
 		// Sanitize inputs
-		const username = sanitizeInputBackEnd(parseResult.data.username);
-		const email = sanitizeInputBackEnd(parseResult.data.email);
-		const password = sanitizeInputBackEnd(parseResult.data.password);
+		const [username, email, password] = [rawUsername, rawEmail, rawPassword].map(sanitizeInputBackEnd);
 		if (!username || !email || !password) {
 			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
 		}
@@ -53,9 +54,8 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
 		// Check if username or email already exists after validation
 		const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-		if (existingUser) {
+		if (existingUser)
 			return createResponse<ApiResponse>({ success: false, error: 'This username or email is not available.' }, 400);
-		}
 
 		// Hash password with auto-generated salt (10 rounds)
 		const hashedPassword = await bcrypt.hash(password, 10);
@@ -79,11 +79,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 			{
 				success: true,
 				message: 'User created successfully',
-				data: {
-					id: newUser._id.toString(),
-					username: newUser.username,
-					email: newUser.email,
-				},
+				data: { id: newUser._id.toString(), username: newUser.username, email: newUser.email },
 			},
 			201
 		);

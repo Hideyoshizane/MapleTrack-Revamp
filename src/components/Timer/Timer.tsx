@@ -3,7 +3,7 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import utc from 'dayjs/plugin/utc';
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 import { nowUtc, getNextResetTime, toUtc, WEEKDAYS } from '@utils/time/time';
@@ -33,31 +33,18 @@ const Timer = ({ target }: TimerProps): JSX.Element => {
 	const calculateTimeLeft = useCallback((): TimeLeft => {
 		const now = nowUtc();
 
-		let targetTime: dayjs.Dayjs;
-
-		if (target === 'daily') {
-			targetTime = toUtc(now).add(1, 'day').startOf('day');
-		} else {
-			targetTime = getNextResetTime(now, WEEKDAYS.THURSDAY);
-		}
-
-		// Difference between now and the next reset
-		const diffMs = targetTime.diff(now);
-		const d = dayjs.duration(diffMs);
+		const targetTime =
+			target === 'daily' ? toUtc(now).add(1, 'day').startOf('day') : getNextResetTime(now, WEEKDAYS.THURSDAY);
 
 		// Construct the time left object
-		const timeLeft: TimeLeft = {
-			hours: d.hours(),
-			minutes: d.minutes(),
-			seconds: d.seconds(),
+		const diff = dayjs.duration(targetTime.diff(now));
+
+		return {
+			days: target === 'weekly' ? Math.floor(diff.asDays()) : undefined,
+			hours: diff.hours(),
+			minutes: diff.minutes(),
+			seconds: diff.seconds(),
 		};
-
-		// For weekly reset, also include number of full days remaining
-		if (target === 'weekly') {
-			timeLeft.days = Math.floor(d.asDays());
-		}
-
-		return timeLeft;
 	}, [target]);
 
 	const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
@@ -74,22 +61,18 @@ const Timer = ({ target }: TimerProps): JSX.Element => {
 
 	// Helper function to pad numbers with leading zeros
 	const pad = (num: number): string => num.toString().padStart(2, '0');
-	if (!timeLeft) {
-		return <SkeletonWrapper width={200} height={58} color="dark" />;
-	}
+
+	if (!timeLeft) return <SkeletonWrapper width={200} height={58} color="dark" />;
+
+	const formatted =
+		target === 'weekly' && timeLeft.days !== undefined
+			? `${pad(timeLeft.days)}:${pad(timeLeft.hours)}:${pad(timeLeft.minutes)}:${pad(timeLeft.seconds)}`
+			: `${pad(timeLeft.hours)}:${pad(timeLeft.minutes)}:${pad(timeLeft.seconds)}`;
 
 	return (
 		<div>
-			{/* Display reset type */}
 			<h2 className={styles.timer}>{target === 'daily' ? 'Until Daily Reset' : 'Until Weekly Reset'}</h2>
-
-			{/* Format timer string depending on reset type */}
-			{/* format: DD:HH:MM:SS*/}
-			<h2 className={styles.timer}>
-				{target === 'weekly' && timeLeft.days !== undefined
-					? `${pad(timeLeft.days)}:${pad(timeLeft.hours)}:${pad(timeLeft.minutes)}:${pad(timeLeft.seconds)}`
-					: `${pad(timeLeft.hours)}:${pad(timeLeft.minutes)}:${pad(timeLeft.seconds)}`}
-			</h2>
+			<h2 className={styles.timer}>{formatted}</h2>
 		</div>
 	);
 };

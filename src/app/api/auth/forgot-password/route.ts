@@ -36,12 +36,8 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		// If validation fails, return early
 		const emailValidation = validateEmail(email);
 		if (!emailValidation.isValid) {
-			return createResponse<ApiResponse>(
-				{
-					success: false,
-					error: 'Validation failed',
-					details: { email: emailValidation.error },
-				},
+			createResponse<ApiResponse>(
+				{ success: false, error: 'Validation failed', details: { email: emailValidation.error } },
 				400
 			);
 		}
@@ -49,46 +45,25 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		// search for user by the sanitized email
 		const user = await User.findOne({ email: email });
 		if (!user) {
-			return createResponse<ApiResponse>(
-				{
-					success: true,
-					message: 'If the email exists, we sent a reset link.',
-				},
-				200
-			);
+			return createResponse<ApiResponse>({ success: true, message: 'If the email exists, we sent a reset link.' }, 200);
 		}
 
 		// Generate the Token to be send and stored
 		const token = crypto.randomBytes(32).toString('hex');
-		const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
 		// Store on user database
-		user.resetPasswordToken = hashedToken;
+		user.resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
 		user.resetPasswordExpires = dayjs().add(15, 'minute').utc().toDate(); // 15 minutes from now
 		await user.save();
 
 		// Send email here
 		const domainURL = process.env.NEXT_PUBLIC_BASE_URL;
-
-		if (!domainURL) {
-			throw new Error('NEXT_PUBLIC_BASE_URL is not defined in production');
-		}
+		if (!domainURL) throw new Error('NEXT_PUBLIC_BASE_URL is not defined');
 
 		const html = getForgotPasswordTemplate(`${domainURL}/reset-password?token=${token}`, user.username);
+		await sendEmail({ to: email, subject: 'Reset Your Password', html });
 
-		await sendEmail({
-			to: email,
-			subject: 'Reset Your Password',
-			html,
-		});
-
-		return createResponse<ApiResponse>(
-			{
-				success: true,
-				message: 'If the email exists, we sent a reset link.',
-			},
-			200
-		);
+		return createResponse<ApiResponse>({ success: true, message: 'If the email exists, we sent a reset link.' }, 200);
 	} catch (error) {
 		console.error('Signup error:', error);
 		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);

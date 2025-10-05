@@ -1,4 +1,4 @@
-export interface LegionBonusRank {
+interface LegionBonusRank {
 	rank: string;
 	description: string;
 }

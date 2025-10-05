@@ -2,10 +2,7 @@ import { toast } from 'react-hot-toast';
 
 import type { z, ZodObject, ZodType, ZodRawShape } from 'zod';
 
-export type ValidationResult = {
-	isValid: boolean;
-	error?: string;
-};
+export type ValidationResult = { isValid: boolean; error?: string };
 
 type SafeParseResult<I, O> = { success: true; data: O } | { success: false; error: z.ZodError<I> };
 

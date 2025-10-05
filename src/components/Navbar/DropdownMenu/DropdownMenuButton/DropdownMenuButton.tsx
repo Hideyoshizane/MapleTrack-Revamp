@@ -2,7 +2,6 @@
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import Link from 'next/link';
-import React from 'react';
 
 import ClassIcon from '@assets/svg/id-card.svg';
 import SwordsIcon from '@assets/svg/swords.svg';
@@ -46,7 +45,7 @@ interface DropdownMenuButtonProps {
 	text: DropdownMenuKey;
 }
 
-const DropdownMenuButton: React.FC<DropdownMenuButtonProps> = ({ text }): JSX.Element => {
+const DropdownMenuButton = ({ text }: DropdownMenuButtonProps): JSX.Element => {
 	const { href, label, Icon } = MENU_CONFIG[text];
 
 	return (

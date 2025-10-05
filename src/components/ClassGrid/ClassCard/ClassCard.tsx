@@ -33,6 +33,18 @@ interface SymbolProps {
 	characterLevel: number;
 }
 
+// Map JobType to class for conditional styles
+const jobLevelClassMap: Record<JobType, string> = {
+	default: styles.defaultLevel,
+	mage: styles.mageLevel,
+	warrior: styles.warriorLevel,
+	bowman: styles.bowmanLevel,
+	thief: styles.thiefLevel,
+	xenon: styles.xenonLevel,
+	pirate: styles.pirateLevel,
+	complete: styles.complete,
+};
+
 // Subcomponent: renders Arcane/Sacred symbols in a grid
 const SymbolGrid = ({ symbols, maxLevel, size = 16, characterLevel }: SymbolProps): JSX.Element => (
 	<div className={styles.symbolGrid}>
@@ -57,7 +69,7 @@ const SymbolGrid = ({ symbols, maxLevel, size = 16, characterLevel }: SymbolProp
 	</div>
 );
 
-// Subcomponent: Render Link Skill + Legion section
+// Bottom section: Link Skill + Legion
 const IconSection = ({
 	character,
 	iconSize = 48,
@@ -78,10 +90,8 @@ const IconSection = ({
 	</div>
 );
 
-const ClassCard: React.FC<ClassCardProps> = ({ character }): JSX.Element => {
-	if (!character?.code || !character.jobType || !character.legion) {
-		redirect('/error');
-	}
+const ClassCard = ({ character }: ClassCardProps): JSX.Element => {
+	if (!character?.code || !character.jobType || !character.legion) redirect('/error');
 
 	const {
 		code,
@@ -107,20 +117,8 @@ const ClassCard: React.FC<ClassCardProps> = ({ character }): JSX.Element => {
 
 	const linkSkill = ls ? getLinkSkillByName(ls) ?? null : null;
 
+	const jobKey: JobType = (jobType ?? 'default') as JobType;
 	const job: string = getJob(character.level);
-	const jobTypeKey: JobType = (jobType ?? 'default') as JobType;
-
-	// Map JobType to class for conditional styles
-	const jobLevelClassMap: Record<JobType, string> = {
-		default: styles.defaultLevel,
-		mage: styles.mageLevel,
-		warrior: styles.warriorLevel,
-		bowman: styles.bowmanLevel,
-		thief: styles.thiefLevel,
-		xenon: styles.xenonLevel,
-		pirate: styles.pirateLevel,
-		complete: styles.complete,
-	};
 
 	return (
 		<Link href={`/${userOrigin}/${server}/${code}`} passHref>
@@ -174,13 +172,10 @@ const ClassCard: React.FC<ClassCardProps> = ({ character }): JSX.Element => {
 
 				{/* Level and ProgressBar */}
 				<div className={styles.levelPart}>
-					<p
-						className={clsx(styles.levelText, jobLevelClassMap[jobTypeKey], {
-							[styles.complete]: level >= targetLevel,
-						})}>
+					<p className={clsx(styles.levelText, jobLevelClassMap[jobKey], { [styles.complete]: level >= targetLevel })}>
 						{level}/{targetLevel}
 					</p>
-					<ProgressBar height={24} width={486} value={level} maxValue={targetLevel} jobType={jobTypeKey} />
+					<ProgressBar height={24} width={486} value={level} maxValue={targetLevel} jobType={jobKey} />
 				</div>
 			</div>
 		</Link>

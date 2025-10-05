@@ -33,13 +33,11 @@ export const useExtraCharacterData = ({
 		const isSyncing = character?.syncing;
 		const charName = committedName ?? character?.name;
 
-		if (!isSyncing || !charName) return;
-		if (characterLoading) return;
+		if (!isSyncing || !charName || characterLoading) return;
 
 		const fetchExtraData = async (): Promise<void> => {
 			setLoading(true);
 			setExtraData(null);
-			setExtraDataFailed(false);
 
 			try {
 				const res = await fetch(
@@ -51,14 +49,10 @@ export const useExtraCharacterData = ({
 				}
 
 				const data: GetExtraCharacterDataApiResponse = await res.json();
-				if (data.success && data.data) {
-					setExtraData(data.data);
-					setExtraDataFailed(false);
-				} else {
-					setExtraDataFailed(true);
-				}
-			} catch (err) {
-				console.error('Error fetching extra character data', err);
+				if (data.success && data.data) setExtraData(data.data);
+				else setExtraDataFailed(true);
+			} catch (error) {
+				console.error('Error fetching extra character data', error);
 				setExtraDataFailed(true);
 			} finally {
 				setLoading(false);

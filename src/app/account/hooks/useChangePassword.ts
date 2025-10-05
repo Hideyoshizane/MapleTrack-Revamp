@@ -25,9 +25,11 @@ export const useChangePassword = ({ username, setError }: UseChangePasswordProps
 	const onSubmit = useCallback(
 		async (data: ChangePasswordFormData): Promise<void> => {
 			try {
-				const currentPassword = sanitizeInputFrontend(data.currentPassword);
-				const newPassword = sanitizeInputFrontend(data.newPassword);
-				const confirmPassword = sanitizeInputFrontend(data.confirmPassword);
+				const [currentPassword, newPassword, confirmPassword] = [
+					data.currentPassword,
+					data.newPassword,
+					data.confirmPassword,
+				].map(sanitizeInputFrontend);
 
 				const validations = {
 					currentPassword: validatePassword(currentPassword),
@@ -64,12 +66,9 @@ export const useChangePassword = ({ username, setError }: UseChangePasswordProps
 					toast.error('Failed to change password');
 				}
 			} catch (error: unknown) {
-				if ((error as DOMException).name === 'AbortError') {
-					toast.error('Request timed out. Please try again.');
-				} else {
-					toast.error('Unexpected error occurred');
-					console.error('Change password error:', error);
-				}
+				const isAbort = (error as DOMException)?.name === 'AbortError';
+				toast.error(isAbort ? 'Request timed out. Please try again.' : 'Unexpected error occurred');
+				if (!isAbort) console.error('Change password error:', error);
 			}
 		},
 		[username, setError]

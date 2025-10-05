@@ -9,13 +9,13 @@ const usernameSchema = userSchema.shape.username;
 
 // Server validation
 const serverNames = servers.map((s): string => s.name);
-export const serverSchema = z.enum(serverNames, {
+const serverSchema = z.enum(serverNames, {
 	message: 'Invalid server selected',
 });
 
 // Character job validation
 const jobClassCodes = JobClasses.map((c): string => c.code);
-export const jobClassSchema = z.enum(jobClassCodes, {
+const jobClassSchema = z.enum(jobClassCodes, {
 	message: 'Invalid job class selected',
 });
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Toaster } from 'react-hot-toast';
 
 import type { JSX } from 'react';
@@ -27,7 +26,7 @@ const toastStyles = {
 	},
 };
 
-const CustomToaster: React.FC<CustomToasterProps> = ({ theme, reverseOrder = false }): JSX.Element => {
+const CustomToaster = ({ theme, reverseOrder = false }: CustomToasterProps): JSX.Element => {
 	// Invert the theme so the toast stands out from the page background
 	const invertedTheme = theme === 'light' ? 'dark' : 'light';
 

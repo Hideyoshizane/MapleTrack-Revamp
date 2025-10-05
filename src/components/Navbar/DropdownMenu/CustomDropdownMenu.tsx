@@ -1,7 +1,7 @@
 'use client';
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import React from 'react';
+import { Fragment } from 'react';
 import { Textfit } from 'react-textfit';
 
 import MenuIcon from '@assets/svg/menu.svg';
@@ -15,16 +15,11 @@ import type { JSX } from 'react';
 interface CustomDropdownMenuProps {
 	username: string;
 }
-const MENU_ITEMS: { type: 'link'; text: Parameters<typeof DropdownMenuButton>[0]['text'] }[] = [
-	{ type: 'link', text: 'Classes' },
-	{ type: 'link', text: 'Weekly' },
-	{ type: 'link', text: 'Liberation' },
-	{ type: 'link', text: 'Account' },
-];
+const MENU_ITEMS = [{ text: 'Classes' }, { text: 'Weekly' }, { text: 'Liberation' }, { text: 'Account' }] as const;
 
-const iconSize = 48;
+const ICON_SIZE = 48;
 
-const CustomDropdownMenu: React.FC<CustomDropdownMenuProps> = ({ username }): JSX.Element => {
+const CustomDropdownMenu = ({ username }: CustomDropdownMenuProps): JSX.Element => {
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
@@ -32,7 +27,7 @@ const CustomDropdownMenu: React.FC<CustomDropdownMenuProps> = ({ username }): JS
 					<Textfit className={styles.usernameText} mode="single" max={32} min={12} style={{ maxWidth: 200 }}>
 						{username}
 					</Textfit>
-					<MenuIcon width={iconSize} height={iconSize} className={styles.icon} />
+					<MenuIcon width={ICON_SIZE} height={ICON_SIZE} className={styles.icon} />
 				</button>
 			</DropdownMenu.Trigger>
 
@@ -40,10 +35,10 @@ const CustomDropdownMenu: React.FC<CustomDropdownMenuProps> = ({ username }): JS
 				<DropdownMenu.Content className={styles.dropdownContent} side="bottom" align="end" sideOffset={5}>
 					{MENU_ITEMS.map(
 						(item): JSX.Element => (
-							<React.Fragment key={item.text}>
+							<Fragment key={item.text}>
 								<DropdownMenuButton text={item.text} />
 								<DropdownMenu.Separator className={styles.separator} />
-							</React.Fragment>
+							</Fragment>
 						)
 					)}
 					<LogoutButton />

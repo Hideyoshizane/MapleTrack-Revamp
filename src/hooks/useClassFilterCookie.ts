@@ -14,8 +14,7 @@ export const useClassFilterCookie = (): {
 	const [loading, setLoading] = useState(true);
 
 	useEffect((): void => {
-		const cookieValue = classFilterCookie.get();
-		setSelectedClasses(cookieValue ?? []);
+		setSelectedClasses(classFilterCookie.get() ?? []);
 		setLoading(false);
 	}, []);
 

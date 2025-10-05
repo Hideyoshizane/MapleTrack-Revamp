@@ -1,5 +1,3 @@
-import React from 'react';
-
 import styles from './Loader.module.scss';
 
 import type { JSX } from 'react';
@@ -11,7 +9,7 @@ interface LoaderProps {
 	borderWidth?: number;
 }
 
-const Loader: React.FC<LoaderProps> = ({ width = 48, height = 48, color = '#FFF', borderWidth = 5 }): JSX.Element => {
+const Loader = ({ width = 48, height = 48, color = '#FFF', borderWidth = 5 }: LoaderProps): JSX.Element => {
 	const style: React.CSSProperties = {
 		width: typeof width === 'number' ? `${width}px` : width,
 		height: typeof height === 'number' ? `${height}px` : height,

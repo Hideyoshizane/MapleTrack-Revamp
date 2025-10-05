@@ -1,20 +1,20 @@
 import linkSkillsData from './linkSkill.json';
 
 // Define interface for each level of a link skill
-export interface LinkSkillLevel {
+interface LinkSkillLevel {
 	level: number;
 	description: string;
 }
 
 // Define interface for a link skill
-export interface LinkSkill {
+interface LinkSkill {
 	name: string;
 	image: string;
 	levels: LinkSkillLevel[];
 }
 
 // Typed JSON import
-export const linkSkills: LinkSkill[] = linkSkillsData as LinkSkill[];
+const linkSkills: LinkSkill[] = linkSkillsData as LinkSkill[];
 
 // Find link skill by name
 export const getLinkSkillByName = (name: string): LinkSkill | undefined =>

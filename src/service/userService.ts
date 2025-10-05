@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-import { LASTVERSION } from '@models/user';
+import { LASTVERSION } from '@data/user/constants';
 
 import type { IUser } from '@models/user';
 

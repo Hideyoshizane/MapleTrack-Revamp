@@ -2,7 +2,6 @@
 
 import { clsx } from 'clsx';
 import Image from 'next/image';
-import React from 'react';
 
 import Tooltip from '@components/Tooltip/Tooltip';
 import { getLinkSkillByName, getLinkSkillDescription } from '@data/linkSkill/linkSkill';
@@ -18,29 +17,20 @@ interface LinkSkillProps {
 	showTooltip?: boolean;
 }
 
-const LinkSkillBlock: React.FC<LinkSkillProps> = ({
+const LinkSkillBlock = ({
 	characterLevel,
 	characterLinkSkill,
 	iconSize = 48,
 	showTooltip = false,
-}): JSX.Element => {
-	const linkSkill = characterLinkSkill ? getLinkSkillByName(characterLinkSkill) : null;
+}: LinkSkillProps): JSX.Element => {
+	const linkSkill = getLinkSkillByName(characterLinkSkill);
+	if (!linkSkill) return <></>;
 
-	if (!linkSkill) {
-		return <></>;
-	}
-
-	const tooltipContent = linkSkill ? getLinkSkillDescription(linkSkill, characterLevel) : '';
+	const tooltipContent = getLinkSkillDescription(linkSkill, characterLevel);
 
 	const content = (
 		<div className={styles.iconDiv}>
-			<p
-				className={clsx({
-					[styles.iconDivText]: showTooltip,
-					[styles.iconDivTextWhite]: !showTooltip,
-				})}>
-				Link Skill:
-			</p>
+			<p className={clsx(showTooltip ? styles.iconDivText : styles.iconDivTextWhite)}>Link Skill:</p>
 			<Image src={linkSkill.image} width={iconSize} height={iconSize} quality={100} alt={linkSkill.name} />
 		</div>
 	);

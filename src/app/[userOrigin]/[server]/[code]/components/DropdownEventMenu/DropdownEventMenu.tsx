@@ -14,19 +14,26 @@ import styles from './DropdownEventMenu.module.css';
 
 import type { JSX } from 'react';
 
-const iconSize = 40;
+const ICON_SIZE = 40;
 const MAX_BONUS = 10;
 
 const DropdownEventMenu = (): JSX.Element => {
 	const { arcaneBonus, sacredBonus, setArcaneBonus, setSacredBonus } = useBonusContext();
 	const rows = Array.from({ length: MAX_BONUS + 1 }, (_, i): number => i);
 
+	const renderBonusItem = (value: number, currentBonus: number, onSelect: (val: number) => void): JSX.Element => (
+		<DropdownMenu.Item className={styles.menuItem} onSelect={(): void => onSelect(value)} key={value}>
+			<span className={styles.menuText}>{value === 0 ? 'No Bonus' : `Bonus +${value}`}</span>
+			{currentBonus === value && <CheckIcon className={styles.checkIcon} width={16} height={16} />}
+		</DropdownMenu.Item>
+	);
+
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
 				<button className={styles.menuOpener}>
 					Event Bonus
-					<MenuIcon width={iconSize} height={iconSize} className={styles.icon} />
+					<MenuIcon width={ICON_SIZE} height={ICON_SIZE} className={styles.icon} />
 				</button>
 			</DropdownMenu.Trigger>
 
@@ -45,19 +52,8 @@ const DropdownEventMenu = (): JSX.Element => {
 						{rows.map(
 							(value): JSX.Element => (
 								<React.Fragment key={value}>
-									{/* Arcane column */}
-									<DropdownMenu.Item
-										className={`${styles.menuItem} ${styles.leftColumn}`}
-										onSelect={(): any => setArcaneBonus(value)}>
-										<span className={styles.menuText}>{value === 0 ? 'No Bonus' : `Bonus +${value}`}</span>
-										{arcaneBonus === value && <CheckIcon className={styles.checkIcon} width={16} height={16} />}
-									</DropdownMenu.Item>
-
-									{/* Sacred column */}
-									<DropdownMenu.Item className={styles.menuItem} onSelect={(): any => setSacredBonus(value)}>
-										<span className={styles.menuText}>{value === 0 ? 'No Bonus' : `Bonus +${value}`}</span>
-										{sacredBonus === value && <CheckIcon className={styles.checkIcon} width={16} height={16} />}
-									</DropdownMenu.Item>
+									<div className={styles.leftColumn}>{renderBonusItem(value, arcaneBonus, setArcaneBonus)}</div>
+									<div>{renderBonusItem(value, sacredBonus, setSacredBonus)}</div>
 								</React.Fragment>
 							)
 						)}

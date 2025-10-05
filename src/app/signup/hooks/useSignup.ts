@@ -45,12 +45,7 @@ export const useSignup = (): UseSignupReturn => {
 		getValues,
 	} = useForm<SignupFormData>({
 		mode: 'onBlur',
-		defaultValues: {
-			username: '',
-			email: '',
-			password: '',
-			confirmPassword: '',
-		},
+		defaultValues: { username: '', email: '', password: '', confirmPassword: '' },
 	});
 
 	const showError = (msg?: string): string => toast.error(msg ?? 'Failed to create user');

@@ -43,15 +43,15 @@ $spacingMedium: 8px;
 		color: var(--default-white);
 		margin-left: $spacingMedium;
 		margin-right: $spacingSmall;
-	}
 
-	&.rotated {
-		transition: transform 0.3s ease;
-		transform: rotate(0deg);
-	}
+		&.rotated {
+			transition: transform 0.3s ease;
+			transform: rotate(0deg);
+		}
 
-	&.rotatedActive {
-		transform: rotate(180deg);
+		&.rotatedActive {
+			transform: rotate(180deg);
+		}
 	}
 }
 

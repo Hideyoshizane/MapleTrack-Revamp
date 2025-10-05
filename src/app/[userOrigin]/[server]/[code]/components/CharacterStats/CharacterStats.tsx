@@ -1,4 +1,5 @@
 'use client';
+
 import BossIcon from '@assets/svg/boss_slayer.svg';
 import LegionBlock from '@components/LegionBlock/LegionBlock';
 import LinkSkillBlock from '@components/LinkSkillBlock/LinkSkillBlock';
@@ -20,37 +21,34 @@ const BOSS_ICON_SIZE = 90;
 const ICON_SIZE = 64;
 
 const CharacterStats = ({ character, job, jobType }: CharacterStatsProps): JSX.Element => {
+	const { level, targetLevel, bossing, linkSkill, code, jobType: charJobType, legion, class: charClass } = character;
 	return (
 		<>
 			<div className={styles.bigBlock}>
 				<div className={styles.characterBossLinkLegion}>
 					<div className={styles.bossSlot}>
-						{character.bossing ? (
-							<BossIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.bossIcon} />
-						) : (
-							<></>
-						)}
+						{bossing ? <BossIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.bossIcon} /> : <></>}
 					</div>
 
 					<LinkSkillBlock
-						characterLevel={character.level}
-						characterLinkSkill={character.linkSkill ?? ''}
+						characterLevel={level}
+						characterLinkSkill={linkSkill ?? ''}
 						iconSize={ICON_SIZE}
 						showTooltip={true}
 					/>
 
 					<LegionBlock
-						characterLevel={character.level}
-						characterCode={character.code ?? ''}
-						characterJobType={character.jobType ?? 'default'}
-						characterLegionType={character.legion ?? 'none'}
+						characterLevel={level}
+						characterCode={code ?? ''}
+						characterJobType={charJobType ?? 'default'}
+						characterLegionType={legion ?? 'none'}
 						iconSize={ICON_SIZE}
 						showTooltip={true}
 					/>
 				</div>
 
 				<div className={styles.characterClassJob}>
-					<p className={styles.characterClass}>{character.class}</p>
+					<p className={styles.characterClass}>{charClass}</p>
 					<p className={styles.characterJob}>{job}</p>
 				</div>
 			</div>
@@ -59,17 +57,11 @@ const CharacterStats = ({ character, job, jobType }: CharacterStatsProps): JSX.E
 				<div className={styles.levelInput}>
 					<p className={styles.levelText}>Level:</p>
 					<p className={styles.levelTextBlack}>
-						{character.level}/{character.targetLevel}
+						{level}/{targetLevel}
 					</p>
 				</div>
 
-				<ProgressBar
-					height={32}
-					width={900}
-					value={character.level}
-					maxValue={character.targetLevel}
-					jobType={jobType}
-				/>
+				<ProgressBar height={32} width={900} value={level} maxValue={targetLevel} jobType={jobType} />
 			</div>
 		</>
 	);

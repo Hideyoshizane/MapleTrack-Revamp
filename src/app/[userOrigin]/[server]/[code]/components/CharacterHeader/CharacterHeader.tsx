@@ -1,4 +1,5 @@
 'use client';
+
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
@@ -22,6 +23,21 @@ interface CharacterHeaderProps {
 
 const CharacterHeader = ({ character, extraData, router }: CharacterHeaderProps): JSX.Element => {
 	const pathname = usePathname();
+
+	const characterImage = character.syncing ? (
+		extraData ? (
+			<Image
+				src={extraData.characterImgURL}
+				alt="Fetched from API"
+				width={80}
+				height={80}
+				className={styles.loadedImage}
+			/>
+		) : (
+			<SkeletonWrapper width={80} height={80} color="light" variant="rectangular" />
+		)
+	) : null;
+
 	return (
 		<>
 			<div className={styles.buttonLine}>
@@ -33,20 +49,7 @@ const CharacterHeader = ({ character, extraData, router }: CharacterHeaderProps)
 			</div>
 
 			<div className={styles.usernameLine}>
-				<div className={styles.characterImgDiv}>
-					{character.syncing &&
-						(extraData ? (
-							<Image
-								src={extraData.characterImgURL}
-								alt="Fetched from API"
-								width={80}
-								height={80}
-								className={styles.loadedImage}
-							/>
-						) : (
-							<SkeletonWrapper width={80} height={80} color="light" variant="rectangular" />
-						))}
-				</div>
+				<div className={styles.characterImgDiv}>{characterImage}</div>
 				<p className={styles.characterName}>{character.name}</p>
 			</div>
 		</>

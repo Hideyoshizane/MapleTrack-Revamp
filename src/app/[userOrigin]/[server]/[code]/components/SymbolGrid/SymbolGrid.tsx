@@ -9,7 +9,7 @@ import styles from './SymbolGrid.module.scss';
 import type { SymbolObjectProps } from '../SymbolObject/SymbolObject';
 import type { JSX } from 'react';
 
-export interface SymbolGridProps {
+interface SymbolGridProps {
 	type: SymbolObjectProps['type'];
 	symbols: SymbolObjectProps['symbol'][];
 	characterLevel: number;

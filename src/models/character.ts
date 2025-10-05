@@ -49,7 +49,7 @@ const CharacterContentSchema = new Schema<CharacterContent>(
 	{ _id: false, versionKey: false }
 );
 
-export const SymbolSchema = new Schema<CharacterSymbol>(
+const SymbolSchema = new Schema<CharacterSymbol>(
 	{
 		name: { type: String, required: true },
 		level: { type: Number, required: true },

@@ -21,35 +21,20 @@ export const DELETE = async (request: NextRequest): Promise<NextResponse> => {
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 		}
 
-		const rawUsername = parseResult.data.username;
-
-		// Validate that the properties are strings
-		if (typeof rawUsername !== 'string') {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
-		}
-
 		// Sanitize input
-		const username = sanitizeInputBackEnd(rawUsername);
-		if (!username) {
-			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
-		}
+		const [username] = [parseResult.data.username].map(sanitizeInputBackEnd);
+		if (!username) return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 
 		// Extract token from the request cookies
 		const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-		if (!token) {
-			return createResponse<ApiResponse>({ success: false, error: 'Unauthorized' }, 401);
-		}
+		if (!token) return createResponse<ApiResponse>({ success: false, error: 'Unauthorized' }, 401);
 
 		// Ensure the authenticated user matches the username being deleted
-		if (token.username !== username) {
-			return createResponse<ApiResponse>({ success: false, error: 'Forbidden' }, 403);
-		}
+		if (token.username !== username) return createResponse<ApiResponse>({ success: false, error: 'Forbidden' }, 403);
 
 		// Find user by username
 		const user = await User.findOne({ username });
-		if (!user) {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid username' }, 404);
-		}
+		if (!user) return createResponse<ApiResponse>({ success: false, error: 'Invalid username' }, 404);
 
 		// Start a session for transactional safety
 		const session = await mongoose.startSession();
@@ -72,13 +57,14 @@ export const DELETE = async (request: NextRequest): Promise<NextResponse> => {
 				{ success: true, message: 'Account and related data deleted successfully.' },
 				200
 			);
-		} catch (err) {
+		} catch (error) {
 			// Rollback if anything fails
 			await session.abortTransaction();
-			await session.endSession();
 
-			console.error('Delete account transaction failed:', err);
+			console.error('Delete account transaction failed:', error);
 			return createResponse<ApiResponse>({ success: false, error: 'A error has occurred.' }, 500);
+		} finally {
+			await session.endSession();
 		}
 	} catch (error) {
 		console.error('Delete account error:', error);

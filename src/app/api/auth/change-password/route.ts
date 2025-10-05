@@ -21,17 +21,17 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		}
 
 		// Sanitize input
-		const username = sanitizeInputBackEnd(parseResult.data.username);
-		const currentPassword = sanitizeInputBackEnd(parseResult.data.currentPassword);
-		const newPassword = sanitizeInputBackEnd(parseResult.data.newPassword);
-
+		const [username, currentPassword, newPassword] = [
+			parseResult.data.username,
+			parseResult.data.currentPassword,
+			parseResult.data.newPassword,
+		].map(sanitizeInputBackEnd);
 		if (!username || !currentPassword || !newPassword) {
 			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
 		}
 
 		// Validate sanitized inputs
 		const passwordValidation = validatePassword(newPassword);
-		// If any validation fails, return early
 		if (!passwordValidation.isValid) {
 			return createResponse<ApiResponse>(
 				{
@@ -45,29 +45,23 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
 		// Find user by username
 		const user = await User.findOne({ username });
-		if (!user) {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid username' }, 404);
-		}
+		if (!user) return createResponse<ApiResponse>({ success: false, error: 'Invalid username' }, 404);
 
 		// Check if current password matches
 		const isCurrentPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
-		if (!isCurrentPasswordCorrect) {
+		if (!isCurrentPasswordCorrect)
 			return createResponse<ApiResponse>({ success: false, error: 'Current password is incorrect' }, 401);
-		}
 
 		// Compare new password with hashed current password
 		if (await bcrypt.compare(newPassword, user.password)) {
-			return createResponse<ApiResponse>(
+			createResponse<ApiResponse>(
 				{ success: false, error: 'New password must be different from the current password' },
 				400
 			);
 		}
 
-		// Hash new password
-		const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-		// Update user password and remove reset token
-		user.password = hashedPassword;
+		// Update user password
+		user.password = await bcrypt.hash(newPassword, 10);
 		await user.save();
 
 		return createResponse<ApiResponse>({ success: true, message: 'Password changed.' }, 200);

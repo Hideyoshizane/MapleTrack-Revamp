@@ -23,16 +23,12 @@ const CharactersPage = async ({ params }: CharactersPageProps): Promise<JSX.Elem
 	}
 
 	// Validate if user is trying to access its own data
-	const isValid = validateUserAccess({ userOrigin, server, code }, session.user.username);
-	if (!isValid) {
+	if (!validateUserAccess({ userOrigin, server, code }, session.user.username)) {
 		redirect('/home?unauthorized=1');
 	}
+
 	// Fetch character data
-	await syncCharacterInfo({
-		userOrigin: userOrigin,
-		server: server,
-		code: code,
-	});
+	await syncCharacterInfo({ userOrigin, server, code });
 
 	return (
 		<main className="container">

@@ -35,33 +35,28 @@ const fetchCharactersApi = async (payload: GetAllCharactersRequestBody): Promise
 
 const filterCharacters = (results: CharacterDocument[], selectedClasses: ClassFilterOption[]): CharacterDocument[] => {
 	return results.filter((char): boolean => {
-		if (selectedClasses.length === 0) return true;
+		if (!selectedClasses.length) return true;
 		if (char.bossing && selectedClasses.includes('bossing')) return true;
-		if (char.jobType === 'xenon' && (selectedClasses.includes('pirate') || selectedClasses.includes('thief'))) {
+		if (char.jobType === 'xenon' && (selectedClasses.includes('pirate') || selectedClasses.includes('thief')))
 			return true;
-		}
 		return selectedClasses.includes(char.jobType as ClassFilterOption);
 	});
 };
 
 const sortCharacters = (characters: CharacterDocument[]): CharacterDocument[] => {
 	return [...characters].sort((a, b): number => {
-		const aType: string = a.jobType ? (a.jobType === 'xenon' ? 'thief' : a.jobType) : 'zzz';
-		const bType: string = b.jobType ? (b.jobType === 'xenon' ? 'thief' : b.jobType) : 'zzz';
+		const aType = a.jobType === 'xenon' ? 'thief' : a.jobType ?? 'zzz';
+		const bType = b.jobType === 'xenon' ? 'thief' : b.jobType ?? 'zzz';
 
-		const aIndex: number = CLASS_ORDER.indexOf(aType);
-		const bIndex: number = CLASS_ORDER.indexOf(bType);
+		const aIndex = CLASS_ORDER.indexOf(aType);
+		const bIndex = CLASS_ORDER.indexOf(bType);
 
 		if (aIndex !== bIndex) return aIndex - bIndex;
 		return (a.class ?? '').localeCompare(b.class ?? '');
 	});
 };
 
-const ClassGrid: React.FC<ClassGridProps> = ({
-	username,
-	serverCookie,
-	selectedClasses,
-}: ClassGridProps): JSX.Element => {
+const ClassGrid = ({ username, serverCookie, selectedClasses }: ClassGridProps): JSX.Element => {
 	const [jobResults, setJobResults] = useState<CharacterDocument[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
@@ -85,15 +80,10 @@ const ClassGrid: React.FC<ClassGridProps> = ({
 			setLoading(true);
 			setError(null);
 
-			if (!serverCookie) {
-				// Redirect to error page
-				redirect('/error');
-			}
+			// Redirect to error page
+			if (!serverCookie) redirect('/error');
 
-			const data: GetAllCharactersApiResponse = await fetchCharactersApi({
-				username,
-				server: serverCookie,
-			});
+			const data = await fetchCharactersApi({ username, server: serverCookie });
 
 			if (!data.success) throw new Error(data.error ?? 'Failed to fetch characters');
 
@@ -115,13 +105,10 @@ const ClassGrid: React.FC<ClassGridProps> = ({
 			});
 
 			// Apply filters + sorting
-			const filteredResults = filterCharacters(results, selectedClasses);
-			const sortedResults = sortCharacters(filteredResults);
-
-			setJobResults(sortedResults);
-		} catch (err: unknown) {
-			console.error('Error fetching characters:', err);
-			setError(err instanceof Error ? err.message : String(err));
+			setJobResults(sortCharacters(filterCharacters(results, selectedClasses)));
+		} catch (error: unknown) {
+			console.error('Error fetching characters:', error);
+			setError(error instanceof Error ? error.message : String(error));
 		} finally {
 			setLoading(false);
 		}
@@ -146,9 +133,7 @@ const ClassGrid: React.FC<ClassGridProps> = ({
 	// Render content
 	return (
 		<div className={styles.classGrid}>
-			{loading
-				? skeletons
-				: jobResults.map((character): JSX.Element => <ClassCard key={character.class} character={character} />)}
+			{loading ? skeletons : jobResults.map((char): JSX.Element => <ClassCard key={char.class} character={char} />)}
 		</div>
 	);
 };

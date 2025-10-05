@@ -3,7 +3,7 @@ import { getToken } from 'next-auth/jwt';
 
 import { DARK_PATHS, themeFromPath, type Theme } from '@lib/theme';
 
-import { LASTVERSION } from './models/user';
+import { LASTVERSION } from './data/user/constants';
 
 import type { NextRequest } from 'next/server';
 
@@ -32,16 +32,20 @@ export const middleware = async (req: NextRequest): Promise<ReturnType<typeof Ne
 	// Check if user is authenticated (token is non-null object)
 	const isAuthenticated = !!token;
 
-	// If authenticated, check version
-	if (isAuthenticated && token?.version !== LASTVERSION) {
-		// Clear NextAuth session cookies to log off user
-		const url = new URL('/login', req.url);
-		url.search = 'version_update=1';
-		const logoutResponse = NextResponse.redirect(url);
-		logoutResponse.cookies.delete('next-auth.session-token');
-		logoutResponse.cookies.delete('__Secure-next-auth.session-token');
+	// VERSION CHECK: redirect immediately if token version mismatch
+	if (isAuthenticated) {
+		const tokenVersion = Number(token?.version ?? 0);
+		if (tokenVersion !== LASTVERSION) {
+			const url = new URL('/login', req.url);
+			url.search = 'version_update=1';
+			const logoutResponse = NextResponse.redirect(url);
 
-		return logoutResponse;
+			// Delete NextAuth session cookies
+			logoutResponse.cookies.delete('next-auth.session-token');
+			logoutResponse.cookies.delete('__Secure-next-auth.session-token');
+
+			return logoutResponse;
+		}
 	}
 
 	// Narrow pathname to first segment for safer DARK_PATHS check

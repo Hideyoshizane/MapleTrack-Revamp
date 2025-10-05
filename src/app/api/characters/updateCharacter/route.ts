@@ -22,14 +22,10 @@ export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
 		if (!parseResult.success)
 			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
 
-		const { userOrigin, server: serverRaw, code: codeRaw, data } = parseResult.data;
+		const { userOrigin: rawUser, server: rawServer, code: rawCode, data } = parseResult.data;
 
 		// Sanitize inputs
-		const username = sanitizeInputBackEnd(userOrigin);
-		const server = sanitizeInputBackEnd(serverRaw);
-		const code = sanitizeInputBackEnd(codeRaw);
-		const characterName = sanitizeInputBackEnd(data.name);
-
+		const [username, server, code, characterName] = [rawUser, rawServer, rawCode, data.name].map(sanitizeInputBackEnd);
 		if (!username || !server || !code || !characterName) {
 			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
 		}
@@ -43,16 +39,9 @@ export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
 		let character: CharacterDocument | null = await Character.findOne({ userOrigin: username, server, code }).exec();
 		if (!character) {
 			// Create new character
-			character = new Character({
-				...data,
-				userOrigin: username,
-				server,
-				code,
-			});
+			character = new Character({ ...data, userOrigin: username, server, code });
 		} else {
-			Object.assign(character, {
-				...data,
-			});
+			Object.assign(character, data);
 		}
 		// If character bossing is true add to BossList
 		// To be added

@@ -32,12 +32,15 @@ export const useCharacterData = ({ userOrigin, server, code }: GetCharacterDataR
 					body: JSON.stringify({ userOrigin, server, code }),
 				});
 				const data = (await res.json()) as GetCharacterDataApiResponse;
+
 				if (data.success && data.data) {
 					setCharacter(data.data);
 					setCommittedName(data.data.name ?? '');
-				} else setError(data.error ?? 'Unknown error');
-			} catch (err) {
-				console.error('Error fetching character:', err);
+				} else {
+					setError(data.error ?? 'Unknown error');
+				}
+			} catch (error) {
+				console.error('Error fetching character:', error);
 				setError('Failed to fetch character data');
 			} finally {
 				setLoading(false);

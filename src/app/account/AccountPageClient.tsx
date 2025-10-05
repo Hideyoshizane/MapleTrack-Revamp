@@ -31,15 +31,12 @@ const AccountPageClient = ({ username }: AccountClientProps): JSX.Element => {
 		watch,
 	} = useForm<ChangePasswordFormData>({
 		mode: 'onBlur',
-		defaultValues: {
-			currentPassword: '',
-			newPassword: '',
-			confirmPassword: '',
-		},
+		defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
 	});
 
 	const { onSubmit } = useChangePassword({ username, setError });
 	const { isDeleteDialogOpen, openDeleteDialog, closeDeleteDialog, handleDelete } = useDeleteAccount({ username });
+
 	const commonInputProps = { control, isSubmitted, isLightmode: true };
 
 	const handleFormSubmit = handleSubmit(onSubmit);
@@ -47,10 +44,10 @@ const AccountPageClient = ({ username }: AccountClientProps): JSX.Element => {
 	const newPassword = watch('newPassword');
 	const confirmPassword = watch('confirmPassword');
 
-	const newPasswordValid = validatePassword(newPassword).isValid;
-	const confirmPasswordValid = validatePasswordConfirmation(newPassword, confirmPassword).isValid;
-
-	const isSubmitDisabled = isSubmitting || !newPasswordValid || !confirmPasswordValid;
+	const isSubmitDisabled =
+		isSubmitting ||
+		!validatePassword(newPassword).isValid ||
+		!validatePasswordConfirmation(newPassword, confirmPassword).isValid;
 
 	return (
 		<section className="mainContent">

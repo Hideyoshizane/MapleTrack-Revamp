@@ -5,9 +5,9 @@ import { allSymbols } from './dailyExp';
 import type { CharacterSymbol, CharacterContent } from '@models/character';
 
 // Symbol Name Types
-export type ArcaneSymbolName = 'Vanishing Journey' | 'Chu Chu Island' | 'Lachelein' | 'Arcana' | 'Morass' | 'Esfera';
-export type SacredSymbolName = 'Cernium' | 'Arcus' | 'Odium' | 'Shangri-La' | 'Arteria' | 'Carcion';
-export type GrandSacredSymbolName = 'Tallahart';
+type ArcaneSymbolName = 'Vanishing Journey' | 'Chu Chu Island' | 'Lachelein' | 'Arcana' | 'Morass' | 'Esfera';
+type SacredSymbolName = 'Cernium' | 'Arcus' | 'Odium' | 'Shangri-La' | 'Arteria' | 'Carcion';
+type GrandSacredSymbolName = 'Tallahart';
 export type SymbolCategory = 'arcane' | 'sacred' | 'grand';
 export type SymbolName = ArcaneSymbolName | SacredSymbolName | GrandSacredSymbolName;
 
@@ -66,10 +66,8 @@ export const getSymbolImagePath = (name: SymbolName): string => {
 
 // Check if character can use symbol
 export const canUseSymbol = (level: number, name: string): boolean => {
-	const symbol = SYMBOL_MAP[name as SymbolName];
-	if (!symbol) return false;
-	if (!symbol.minLevel) return true;
-	return level >= symbol.minLevel;
+	const minLevel = SYMBOL_MAP[name as SymbolName]?.minLevel;
+	return minLevel ? level >= minLevel : true;
 };
 
 // Get symbol min level
@@ -77,7 +75,7 @@ export const getSymbolMinLevel = (name: string): number => SYMBOL_MAP[name as Sy
 
 // Get max level (by name or category)
 export const getSymbolMaxLevel = (input: SymbolCategory | SymbolName): number =>
-	input in CATEGORY_MAX_LEVEL ? CATEGORY_MAX_LEVEL[input as SymbolCategory] : SYMBOL_MAP[input as SymbolName].maxLevel;
+	CATEGORY_MAX_LEVEL[input as SymbolCategory] ?? SYMBOL_MAP[input as SymbolName].maxLevel;
 
 // Get symbol value
 export const getContentValue = (symbolName: string, contentType: string): number => {
@@ -92,6 +90,7 @@ export const getContentValue = (symbolName: string, contentType: string): number
 	const value = resolve(contentType);
 	return value !== 0 ? value : resolve('Weekly');
 };
+
 // Compute daily and weekly values
 export const computeDailyWeeklyValues = (
 	symbol: CharacterSymbol,
@@ -151,25 +150,21 @@ export const calculateNewLevelFromExp = (
 	currentLevel: number,
 	currentExp: number
 ): LevelUpResult => {
-	const lastLevel = getLastLevel(type);
-
 	let level = currentLevel;
 	let exp = currentExp;
+	const maxLevel = getLastLevel(type);
 
 	// Loop until we reach max level or can't level up anymore
-	while (level < lastLevel) {
+	while (level < maxLevel) {
 		const expForNextLevel = getExpForLevel(type, level);
 
 		if (exp >= expForNextLevel) {
 			exp -= expForNextLevel;
-			level += 1;
+			level++;
 		} else {
 			break;
 		}
 	}
 
-	return {
-		currentLevel: level,
-		currentExp: exp,
-	};
+	return { currentLevel: level, currentExp: exp };
 };

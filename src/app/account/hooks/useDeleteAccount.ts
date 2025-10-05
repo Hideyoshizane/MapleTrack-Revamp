@@ -23,7 +23,6 @@ export const useDeleteAccount = ({ username }: UseDeleteAccountProps): UseDelete
 
 	const handleDelete = useCallback(async (): Promise<void> => {
 		try {
-			console.log(username);
 			const response = await fetch('/api/account/delete', {
 				method: 'DELETE',
 				headers: { 'Content-Type': 'application/json' },
@@ -33,18 +32,15 @@ export const useDeleteAccount = ({ username }: UseDeleteAccountProps): UseDelete
 			const result = (await response.json()) as ApiResponse;
 
 			if (response.ok && result.success) {
-				await signOut({ callbackUrl: `${window.location.origin}/login?accountDeleted=1` });
 				closeDeleteDialog();
-			} else if (!result.success) {
+				await signOut({ callbackUrl: `${window.location.origin}/login?accountDeleted=1` });
+			} else {
 				toast.error(result.error || 'Failed to delete account');
 			}
 		} catch (error: unknown) {
-			if (error instanceof Error) {
-				toast.error(error.message);
-				console.error('Delete account error:', error);
-			} else {
-				toast.error('Unknown error occurred.');
-			}
+			const message = error instanceof Error ? error.message : 'Unknown error occurred.';
+			toast.error(message);
+			console.error('Delete account error:', error);
 		}
 	}, [username, closeDeleteDialog]);
 

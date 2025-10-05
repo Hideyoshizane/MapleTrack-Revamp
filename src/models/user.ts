@@ -1,8 +1,8 @@
 import mongoose, { Schema } from 'mongoose';
 
-import type { Document, Model, Types } from 'mongoose';
+import { LASTVERSION } from '@data/user/constants';
 
-const LASTVERSION = 1;
+import type { Document, Model, Types } from 'mongoose';
 
 export interface IUser extends Document {
 	_id: Types.ObjectId;
@@ -75,4 +75,3 @@ userSchema.index({ resetPasswordToken: 1, resetPasswordExpires: 1 });
 const User: Model<IUser> = (mongoose.models.User as Model<IUser>) || mongoose.model<IUser>('User', userSchema);
 
 export default User;
-export { LASTVERSION };

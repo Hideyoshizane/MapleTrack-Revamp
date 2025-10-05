@@ -2,7 +2,6 @@
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { signOut } from 'next-auth/react';
-import React from 'react';
 
 import LogOutIcon from '@assets/svg/log-out.svg';
 
@@ -11,7 +10,7 @@ import styles from './DropdownMenuCommon.module.scss';
 
 import type { JSX } from 'react';
 
-const LogoutButton: React.FC = (): JSX.Element => {
+const LogoutButton = (): JSX.Element => {
 	const handleLogout = async (): Promise<void> => {
 		try {
 			await signOut({ callbackUrl: '/login' });

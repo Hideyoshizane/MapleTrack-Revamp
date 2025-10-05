@@ -1,21 +1,27 @@
 export type Rank = 'rank_b' | 'rank_a' | 'rank_s' | 'rank_ss' | 'rank_sss' | 'no_rank';
 
-export const getRank = (level: number, characterCode?: string): Rank => {
-	if (!characterCode) return 'no_rank';
+type Threshold = { min: number; max?: number; rank: Rank };
 
-	if (characterCode === 'zero') {
-		if (level >= 130 && level <= 159) return 'rank_b';
-		if (level >= 160 && level <= 179) return 'rank_a';
-		if (level >= 180 && level <= 199) return 'rank_s';
-		if (level >= 200 && level <= 249) return 'rank_ss';
-		if (level >= 250) return 'rank_sss';
-	} else {
-		if (level >= 60 && level <= 99) return 'rank_b';
-		if (level >= 100 && level <= 139) return 'rank_a';
-		if (level >= 140 && level <= 199) return 'rank_s';
-		if (level >= 200 && level <= 249) return 'rank_ss';
-		if (level >= 250) return 'rank_sss';
-	}
+const thresholds: Record<'zero' | 'default', Threshold[]> = {
+	zero: [
+		{ min: 130, max: 159, rank: 'rank_b' },
+		{ min: 160, max: 179, rank: 'rank_a' },
+		{ min: 180, max: 199, rank: 'rank_s' },
+		{ min: 200, max: 249, rank: 'rank_ss' },
+		{ min: 250, rank: 'rank_sss' },
+	],
+	default: [
+		{ min: 60, max: 99, rank: 'rank_b' },
+		{ min: 100, max: 139, rank: 'rank_a' },
+		{ min: 140, max: 199, rank: 'rank_s' },
+		{ min: 200, max: 249, rank: 'rank_ss' },
+		{ min: 250, rank: 'rank_sss' },
+	],
+};
 
-	return 'no_rank';
+export const getRank = (level: number, code?: string): Rank => {
+	if (!code) return 'no_rank';
+	const set = thresholds[code === 'zero' ? 'zero' : 'default'];
+	const found = set.find(({ min, max }): boolean => level >= min && (max === undefined || level <= max));
+	return found ? found.rank : 'no_rank';
 };

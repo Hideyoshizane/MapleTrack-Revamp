@@ -1,8 +1,9 @@
 import bcrypt from 'bcrypt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
+import { LASTVERSION } from '@data/user/constants';
 import connectToDatabase from '@lib/mongooseConect';
-import UserMongo, { LASTVERSION } from '@models/user';
+import UserMongo from '@models/user';
 import { updateLastLogin } from '@service/userService';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 import { validateUsernameLogin, validatePasswordLogin } from '@utils/validation';

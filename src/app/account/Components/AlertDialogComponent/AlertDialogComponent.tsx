@@ -1,7 +1,6 @@
 'use client';
 
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
-import React from 'react';
 
 import styles from './AlertDialogComponent.module.scss';
 
@@ -14,12 +13,21 @@ interface AlertDialogComponentProps {
 }
 
 const AlertDialogComponent = ({ open, onOpenChange, onConfirm }: AlertDialogComponentProps): JSX.Element => {
+	const handleConfirm = async (): Promise<void> => {
+		try {
+			await onConfirm();
+			onOpenChange(false);
+		} catch (error) {
+			console.error('Error on confirm:', error);
+		}
+	};
+
 	return (
 		<AlertDialog.Root open={open} onOpenChange={onOpenChange}>
 			<AlertDialog.Portal>
 				<AlertDialog.Overlay className={styles.overlay} />
 				<AlertDialog.Content className={styles.content}>
-					<AlertDialog.Title className={styles.title}>{'Are you absolutely sure?'}</AlertDialog.Title>
+					<AlertDialog.Title className={styles.title}>Are you absolutely sure?</AlertDialog.Title>
 
 					<AlertDialog.Description className={styles.description}>
 						This action cannot be undone. This will permanently delete your account and remove your data from our
@@ -36,14 +44,7 @@ const AlertDialogComponent = ({ open, onOpenChange, onConfirm }: AlertDialogComp
 							<button
 								className={styles.dangerButton}
 								onClick={(): void => {
-									void (async (): Promise<void> => {
-										try {
-											await onConfirm();
-											onOpenChange(false);
-										} catch (error) {
-											console.error('Error on confirm:', error);
-										}
-									})();
+									void handleConfirm();
 								}}>
 								Yes, delete account
 							</button>

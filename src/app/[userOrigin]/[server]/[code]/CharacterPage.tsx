@@ -1,4 +1,5 @@
 'use client';
+
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
@@ -37,21 +38,11 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 	}, [success, router]);
 
 	const { character, loading: characterLoading, error } = useCharacterData({ userOrigin, server, code });
-
-	const { extraData } = useExtraCharacterData({
-		character,
-		server,
-		characterLoading,
-	});
+	const { extraData } = useExtraCharacterData({ character, server, characterLoading });
 
 	// Redirect to /error if done loading and no character
-	if (!characterLoading && !character) {
-		router.push('/error');
-	}
-
-	if (error) {
-		throw new Error(error);
-	}
+	if (!characterLoading && !character) return <FullPageLoader />;
+	if (error) throw new Error(error);
 
 	if (!character) {
 		return <FullPageLoader />;

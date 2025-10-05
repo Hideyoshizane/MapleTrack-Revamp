@@ -4,8 +4,8 @@ import styles from './SearchBar.module.css';
 
 import type { JSX } from 'react';
 
-const Navbar: React.FC = (): JSX.Element => {
+const SearchBar = (): JSX.Element => {
 	return <div className={styles.bar} />;
 };
 
-export default Navbar;
+export default SearchBar;

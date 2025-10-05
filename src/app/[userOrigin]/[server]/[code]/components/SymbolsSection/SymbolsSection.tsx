@@ -11,12 +11,13 @@ interface SymbolsSectionProps {
 }
 
 const SymbolsSection = ({ character }: SymbolsSectionProps): JSX.Element => {
-	const symbolSections = [
-		{ type: 'arcane', title: 'Arcane Symbols', symbols: character.ArcaneSymbol, level: character.level },
-		{ type: 'sacred', title: 'Sacred Symbols', symbols: character.SacredSymbol, level: character.level },
-		{ type: 'grand', title: 'Grand Sacred Symbols', symbols: character.GrandSacredSymbol, level: character.level },
-	] as const;
+	const { ArcaneSymbol, SacredSymbol, GrandSacredSymbol, level, jobType } = character;
 
+	const symbolSections = [
+		{ type: 'arcane', title: 'Arcane Symbols', symbols: ArcaneSymbol },
+		{ type: 'sacred', title: 'Sacred Symbols', symbols: SacredSymbol },
+		{ type: 'grand', title: 'Grand Sacred Symbols', symbols: GrandSacredSymbol },
+	] as const;
 	return (
 		<div className={styles.symbols}>
 			{symbolSections.map(
@@ -26,8 +27,8 @@ const SymbolsSection = ({ character }: SymbolsSectionProps): JSX.Element => {
 						<SymbolGrid
 							type={section.type}
 							symbols={section.symbols}
-							characterLevel={section.level}
-							characterJobType={character.jobType ?? 'default'}
+							characterLevel={level}
+							characterJobType={jobType ?? 'default'}
 							size={56}
 						/>
 					</div>

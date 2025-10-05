@@ -10,7 +10,7 @@ import type { EditPageSymbolObjectProps } from '../EditPageSymbolObject/EditPage
 import type { CharacterSymbol } from '@models/character';
 import type { JSX } from 'react';
 
-export interface SymbolGridProps {
+interface SymbolGridProps {
 	type: EditPageSymbolObjectProps['type'];
 	symbols: EditPageSymbolObjectProps['symbol'][];
 	characterLevel: number;

@@ -52,7 +52,7 @@ const ContentUpdateSchema = z.object({
 		.optional(),
 });
 
-export const createSymbolSchema = <Name extends string, Category extends 'arcane' | 'sacred' | 'grand'>(
+const createSymbolSchema = <Name extends string, Category extends 'arcane' | 'sacred' | 'grand'>(
 	names: readonly Name[],
 	category: Category,
 	maxLevel: number
@@ -77,7 +77,7 @@ const SacredSymbolUpdateSchema = createSymbolSchema(SYMBOL_NAMES.sacred, 'sacred
 const GrandSacredSymbolUpdateSchema = createSymbolSchema(SYMBOL_NAMES.grand, 'grand', CATEGORY_MAX_LEVEL.grand);
 
 // Schema for character update request
-export const CharacterUpdateSchema = z
+const CharacterUpdateSchema = z
 	.object({
 		name: characterNameField,
 		level: z.number().min(0).max(CHARACTER_MAX_LEVEL),
