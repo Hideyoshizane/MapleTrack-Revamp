@@ -43,7 +43,6 @@ const ContentUpdateSchema = z.object({
 	contentType: z.enum(CONTENT_TYPES),
 	checked: z.boolean().optional(),
 	tries: z.number().min(0).max(DEFAULT_WEEKLY_TRIES).optional(),
-	maxTries: z.number().min(0).max(DEFAULT_WEEKLY_TRIES).optional(),
 	date: z
 		.preprocess(
 			(val): Date | null => (val === null ? null : val instanceof Date ? val : new Date(val as string)),

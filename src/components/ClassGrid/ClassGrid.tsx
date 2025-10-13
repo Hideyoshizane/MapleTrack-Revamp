@@ -21,6 +21,7 @@ interface ClassGridProps {
 	username: string;
 	serverCookie: string | undefined;
 	selectedClasses: ClassFilterOption[];
+	selectedClassesLoading: boolean;
 }
 
 const fetchCharactersApi = async (payload: GetAllCharactersRequestBody): Promise<GetAllCharactersApiResponse> => {
@@ -56,7 +57,12 @@ const sortCharacters = (characters: CharacterDocument[]): CharacterDocument[] =>
 	});
 };
 
-const ClassGrid = ({ username, serverCookie, selectedClasses }: ClassGridProps): JSX.Element => {
+const ClassGrid = ({
+	username,
+	serverCookie,
+	selectedClasses,
+	selectedClassesLoading,
+}: ClassGridProps): JSX.Element => {
 	const [jobResults, setJobResults] = useState<CharacterDocument[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
@@ -134,6 +140,9 @@ const ClassGrid = ({ username, serverCookie, selectedClasses }: ClassGridProps):
 	return (
 		<div className={styles.classGrid}>
 			{loading ? skeletons : jobResults.map((char): JSX.Element => <ClassCard key={char.class} character={char} />)}
+			{loading || selectedClassesLoading
+				? skeletons
+				: jobResults.map((char): JSX.Element => <ClassCard key={char.class} character={char} />)}
 		</div>
 	);
 };

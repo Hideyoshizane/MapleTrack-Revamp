@@ -1,15 +1,16 @@
 'use client';
-import SymbolGrid from '../SymbolGrid/SymbolGrid';
+import SymbolObject from '../SymbolObject/SymbolObject';
 
 import styles from './SymbolsSection.module.scss';
 
+import type { SymbolObjectProps } from '../SymbolObject/SymbolObject';
 import type { CharacterDocument } from '@models/character';
 import type { JSX } from 'react';
 
 interface SymbolsSectionProps {
 	character: CharacterDocument;
 }
-
+const SYMBOL_SIZE = 56;
 const SymbolsSection = ({ character }: SymbolsSectionProps): JSX.Element => {
 	const { ArcaneSymbol, SacredSymbol, GrandSacredSymbol, level, jobType } = character;
 
@@ -24,13 +25,20 @@ const SymbolsSection = ({ character }: SymbolsSectionProps): JSX.Element => {
 				(section): JSX.Element => (
 					<div key={section.type}>
 						<p className={styles.title}>{section.title}</p>
-						<SymbolGrid
-							type={section.type}
-							symbols={section.symbols}
-							characterLevel={level}
-							characterJobType={jobType ?? 'default'}
-							size={56}
-						/>
+						<div className={styles.symbolGrid}>
+							{section.symbols.map(
+								(symbol: SymbolObjectProps['symbol']): JSX.Element => (
+									<SymbolObject
+										key={symbol.name}
+										type={section.type}
+										symbol={symbol}
+										characterLevel={level}
+										characterJobType={jobType ?? 'default'}
+										size={SYMBOL_SIZE}
+									/>
+								)
+							)}
+						</div>
 					</div>
 				)
 			)}

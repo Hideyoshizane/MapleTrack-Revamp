@@ -53,7 +53,12 @@ const HomePageClient = ({ username }: HomePageClientProps): JSX.Element => {
 			<div className={styles.classFilter}>
 				<ClassFilter selectedClasses={selectedClasses} setSelectedClasses={setClasses} loading={loading} />
 			</div>
-			<ClassGrid username={username} serverCookie={serverCookie} selectedClasses={selectedClasses} />
+			<ClassGrid
+				username={username}
+				serverCookie={serverCookie}
+				selectedClasses={selectedClasses}
+				selectedClassesLoading={loading}
+			/>
 		</section>
 	);
 };

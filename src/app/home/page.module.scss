@@ -3,7 +3,7 @@ $marginTop: 16px;
 
 .serverDropdown {
 	position: relative;
-	z-index: 1000;
+	z-index: 900;
 	display: flex;
 	justify-content: flex-end;
 	width: $widthSize;

@@ -1,3 +1,5 @@
+import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
+
 import type { CharacterDocument } from '@models/character';
 
 export const templateCharacter: Partial<CharacterDocument> = {
@@ -14,7 +16,12 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			category: 'arcane',
 			content: [
 				{ contentType: 'Daily Quest', checked: true, date: null },
-				{ contentType: 'Erda Spectrum', checked: false, tries: 3, maxTries: 3, date: null },
+				{
+					contentType: 'Erda Spectrum',
+					checked: false,
+					tries: DEFAULT_WEEKLY_TRIES,
+					date: null,
+				},
 				{ contentType: 'Reverse City', checked: false },
 			],
 		},
@@ -25,7 +32,12 @@ export const templateCharacter: Partial<CharacterDocument> = {
 			category: 'arcane',
 			content: [
 				{ contentType: 'Daily Quest', checked: true, date: null },
-				{ contentType: 'Hungry Muto', checked: false, tries: 3, maxTries: 3, date: null },
+				{
+					contentType: 'Hungry Muto',
+					checked: false,
+					tries: DEFAULT_WEEKLY_TRIES,
+					date: null,
+				},
 				{ contentType: 'Yum Yum Island', checked: false },
 			],
 		},
@@ -43,8 +55,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 				{
 					contentType: 'Midnight Chaser',
 					checked: false,
-					tries: 3,
-					maxTries: 3,
+					tries: DEFAULT_WEEKLY_TRIES,
 					date: null,
 				},
 			],
@@ -63,8 +74,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 				{
 					contentType: 'Spirit Savior',
 					checked: false,
-					tries: 3,
-					maxTries: 3,
+					tries: DEFAULT_WEEKLY_TRIES,
 					date: null,
 				},
 			],
@@ -83,8 +93,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 				{
 					contentType: 'Ranheim Defense',
 					checked: false,
-					tries: 3,
-					maxTries: 3,
+					tries: DEFAULT_WEEKLY_TRIES,
 					date: null,
 				},
 			],
@@ -103,8 +112,7 @@ export const templateCharacter: Partial<CharacterDocument> = {
 				{
 					contentType: 'Esfera Guardian',
 					checked: false,
-					tries: 3,
-					maxTries: 3,
+					tries: DEFAULT_WEEKLY_TRIES,
 					date: null,
 				},
 			],

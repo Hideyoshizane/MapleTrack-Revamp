@@ -44,7 +44,6 @@ const CharacterContentSchema = new Schema<CharacterContent>(
 		checked: { type: Boolean, default: false },
 		date: { type: Date, default: null },
 		tries: { type: Number, min: 0 },
-		maxTries: { type: Number, min: 0 },
 	},
 	{ _id: false, versionKey: false }
 );

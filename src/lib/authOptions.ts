@@ -4,7 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { LASTVERSION } from '@data/user/constants';
 import connectToDatabase from '@lib/mongooseConect';
 import UserMongo from '@models/user';
-import { updateLastLogin } from '@service/userService';
+import { updateLastLogin, updateUserVersion } from '@service/userService';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 import { validateUsernameLogin, validatePasswordLogin } from '@utils/validation';
 
@@ -59,6 +59,7 @@ export const authOptions: AuthOptions = {
 				}
 
 				updateLastLogin(user);
+				updateUserVersion(user);
 
 				//User specific functions.
 				/*if (user.version < LASTVERSION) {

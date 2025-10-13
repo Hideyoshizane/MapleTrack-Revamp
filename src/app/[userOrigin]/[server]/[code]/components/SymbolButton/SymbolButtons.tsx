@@ -3,49 +3,49 @@
 import dayjs from 'dayjs';
 import { useEffect, useCallback, useState } from 'react';
 
+import { DEFAULT_WEEKLY_TRIES } from '@/data/character/constants';
 import Button from '@components/Button/Button';
-import { computeDailyWeeklyValues } from '@data/symbols/symbolMappings';
 import { hasDailyResetOccurred, hasWeeklyQuestResetOccurred } from '@utils/time/time';
-
-import { useBonusContext } from '../../useBonusContext';
 
 import styles from './SymbolButtons.module.scss';
 
-import type { SymbolCategory } from '@data/symbols/symbolMappings';
 import type { CharacterContent, CharacterSymbol } from '@models/character';
 import type { JSX } from 'react';
 
 interface SymbolButtonsProps {
-	type: SymbolCategory;
 	symbol: CharacterSymbol;
+	dailyValue: number;
+	weeklyValue: number;
+	bonus: number;
 	content: CharacterContent[];
-	onValueChange?: (dailyValue: number, weeklyValue: number) => void;
+	onValueChange?: (data: { currentExp: number; currentLevel: number }) => void;
 }
 
-const SymbolButtons = ({ type, symbol, content, onValueChange }: SymbolButtonsProps): JSX.Element => {
-	const { arcaneBonus, sacredBonus } = useBonusContext();
+interface UpdateCharacterDailyResponse {
+	success: boolean;
+	message: string;
+	data: { currentExp: number; currentLevel: number };
+}
+
+const SymbolButtons = ({
+	symbol,
+	dailyValue,
+	weeklyValue,
+	bonus,
+	content,
+	onValueChange,
+}: SymbolButtonsProps): JSX.Element => {
 	const [isResetDone, setIsResetDone] = useState(true);
 	const [isWeeklyDone, setIsWeeklyDone] = useState(true);
 
-	// Get the base daily value and weekly value
-	const { dailyValue: baseDaily, weeklyValue } = computeDailyWeeklyValues(symbol, content);
-	const dailyValue = baseDaily + (type === 'arcane' ? arcaneBonus : sacredBonus);
-
 	// Compute Daily Button and Weekly Button
 	useEffect((): void => {
-		setIsResetDone(content[0]?.date ? hasDailyResetOccurred(dayjs(content[0].date)) : true);
+		setIsResetDone(content[0]?.date ? hasDailyResetOccurred(content[0].date) : true);
 		setIsWeeklyDone(content[1]?.date ? hasWeeklyQuestResetOccurred(dayjs(content[1].date)) : true);
 	}, [content]);
 
-	// Notify parent of current values
-	useEffect((): void => {
-		onValueChange?.(dailyValue, weeklyValue);
-	}, [dailyValue, weeklyValue, onValueChange]);
-
 	const handleDailyUpdate = useCallback(async (): Promise<void> => {
 		try {
-			const bonus = type === 'arcane' ? arcaneBonus : sacredBonus;
-
 			// Compute URL segments here, local to this function
 			const pathname = window.location.pathname;
 			const segments = pathname.split('/').filter(Boolean);
@@ -61,14 +61,15 @@ const SymbolButtons = ({ type, symbol, content, onValueChange }: SymbolButtonsPr
 				body: JSON.stringify(payload),
 			});
 
-			const data = await res.json();
+			const data: UpdateCharacterDailyResponse = await res.json();
 			if (data.success) {
-				// Aqui faz conexão com onValueChange.
+				onValueChange?.(data.data);
+				setIsResetDone(false);
 			}
 		} catch (error) {
 			console.error('Error updating daily bonus', error);
 		}
-	}, [type, symbol.name, arcaneBonus, sacredBonus]);
+	}, [symbol.name, onValueChange, bonus]);
 
 	// Determine button state and label for Daily Button
 	const dailyButtonDisabled = !content[0]?.checked || !isResetDone;
@@ -80,14 +81,11 @@ const SymbolButtons = ({ type, symbol, content, onValueChange }: SymbolButtonsPr
 		? 'Disabled'
 		: !isWeeklyDone && content[1].tries === 0
 		? 'Weekly Done'
-		: `Weekly: ${content[1].tries}/${content[1].maxTries}`;
+		: `Weekly: ${content[1].tries}/${DEFAULT_WEEKLY_TRIES}`;
 
 	return (
 		<div className={styles.buttonLines}>
-			<Button
-				className={styles.button}
-				disabled={dailyButtonDisabled}
-				onClick={(): undefined => void handleDailyUpdate()}>
+			<Button className={styles.button} disabled={dailyButtonDisabled} onClick={(): void => void handleDailyUpdate()}>
 				{dailyButtonLabel}
 			</Button>
 			<div className={styles.weeklyDiv}>

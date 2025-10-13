@@ -4,7 +4,7 @@ import { Character } from '@models/character';
 import { createResponse } from '@utils/api/createResponse';
 import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
-import { hasDailyResetOccurred, hasWeeklyQuestResetOccurred, nowUtc } from '@utils/time/time';
+import { hasWeeklyQuestResetOccurred, nowUtc } from '@utils/time/time';
 
 import { fetchCharacterExternal } from './fetchCharacterExternal';
 
@@ -66,7 +66,7 @@ export const syncCharacterInfo = async (params: {
 		}
 
 		// Reset quests
-		resetDailyQuests(character);
+		//resetDailyQuests(character);
 		resetWeeklyQuests(character);
 
 		await character.save();
@@ -76,29 +76,6 @@ export const syncCharacterInfo = async (params: {
 		console.error('Character Sync error:', error);
 		return createResponse({ success: false, error: 'Internal Server Error' }, 500);
 	}
-};
-
-const resetDailyQuests = (character: CharacterDocument): void => {
-	// Helper to process one symbol array
-	const processSymbolArray = (symbolArray: CharacterSymbol[]): void => {
-		symbolArray.forEach((symbol: CharacterSymbol): void => {
-			symbol.content.forEach((quest): void => {
-				// Only process daily quests that were previously interacted with
-				if (quest.contentType === 'Daily Quest' && quest.date) {
-					try {
-						if (hasDailyResetOccurred(quest.date)) {
-							quest.date = nowUtc().toDate();
-						}
-					} catch (error) {
-						console.error(`Error checking daily reset for ${symbol.name} (${quest.contentType}):`, error);
-					}
-				}
-			});
-		});
-	};
-
-	// Run across all symbol arrays
-	[character.ArcaneSymbol, character.SacredSymbol, character.GrandSacredSymbol].forEach(processSymbolArray);
 };
 
 const resetWeeklyQuests = (character: CharacterDocument): void => {

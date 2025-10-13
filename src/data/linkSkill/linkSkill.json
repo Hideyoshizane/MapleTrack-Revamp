@@ -19,11 +19,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "When attacking, has a 15% chance to identify the weakness of the enemy with the highest Max HP among those struck, granting you the following bonuses against them: Damage per Stack: +1%, Enemy DEF Ignored per Stack: +1%, Effect Duration: 10 sec, Stacks up to 3 times."
+				"description": "When attacking, has a 15% chance to identify the weakness of the enemy with the highest Max HP among those struck, granting you the following bonuses against them: \nDamage per Stack: +1% \nEnemy DEF Ignored per Stack: +1% \nEffect Duration: 10 sec, Stacks up to 3 times."
 			},
 			{
 				"level": 2,
-				"description": "When attacking, has a 17% chance to identify the weakness of the enemy with the highest Max HP among those struck, granting you the following bonuses against them: Damage per Stack: +1%, Enemy DEF Ignored per Stack: +1%, Effect Duration: 10 sec, Stacks up to 3 times."
+				"description": "When attacking, has a 17% chance to identify the weakness of the enemy with the highest Max HP among those struck, granting you the following bonuses against them: \nDamage per Stack: +1% \nEnemy DEF Ignored per Stack: +1% \nEffect Duration: 10 sec, Stacks up to 3 times."
 			}
 		]
 	},
@@ -33,11 +33,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Chance to add monsters to Monster Collection: +10%, Critical Rate: +3%."
+				"description": "Chance to add monsters to Monster Collection: +10%, \nCritical Rate: +3%."
 			},
 			{
 				"level": 2,
-				"description": "Chance to add monsters to Monster Collection: +15%, Critical Rate: +4%."
+				"description": "Chance to add monsters to Monster Collection: +15%, \nCritical Rate: +4%."
 			}
 		]
 	},
@@ -47,11 +47,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Upon debuffing an enemy, Damage: +3%. Duration: 10 sec. Cooldown: 20 sec."
+				"description": "Upon debuffing an enemy, Damage: +3%. Duration: 10 sec. \nCooldown: 20 sec."
 			},
 			{
 				"level": 2,
-				"description": "Upon debuffing an enemy, Damage: +6%. Duration: 10 sec. Cooldown: 20 sec."
+				"description": "Upon debuffing an enemy, Damage: +6%. Duration: 10 sec. \nCooldown: 20 sec."
 			}
 		]
 	},
@@ -75,11 +75,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Attack Power and Magic ATT: +7, Abnormal Status Resistance: +2, All Elemental Resistance: +1%."
+				"description": "Attack Power and Magic ATT: +7, \nAbnormal Status Resistance: +2, \nAll Elemental Resistance: +1%."
 			},
 			{
 				"level": 2,
-				"description": "Attack Power and Magic ATT: +9, Abnormal Status Resistance: +3, All Elemental Resistance: +3%."
+				"description": "Attack Power and Magic ATT: +9, \nAbnormal Status Resistance: +3, \nAll Elemental Resistance: +3%."
 			}
 		]
 	},
@@ -89,15 +89,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Temporarily increases Status Resistance.Duration: 10 sec, Status Resistance: +100. Cooldown: 120 sec."
+				"description": "Duration: 10 sec. \nStatus Resistance: +100. \nCooldown: 120 sec."
 			},
 			{
 				"level": 2,
-				"description": "Temporarily increases Status Resistance.Duration: 15 sec, Status Resistance: +100. Cooldown: 120 sec."
+				"description": "Duration: 15 sec. \nStatus Resistance: +100. \nCooldown: 120 sec."
 			},
 			{
 				"level": 3,
-				"description": "Temporarily increases Status Resistance.Duration: 20 sec, Status Resistance: +100. Cooldown: 120 sec."
+				"description": "Duration: 20 sec. \nStatus Resistance: +100. \nCooldown: 120 sec."
 			}
 		]
 	},
@@ -107,15 +107,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Combo Kill Marble EXP: +400% (permanently)."
+				"description": "Combo Kill Orb EXP: +400% (permanently)."
 			},
 			{
 				"level": 2,
-				"description": "Combo Kill Marble EXP: +650% (permanently)."
+				"description": "Combo Kill Orb EXP: +650% (permanently)."
 			},
 			{
 				"level": 3,
-				"description": "Combo Kill Marble EXP: +900% (permanently)."
+				"description": "Combo Kill Orb EXP: +900% (permanently)."
 			}
 		]
 	},
@@ -125,15 +125,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Rune Duration: +30%."
+				"description": "Liberated Rune Power Duration: +30%."
 			},
 			{
 				"level": 2,
-				"description": "Rune Duration: +50%."
+				"description": "Liberated Rune Power Duration: +50%."
 			},
 			{
 				"level": 3,
-				"description": "Rune Duration: +70%."
+				"description": "Liberated Rune Power Duration: +70%."
 			}
 		]
 	},
@@ -143,15 +143,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Returns you to Elluel (Cooldown: 1800 sec). Additional Effect: Permanently receive 10% additional EXP."
+				"description": "Returns you to Elluel \nCooldown: 1800 sec. \nAdditional Effect: Permanently receive 10% additional EXP."
 			},
 			{
 				"level": 2,
-				"description": "Returns you to Elluel (Cooldown: 1800 sec). Additional Effect: Permanently receive 15% additional EXP."
+				"description": "Returns you to Elluel \nCooldown: 1800 sec. \nAdditional Effect: Permanently receive 15% additional EXP."
 			},
 			{
 				"level": 3,
-				"description": "Returns you to Elluel (Cooldown: 1800 sec). Additional Effect: Permanently receive 20% additional EXP."
+				"description": "Returns you to Elluel \nCooldown: 1800 sec. \nAdditional Effect: Permanently receive 20% additional EXP."
 			}
 		]
 	},
@@ -179,15 +179,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "10% of enemy DEF ignored."
+				"description": "Enemy DEF Ignored: +10% when attacking enemies."
 			},
 			{
 				"level": 2,
-				"description": "15% of enemy DEF ignored."
+				"description": "Enemy DEF Ignored: +15% when attacking enemies."
 			},
 			{
 				"level": 3,
-				"description": "20% of enemy DEF ignored."
+				"description": "Enemy DEF Ignored: +20% when attacking enemies."
 			}
 		]
 	},
@@ -211,11 +211,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Grants 1 seconds of invincibility after being revived. Removed upon moving to another map."
+				"description": "Grants 1 seconds of invincibility after being revived. \nRemoved upon moving to another map."
 			},
 			{
 				"level": 2,
-				"description": "Grants 2 seconds of invincibility after being revived. Removed upon moving to another map."
+				"description": "Grants 2 seconds of invincibility after being revived. \nRemoved upon moving to another map."
 			}
 		]
 	},
@@ -225,15 +225,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Damage: +5%"
+				"description": "Damage: +5%."
 			},
 			{
 				"level": 2,
-				"description": "Damage: +10%"
+				"description": "Damage: +10%."
 			},
 			{
 				"level": 3,
-				"description": "Damage: +15%"
+				"description": "Damage: +15%."
 			}
 		]
 	},
@@ -243,15 +243,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "When attacking Boss Monster- Damage: +10%, Additional Fury Absorption: 10."
+				"description": "Boss Damage: +10%."
 			},
 			{
 				"level": 2,
-				"description": "When attacking Boss Monster- Damage: +15%, Additional Fury Absorption: 10."
+				"description": "Boss Damage: +15%."
 			},
 			{
 				"level": 3,
-				"description": "When attacking Boss Monster- Damage: +20%, Additional Fury Absorption: 10."
+				"description": "Boss Damage: +20%."
 			}
 		]
 	},
@@ -261,11 +261,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "All Stats: +5%"
+				"description": "All Stats: +5%."
 			},
 			{
 				"level": 2,
-				"description": "All Stats: +10%"
+				"description": "All Stats: +10%."
 			}
 		]
 	},
@@ -275,15 +275,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Max HP: +10%"
+				"description": "Max HP: +10%."
 			},
 			{
 				"level": 2,
-				"description": "Max HP: +15%"
+				"description": "Max HP: +15%."
 			},
 			{
 				"level": 3,
-				"description": "Max HP: +20%"
+				"description": "Max HP: +20%."
 			}
 		]
 	},
@@ -293,11 +293,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "After completing Time to Prepare at least 1 time, then upon either defeating 8 enemies or attacking a boss 5 times, damage increases by 9% for 20 sec, for every 5 times you've stacked Time to Prepare. Cooldown: 40 sec"
+				"description": "By defeating 8 enemies or attacking a boss 5 times, you gain 1 stack of Time to Prepare. \nAt 5 stacks of Time to Prepare, your damage increases by 9% for 20 sec. \nCooldown: 40 sec."
 			},
 			{
 				"level": 2,
-				"description": "After completing Time to Prepare at least 1 time, then upon either defeating 8 enemies or attacking a boss 5 times, damage increases by 17% for 20 sec, for every 5 times you've stacked Time to Prepare. Cooldown: 40 sec"
+				"description": "By defeating 8 enemies or attacking a boss 5 times, you gain 1 stack of Time to Prepare. \nAt 5 stacks of Time to Prepare, your damage increases by 17% for 20 sec. \nCooldown: 40 sec."
 			}
 		]
 	},
@@ -307,11 +307,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Attacks against weaker opponents deal +3% damage. Attacks against monsters afflicted by Abnormal Statuses deal +3% damage."
+				"description": "Attacks against weaker opponents deal +3% damage. \nAttacks against monsters afflicted by Abnormal Statuses deal +3% damage."
 			},
 			{
 				"level": 2,
-				"description": "Attacks against weaker opponents deal +6% damage. Attacks against monsters afflicted by Abnormal Statuses deal +6% damage."
+				"description": "Attacks against weaker opponents deal +6% damage. \nAttacks against monsters afflicted by Abnormal Statuses deal +6% damage."
 			}
 		]
 	},
@@ -321,15 +321,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "+60% skill damage for 10 sec when active. Cooldown: 90 sec. Skill effects reduced to half when used with link skill."
+				"description": "Duration: 10 sec, Damage: +30%. \nCooldown: 90 sec."
 			},
 			{
 				"level": 2,
-				"description": "+90% skill damage for 10 sec when active. Cooldown: 90 sec. Skill effects reduced to half when used with link skill."
+				"description": "Duration: 10 sec, Damage: +45%. \nCooldown: 60 sec."
 			},
 			{
 				"level": 3,
-				"description": "+120% skill damage for 10 sec when active. Cooldown: 90 sec. Skill effects reduced to half when used with link skill."
+				"description": "Duration: 10 sec, Damage: +60%. \nCooldown: 60 sec."
 			}
 		]
 	},
@@ -339,11 +339,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Boss Damage: +2%. Increases damage by 1% up to 4% for each party member, including yourself, on the same map. If you are not in a party, you will be considered to be in your own party."
+				"description": "Boss Damage: +2%.\nIncreases damage by 1% up to 4% for each party member, including yourself, on the same map.\nIf you are not in a party, you will be considered to be in your own party."
 			},
 			{
 				"level": 2,
-				"description": "Boss Damage: +4%. Increases damage by 2% up to 8% for each party member, including yourself, on the same map. If you are not in a party, you will be considered to be in your own party."
+				"description": "Boss Damage: +4%.\nIncreases damage by 2% up to 8% for each party member, including yourself, on the same map.\nIf you are not in a party, you will be considered to be in your own party."
 			}
 		]
 	},
@@ -353,11 +353,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Activated when moving a certain distance. Max number of stacks: 6 times, Duration: 5 sec, Damage per stack: +1%."
+				"description": "Activated when moving a certain distance.\nMax number of stacks: 4 times, \nDuration: 10 sec, Damage per stack: +2%."
 			},
 			{
 				"level": 2,
-				"description": "Activated when moving a certain distance. Max number of stacks: 6 times, Duration: 5 sec, Damage per stack: +2%."
+				"description": "Activated when moving a certain distance.\nMax number of stacks: 4 times, \nDuration: 10 sec, Damage per stack: +3%."
 			}
 		]
 	},
@@ -367,15 +367,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Activates when the combat state continues for 5 sec. Can be stacked a max of 5 times. Duration: 5 sec. When activated, damage increases by 1%, and damage increases an extra 1% per stack."
+				"description": "Activates when the combat state continues for 5 sec. \nCan be stacked a max of 5 times. \nDuration: 5 sec. \nWhen activated, damage increases by 1%, and damage increases an extra 1% per stack."
 			},
 			{
 				"level": 2,
-				"description": "Activates when the combat state continues for 5 sec. Can be stacked a max of 5 times. Duration: 5 sec. When activated, damage increases by 1%, and damage increases an extra 2% per stack."
+				"description": "Activates when the combat state continues for 5 sec. \nCan be stacked a max of 5 times. \nDuration: 5 sec. \nWhen activated, damage increases by 1%, and damage increases an extra 2% per stack."
 			},
 			{
 				"level": 3,
-				"description": "Activates when the combat state continues for 5 sec. Can be stacked a max of 5 times. Duration: 5 sec. When activated, damage increases by 1%, and damage increases an extra 3% per stack."
+				"description": "Activates when the combat state continues for 5 sec. \nCan be stacked a max of 5 times. \nDuration: 5 sec. \nWhen activated, damage increases by 1%, and damage increases an extra 3% per stack."
 			}
 		]
 	},
@@ -385,11 +385,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "All Stats: 15, Attack Power Increase: 10, Magic Attack Power Increase: 10."
+				"description": "All Stats: 15, \nAttack Power Increase: 10, \nMagic Attack Power Increase: 10."
 			},
 			{
 				"level": 2,
-				"description": "All Stats: 25, Attack Power Increase: 15, Magic Attack Power Increase: 15."
+				"description": "All Stats: 25, \nAttack Power Increase: 15, \nMagic Attack Power Increase: 15."
 			}
 		]
 	},
@@ -399,11 +399,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Permanent Damage Increase: 5%."
+				"description": "Damage: 5%."
 			},
 			{
 				"level": 2,
-				"description": "Permanent Damage Increase: 10%."
+				"description": "Damage: 10%."
 			}
 		]
 	},
@@ -413,11 +413,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Damage: +3%. Activate nature's help upon defeating 20 normal monsters. Increases Damage Against Normal Monsters by 5% for 30 sec. when nature's help is active.Cooldown: 30 sec."
+				"description": "Damage: +3%. \nActivate nature's help upon defeating 20 normal monsters. \nIncreases Damage Against Normal Monsters by 5% for 30 sec. when nature's help is active.\nCooldown: 30 sec."
 			},
 			{
 				"level": 2,
-				"description": "Damage: +7%. Activate nature's help upon defeating 20 normal monsters. Increases Damage Against Normal Monsters by 11% for 30 sec. when nature's help is active.Cooldown: 30 sec."
+				"description": "Damage: +7%. \nActivate nature's help upon defeating 20 normal monsters. \nIncreases Damage Against Normal Monsters by 11% for 30 sec. when nature's help is active.\nCooldown: 30 sec."
 			}
 		]
 	},
@@ -427,11 +427,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Enemy DEF Ignored: +5%, Damage: +10% against enemies with 100% HP."
+				"description": "Enemy DEF Ignored: +5%, \nDamage: +9% against enemies with 100% HP."
 			},
 			{
 				"level": 2,
-				"description": "Enemy DEF Ignored: +9%, Damage: +14% against enemies with 100% HP."
+				"description": "Enemy DEF Ignored: +10%, Damage: +14% against enemies with 100% HP."
 			}
 		]
 	},
@@ -441,15 +441,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Boss Damage: +4%. Critical Rate: +4%. Max HP +3%. Max MP: +3%."
+				"description": "Boss Damage: +4%. \nCritical Rate: +4%. \nMax HP +3%. \nMax MP: +3%."
 			},
 			{
 				"level": 2,
-				"description": "Boss Damage: +7%. Critical Rate: +7%. Max HP +4%. Max MP: +4%."
+				"description": "Boss Damage: +7%. \nCritical Rate: +7%. \nMax HP +4%. \nMax MP: +4%."
 			},
 			{
 				"level": 3,
-				"description": "Boss Damage: +10%. Critical Rate: +10%. Max HP +5%. Max MP: +5%."
+				"description": "Boss Damage: +10%. \nCritical Rate: +10%. \nMax HP +5%. \nMax MP: +5%."
 			}
 		]
 	},
@@ -459,23 +459,23 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Incoming damage reduced: 3%, defense ignored: 2%."
+				"description": "Incoming damage reduced: 3%,\nDefense ignored: 2%."
 			},
 			{
 				"level": 2,
-				"description": "Incoming damage reduced: 6%, defense ignored: 4%."
+				"description": "Incoming damage reduced: 6%,\nDefense ignored: 4%."
 			},
 			{
 				"level": 3,
-				"description": "Incoming damage reduced: 9%, defense ignored: 6%."
+				"description": "Incoming damage reduced: 9%,\nDefense ignored: 6%."
 			},
 			{
 				"level": 4,
-				"description": "Incoming damage reduced: 12%, defense ignored: 8%."
+				"description": "Incoming damage reduced: 12%,\nDefense ignored: 8%."
 			},
 			{
 				"level": 5,
-				"description": "Incoming damage reduced: 15%, defense ignored: 10%."
+				"description": "Incoming damage reduced: 15%,\nDefense ignored: 10%."
 			}
 		]
 	},
@@ -499,11 +499,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Damage: +3%. Upon attacking, Recovery Chance: 100%, Recovery: 1% of Max HP/MP per sec, Duration: 5 sec. Cooldown: 30 sec"
+				"description": "Damage: +3%.\nUpon attacking, Recovery Chance: 100%, Recovery: 1% of Max HP/MP per sec, Duration: 5 sec. \nCooldown: 30 sec"
 			},
 			{
 				"level": 2,
-				"description": "Damage: +5%. Upon attacking, Recovery Chance: 100%, Recovery: 2% of Max HP/MP per sec, Duration: 5 sec. Cooldown: 30 sec"
+				"description": "Damage: +5%.\nUpon attacking, Recovery Chance: 100%, Recovery: 2% of Max HP/MP per sec, Duration: 5 sec. \nCooldown: 30 sec"
 			}
 		]
 	},
@@ -513,11 +513,11 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Boss Damage: +2%. If the target is a boss, up to 1% increase for every successful attack. Max Stacks: 6, stack activates once every 2 sec. Duration: 5 sec."
+				"description": "Boss Damage: +2%. \nIf the target is a boss, up to 1% increase for every successful attack. \nMax Stacks: 6, stack activates once every 2 sec. \nDuration: 5 sec."
 			},
 			{
 				"level": 2,
-				"description": "Boss Damage: +4%. If the target is a boss, up to 2% increase for every successful attack. Max Stacks: 6, stack activates once every 2 sec. Duration: 5 sec."
+				"description": "Boss Damage: +4%.\nIf the target is a boss, up to 2% increase for every successful attack. \nMax Stacks: 6, stack activates once every 2 sec. \nDuration: 5 sec."
 			}
 		]
 	},
