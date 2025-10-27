@@ -115,3 +115,24 @@ export const updateCharacterDailySchema = z.object({
 
 // Type inferred from the schema for use across the codebase
 export type UpdateCharacterDailyRequestInput = z.infer<typeof updateCharacterDailySchema>;
+
+export const updateCharacterWeeklySchema = z.object({
+	symbolName: z.enum(allSymbolNames),
+	userOrigin: usernameSchema,
+	server: z.enum(serverNames),
+	code: z.enum(codes),
+});
+
+// Type inferred from the schema for use across the codebase
+export type UpdateCharacterWeeklyRequestInput = z.infer<typeof updateCharacterWeeklySchema>;
+
+export const updateAllDailySchema = z.object({
+	userOrigin: usernameSchema,
+	server: z.enum(serverNames),
+	code: z.enum(codes),
+	arcaneBonus: z.number().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
+	sacredBonus: z.number().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
+});
+
+// Type inferred from the schema for use across the codebase
+export type UpdateAllDailySchema = z.infer<typeof updateCharacterDailySchema>;

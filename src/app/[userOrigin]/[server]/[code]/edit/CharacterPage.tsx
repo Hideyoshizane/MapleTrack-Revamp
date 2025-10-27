@@ -176,7 +176,6 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 	if (pageLoading || !character) return <FullPageLoader />;
 	if (error) throw new Error(error);
 	if (!character) notFound();
-	console.log(character);
 	return (
 		<section className="mainContent">
 			<div className={styles.mainDiv}>

@@ -3,7 +3,7 @@
 import * as Checkbox from '@radix-ui/react-checkbox';
 import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
 import Image from 'next/image';
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import ProgressBar from '@components/ProgressBar/ProgressBar';
 import Tooltip from '@components/Tooltip/Tooltip';
@@ -35,7 +35,8 @@ export interface EditPageSymbolObjectProps {
 }
 
 // Subcomponent for Level & EXP input
-const LevelExpInput: React.FC<{
+
+interface LevelExpInputProps {
 	level: number;
 	levelInput: string;
 	exp: number;
@@ -47,7 +48,9 @@ const LevelExpInput: React.FC<{
 	setLevelInput: (val: string) => void;
 	setExpInput: (val: string) => void;
 	setIsProgressFull: (val: boolean) => void;
-}> = ({
+}
+
+function LevelExpInput({
 	level,
 	levelInput,
 	exp,
@@ -59,69 +62,84 @@ const LevelExpInput: React.FC<{
 	setLevelInput,
 	setExpInput,
 	setIsProgressFull,
-}): JSX.Element => (
-	<div className={styles.levelExpInfo}>
-		<p className={styles.symbolLevelText}>Level:</p>
-		<input
-			type="number"
-			className={styles.symbolLevel}
-			placeholder={level.toString()}
-			min={0}
-			max={maxLevel}
-			value={levelInput}
-			onChange={(e): void => setLevelInput(e.target.value)}
-			onBlur={(): void => {
-				const levelValue = levelInput === '' ? 0 : Number(levelInput);
-				setLevel(levelValue);
-				setIsProgressFull(levelValue >= maxLevel);
-			}}
-		/>
+}: LevelExpInputProps): JSX.Element {
+	return (
+		<div className={styles.levelExpInfo}>
+			<p className={styles.symbolLevelText}>Level:</p>
+			<input
+				type="number"
+				className={styles.symbolLevel}
+				placeholder={level.toString()}
+				min={0}
+				max={maxLevel}
+				value={levelInput}
+				onChange={(e): void => setLevelInput(e.target.value)}
+				onBlur={(): void => {
+					const levelValue = levelInput === '' ? 0 : Number(levelInput);
+					setLevel(levelValue);
+					setIsProgressFull(levelValue >= maxLevel);
+				}}
+			/>
 
-		<p className={styles.symbolLevelText}>EXP:</p>
-		<input
-			type="number"
-			className={styles.symbolExp}
-			placeholder={exp.toString()}
-			min={0}
-			max={expRequired}
-			value={expInput}
-			onChange={(e): void => setExpInput(e.target.value)}
-			onBlur={(): void => {
-				const expValue = expInput === '' ? 0 : Number(expInput);
-				setExp(expValue);
-				setIsProgressFull(levelInput !== '' && Number(levelInput) >= maxLevel);
-			}}
-		/>
-	</div>
-);
+			<p className={styles.symbolLevelText}>EXP:</p>
+			<input
+				type="number"
+				className={styles.symbolExp}
+				placeholder={exp.toString()}
+				min={0}
+				max={expRequired}
+				value={expInput}
+				onChange={(e): void => setExpInput(e.target.value)}
+				onBlur={(): void => {
+					const expValue = expInput === '' ? 0 : Number(expInput);
+					setExp(expValue);
+					setIsProgressFull(levelInput !== '' && Number(levelInput) >= maxLevel);
+				}}
+			/>
+		</div>
+	);
+}
 
 // Subcomponent for Symbol Image + Tooltip
-const SymbolImage: React.FC<{
+interface SymbolImageProps {
 	src: string;
 	size: number;
 	computedValue: number;
 	usable: boolean;
-}> = ({ src, size, computedValue, usable }): JSX.Element => (
-	<Tooltip content={`Days to max Level: ${computedValue}`} placement="top" enabled={usable}>
-		<Image
-			src={src}
-			width={size}
-			height={size}
-			alt="Symbol Icon"
-			className={!usable ? styles.off : ''}
-			loading="lazy"
-		/>
-	</Tooltip>
-);
+}
+
+function SymbolImage({ src, size, computedValue, usable }: SymbolImageProps): JSX.Element {
+	const tooltipMessage = computedValue === 0 ? 'Symbol at Max level.' : `Days to max Level: ${computedValue}`;
+	return (
+		<Tooltip content={tooltipMessage} placement="top" enabled={usable}>
+			<Image
+				src={src}
+				width={size}
+				height={size}
+				alt="Symbol Icon"
+				className={!usable ? styles.off : ''}
+				loading="lazy"
+			/>
+		</Tooltip>
+	);
+}
 
 // Subcomponent for Content Checkbox
-const ContentCheckbox: React.FC<{
+interface ContentCheckboxProps {
 	content: CharacterContent;
 	index: number;
 	characterLevel: number;
 	handleToggle: (index: number, checked: boolean) => void;
 	symbolName: string;
-}> = ({ content, index, characterLevel, handleToggle, symbolName }): JSX.Element => {
+}
+
+function ContentCheckbox({
+	content,
+	index,
+	characterLevel,
+	handleToggle,
+	symbolName,
+}: ContentCheckboxProps): JSX.Element {
 	const isDisabled = ((): boolean => {
 		switch (content.contentType) {
 			case 'Reverse City':
@@ -147,16 +165,16 @@ const ContentCheckbox: React.FC<{
 			{content.contentType}: +{getContentValue(symbolName, content.contentType)}
 		</label>
 	);
-};
+}
 
-const EditPageSymbolObject: React.FC<EditPageSymbolObjectProps> = ({
+function EditPageSymbolObject({
 	type,
 	symbol,
 	characterLevel,
 	characterJobType,
 	size = 24,
 	onChange,
-}): JSX.Element => {
+}: EditPageSymbolObjectProps): JSX.Element {
 	// Check if the character can use this symbol
 	const isSymbolUsable = canUseSymbol(characterLevel, symbol.name);
 
@@ -171,8 +189,12 @@ const EditPageSymbolObject: React.FC<EditPageSymbolObjectProps> = ({
 	const [levelInput, setLevelInput] = useState<string>(symbol.level.toString());
 	const [exp, setExp] = useState<number>(symbol.exp);
 	const [expInput, setExpInput] = useState<string>(symbol.exp.toString());
-	const [isProgressFull, setIsProgressFull] = useState<boolean>(false);
 	const [contentState, setContentState] = useState<CharacterContent[]>(symbol.content);
+
+	const [isProgressFull, setIsProgressFull] = useState<boolean>(
+		// Filled if level >= maxLevel or exp >= max EXP
+		symbol.level >= maxLevel || symbol.exp >= getExpForLevel(type, symbol.level)
+	);
 
 	const expRequired = useMemo((): number => getExpForLevel(type, level), [type, level]);
 
@@ -268,6 +290,6 @@ const EditPageSymbolObject: React.FC<EditPageSymbolObjectProps> = ({
 			</div>
 		</div>
 	);
-};
+}
 
 export default EditPageSymbolObject;

@@ -15,13 +15,13 @@ import type { JSX } from 'react';
 interface SymbolButtonsProps {
 	symbol: CharacterSymbol;
 	dailyValue: number;
-	weeklyValue: number;
 	bonus: number;
 	content: CharacterContent[];
 	onValueChange?: (data: { currentExp: number; currentLevel: number }) => void;
+	disableAllDaily: boolean;
 }
 
-interface UpdateCharacterDailyResponse {
+interface UpdateCharacterResponse {
 	success: boolean;
 	message: string;
 	data: { currentExp: number; currentLevel: number };
@@ -30,16 +30,18 @@ interface UpdateCharacterDailyResponse {
 const SymbolButtons = ({
 	symbol,
 	dailyValue,
-	weeklyValue,
 	bonus,
 	content,
 	onValueChange,
+	disableAllDaily = false,
 }: SymbolButtonsProps): JSX.Element => {
 	const [isResetDone, setIsResetDone] = useState(true);
 	const [isWeeklyDone, setIsWeeklyDone] = useState(true);
+	const [localContent, setLocalContent] = useState(content);
 
 	// Compute Daily Button and Weekly Button
 	useEffect((): void => {
+		setLocalContent(content);
 		setIsResetDone(content[0]?.date ? hasDailyResetOccurred(content[0].date) : true);
 		setIsWeeklyDone(content[1]?.date ? hasWeeklyQuestResetOccurred(dayjs(content[1].date)) : true);
 	}, [content]);
@@ -48,10 +50,7 @@ const SymbolButtons = ({
 		try {
 			// Compute URL segments here, local to this function
 			const pathname = window.location.pathname;
-			const segments = pathname.split('/').filter(Boolean);
-			const userOrigin = segments[0];
-			const server = segments[1];
-			const code = segments[2];
+			const [userOrigin, server, code] = pathname.split('/').filter(Boolean);
 
 			const payload = { symbolName: symbol.name, bonus, userOrigin, server, code };
 
@@ -61,27 +60,85 @@ const SymbolButtons = ({
 				body: JSON.stringify(payload),
 			});
 
-			const data: UpdateCharacterDailyResponse = await res.json();
+			const data: UpdateCharacterResponse = await res.json();
 			if (data.success) {
 				onValueChange?.(data.data);
 				setIsResetDone(false);
+
+				setLocalContent((prev): CharacterContent[] => {
+					const updated = [...prev];
+					if (updated[0]) {
+						updated[0].cleared = true;
+					}
+					return updated;
+				});
 			}
 		} catch (error) {
-			console.error('Error updating daily bonus', error);
+			console.error('Error updating daily: ', error);
 		}
 	}, [symbol.name, onValueChange, bonus]);
 
+	const handleWeeklyUpdate = useCallback(async (): Promise<void> => {
+		try {
+			// Compute URL segments here, local to this function
+			const pathname = window.location.pathname;
+			const [userOrigin, server, code] = pathname.split('/').filter(Boolean);
+
+			const payload = { symbolName: symbol.name, userOrigin, server, code };
+
+			const res = await fetch('/api/characters/updateCharacterWeekly', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload),
+			});
+
+			const data: UpdateCharacterResponse = await res.json();
+			if (data.success) {
+				onValueChange?.(data.data);
+				setLocalContent((prev): CharacterContent[] => {
+					const updated = [...prev];
+					if (updated[1]) {
+						// Decrement tries and clear when zero
+						const currentTries =
+							typeof updated[1].tries === 'number' && updated[1].tries > 0 ? updated[1].tries : DEFAULT_WEEKLY_TRIES;
+						const newTries = Math.max(currentTries - 1, 0);
+
+						updated[1] = {
+							...updated[1],
+							tries: newTries,
+							cleared: newTries === 0,
+						};
+						if (newTries === 0) {
+							setIsWeeklyDone(false);
+						}
+					}
+					return updated;
+				});
+			}
+		} catch (error) {
+			console.error('Error updating Weekly: ', error);
+		}
+	}, [symbol.name, onValueChange]);
+
 	// Determine button state and label for Daily Button
-	const dailyButtonDisabled = !content[0]?.checked || !isResetDone;
-	const dailyButtonLabel = !content[0]?.checked ? 'Disabled' : !isResetDone ? 'Daily done!' : `Daily: +${dailyValue}`;
+	const dailyButtonDisabled = disableAllDaily || !localContent[0]?.checked || localContent[0]?.cleared || !isResetDone;
+	const dailyButtonLabel = disableAllDaily
+		? 'Daily done!'
+		: !localContent[0]?.checked
+		? 'Disabled'
+		: !isResetDone
+		? 'Daily done!'
+		: `Daily: +${dailyValue}`;
 
 	// Determine button state and label for Weekly Button
-	const weeklyButtonDisabled = !content[1]?.checked || (content[1].tries === 0 && !isWeeklyDone);
-	const weeklyButtonLabel = !content[1]?.checked
+	const weeklyButtonDisabled =
+		!localContent[1]?.checked || localContent[1]?.cleared || (localContent[1].tries === 0 && !isWeeklyDone);
+
+	const weeklyButtonLabel = !localContent[1]?.checked
 		? 'Disabled'
-		: !isWeeklyDone && content[1].tries === 0
+		: !isWeeklyDone && localContent[1].tries === 0
 		? 'Weekly Done'
-		: `Weekly: ${content[1].tries}/${DEFAULT_WEEKLY_TRIES}`;
+		: `Weekly: ${localContent[1].tries}/${DEFAULT_WEEKLY_TRIES}`;
 
 	return (
 		<div className={styles.buttonLines}>
@@ -89,8 +146,11 @@ const SymbolButtons = ({
 				{dailyButtonLabel}
 			</Button>
 			<div className={styles.weeklyDiv}>
-				{content[1] && (
-					<Button className={styles.button} disabled={weeklyButtonDisabled}>
+				{localContent[1] && (
+					<Button
+						className={styles.button}
+						disabled={weeklyButtonDisabled}
+						onClick={(): void => void handleWeeklyUpdate()}>
 						{weeklyButtonLabel}
 					</Button>
 				)}

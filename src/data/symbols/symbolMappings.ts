@@ -157,7 +157,6 @@ export const calculateNewLevelFromExp = (
 	// Loop until we reach max level or can't level up anymore
 	while (level < maxLevel) {
 		const expForNextLevel = getExpForLevel(type, level);
-
 		if (exp >= expForNextLevel) {
 			exp -= expForNextLevel;
 			level++;

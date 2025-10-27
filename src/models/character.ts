@@ -8,6 +8,7 @@ export interface CharacterContent {
 	checked: boolean;
 	date?: Date | null;
 	tries?: number;
+	cleared?: boolean;
 	maxTries?: number;
 }
 
@@ -43,6 +44,7 @@ const CharacterContentSchema = new Schema<CharacterContent>(
 		contentType: { type: String, required: true },
 		checked: { type: Boolean, default: false },
 		date: { type: Date, default: null },
+		cleared: { type: Boolean, default: false },
 		tries: { type: Number, min: 0 },
 	},
 	{ _id: false, versionKey: false }

@@ -19,9 +19,10 @@ interface CharacterHeaderProps {
 	character: CharacterDocument;
 	extraData: ExtraCharacterData | null;
 	router: AppRouterInstance;
+	handleIncreaseAll: () => Promise<void>;
 }
 
-const CharacterHeader = ({ character, extraData, router }: CharacterHeaderProps): JSX.Element => {
+const CharacterHeader = ({ character, extraData, router, handleIncreaseAll }: CharacterHeaderProps): JSX.Element => {
 	const pathname = usePathname();
 
 	const characterImage = character.syncing ? (
@@ -42,7 +43,13 @@ const CharacterHeader = ({ character, extraData, router }: CharacterHeaderProps)
 		<>
 			<div className={styles.buttonLine}>
 				<DropdownEventMenu />
-				<Button className={styles.increaseAllButton}>Increase All</Button>
+				<Button
+					className={styles.increaseAllButton}
+					onClick={(): void => {
+						void handleIncreaseAll();
+					}}>
+					Increase All
+				</Button>
 				<Button className={styles.editCharacterButton} onClick={(): void => router.push(`${pathname}/edit`)}>
 					Edit Character
 				</Button>

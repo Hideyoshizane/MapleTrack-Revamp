@@ -9,9 +9,10 @@ import type { JSX } from 'react';
 
 interface SymbolsSectionProps {
 	character: CharacterDocument;
+	disableAllDaily: boolean;
 }
 const SYMBOL_SIZE = 56;
-const SymbolsSection = ({ character }: SymbolsSectionProps): JSX.Element => {
+const SymbolsSection = ({ character, disableAllDaily }: SymbolsSectionProps): JSX.Element => {
 	const { ArcaneSymbol, SacredSymbol, GrandSacredSymbol, level, jobType } = character;
 
 	const symbolSections = [
@@ -35,6 +36,7 @@ const SymbolsSection = ({ character }: SymbolsSectionProps): JSX.Element => {
 										characterLevel={level}
 										characterJobType={jobType ?? 'default'}
 										size={SYMBOL_SIZE}
+										disableAllDaily={disableAllDaily}
 									/>
 								)
 							)}
