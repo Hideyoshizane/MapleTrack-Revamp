@@ -1,6 +1,6 @@
 'use client';
 import { useRouter, usePathname } from 'next/navigation';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 import Button from '@components/Button/Button';
 import Tooltip from '@components/Tooltip/Tooltip';

@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 import { ClassFilter } from '@components/ClassFilter/ClassFilter';
 import ClassGrid from '@components/ClassGrid/ClassGrid';

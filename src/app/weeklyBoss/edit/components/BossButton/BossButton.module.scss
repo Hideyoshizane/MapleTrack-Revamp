@@ -1,0 +1,77 @@
+.button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 40px;
+	border: none;
+	border-radius: 25px;
+	transition: background 0.2s ease-in-out;
+	cursor: pointer;
+
+	&:disabled {
+		cursor: not-allowed;
+	}
+
+	.buttonText {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 40px;
+		font-weight: 500;
+		margin-right: 2px;
+	}
+}
+
+.easy {
+	background-color: var(--boss-easy);
+	font-weight: 500;
+	color: var(--default-white);
+}
+
+.normal {
+	background-color: var(--boss-normal);
+	font-weight: 500;
+	color: var(--default-button-text);
+}
+
+.hard {
+	background-color: var(--boss-hard);
+	font-weight: 500;
+	color: var(--default-button-text);
+}
+
+.chaos {
+	box-sizing: border-box;
+	border: solid 2px var(--boss-chaos-secondary);
+	background-color: var(--boss-chaos);
+	font-weight: 500;
+	color: var(--boss-chaos-secondary);
+}
+
+.extreme {
+	box-sizing: border-box;
+	border: solid 2px var(--boss-extreme-secondary);
+	background-color: var(--boss-extreme);
+	font-weight: 500;
+	color: var(--boss-extreme-secondary);
+}
+
+.smallButton {
+	width: 80px;
+}
+
+.bigButton {
+	width: 112px;
+}
+
+.white {
+	color: var(--default-white);
+}
+
+.black {
+	color: var(--default-button-text);
+}
+
+.banIcon {
+	color: var(--icon-danger-color);
+}

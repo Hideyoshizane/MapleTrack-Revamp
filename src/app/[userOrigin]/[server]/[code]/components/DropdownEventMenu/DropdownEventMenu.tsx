@@ -10,7 +10,7 @@ import ArcaneIcon from '@assets/svg/star.svg';
 
 import { useBonusContext } from '../../useBonusContext';
 
-import styles from './DropdownEventMenu.module.css';
+import styles from './DropdownEventMenu.module.scss';
 
 import type { JSX } from 'react';
 

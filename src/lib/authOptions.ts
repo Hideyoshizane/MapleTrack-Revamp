@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import argon2 from 'argon2';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
 import { LASTVERSION } from '@data/user/constants';
@@ -47,13 +47,17 @@ export const authOptions: AuthOptions = {
 
 				// Find user in DB
 				const user = await UserMongo.findOne({ username });
+
+				const dummyHash =
+					'$argon2id$v=19$m=65536,t=3,p=4$uX1p9U1nE8p4cXb3rFxNcg$hX57IVHIUi7fYcl0jYxA/0hhQ2PzefRgQdIMZcPgYG8';
+
 				if (!user) {
-					await bcrypt.compare(password, '$2b$10$invalidhashstring0000000000000000000000');
+					await argon2.verify(dummyHash, password).catch((): null => null);
 					throw new Error('Wrong username or password');
 				}
 
 				// Compare password hash
-				const isValid = await bcrypt.compare(password, user.password);
+				const isValid = await argon2.verify(user.password, password);
 				if (!isValid) {
 					throw new Error('Wrong username or password');
 				}

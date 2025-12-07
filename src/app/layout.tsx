@@ -2,7 +2,7 @@ import { clsx } from 'clsx';
 import { Roboto } from 'next/font/google';
 import { cookies } from 'next/headers';
 
-import CustomToaster from '@components/Toaster/Toaster';
+import ClientToaster from '@components/CustomToaster/CustomToaster';
 import { type Theme } from '@lib/theme';
 
 import Providers from './providers';
@@ -13,7 +13,7 @@ import './globals.scss';
 
 const roboto = Roboto({
 	subsets: ['latin'],
-	weight: ['300', '400', '500', '700'],
+	weight: ['300', '400', '500', '600', '700'],
 });
 
 const RootLayout = async ({ children }: Readonly<{ children: React.ReactNode }>): Promise<JSX.Element> => {
@@ -23,8 +23,8 @@ const RootLayout = async ({ children }: Readonly<{ children: React.ReactNode }>)
 	return (
 		<html lang="en">
 			<body className={clsx(roboto.className, theme)}>
-				<CustomToaster theme={theme} reverseOrder={false} />
 				<Providers>
+					<ClientToaster position="top-right" rtl={false} theme="dark" />
 					<main>{children}</main>
 				</Providers>
 			</body>

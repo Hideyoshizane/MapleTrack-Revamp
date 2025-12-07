@@ -37,7 +37,7 @@ export const ClassFilter = ({
 		// Show skeleton for entire component
 		return (
 			<div className={styles.classFilter}>
-				<SkeletonWrapper width={1243} height={56} color="light" />
+				<SkeletonWrapper width={1243} height={56} color="light" variant="rounded" />
 			</div>
 		);
 	}

@@ -1,9 +1,10 @@
-import bcrypt from 'bcrypt';
+import argon2 from 'argon2';
 
 import { LASTVERSION } from '@data/user/constants';
 import connectToDatabase from '@lib/mongooseConect';
 import User from '@models/user';
 import { signupRequestSchema } from '@schemas/authSchemas';
+import { createBossList } from '@service/bossListService';
 import { createResponse } from '@utils/api/createResponse';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
 import { validateUsername, validateEmail, validatePassword } from '@utils/validation';
@@ -57,8 +58,10 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		if (existingUser)
 			return createResponse<ApiResponse>({ success: false, error: 'This username or email is not available.' }, 400);
 
-		// Hash password with auto-generated salt (10 rounds)
-		const hashedPassword = await bcrypt.hash(password, 10);
+		// Hash password
+		const hashedPassword = await argon2.hash(password, {
+			type: argon2.argon2id,
+		});
 		const newUser = new User({
 			username,
 			email,
@@ -70,10 +73,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
 		// Save user
 		await newUser.save();
-
-		// DB populate functions
-		//await createMissingCharacters(newUser._id, newUser.username);
-		//await createBossList(newUser.username);
+		await createBossList(username);
 
 		return createResponse<ApiResponse<{ id: string; username: string; email: string }>>(
 			{

@@ -50,7 +50,7 @@ const ServerDropdown = ({ serverCookie, setServerCookie }: ServerDropdownProps):
 	}, []);
 
 	// Skeleton placeholder while selectedServer is not ready
-	if (!selectedServer) return <SkeletonWrapper width={502} height={368} color="light" />;
+	if (!selectedServer) return <SkeletonWrapper width={502} height={368} color="light" variant="rounded" />;
 
 	return (
 		<div ref={dropdownRef} className={clsx(styles.serverDropdownWrapper, { [styles.open]: isOpen })}>

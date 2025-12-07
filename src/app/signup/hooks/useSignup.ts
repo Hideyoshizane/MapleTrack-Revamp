@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useForm, type Control, type UseFormHandleSubmit, type UseFormGetValues } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 import { fetchWithTimeout } from '@utils/fetch/withTimeout';
 import { sanitizeInputFrontend } from '@utils/sanitize/sanitizeInputFrontEnd';
@@ -48,7 +48,10 @@ export const useSignup = (): UseSignupReturn => {
 		defaultValues: { username: '', email: '', password: '', confirmPassword: '' },
 	});
 
-	const showError = (msg?: string): string => toast.error(msg ?? 'Failed to create user');
+	const showError = (msg?: string): void => {
+		console.log(msg);
+		toast.error(msg ?? 'Failed to create user');
+	};
 
 	const onSubmit = async (data: SignupFormData): Promise<void> => {
 		try {
@@ -72,7 +75,11 @@ export const useSignup = (): UseSignupReturn => {
 			const hasErrors = (Object.entries(validations) as [keyof SignupFormData, ValidationResult][]).some(
 				([field, result]): boolean => handleFieldValidation(field, result, setError)
 			);
-			if (hasErrors) return;
+			console.log(hasErrors);
+			if (hasErrors) {
+				toast.error('Invalid input.');
+				return;
+			}
 
 			const payload: SignupPayload = sanitizedData;
 

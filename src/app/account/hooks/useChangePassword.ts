@@ -1,7 +1,7 @@
 // hooks/useChangePassword.ts
 import { signOut } from 'next-auth/react';
 import { useCallback } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 import { fetchWithTimeout } from '@utils/fetch/withTimeout';
 import { sanitizeInputFrontend } from '@utils/sanitize/sanitizeInputFrontEnd';

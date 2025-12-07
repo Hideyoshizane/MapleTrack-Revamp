@@ -1,6 +1,8 @@
 'use client';
 
-import Skeleton from '@mui/material/Skeleton';
+import clsx from 'clsx';
+
+import styles from './SkeletonWrapper.module.scss';
 
 import type { JSX } from 'react';
 
@@ -11,20 +13,32 @@ interface SkeletonWrapperProps {
 	variant?: 'text' | 'rectangular' | 'rounded' | 'circular';
 }
 
-// Predefined background colors
+// Mapeia os backgrounds
 const SkeletonBgColors: Record<SkeletonWrapperProps['color'], string> = {
 	light: 'rgba(0,0,0,0.3)',
 	dark: 'rgba(255,255,255,0.6)',
 };
+void styles.text;
+void styles.rectangular;
+void styles.rounded;
+void styles.circular;
 
-export const SkeletonWrapper = ({ width, height, color, variant = 'text' }: SkeletonWrapperProps): JSX.Element => {
+// O componente final substitui totalmente o MUI Skeleton
+export const SkeletonWrapper = ({
+	width,
+	height,
+	color,
+	variant = 'rectangular',
+}: SkeletonWrapperProps): JSX.Element => {
 	return (
-		<Skeleton
-			width={width}
-			height={height}
-			animation="wave"
-			variant={variant}
-			sx={{ bgcolor: SkeletonBgColors[color], borderRadius: 4 }}
+		// Aplica classes e estilos de tamanho diretamente
+		<div
+			className={clsx(styles.skeleton, styles[variant])}
+			style={{
+				width,
+				height,
+				backgroundColor: SkeletonBgColors[color],
+			}}
 		/>
 	);
 };

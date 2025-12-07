@@ -183,6 +183,7 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 					src={`/assets/profile/${character.code}.webp`}
 					width={650}
 					height={827}
+					quality={100}
 					priority
 					alt={`${character.class} class profile Icon`}
 				/>

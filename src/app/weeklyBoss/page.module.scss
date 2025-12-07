@@ -1,0 +1,137 @@
+$heightTopbar: 96px;
+$buttonHeight: 56px;
+$fontWeightMedium: 500;
+$textColor: var(--default-button-text);
+$hudColor: var(--boss-hud-color);
+$borderRadius: 20px;
+$marginLeftSmall: 8px;
+$marginTopLarge: 40px;
+
+.topBar {
+	display: flex;
+	gap: 16px;
+	margin-top: 24px;
+
+	.bossHunt {
+		display: flex;
+		align-items: center;
+		width: 240px;
+
+		.bossIcon {
+			color: $textColor;
+		}
+
+		.bossTitle {
+			width: 152px;
+			font-size: 40px;
+			font-weight: $fontWeightMedium;
+			color: $textColor;
+		}
+	}
+
+	.weekProgress {
+		display: flex;
+		align-items: center;
+		width: 328px;
+		height: $heightTopbar;
+		border-radius: $borderRadius;
+		background-color: $hudColor;
+
+		.icon {
+			margin-left: $marginLeftSmall;
+		}
+
+		.content {
+			margin-left: $marginLeftSmall;
+
+			.weekTitle {
+				font-size: 24px;
+				font-weight: $fontWeightMedium;
+				color: $textColor;
+			}
+
+			.weekProgressNumber {
+				display: flex;
+				justify-content: flex-end;
+				font-size: 24px;
+				font-weight: $fontWeightMedium;
+				color: var(--default-button-text);
+			}
+		}
+	}
+
+	.totalGain {
+		display: flex;
+		align-items: center;
+		width: 376px;
+		height: $heightTopbar;
+		border-radius: $borderRadius;
+		background-color: $hudColor;
+
+		.icon {
+			margin-left: $marginLeftSmall;
+		}
+
+		.content {
+			width: 272px;
+			margin-left: $marginLeftSmall;
+
+			.totalGainTitle,
+			.totalGainValue {
+				font-size: 32px;
+				font-weight: $fontWeightMedium;
+				color: var(--default-button-text);
+			}
+
+			.totalGainValue {
+				display: flex;
+				align-items: center;
+				justify-content: flex-end;
+				height: 38px;
+			}
+		}
+	}
+
+	.serverDropdown {
+		position: relative;
+		z-index: 900;
+		display: flex;
+		width: 256px;
+		height: $buttonHeight;
+		margin-top: $marginTopLarge;
+	}
+
+	.editCharacterButton {
+		width: 216px;
+		height: $buttonHeight;
+		border-radius: 50px;
+		background-color: var(--default-color-button);
+		font-size: 24px;
+		font-weight: 600;
+		color: var(--default-button-text);
+		margin-top: $marginTopLarge;
+	}
+}
+
+.notFoundList {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-top: 215px;
+
+	.errorIcon {
+		color: var(--icon-danger-color);
+	}
+
+	.title {
+		font-size: 32px;
+		color: $textColor;
+		margin-bottom: 24px;
+		margin-top: 36px;
+	}
+
+	.text {
+		font-size: 24px;
+		color: $textColor;
+	}
+}

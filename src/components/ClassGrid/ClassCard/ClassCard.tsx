@@ -3,16 +3,16 @@ import { clsx } from 'clsx';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { Textfit } from 'react-textfit';
 
+import { getJob } from '@/utils/character/getJob';
 import BossIcon from '@assets/svg/boss_slayer.svg';
 import LegionBlock from '@components/LegionBlock/LegionBlock';
 import LinkSkillBlock from '@components/LinkSkillBlock/LinkSkillBlock';
 import ProgressBar from '@components/ProgressBar/ProgressBar';
+import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import { getLinkSkillByName } from '@data/linkSkill/linkSkill';
 import { getLastLevel } from '@data/symbols/exp/expTable';
 import { getSymbolImagePath, canUseSymbol } from '@data/symbols/symbolMappings';
-import { getJob } from '@utils/jobs/getJob';
 
 import styles from './ClassCard.module.scss';
 
@@ -162,9 +162,14 @@ const ClassCard = ({ character }: ClassCardProps): JSX.Element => {
 					<div className={styles.bottomHalf}>
 						{bossing && <BossIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.bossIcon} />}
 						<div className={styles.characterNameJobDiv}>
-							<Textfit className={styles.characterName} max={24} min={12}>
+							<ResponsiveText
+								className={styles.characterName}
+								width={180}
+								height={36}
+								maxFontSize={28}
+								minFontSize={12}>
 								{name}
-							</Textfit>
+							</ResponsiveText>
 							<p className={styles.characterJob}>{job}</p>
 						</div>
 					</div>

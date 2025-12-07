@@ -1,0 +1,8 @@
+.classGrid {
+	display: grid;
+	align-items: start;
+	justify-content: space-between;
+	width: 1528px;
+	grid-template-columns: repeat(2, 720px);
+	margin-top: 32px;
+}

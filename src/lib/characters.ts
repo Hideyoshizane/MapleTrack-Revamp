@@ -1,6 +1,7 @@
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 import connectToDatabase from '@lib/mongooseConect';
 import { Character } from '@models/character';
+import { updateCharacterLevelFromBossList } from '@service/bossListService';
 import { createResponse } from '@utils/api/createResponse';
 import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
@@ -61,8 +62,13 @@ export const syncCharacterInfo = async (params: {
 		if (character.syncing) {
 			const externalData = await fetchCharacterExternal(character.name, server);
 
-			// Only update if external level is higher than current
-			character.level = Math.max(character.level, externalData.level);
+			// Only update when external level is higher
+			if (externalData.level > character.level) {
+				character.level = externalData.level;
+
+				// Change on the BossList
+				await updateCharacterLevelFromBossList(userOrigin, server, code, externalData.level);
+			}
 		}
 
 		// Reset quests

@@ -38,7 +38,7 @@ const userSchema = new Schema<IUser>(
 			type: String,
 			required: true,
 			minlength: 8,
-			maxlength: 72,
+			maxlength: 255,
 		},
 		version: {
 			type: Number,

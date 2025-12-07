@@ -1,0 +1,142 @@
+.menuOpener {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100px;
+	height: 40px;
+	border: none;
+	border-radius: 25px;
+	background-color: var(--event-color-button);
+	font-size: 32px;
+	color: var(--default-black);
+	cursor: pointer;
+	outline: none;
+
+	&:disabled {
+		cursor: not-allowed;
+	}
+}
+
+.arrow {
+	fill: var(--default-black);
+}
+
+.dropdownContent {
+	min-width: 130px;
+	padding: 8px;
+	border-radius: 6px;
+	background-color: var(--default-black);
+	color: var(--default-white);
+	will-change: opacity, transform;
+
+	&[data-state='open'] {
+		animation: fade-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	&[data-state='closed'] {
+		animation: fade-out 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+}
+
+@keyframes fade-in {
+	from {
+		transform: translateY(-10px);
+		opacity: 0;
+	}
+
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes fade-out {
+	from {
+		transform: translateY(0);
+		opacity: 1;
+	}
+
+	to {
+		transform: translateY(-10px);
+		opacity: 0;
+	}
+}
+
+.gridContainer {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.menuItem {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 6px 8px;
+	border-radius: 4px;
+	font-size: 14px;
+	text-align: center;
+	cursor: pointer;
+	margin-top: 4px;
+
+	&:hover {
+		background-color: #333;
+		outline: none;
+	}
+
+	.checkIcon {
+		position: absolute;
+		top: 50%;
+		right: 8px;
+		transform: translateY(-50%);
+		vertical-align: middle;
+	}
+}
+
+.menuText {
+	flex: 1;
+}
+
+.easy {
+	background-color: var(--boss-easy);
+	font-size: 18px;
+	font-weight: 500;
+	color: var(--default-white);
+}
+
+.normal {
+	background-color: var(--boss-normal);
+	font-size: 18px;
+	font-weight: 500;
+	color: var(--default-button-text);
+}
+
+.hard {
+	background-color: var(--boss-hard);
+	font-size: 18px;
+	font-weight: 500;
+	color: var(--default-button-text);
+}
+
+.chaos {
+	box-sizing: border-box;
+	border: solid 2px var(--boss-chaos-secondary);
+	background-color: var(--boss-chaos);
+	font-size: 18px;
+	font-weight: 500;
+	color: var(--boss-chaos-secondary);
+}
+
+.extreme {
+	box-sizing: border-box;
+	border: solid 2px var(--boss-extreme-secondary);
+	background-color: var(--boss-extreme);
+	font-size: 18px;
+	font-weight: 500;
+	color: var(--boss-extreme-secondary);
+}
+
+.banIcon {
+	color: var(--icon-danger-color);
+}

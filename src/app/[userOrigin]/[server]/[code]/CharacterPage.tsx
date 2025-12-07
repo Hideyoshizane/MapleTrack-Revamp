@@ -3,12 +3,12 @@
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
+import { getJob } from '@/utils/character/getJob';
 import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
 import { useCharacterData } from '@hooks/useCharacterData';
 import { useExtraCharacterData } from '@hooks/useExtraCharacterData';
-import { getJob } from '@utils/jobs/getJob';
 
 import CharacterHeader from './components/CharacterHeader/CharacterHeader';
 import CharacterStats from './components/CharacterStats/CharacterStats';

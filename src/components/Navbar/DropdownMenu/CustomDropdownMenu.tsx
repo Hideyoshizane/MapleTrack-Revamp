@@ -1,10 +1,12 @@
 'use client';
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { Fragment } from 'react';
-import { Textfit } from 'react-textfit';
 
-import MenuIcon from '@assets/svg/menu.svg';
+import { Fragment } from 'react';
+
+import MenuIcon from '@assets/svg/menu.svg?react';
+
+import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 
 import styles from './CustomDropdownMenu.module.scss';
 import DropdownMenuButton from './DropdownMenuButton/DropdownMenuButton';
@@ -24,9 +26,9 @@ const CustomDropdownMenu = ({ username }: CustomDropdownMenuProps): JSX.Element 
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
 				<button className={styles.menuOpener} aria-label={`Open menu for ${username}`}>
-					<Textfit className={styles.usernameText} mode="single" max={32} min={12} style={{ maxWidth: 200 }}>
+					<ResponsiveText className={styles.usernameText} width={200} height={40} maxFontSize={32} minFontSize={12}>
 						{username}
-					</Textfit>
+					</ResponsiveText>
 					<MenuIcon width={ICON_SIZE} height={ICON_SIZE} className={styles.icon} />
 				</button>
 			</DropdownMenu.Trigger>

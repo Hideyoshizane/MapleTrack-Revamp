@@ -1,5 +1,5 @@
 // Define an array of paths that should use the dark theme
-export const DARK_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password'] as const;
+export const DARK_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/testpage'] as const;
 export type Theme = 'light' | 'dark';
 
 export const themeFromPath = (pathname: string): Theme =>

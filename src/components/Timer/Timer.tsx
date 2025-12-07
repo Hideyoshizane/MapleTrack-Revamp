@@ -62,7 +62,7 @@ const Timer = ({ target }: TimerProps): JSX.Element => {
 	// Helper function to pad numbers with leading zeros
 	const pad = (num: number): string => num.toString().padStart(2, '0');
 
-	if (!timeLeft) return <SkeletonWrapper width={200} height={58} color="dark" />;
+	if (!timeLeft) return <SkeletonWrapper width={200} height={58} color="dark" variant="rounded" />;
 
 	const formatted =
 		target === 'weekly' && timeLeft.days !== undefined

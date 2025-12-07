@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-import bcrypt from 'bcrypt';
+import argon2 from 'argon2';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
@@ -53,7 +53,8 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		}
 
 		// Compare new password with current one
-		if (await bcrypt.compare(sanitizedPassword, user.password)) {
+		const isSamePassword = await argon2.verify(user.password, sanitizedPassword);
+		if (isSamePassword) {
 			return createResponse<ApiResponse>(
 				{ success: false, error: 'New password must be different from the current password' },
 				400
@@ -61,7 +62,11 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		}
 
 		// Update user password and remove reset token
-		user.password = await bcrypt.hash(sanitizedPassword, 10);
+		const hashedPassword = await argon2.hash(sanitizedPassword, {
+			type: argon2.argon2id,
+		});
+
+		user.password = hashedPassword;
 		user.resetPasswordToken = undefined;
 		user.resetPasswordExpires = undefined;
 		await user.save();

@@ -1,0 +1,63 @@
+$spacingSmall: 4px;
+$spacingMedium: 8px;
+
+.bossSlotBody {
+	display: flex;
+	width: 576px;
+	height: 80px;
+	border-radius: 25px;
+	background-color: var(--default-color-button);
+	transition: width 0.3s ease;
+	margin-top: 24px;
+
+	&.open {
+		width: 720px;
+	}
+
+	.bossSlotContent {
+		display: flex;
+		align-items: center;
+		margin-left: 16px;
+
+		.bossName {
+			display: flex;
+			align-items: center;
+			font-weight: 500;
+			margin-left: 8px;
+		}
+
+		.bossButtons {
+			display: flex;
+			width: 352px;
+			height: 40px;
+			margin-left: 8px;
+
+			&.smallGap {
+				justify-content: space-between;
+			}
+
+			&.largeGap {
+				gap: 8px;
+			}
+		}
+
+		.goldValue {
+			width: 136px;
+			height: 40px;
+			transition: opacity 0.2s ease;
+			margin-left: 8px;
+			opacity: 1;
+
+			.goldText {
+				display: flex;
+				align-items: center;
+				justify-content: flex-end;
+				width: 136px;
+				height: 40px;
+				font-size: 18px;
+				font-weight: 400;
+				color: var(--default-button-text);
+			}
+		}
+	}
+}

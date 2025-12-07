@@ -97,9 +97,10 @@ $font: 32px;
 				align-items: flex-end;
 
 				.characterName {
+					display: flex;
+					justify-content: flex-end;
 					width: 180px;
 					font-size: $font;
-					text-align: end;
 					color: var(--default-white);
 				}
 

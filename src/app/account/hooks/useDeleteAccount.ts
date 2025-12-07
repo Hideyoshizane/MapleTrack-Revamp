@@ -1,6 +1,6 @@
 import { signOut } from 'next-auth/react';
 import { useState, useCallback } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 import type { ApiResponse } from '@sharedTypes/api';
 

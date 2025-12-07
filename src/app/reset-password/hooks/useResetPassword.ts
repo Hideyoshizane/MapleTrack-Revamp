@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useForm, type Control, type UseFormHandleSubmit, type UseFormGetValues } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 import { fetchWithTimeout } from '@utils/fetch/withTimeout';
 import { sanitizeInputFrontend } from '@utils/sanitize/sanitizeInputFrontEnd';
@@ -44,7 +44,7 @@ export const useResetPassword = (rawToken: string): UseResetPasswordReturn => {
 	const token = sanitizeInputFrontend(rawToken);
 
 	// helper to avoid repeated toast calls
-	const showResetError = (msg?: string): string => toast.error(msg ?? 'Failed to reset the password');
+	const showResetError = (msg?: string) => toast.error(msg ?? 'Failed to reset the password');
 
 	const onSubmit = async (data: ResetPasswordFormData): Promise<void> => {
 		try {

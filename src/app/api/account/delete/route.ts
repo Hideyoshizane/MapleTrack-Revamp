@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { getToken } from 'next-auth/jwt';
 
 import connectToDatabase from '@lib/mongooseConect';
+import { BossList } from '@models/bossList';
 import { Character } from '@models/character';
 import User from '@models/user';
 import { deleteAccountRequestSchema } from '@schemas/authSchemas';
@@ -44,7 +45,8 @@ export const DELETE = async (request: NextRequest): Promise<NextResponse> => {
 			// Delete characters owned by user
 			await Character.deleteMany({ userOrigin: username }, { session });
 
-			// TODO: Delete BossList when model is added (inside same session)
+			// Delete bossList
+			await BossList.deleteOne({ userOrigin: username });
 
 			// Delete the user
 			await User.deleteOne({ _id: user._id }, { session });

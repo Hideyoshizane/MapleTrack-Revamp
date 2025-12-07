@@ -1,6 +1,7 @@
 import connectToDatabase from '@lib/mongooseConect';
 import { Character } from '@models/character';
 import { getUpdateCharacterDataRequestSchema } from '@schemas/characterUpdateSchema';
+import { addCharacterToBossList, removeCharacterFromBossList } from '@service/bossListService';
 import { createResponse } from '@utils/api/createResponse';
 import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
 import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
@@ -41,10 +42,17 @@ export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
 			// Create new character
 			character = new Character({ ...data, userOrigin: username, server, code });
 		} else {
+			if (character.bossing != data.bossing) {
+				// Character need to be removed from database;
+				await removeCharacterFromBossList(username, server, code);
+			}
+			// Update character
 			Object.assign(character, data);
 		}
 		// If character bossing is true add to BossList
-		// To be added
+		if (character.bossing) {
+			await addCharacterToBossList(username, server, character.name, code, data.class, character.level);
+		}
 
 		await character.save();
 		return createResponse<ApiResponse>({ success: true, message: 'Character updated successfully.' }, 200);

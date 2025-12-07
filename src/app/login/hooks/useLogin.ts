@@ -2,7 +2,7 @@
 
 import { signIn } from 'next-auth/react';
 import { useCallback, useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 import { sanitizeInputFrontend } from '@utils/sanitize/sanitizeInputFrontEnd';
 import { validateUsernameLogin, validatePasswordLogin, handleFieldValidation } from '@utils/validation';

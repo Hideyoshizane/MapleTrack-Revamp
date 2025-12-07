@@ -8,7 +8,7 @@ import { LASTVERSION } from './data/user/constants';
 import type { NextRequest } from 'next/server';
 
 // Middleware function to set 'theme' cookie and handle auth redirects
-export const middleware = async (req: NextRequest): Promise<ReturnType<typeof NextResponse.redirect>> => {
+export const proxy = async (req: NextRequest): Promise<ReturnType<typeof NextResponse.redirect>> => {
 	// Extract the current pathname from the request URL
 	const { pathname } = req.nextUrl;
 

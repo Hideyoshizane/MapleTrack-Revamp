@@ -1,4 +1,4 @@
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 import type { z, ZodObject, ZodType, ZodRawShape } from 'zod';
 

@@ -1,0 +1,195 @@
+$heightTopbar: 96px;
+$buttonHeight: 48px;
+$fontWeightMedium: 500;
+$textColor: var(--default-button-text);
+$hudColor: var(--boss-hud-color);
+$borderRadius: 20px;
+$marginSmall: 8px;
+$marginTopLarge: 48px;
+
+.topBar {
+	display: flex;
+	gap: 16px;
+	margin-top: 24px;
+
+	.bossHunt {
+		display: flex;
+		align-items: center;
+		width: 240px;
+
+		.bossIcon {
+			color: $textColor;
+		}
+
+		.bossTitle {
+			width: 152px;
+			font-size: 40px;
+			font-weight: $fontWeightMedium;
+			color: $textColor;
+		}
+	}
+
+	.weekProgress {
+		display: flex;
+		align-items: center;
+		width: 288px;
+		height: $heightTopbar;
+		border-radius: $borderRadius;
+		background-color: $hudColor;
+
+		.icon {
+			margin-left: $marginSmall;
+		}
+
+		.content {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-end;
+			margin-left: auto;
+			margin-right: 16px;
+
+			.bossOverview {
+				font-size: 28px;
+				font-weight: $fontWeightMedium;
+				color: $textColor;
+			}
+
+			.weekProgressNumber {
+				font-size: 28px;
+				font-weight: $fontWeightMedium;
+				color: var(--default-button-text);
+			}
+		}
+	}
+
+	.totalGain {
+		display: flex;
+		align-items: center;
+		width: 368px;
+		height: $heightTopbar;
+		border-radius: $borderRadius;
+		background-color: $hudColor;
+
+		.icon {
+			margin-left: $marginSmall;
+		}
+
+		.content {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-end;
+			width: 272px;
+			margin-left: auto;
+			margin-right: 16px;
+
+			.charactersIncome {
+				font-size: 24px;
+				font-weight: $fontWeightMedium;
+				color: var(--default-button-text);
+			}
+
+			.totalIncome {
+				display: flex;
+				align-items: center;
+				justify-content: flex-end;
+				font-size: 28px;
+				font-weight: $fontWeightMedium;
+				color: var(--default-button-text);
+			}
+		}
+	}
+
+	.discardChangesButton,
+	.saveChangesButton {
+		width: 284px;
+		height: $buttonHeight;
+		border-radius: 50px;
+		font-size: 24px;
+		font-weight: 600;
+		margin-top: $marginTopLarge;
+	}
+
+	.discardChangesButton {
+		background-color: var(--danger-color-button);
+		color: var(--default-white);
+	}
+
+	.saveChangesButton {
+		background-color: var(--primary-color-button);
+		color: var(--default-button-text);
+	}
+}
+
+.charPart {
+	display: flex;
+	justify-content: space-between;
+	width: 1528px;
+	margin-top: 48px;
+
+	.serverDropdown {
+		position: relative;
+		width: 480px;
+		height: 80px;
+	}
+
+	.characterInfo {
+		display: flex;
+		align-items: center;
+		width: 336px;
+		height: 80px;
+		border-radius: $borderRadius;
+		background-color: var(--default-color-button);
+
+		.icon {
+			margin-left: $marginSmall;
+			margin-right: $marginSmall;
+		}
+
+		.content {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-end;
+
+			width: 240px;
+
+			.goldTitle {
+				font-size: 28px;
+				font-weight: $fontWeightMedium;
+				color: var(--default-button-text);
+			}
+
+			.goldTotal {
+				display: flex;
+				align-items: center;
+				justify-content: flex-end;
+				font-size: 24px;
+				font-weight: $fontWeightMedium;
+				color: var(--default-button-text);
+			}
+
+			.weeklyBoss {
+				font-size: 24px;
+				font-weight: $fontWeightMedium;
+				color: var(--default-button-text);
+			}
+
+			.weeklyNumber {
+				font-size: 28px;
+				font-weight: $fontWeightMedium;
+				color: var(--default-button-text);
+			}
+
+			.monthlyBoss {
+				font-size: 24px;
+				font-weight: $fontWeightMedium;
+				color: var(--default-button-text);
+			}
+
+			.monthlyNumber {
+				font-size: 28px;
+				font-weight: $fontWeightMedium;
+				color: var(--default-button-text);
+			}
+		}
+	}
+}

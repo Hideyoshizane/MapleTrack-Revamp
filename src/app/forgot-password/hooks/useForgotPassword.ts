@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 import { fetchWithTimeout } from '@utils/fetch/withTimeout';
 import { sanitizeInputFrontend } from '@utils/sanitize/sanitizeInputFrontEnd';

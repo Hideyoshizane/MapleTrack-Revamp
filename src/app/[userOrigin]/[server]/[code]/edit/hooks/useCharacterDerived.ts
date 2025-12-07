@@ -1,6 +1,6 @@
 'use client';
 
-import { getJob } from '@utils/jobs/getJob';
+import { getJob } from '@/utils/character/getJob';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { Character } from '@sharedTypes/character';

@@ -5,25 +5,68 @@
 	--primary-color-button: #96e4a5;
 	--default-button-text: #121212;
 	--placeholder-color-text: #474747;
-	--server-color-button: #3c6997;
-	--filter-color-button: #adbfeb;
+	--server-color-button: #2b6aa8;
+	--filter-color-button: #aebfea;
 	--default-color-button: #d7d7d7;
 	--danger-color-button: #c33232;
-	--event-color-button: #73dce7;
+	--event-color-button: #7cd4dd;
 	--boss-hud-color: #91c9e3;
-	--icon-cta-color: #40a06a;
-	--icon-danger-color: #da2c38;
+	--icon-cta-color: #2eb267;
+	--icon-danger-color: #cc3a44;
 	--link-color: #64b5f6;
 	--link-color-hover: #40c4ff;
 	--disabled: #adadad;
-	--bar-default: #9ee493;
+	--bar-default: #9ee394;
 	--bar-mage: #91bbe3;
 	--bar-warrior: #e39294;
-	--bar-bowman: #9ee493;
+	--bar-bowman: #9ee394;
 	--bar-thief: #b992e3;
 	--bar-pirate: #e3c192;
-	--bar-complete: #48aa39;
+	--bar-complete: #40b42f;
+	--boss-easy: #6d6d6d;
+	--boss-normal: #49b3d0;
+	--boss-hard: #e392b0;
+	--boss-chaos: #121212;
+	--boss-chaos-secondary: #ce9040;
+	--boss-extreme: #121212;
+	--boss-extreme-secondary: #d14c69;
 }
+
+/* stylelint-disable selector-class-pattern */
+.Toastify__toast-container--top-right {
+	top: 136px;
+}
+
+.Toastify__toast {
+	border-radius: 6px;
+	background-color: var(--default-button-text);
+	font-family: Roboto, sans-serif;
+	font-size: 1rem;
+	font-weight: 500;
+	color: var(--default-white);
+}
+
+/* Success toast progress bar */
+.Toastify__toast--success .Toastify__progress-bar {
+	background: var(--icon-cta-color);
+}
+
+/* Success icon */
+.Toastify__toast--success .Toastify__toast-icon svg {
+	fill: var(--icon-cta-color);
+}
+
+/* Error toast progress bar */
+.Toastify__toast--error .Toastify__progress-bar {
+	background: var(--icon-danger-color);
+}
+
+/* Error icon */
+.Toastify__toast--error .Toastify__toast-icon svg {
+	fill: var(--icon-danger-color);
+}
+
+/* stylelint-enable selector-class-pattern */
 
 html,
 body {

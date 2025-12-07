@@ -33,7 +33,7 @@ export const userSchema = z
 			.string()
 			.nonempty({ message: 'Password is required.' })
 			.min(8, 'Password must be at least 8 characters.')
-			.max(72, 'Password must be at most 72 characters.')
+			.max(255, 'Password must be at most 255 characters.')
 			.refine((val: string): boolean => /[A-Z]/.test(val), {
 				message: 'Password must contain at least one uppercase letter.',
 			})

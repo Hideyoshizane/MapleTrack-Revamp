@@ -73,7 +73,7 @@ const ClassGrid = ({
 			JobClasses.map(
 				(job): JSX.Element => (
 					<div key={job.className} className={styles.skeletonWrapper}>
-						<SkeletonWrapper width={502} height={368} color="light" variant="rectangular" />
+						<SkeletonWrapper width={502} height={368} color="light" variant="rounded" />
 					</div>
 				)
 			),

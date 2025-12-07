@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import argon2 from 'argon2';
 
 import connectToDatabase from '@lib/mongooseConect';
 import User from '@models/user';
@@ -48,12 +48,13 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		if (!user) return createResponse<ApiResponse>({ success: false, error: 'Invalid username' }, 404);
 
 		// Check if current password matches
-		const isCurrentPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
+		const isCurrentPasswordCorrect = await argon2.verify(user.password, currentPassword);
 		if (!isCurrentPasswordCorrect)
 			return createResponse<ApiResponse>({ success: false, error: 'Current password is incorrect' }, 401);
 
 		// Compare new password with hashed current password
-		if (await bcrypt.compare(newPassword, user.password)) {
+		const isSamePassword = await argon2.verify(user.password, newPassword);
+		if (isSamePassword) {
 			createResponse<ApiResponse>(
 				{ success: false, error: 'New password must be different from the current password' },
 				400
@@ -61,7 +62,9 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		}
 
 		// Update user password
-		user.password = await bcrypt.hash(newPassword, 10);
+		user.password = await argon2.hash(newPassword, {
+			type: argon2.argon2id,
+		});
 		await user.save();
 
 		return createResponse<ApiResponse>({ success: true, message: 'Password changed.' }, 200);

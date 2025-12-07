@@ -1,0 +1,115 @@
+.menuOpener {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 284px;
+	height: 56px;
+	border: none;
+	border-radius: 15px;
+	background-color: var(--event-color-button);
+	font-size: 32px;
+	color: var(--default-black);
+	cursor: pointer;
+	outline: none;
+
+	.icon {
+		color: var(--default-black);
+		margin-left: 8px;
+	}
+}
+
+.arrow {
+	fill: var(--default-black);
+}
+
+.dropdownContent {
+	min-width: 284px;
+	padding: 8px;
+	border-radius: 6px;
+	background-color: var(--default-black);
+	color: var(--default-white);
+	will-change: opacity, transform;
+
+	&[data-state='open'] {
+		animation: fade-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	&[data-state='closed'] {
+		animation: fade-out 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+}
+
+@keyframes fade-in {
+	from {
+		transform: translateY(-10px);
+		opacity: 0;
+	}
+
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes fade-out {
+	from {
+		transform: translateY(0);
+		opacity: 1;
+	}
+
+	to {
+		transform: translateY(-10px);
+		opacity: 0;
+	}
+}
+
+.gridContainer {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 8px;
+	font-weight: bold;
+	text-align: center;
+	border-bottom: 1px solid var(--default-white);
+}
+
+.leftColumn {
+	box-sizing: border-box;
+	padding-right: 4px;
+}
+
+.menuItem {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 6px 8px;
+	border-radius: 4px;
+	font-size: 14px;
+	text-align: center;
+	cursor: pointer;
+	margin-top: 4px;
+
+	&:hover {
+		background-color: #333;
+		outline: none;
+	}
+
+	.menuText {
+		flex: 1;
+	}
+
+	.checkIcon {
+		position: absolute;
+		top: 50%;
+		right: 8px;
+		transform: translateY(-50%);
+		vertical-align: middle;
+	}
+}

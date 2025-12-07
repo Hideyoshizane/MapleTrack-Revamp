@@ -1,8 +1,8 @@
 'use client';
 
 import * as RadixTooltip from '@radix-ui/react-tooltip';
-import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react';
+import Cookies from 'universal-cookie';
 
 import styles from './Tooltip.module.scss';
 
@@ -20,7 +20,9 @@ const Tooltip = ({ content, children, placement = 'top', enabled = true }: Custo
 
 	// Read theme cookie
 	useEffect((): void => {
-		const themeCookie = Cookies.get('theme');
+		const cookies = new Cookies();
+
+		const themeCookie = cookies.get('theme') as unknown;
 		if (themeCookie === 'dark' || themeCookie === 'light') {
 			setTheme(themeCookie);
 		}
