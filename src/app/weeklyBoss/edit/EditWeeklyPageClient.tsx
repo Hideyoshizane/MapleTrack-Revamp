@@ -10,14 +10,18 @@ import WeeklyBossDropdown from '@/components/WeeklyBossDropdown/WeeklyBossDropdo
 import { useBossListStore } from '@/store/bossListStore';
 import BossIcon from '@assets/svg/boss_slayer.svg';
 import Button from '@components/Button/Button';
+import {
+	WEEKLY_BOSSES_TOTAL,
+	WEEKLY_BOSSES_PER_CHARACTER,
+	MONTHLY_BOSSES_PER_CHARACTER,
+} from '@constants/bossConstants';
 import { useServerCookie } from '@hooks/useServerCookie';
-import { WEEKLY_BOSSES_TOTAL, WEEKLY_BOSSES_PER_CHARACTER, MONTHLY_BOSSES_PER_CHARACTER } from '@utils/boss/constants';
-import { fetchWithTimeout } from '@utils/fetch/withTimeout';
+import { fetchWithTimeout } from '@utils/withTimeout';
 
 import BossGrid from './components/BossGrid/BossGrid';
 import styles from './page.module.scss';
 
-import type { BossServer, BossCharacter } from '@/models/bossList';
+import type { BossServer, BossCharacter } from '@features/Boss/bossListModel';
 import type { GetBossListRequestBody, GetBossListApiResponse } from '@sharedTypes/bossList';
 import type { JSX } from 'react';
 
@@ -34,9 +38,9 @@ const fetchBossList = async (
 	return res.json() as Promise<GetBossListApiResponse>;
 };
 
-interface EditWeeklyPageClientProps {
+type EditWeeklyPageClientProps = {
 	username: string;
-}
+};
 
 const EditWeeklyPageClient = ({ username }: EditWeeklyPageClientProps): JSX.Element => {
 	const pathname = usePathname();
@@ -59,10 +63,14 @@ const EditWeeklyPageClient = ({ username }: EditWeeklyPageClientProps): JSX.Elem
 	const BOSS_ICON_SIZE = 96;
 
 	const loadBossList = useCallback(async (): Promise<void> => {
-		if (!serverCookie || !username) return;
+		if (!serverCookie || !username) {
+			return;
+		}
 
 		// Cancel any previous request
-		if (abortController.current) abortController.current.abort();
+		if (abortController.current) {
+			abortController.current.abort();
+		}
 		const controller = new AbortController();
 		abortController.current = controller;
 
@@ -87,7 +95,9 @@ const EditWeeklyPageClient = ({ username }: EditWeeklyPageClientProps): JSX.Elem
 	useEffect((): (() => void) => {
 		void loadBossList();
 		return (): void => {
-			if (abortController.current) abortController.current.abort();
+			if (abortController.current) {
+				abortController.current.abort();
+			}
 		};
 	}, [loadBossList]);
 

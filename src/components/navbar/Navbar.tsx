@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import Timer from '@components/Timer/Timer';
-import { APP_VERSION } from '@lib/version';
+import { APP_VERSION } from '@lib/config/version';
 
 import CustomDropdownMenu from './DropdownMenu/CustomDropdownMenu';
 import styles from './Navbar.module.scss';
@@ -10,9 +10,9 @@ import SearchBar from './SearchBar/SearchBar';
 
 import type { JSX } from 'react';
 
-interface NavbarProps {
+type NavbarProps = {
 	username: string;
-}
+};
 
 const Navbar = ({ username }: NavbarProps): JSX.Element => {
 	return (

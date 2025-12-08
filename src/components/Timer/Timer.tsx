@@ -1,12 +1,13 @@
 'use client';
 
+import NumberFlow, { NumberFlowGroup } from '@number-flow/react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import utc from 'dayjs/plugin/utc';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
-import { nowUtc, getNextResetTime, toUtc, WEEKDAYS } from '@utils/time/time';
+import { nowUtc, getNextResetTime, toUtc, WEEKDAYS } from '@utils/time';
 
 import styles from './Timer.module.scss';
 
@@ -16,7 +17,6 @@ import type { JSX } from 'react';
 dayjs.extend(utc);
 dayjs.extend(duration);
 
-// Type definition for the time left
 type TimeLeft = {
 	days?: number;
 	hours: number;
@@ -24,56 +24,72 @@ type TimeLeft = {
 	seconds: number;
 };
 
-interface TimerProps {
-	target: 'daily' | 'weekly'; // Determines which type of reset. Daily = UTC 12AM. Weekly = Thursday UTC 12AM
-}
+// Determines which type of reset. Daily = UTC 12AM. Weekly = Thursday UTC 12AM
+type TimerProps = {
+	target: 'daily' | 'weekly';
+};
 
-const Timer = ({ target }: TimerProps): JSX.Element => {
+export default function Timer({ target }: TimerProps): JSX.Element {
+	const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
+
 	// Calculate time left until next reset
-	const calculateTimeLeft = useCallback((): TimeLeft => {
+	const computeTimeLeft = (resetType: 'daily' | 'weekly'): TimeLeft => {
 		const now = nowUtc();
 
 		const targetTime =
-			target === 'daily' ? toUtc(now).add(1, 'day').startOf('day') : getNextResetTime(now, WEEKDAYS.THURSDAY);
+			resetType === 'daily' ? toUtc(now).add(1, 'day').startOf('day') : getNextResetTime(now, WEEKDAYS.THURSDAY);
 
-		// Construct the time left object
 		const diff = dayjs.duration(targetTime.diff(now));
 
 		return {
-			days: target === 'weekly' ? Math.floor(diff.asDays()) : undefined,
+			days: resetType === 'weekly' ? Math.floor(diff.asDays()) : undefined,
 			hours: diff.hours(),
 			minutes: diff.minutes(),
 			seconds: diff.seconds(),
 		};
-	}, [target]);
+	};
 
-	const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
+	useEffect(() => {
+		queueMicrotask(() => {
+			setTimeLeft(computeTimeLeft(target));
+		});
 
-	// Update countdown every second
-	useEffect((): (() => void) => {
-		const interval: ReturnType<typeof setInterval> = setInterval((): void => {
-			setTimeLeft(calculateTimeLeft());
+		const interval = setInterval(() => {
+			try {
+				setTimeLeft(computeTimeLeft(target));
+			} catch (err) {
+				console.error('Timer update error:', err);
+			}
 		}, 1000);
 
-		const cleanup = (): void => clearInterval(interval);
-		return cleanup;
-	}, [calculateTimeLeft]);
+		return (): void => clearInterval(interval);
+	}, [target]);
 
-	// Helper function to pad numbers with leading zeros
-	const pad = (num: number): string => num.toString().padStart(2, '0');
+	if (!timeLeft) {
+		return <SkeletonWrapper width={200} height={58} color="dark" variant="rounded" />;
+	}
 
-	if (!timeLeft) return <SkeletonWrapper width={200} height={58} color="dark" variant="rounded" />;
-
-	const formatted =
-		target === 'weekly' && timeLeft.days !== undefined
-			? `${pad(timeLeft.days)}:${pad(timeLeft.hours)}:${pad(timeLeft.minutes)}:${pad(timeLeft.seconds)}`
-			: `${pad(timeLeft.hours)}:${pad(timeLeft.minutes)}:${pad(timeLeft.seconds)}`;
+	const { days, hours, minutes, seconds } = timeLeft;
 
 	return (
 		<div>
-			<h2 className={styles.timer}>{target === 'daily' ? 'Until Daily Reset' : 'Until Weekly Reset'}</h2>
-			<h2 className={styles.timer}>{formatted}</h2>
+			<h2 className={styles.timerText}>{target === 'daily' ? 'Until Daily Reset' : 'Until Weekly Reset'}</h2>
+
+			<div className={styles.timerText}>
+				<NumberFlowGroup>
+					{days !== undefined && (
+						<>
+							<NumberFlow value={days} trend={-1} format={{ minimumIntegerDigits: 2 }} />
+							<span>:</span>
+						</>
+					)}
+					<NumberFlow value={hours} trend={-1} format={{ minimumIntegerDigits: 2 }} />
+					<span>:</span>
+					<NumberFlow value={minutes} trend={-1} format={{ minimumIntegerDigits: 2 }} />
+					<span>:</span>
+					<NumberFlow value={seconds} trend={-1} format={{ minimumIntegerDigits: 2 }} />
+				</NumberFlowGroup>
+			</div>
 		</div>
 	);
-};
-export default Timer;
+}

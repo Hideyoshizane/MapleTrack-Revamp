@@ -4,42 +4,37 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 import { JobClasses } from '@data/classes/classes';
-import { generateCharacterObject } from '@service/characterService';
-import { fetchWithTimeout } from '@utils/fetch/withTimeout';
+import { generateCharacterObject, characterApi } from '@features/character/characterService';
 
 import ClassCard from './ClassCard/ClassCard';
 import styles from './ClassGrid.module.scss';
 
-import type { CharacterDocument } from '@models/character';
-import type { GetAllCharactersApiResponse, GetAllCharactersRequestBody } from '@sharedTypes/character';
-import type { ClassFilterOption } from '@utils/cookies/classFilterCookie';
+import type { CharacterDocument } from '@features/character/characterModel';
+import type { GetAllCharactersRequestBody } from '@sharedTypes/character';
+import type { ClassFilterOption } from '@utils/classFilterCookie';
 import type { JSX } from 'react';
 
 const CLASS_ORDER = ['mage', 'warrior', 'thief', 'bowman', 'pirate'];
 
-interface ClassGridProps {
+type ClassGridProps = {
 	username: string;
 	serverCookie: string | undefined;
 	selectedClasses: ClassFilterOption[];
 	selectedClassesLoading: boolean;
-}
-
-const fetchCharactersApi = async (payload: GetAllCharactersRequestBody): Promise<GetAllCharactersApiResponse> => {
-	const res: Response = await fetchWithTimeout('/api/characters/getAllCharacters', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(payload),
-	});
-
-	return (await res.json()) as GetAllCharactersApiResponse;
 };
 
 const filterCharacters = (results: CharacterDocument[], selectedClasses: ClassFilterOption[]): CharacterDocument[] => {
 	return results.filter((char): boolean => {
-		if (!selectedClasses.length) return true;
-		if (char.bossing && selectedClasses.includes('bossing')) return true;
-		if (char.jobType === 'xenon' && (selectedClasses.includes('pirate') || selectedClasses.includes('thief')))
+		if (!selectedClasses.length) {
 			return true;
+		}
+		if (char.bossing && selectedClasses.includes('bossing')) {
+			return true;
+		}
+		if (char.jobType === 'xenon' && (selectedClasses.includes('pirate') || selectedClasses.includes('thief'))) {
+			return true;
+		}
+
 		return selectedClasses.includes(char.jobType as ClassFilterOption);
 	});
 };
@@ -52,7 +47,9 @@ const sortCharacters = (characters: CharacterDocument[]): CharacterDocument[] =>
 		const aIndex = CLASS_ORDER.indexOf(aType);
 		const bIndex = CLASS_ORDER.indexOf(bType);
 
-		if (aIndex !== bIndex) return aIndex - bIndex;
+		if (aIndex !== bIndex) {
+			return aIndex - bIndex;
+		}
 		return (a.class ?? '').localeCompare(b.class ?? '');
 	});
 };
@@ -87,13 +84,19 @@ const ClassGrid = ({
 			setError(null);
 
 			// Redirect to error page
-			if (!serverCookie) redirect('/error');
+			if (!serverCookie) {
+				redirect('/error');
+			}
 
-			const data = await fetchCharactersApi({ username, server: serverCookie });
+			const payload: GetAllCharactersRequestBody = { username: username, server: serverCookie };
 
-			if (!data.success) throw new Error(data.error ?? 'Failed to fetch characters');
+			const response = await characterApi.getAllCharacters(payload);
 
-			const fetchedCharacters: CharacterDocument[] = Array.isArray(data.data) ? data.data : [];
+			if (!response.success) {
+				throw new Error(response.message ?? 'Failed to fetch characters');
+			}
+
+			const fetchedCharacters: CharacterDocument[] = Array.isArray(response.data) ? response.data : [];
 
 			// Build all characters
 			const results: CharacterDocument[] = JobClasses.map((job): CharacterDocument => {
@@ -122,7 +125,9 @@ const ClassGrid = ({
 
 	// Trigger fetch on dependency changes
 	useEffect((): void => {
-		if (!username || !serverCookie) return;
+		if (!username || !serverCookie) {
+			return;
+		}
 		void fetchCharacters();
 	}, [fetchCharacters, username, serverCookie]);
 

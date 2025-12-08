@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-import { classFilterCookie, type ClassFilterOption } from '@utils/cookies/classFilterCookie';
+import { classFilterCookie, type ClassFilterOption } from '@utils/classFilterCookie';
 
 export const useClassFilterCookie = (): {
 	selectedClasses: ClassFilterOption[];
@@ -14,8 +14,10 @@ export const useClassFilterCookie = (): {
 	const [loading, setLoading] = useState(true);
 
 	useEffect((): void => {
-		setSelectedClasses(classFilterCookie.get() ?? []);
-		setLoading(false);
+		queueMicrotask(() => {
+			setSelectedClasses(classFilterCookie.get() ?? []);
+			setLoading(false);
+		});
 	}, []);
 
 	// Update both state and cookie

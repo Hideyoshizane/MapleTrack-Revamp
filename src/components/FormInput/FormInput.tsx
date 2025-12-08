@@ -7,10 +7,10 @@ import { Controller, type Control, type Path, type FieldValues } from 'react-hoo
 import styles from './FormInput.module.scss';
 import ValidationIcon from './ValidationIcon/ValidationIcon';
 
-import type { ValidationResult } from '@utils/validation';
+import type { ValidationResult } from '@utils/validateField';
 import type { HTMLInputTypeAttribute, JSX } from 'react';
 
-interface FormInputProps<TFieldValues extends FieldValues> {
+type FormInputProps<TFieldValues extends FieldValues> = {
 	id: Path<TFieldValues>;
 	label: string;
 	type: HTMLInputTypeAttribute;
@@ -18,7 +18,7 @@ interface FormInputProps<TFieldValues extends FieldValues> {
 	validation?: (value: string) => ValidationResult;
 	isLogin?: boolean;
 	isLightmode?: boolean;
-}
+};
 
 const FormInput = <TFieldValues extends FieldValues>({
 	id,

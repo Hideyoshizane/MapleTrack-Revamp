@@ -4,27 +4,28 @@ import { useRouter } from 'next/navigation';
 import { useForm, type Control, type UseFormHandleSubmit, type UseFormGetValues } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import { fetchWithTimeout } from '@utils/fetch/withTimeout';
-import { sanitizeInputFrontend } from '@utils/sanitize/sanitizeInputFrontEnd';
-import { validatePassword, validatePasswordConfirmation, handleFieldValidation } from '@utils/validation';
+import { handleFieldValidation } from '@/utils/validateField';
+import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
+import { validatePassword, validatePasswordConfirmation } from '@utils/validators';
+import { fetchWithTimeout } from '@utils/withTimeout';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { ResetPasswordFormData } from '@sharedTypes/form';
-import type { ValidationResult } from '@utils/validation';
+import type { ValidationResult } from '@utils/validateField';
 
-interface ResetPasswordPayload {
+type ResetPasswordPayload = {
 	password: string;
 	token: string;
-}
+};
 
-interface UseResetPasswordReturn {
+type UseResetPasswordReturn = {
 	control: Control<ResetPasswordFormData>;
 	handleSubmit: UseFormHandleSubmit<ResetPasswordFormData>;
 	isSubmitting: boolean;
 	isSubmitted: boolean;
 	getValues: UseFormGetValues<ResetPasswordFormData>;
 	onSubmit: (data: ResetPasswordFormData) => Promise<void>;
-}
+};
 
 export const useResetPassword = (rawToken: string): UseResetPasswordReturn => {
 	const router = useRouter();
@@ -85,9 +86,9 @@ export const useResetPassword = (rawToken: string): UseResetPasswordReturn => {
 			if (response.ok && result.success) {
 				router.push('/login?reset=1');
 			} else if (!result.success) {
-				showResetError(result.error);
-				if (result.details) {
-					for (const [field, msg] of Object.entries(result.details)) {
+				showResetError(result.message);
+				if (result.message) {
+					for (const [field, msg] of Object.entries(result.message)) {
 						setError(field as keyof ResetPasswordFormData, {
 							message: msg ?? 'Invalid input',
 						});

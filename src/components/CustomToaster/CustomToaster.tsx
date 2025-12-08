@@ -1,8 +1,9 @@
 'use client';
 
-import { ToastContainer, Bounce, ToastContainerProps } from 'react-toastify';
+import { ToastContainer, Bounce } from 'react-toastify';
 
 import type { JSX } from 'react';
+import type { ToastContainerProps } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 

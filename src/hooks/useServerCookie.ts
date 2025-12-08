@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { serverCookie, SERVER_OPTIONS, type ServerOption } from '@utils/cookies/serverCookie';
+import { serverCookie, SERVER_OPTIONS, type ServerOption } from '@utils/serverCookie';
 
 export const useServerCookie = (): { server: ServerOption; setServerCookie: (name: ServerOption) => void } => {
 	// State typed to exact allowed server names
@@ -14,7 +14,10 @@ export const useServerCookie = (): { server: ServerOption; setServerCookie: (nam
 		// Validate cookie: fallback to 'Scania' if missing or invalid
 		const validServer: ServerOption = SERVER_OPTIONS.includes(first ?? '') ? (first as ServerOption) : 'Scania';
 
-		setServer(validServer);
+		queueMicrotask(() => {
+			setServer(validServer);
+		});
+
 		serverCookie.set([validServer]);
 	}, []);
 

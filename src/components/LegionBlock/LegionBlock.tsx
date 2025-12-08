@@ -4,20 +4,21 @@ import Image from 'next/image';
 
 import Tooltip from '@components/Tooltip/Tooltip';
 import { getLegionData } from '@data/legion/legionSystems';
-import { getRank } from '@utils/legion/getRank';
+import { getRank } from '@utils/getRank';
 
 import styles from './LegionBlock.module.scss';
 
+import type { ThresholdSetCode } from '@utils/getRank';
 import type { JSX } from 'react';
 
-interface LegionBlockProps {
+type LegionBlockProps = {
 	characterLevel: number;
-	characterCode: string;
+	characterCode: ThresholdSetCode;
 	characterJobType: string;
 	characterLegionType: string;
 	iconSize?: number;
 	showTooltip?: boolean;
-}
+};
 
 const RANK_MAP: Record<string, string> = {
 	rank_b: 'B',
@@ -30,7 +31,9 @@ const RANK_MAP: Record<string, string> = {
 const normalizeRank = (rank: string): string => RANK_MAP[rank] ?? 'no_rank';
 
 const getTooltipContent = (legionRank: string, legionData: ReturnType<typeof getLegionData>): JSX.Element => {
-	if (!legionData?.ranking) return <p>No bonus available</p>;
+	if (!legionData?.ranking) {
+		return <p>No bonus available</p>;
+	}
 
 	const normalizedRank = normalizeRank(legionRank);
 

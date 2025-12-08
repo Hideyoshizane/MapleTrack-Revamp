@@ -1,12 +1,12 @@
+import { addCharacterToBossList, removeCharacterFromBossList } from '@features/Boss/bossListService';
+import { Character } from '@features/character/characterModel';
+import { getUpdateCharacterDataRequestSchema } from '@features/character/characterUpdateSchema';
 import connectToDatabase from '@lib/mongooseConect';
-import { Character } from '@models/character';
-import { getUpdateCharacterDataRequestSchema } from '@schemas/characterUpdateSchema';
-import { addCharacterToBossList, removeCharacterFromBossList } from '@service/bossListService';
-import { createResponse } from '@utils/api/createResponse';
-import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
-import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
+import { createResponse } from '@utils/createResponse';
+import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
+import { SERVER_OPTIONS } from '@utils/serverCookie';
 
-import type { CharacterDocument } from '@models/character';
+import type { CharacterDocument } from '@features/character/characterModel';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
@@ -16,24 +16,24 @@ export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
 
 		// Validate request body using Zod
 		const body = await request.json();
-		if (!body?.data) return createResponse<ApiResponse>({ success: false, error: 'Missing request data' }, 400);
+		if (!body?.data) return createResponse<ApiResponse>({ success: false, message: 'Missing request data' }, 400);
 		delete body.data._id;
 
 		const parseResult = getUpdateCharacterDataRequestSchema.safeParse(body);
 		if (!parseResult.success)
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 
 		const { userOrigin: rawUser, server: rawServer, code: rawCode, data } = parseResult.data;
 
 		// Sanitize inputs
 		const [username, server, code, characterName] = [rawUser, rawServer, rawCode, data.name].map(sanitizeInputBackEnd);
 		if (!username || !server || !code || !characterName) {
-			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Missing required fields' }, 400);
 		}
 
 		// Validate allowed server
 		if (!SERVER_OPTIONS.includes(server)) {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid server' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid server' }, 400);
 		}
 
 		// Fetch existing character
@@ -58,6 +58,6 @@ export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
 		return createResponse<ApiResponse>({ success: true, message: 'Character updated successfully.' }, 200);
 	} catch (error) {
 		console.error('Search error:', error);
-		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
+		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

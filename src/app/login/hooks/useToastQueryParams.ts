@@ -2,12 +2,12 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-interface ToastMessages {
+type ToastMessages = {
 	[key: string]: {
 		message: string;
 		type: 'success' | 'error';
 	};
-}
+};
 
 const TOAST_MESSAGES: ToastMessages = {
 	success: { message: 'Account created! Please log in.', type: 'success' },
@@ -32,7 +32,10 @@ export const useToastQueryParams = (): void => {
 				} else {
 					toast.error(message);
 				}
-				setHasShownToast(true);
+
+				queueMicrotask(() => {
+					setHasShownToast(true);
+				});
 				router.replace('/login');
 				break;
 			}

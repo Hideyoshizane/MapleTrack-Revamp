@@ -1,17 +1,17 @@
 import linkSkillsData from './linkSkill.json';
 
 // Define interface for each level of a link skill
-interface LinkSkillLevel {
+type LinkSkillLevel = {
 	level: number;
 	description: string;
-}
+};
 
 // Define interface for a link skill
-interface LinkSkill {
+type LinkSkill = {
 	name: string;
 	image: string;
 	levels: LinkSkillLevel[];
-}
+};
 
 // Typed JSON import
 const linkSkills: LinkSkill[] = linkSkillsData as LinkSkill[];
@@ -22,7 +22,9 @@ export const getLinkSkillByName = (name: string): LinkSkill | undefined =>
 
 // Get link skill description for a character level
 export const getLinkSkillDescription = (linkSkill: LinkSkill, characterLevel: number): string => {
-	if (!linkSkill?.levels?.length) return '';
+	if (!linkSkill?.levels?.length) {
+		return '';
+	}
 
 	// Determine skill level based on character level
 	const skillLevel = characterLevel >= 210 ? 3 : characterLevel >= 120 ? 2 : 1;

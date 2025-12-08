@@ -10,21 +10,23 @@ import styles from './LinkSkillBlock.module.scss';
 
 import type { JSX } from 'react';
 
-interface LinkSkillProps {
+type LinkSkillProps = {
 	characterLevel: number;
 	characterLinkSkill: string;
 	iconSize?: number;
 	showTooltip?: boolean;
-}
+};
 
 const LinkSkillBlock = ({
 	characterLevel,
 	characterLinkSkill,
 	iconSize = 48,
 	showTooltip = false,
-}: LinkSkillProps): JSX.Element => {
+}: LinkSkillProps): JSX.Element | null => {
 	const linkSkill = getLinkSkillByName(characterLinkSkill);
-	if (!linkSkill) return <></>;
+	if (!linkSkill) {
+		return null;
+	}
 
 	const tooltipContent = getLinkSkillDescription(linkSkill, characterLevel);
 

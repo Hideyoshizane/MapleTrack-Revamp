@@ -1,11 +1,9 @@
 'use client';
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-
 import { Fragment } from 'react';
 
-import MenuIcon from '@assets/svg/menu.svg?react';
-
+import MenuIcon from '@assets/svg/menu.svg';
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 
 import styles from './CustomDropdownMenu.module.scss';
@@ -14,9 +12,9 @@ import LogoutButton from './DropdownMenuButton/LogoutButton';
 
 import type { JSX } from 'react';
 
-interface CustomDropdownMenuProps {
+type CustomDropdownMenuProps = {
 	username: string;
-}
+};
 const MENU_ITEMS = [{ text: 'Classes' }, { text: 'Weekly' }, { text: 'Liberation' }, { text: 'Account' }] as const;
 
 const ICON_SIZE = 48;

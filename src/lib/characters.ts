@@ -1,15 +1,15 @@
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
+import { updateCharacterLevelFromBossList } from '@features/Boss/bossListService';
+import { Character } from '@features/character/characterModel';
 import connectToDatabase from '@lib/mongooseConect';
-import { Character } from '@models/character';
-import { updateCharacterLevelFromBossList } from '@service/bossListService';
-import { createResponse } from '@utils/api/createResponse';
-import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
-import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
-import { hasWeeklyQuestResetOccurred, hasDailyResetOccurred } from '@utils/time/time';
+import { createResponse } from '@utils/createResponse';
+import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
+import { SERVER_OPTIONS } from '@utils/serverCookie';
+import { hasWeeklyResetOccurred, hasDailyResetOccurred } from '@utils/time';
 
 import { fetchCharacterExternal } from './fetchCharacterExternal';
 
-import type { CharacterDocument, CharacterSymbol } from '@models/character';
+import type { CharacterDocument, CharacterSymbol } from '@features/character/characterModel';
 import type { NextResponse } from 'next/server';
 
 const sanitizeString = (input: unknown): string | null => {
@@ -56,7 +56,9 @@ export const syncCharacterInfo = async (params: {
 
 		// Search for the character
 		const character = await Character.findOne({ userOrigin, server, code });
-		if (!character) return createResponse({ success: false, error: 'Character not found' }, 404);
+		if (!character) {
+			return createResponse({ success: false, error: 'Character not found' }, 404);
+		}
 
 		// Check if sync on, then sync with Maplestory API
 		if (character.syncing) {
@@ -121,7 +123,7 @@ const resetWeeklyQuests = (character: CharacterDocument): void => {
 				symbol.content.forEach((quest): void => {
 					// Only process quests that have 'tries'
 					if (quest.tries !== undefined) {
-						if (!quest.date || hasWeeklyQuestResetOccurred(quest.date)) {
+						if (!quest.date || hasWeeklyResetOccurred(quest.date)) {
 							quest.tries = DEFAULT_WEEKLY_TRIES ?? quest.tries;
 							quest.cleared = false;
 						}

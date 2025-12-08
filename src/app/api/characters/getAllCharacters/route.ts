@@ -1,9 +1,9 @@
+import { Character } from '@features/character/characterModel';
+import { getAllCharactersRequestSchema } from '@features/character/characterRequestSchema';
 import connectToDatabase from '@lib/mongooseConect';
-import { Character } from '@models/character';
-import { getAllCharactersRequestSchema } from '@schemas/characterRequestSchema';
-import { createResponse } from '@utils/api/createResponse';
-import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
-import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
+import { createResponse } from '@utils/createResponse';
+import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
+import { SERVER_OPTIONS } from '@utils/serverCookie';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
@@ -15,18 +15,18 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		// Validate request body using Zod
 		const parseResult = getAllCharactersRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
 		// Sanitize inputs
 		const [username, server] = [parseResult.data.username, parseResult.data.server].map(sanitizeInputBackEnd);
 		if (!username || !server) {
-			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Missing required fields' }, 400);
 		}
 
 		// Validate allowed server
 		if (!SERVER_OPTIONS.includes(server)) {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid server' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid server' }, 400);
 		}
 
 		// Query characters by userOrigin and server
@@ -42,6 +42,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		);
 	} catch (error) {
 		console.error('Search error:', error);
-		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
+		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

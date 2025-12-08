@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import type { BossCharacter, BossServer, Boss } from '@/models/bossList';
+import type { BossCharacter, BossServer, Boss } from '@features/Boss/bossListModel';
 
 export type BossListState = {
 	name: string | null;
@@ -74,7 +74,9 @@ export const useBossListStore = create<BossListState>(
 
 		addOrReplaceBoss: (boss: Boss): void => {
 			const state = get();
-			if (!state.selectedCharacter) return;
+			if (!state.selectedCharacter) {
+				return;
+			}
 
 			const char: BossCharacter = state.selectedCharacter;
 
@@ -99,7 +101,9 @@ export const useBossListStore = create<BossListState>(
 					return b;
 				});
 
-				if (!replaced) updatedBosses.push(boss);
+				if (!replaced) {
+					updatedBosses.push(boss);
+				}
 			}
 
 			const updatedCharacters: BossCharacter[] = state.characters.map(
@@ -119,7 +123,9 @@ export const useBossListStore = create<BossListState>(
 
 		removeBossFromSelected: (name: string, reset: Boss['reset']): void => {
 			const state = get();
-			if (!state.selectedCharacter) return;
+			if (!state.selectedCharacter) {
+				return;
+			}
 
 			const char: BossCharacter = state.selectedCharacter;
 

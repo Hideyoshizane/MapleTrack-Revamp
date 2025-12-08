@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { getJob } from '@/utils/character/getJob';
+import { getJob } from '@/utils/getJob';
 import BossIcon from '@assets/svg/boss_slayer.svg';
 import LegionBlock from '@components/LegionBlock/LegionBlock';
 import LinkSkillBlock from '@components/LinkSkillBlock/LinkSkillBlock';
@@ -18,20 +18,20 @@ import styles from './ClassCard.module.scss';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { SymbolName } from '@data/symbols/symbolMappings';
-import type { CharacterDocument } from '@models/character';
+import type { CharacterDocument } from '@features/character/characterModel';
 import type { JSX } from 'react';
 
-interface ClassCardProps {
+type ClassCardProps = {
 	character: CharacterDocument;
-}
+};
 
-interface SymbolProps {
+type SymbolProps = {
 	type: 'arcane' | 'sacred';
 	symbols: { name: string; level: number }[];
 	maxLevel: number;
 	size?: number;
 	characterLevel: number;
-}
+};
 
 // Map JobType to class for conditional styles
 const jobLevelClassMap: Record<JobType, string> = {
@@ -82,7 +82,7 @@ const IconSection = ({
 		<LinkSkillBlock characterLevel={character.level} characterLinkSkill={character.linkSkill} iconSize={iconSize} />
 		<LegionBlock
 			characterLevel={character.level}
-			characterCode={character.code}
+			characterCode={character.code === 'zero' ? 'zero' : 'default'}
 			characterJobType={character.jobType}
 			characterLegionType={character.legion}
 			iconSize={iconSize}
@@ -91,7 +91,9 @@ const IconSection = ({
 );
 
 const ClassCard = ({ character }: ClassCardProps): JSX.Element => {
-	if (!character?.code || !character.jobType || !character.legion) redirect('/error');
+	if (!character?.code || !character.jobType || !character.legion) {
+		redirect('/error');
+	}
 
 	const {
 		code,

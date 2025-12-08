@@ -7,13 +7,13 @@ import { useSearchParams } from 'next/navigation';
 import Button from '@components/Button/Button';
 import FooterOutside from '@components/FooterOutside/FooterOutside';
 import FormInput from '@components/FormInput/FormInput';
-import { validatePassword, validatePasswordConfirmation } from '@utils/validation';
+import { validatePassword, validatePasswordConfirmation } from '@utils/validators';
 
 import { useResetPassword } from './hooks/useResetPassword';
 import styles from './page.module.scss';
 
 import type { ResetPasswordFormData } from '@sharedTypes/form';
-import type { ValidationResult } from '@utils/validation';
+import type { ValidationResult } from '@utils/validateField';
 import type { JSX } from 'react';
 
 const ResetPasswordPage = (): JSX.Element => {

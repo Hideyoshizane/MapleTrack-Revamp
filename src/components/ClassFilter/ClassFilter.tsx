@@ -1,18 +1,18 @@
 'use client';
 
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
-import { classFilterOptions } from '@utils/cookies/classFilterCookie';
+import { classFilterOptions } from '@utils/classFilterCookie';
 
 import styles from './ClassFilter.module.scss';
 
-import type { ClassFilterOption } from '@utils/cookies/classFilterCookie';
+import type { ClassFilterOption } from '@utils/classFilterCookie';
 import type { JSX } from 'react';
 
-interface ClassFilterProps {
+type ClassFilterProps = {
 	selectedClasses: ClassFilterOption[];
 	setSelectedClasses: (values: ClassFilterOption[]) => void;
 	loading?: boolean;
-}
+};
 
 const toCapitalCase = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
@@ -34,7 +34,6 @@ export const ClassFilter = ({
 	};
 
 	if (loading) {
-		// Show skeleton for entire component
 		return (
 			<div className={styles.classFilter}>
 				<SkeletonWrapper width={1243} height={56} color="light" variant="rounded" />
@@ -56,7 +55,7 @@ export const ClassFilter = ({
 								onClick={(): void => toggleClass(lowerName)}>
 								{toCapitalCase(lowerName)}
 							</button>
-							{index < arr.length - 1 && <span className={styles.separator}></span>}
+							{index < arr.length - 1 && <span className={styles.separator} />}
 						</span>
 					);
 				})}

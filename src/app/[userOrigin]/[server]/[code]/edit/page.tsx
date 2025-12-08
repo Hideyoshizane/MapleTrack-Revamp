@@ -1,24 +1,22 @@
 import { redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth';
-import React from 'react';
 
+import { auth } from '@/auth';
 import Navbar from '@components/Navbar/Navbar';
-import { authOptions } from '@lib/authOptions';
 import { validateUserAccess, syncCharacterInfo } from '@lib/characters';
 
 import CharacterPage from './CharacterPage';
 
 import type { JSX } from 'react';
 
-interface CharactersPageProps {
+type CharactersPageProps = {
 	params: Promise<{ userOrigin: string; server: string; code: string }>;
-}
+};
 
 const CharactersPage = async ({ params }: CharactersPageProps): Promise<JSX.Element> => {
 	const { userOrigin, server, code } = await params;
 
 	// Redirect to login if not autenthicated
-	const session = await getServerSession(authOptions);
+	const session = await auth();
 	if (!session) {
 		redirect('/login?unauthorized=1');
 	}

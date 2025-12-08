@@ -15,20 +15,20 @@ import styles from './BossItem.module.scss';
 
 import type { JSX } from 'react';
 
-export interface BossDifficulty {
+export type BossDifficulty = {
 	name: string;
 	value: number;
 	reset: string;
 	minLevel: number;
-}
+};
 
-export interface Boss {
+export type Boss = {
 	name: string;
 	img: string;
 	difficulties: BossDifficulty[];
-}
+};
 
-export interface BossProgress {
+export type BossProgress = {
 	name: string;
 	difficulty: string;
 	reset: 'Daily' | 'Weekly' | 'Monthly';
@@ -36,9 +36,9 @@ export interface BossProgress {
 	DailyTotal?: number;
 	date?: Date;
 	locked?: boolean;
-}
+};
 
-interface BossItemProps {
+type BossItemProps = {
 	serverCookie: string;
 	boss: Boss;
 	selectedBoss: BossProgress | null;
@@ -46,7 +46,7 @@ interface BossItemProps {
 
 	onSelect: (boss: BossProgress) => void;
 	onRemove: (reset: BossProgress['reset']) => void;
-}
+};
 
 const BossItem = ({
 	serverCookie,
@@ -116,7 +116,9 @@ const BossItem = ({
 	);
 
 	useEffect((): void => {
-		if (!selectedBoss) return;
+		if (!selectedBoss) {
+			return;
+		}
 
 		setSelectedByReset(
 			(prev): Record<string, string | null> => ({
@@ -128,7 +130,9 @@ const BossItem = ({
 		const found = boss.difficulties.find(
 			(d): boolean => d.name === selectedBoss.difficulty && d.reset === selectedBoss.reset
 		);
-		if (!found) return;
+		if (!found) {
+			return;
+		}
 
 		const base = isRebootServer(serverCookie) ? found.value * 5 : found.value;
 

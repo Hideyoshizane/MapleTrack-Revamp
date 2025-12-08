@@ -1,23 +1,24 @@
 'use client';
 
-import React, { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect } from 'react';
 
-import { arcaneBonusCookie, sacredBonusCookie } from '@utils/cookies/bonusCookie';
+import { arcaneBonusCookie, sacredBonusCookie } from '@utils/bonusCookie';
 
+import type React from 'react';
 import type { ReactNode, JSX } from 'react';
 
-export interface BonusContextType {
+export type BonusContextType = {
 	arcaneBonus: number;
 	sacredBonus: number;
 	setArcaneBonus: (value: number) => void;
 	setSacredBonus: (value: number) => void;
-}
+};
 
 const BonusContext = createContext<BonusContextType | undefined>(undefined);
 
-interface BonusProviderProps {
+type BonusProviderProps = {
 	children: ReactNode;
-}
+};
 
 export const BonusProvider: React.FC<BonusProviderProps> = ({ children }): JSX.Element => {
 	const [arcaneBonus, setArcaneBonusState] = useState<number>(0);
@@ -27,8 +28,10 @@ export const BonusProvider: React.FC<BonusProviderProps> = ({ children }): JSX.E
 		const arcane = arcaneBonusCookie.get() ?? 0;
 		const sacred = sacredBonusCookie.get() ?? 0;
 
-		setArcaneBonusState(arcane);
-		setSacredBonusState(sacred);
+		queueMicrotask(() => {
+			setArcaneBonusState(arcane);
+			setSacredBonusState(sacred);
+		});
 
 		arcaneBonusCookie.set(arcane);
 		sacredBonusCookie.set(sacred);

@@ -4,9 +4,9 @@ import { SessionProvider } from 'next-auth/react';
 
 import type { JSX } from 'react';
 
-interface ProvidersProps {
+type ProvidersProps = {
 	children: React.ReactNode;
-}
+};
 
 const Providers = ({ children }: ProvidersProps): JSX.Element => {
 	return <SessionProvider>{children}</SessionProvider>;

@@ -4,35 +4,30 @@ import { useRouter } from 'next/navigation';
 import { useForm, type Control, type UseFormHandleSubmit, type UseFormGetValues } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import { fetchWithTimeout } from '@utils/fetch/withTimeout';
-import { sanitizeInputFrontend } from '@utils/sanitize/sanitizeInputFrontEnd';
-import {
-	validateUsername,
-	validateEmail,
-	validatePassword,
-	validatePasswordConfirmation,
-	handleFieldValidation,
-} from '@utils/validation';
+import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
+import { handleFieldValidation } from '@utils/validateField';
+import { validateUsername, validateEmail, validatePassword, validatePasswordConfirmation } from '@utils/validators';
+import { fetchWithTimeout } from '@utils/withTimeout';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { SignupFormData } from '@sharedTypes/form';
-import type { ValidationResult } from '@utils/validation';
+import type { ValidationResult } from '@utils/validateField';
 
-interface SignupPayload {
+type SignupPayload = {
 	username: string;
 	email: string;
 	password: string;
 	confirmPassword: string;
-}
+};
 
-interface UseSignupReturn {
+type UseSignupReturn = {
 	control: Control<SignupFormData>;
 	handleSubmit: UseFormHandleSubmit<SignupFormData>;
 	isSubmitting: boolean;
 	isSubmitted: boolean;
 	getValues: UseFormGetValues<SignupFormData>;
 	onSubmit: (data: SignupFormData) => Promise<void>;
-}
+};
 
 export const useSignup = (): UseSignupReturn => {
 	const router = useRouter();
@@ -94,9 +89,9 @@ export const useSignup = (): UseSignupReturn => {
 			if (response.ok && result.success) {
 				router.push('/login?success=1');
 			} else {
-				showError(result.error);
-				if (result.details) {
-					for (const [field, msg] of Object.entries(result.details)) {
+				showError(result.message);
+				if (result.message) {
+					for (const [field, msg] of Object.entries(result.message)) {
 						setError(field as keyof SignupFormData, { message: msg ?? 'Invalid input' });
 					}
 				}

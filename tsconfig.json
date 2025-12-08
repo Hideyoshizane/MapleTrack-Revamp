@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"baseUrl": "./",
 		"target": "ES2022",
 		"lib": ["dom", "dom.iterable", "ES2022", "ESNext"],
 		"skipLibCheck": true,
@@ -22,22 +23,31 @@
 				"name": "next"
 			}
 		],
-		"types": ["react", "react-dom"],
+		"types": ["react", "react-dom", "@auth/core"],
 		"paths": {
 			"@/*": ["./src/*"],
-			"@components/*": ["./src/components/*"],
-			"@lib/*": ["./src/lib/*"],
-			"@models/*": ["./src/models/*"],
-			"@service/*": ["./src/service/*"],
-			"@utils/*": ["./src/utils/*"],
-			"@schemas/*": ["./src/schemas/*"],
 			"@assets/*": ["./src/assets/*"],
-			"@sharedTypes/*": ["./src/shared/types/*"],
+			"@components/*": ["./src/components/*"],
+			"@constants/*": ["./src/constants/*"],
 			"@data/*": ["./src/data/*"],
-			"@hooks/*": ["./src/hooks/*"]
+			"@features/*": ["./src/features/*"],
+			"@hooks/*": ["./src/hooks/*"],
+			"@lib/*": ["./src/lib/*"],
+			"@schemas/*": ["./src/schemas/*"],
+			"@sharedTypes/*": ["./src/shared/types/*"],
+			"@store/*": ["./src/store/*"],
+			"@utils/*": ["./src/utils/*"]
 		},
 		"allowJs": true
 	},
-	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
+	"include": [
+		"next-env.d.ts",
+		"**/*.ts",
+		"**/*.tsx",
+		".next/types/**/*.ts",
+		".next/dev/types/**/*.ts",
+		"types/**/*.d.ts",
+		"src/shared/types/**/*.d.ts"
+	],
 	"exclude": ["node_modules"]
 }

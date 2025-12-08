@@ -11,13 +11,13 @@ import Button from '@components/Button/Button';
 import ProgressBar from '@components/ProgressBar/ProgressBar';
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import ServerDropdown from '@components/ServerDropdown/ServerDropdown';
+import { WEEKLY_BOSSES_TOTAL } from '@constants/bossConstants';
 import { useServerCookie } from '@hooks/useServerCookie';
-import { WEEKLY_BOSSES_TOTAL } from '@utils/boss/constants';
-import { fetchWithTimeout } from '@utils/fetch/withTimeout';
+import { fetchWithTimeout } from '@utils/withTimeout';
 
 import styles from './page.module.scss';
 
-import type { BossCharacter, BossServer } from '@/models/bossList';
+import type { BossCharacter, BossServer } from '@features/Boss/bossListModel';
 import type { GetBossListRequestBody, GetBossListApiResponse } from '@sharedTypes/bossList';
 import type { JSX } from 'react';
 
@@ -34,10 +34,10 @@ const fetchBossList = async (
 	return res.json() as Promise<GetBossListApiResponse>;
 };
 
-interface WeeklyPageClientProps {
+type WeeklyPageClientProps = {
 	searchParams?: Record<string, string | undefined>;
 	username: string;
-}
+};
 
 const WeeklyPageClient = ({ username }: WeeklyPageClientProps): JSX.Element => {
 	const pathname = usePathname();
@@ -56,10 +56,14 @@ const WeeklyPageClient = ({ username }: WeeklyPageClientProps): JSX.Element => {
 	const BOSS_ICON_SIZE = 96;
 
 	const loadBossList = useCallback(async (): Promise<void> => {
-		if (!serverCookie || !username) return;
+		if (!serverCookie || !username) {
+			return;
+		}
 
 		// Cancel any previous request
-		if (abortController.current) abortController.current.abort();
+		if (abortController.current) {
+			abortController.current.abort();
+		}
 		const controller = new AbortController();
 		abortController.current = controller;
 
@@ -76,7 +80,9 @@ const WeeklyPageClient = ({ username }: WeeklyPageClientProps): JSX.Element => {
 				console.error(error);
 			}
 		} finally {
-			if (!controller.signal.aborted) setLoading(false);
+			if (!controller.signal.aborted) {
+				setLoading(false);
+			}
 		}
 	}, [serverCookie, username]);
 
@@ -84,7 +90,9 @@ const WeeklyPageClient = ({ username }: WeeklyPageClientProps): JSX.Element => {
 	useEffect((): (() => void) => {
 		void loadBossList();
 		return (): void => {
-			if (abortController.current) abortController.current.abort();
+			if (abortController.current) {
+				abortController.current.abort();
+			}
 		};
 	}, [loadBossList]);
 

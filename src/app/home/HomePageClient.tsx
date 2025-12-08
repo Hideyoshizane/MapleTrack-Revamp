@@ -14,10 +14,10 @@ import styles from './page.module.scss';
 
 import type { JSX } from 'react';
 
-interface HomePageClientProps {
+type HomePageClientProps = {
 	searchParams?: Record<string, string | undefined>;
 	username: string;
-}
+};
 
 const HomePageClient = ({ username }: HomePageClientProps): JSX.Element => {
 	// Cookie hooks
@@ -32,7 +32,9 @@ const HomePageClient = ({ username }: HomePageClientProps): JSX.Element => {
 	const hasShownToast = useRef(false);
 
 	useEffect((): void => {
-		if (hasShownToast.current) return;
+		if (hasShownToast.current) {
+			return;
+		}
 
 		if (searchParams?.get('logged') === '1') {
 			toast.success('Redirected, user already authenticated.');

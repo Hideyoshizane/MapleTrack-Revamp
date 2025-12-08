@@ -4,16 +4,16 @@ import { toast } from 'react-toastify';
 
 import type { ApiResponse } from '@sharedTypes/api';
 
-interface UseDeleteAccountProps {
+type UseDeleteAccountProps = {
 	username: string;
-}
+};
 
-interface UseDeleteAccountReturn {
+type UseDeleteAccountReturn = {
 	isDeleteDialogOpen: boolean;
 	openDeleteDialog: () => void;
 	closeDeleteDialog: () => void;
 	handleDelete: () => Promise<void>;
-}
+};
 
 export const useDeleteAccount = ({ username }: UseDeleteAccountProps): UseDeleteAccountReturn => {
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -35,7 +35,7 @@ export const useDeleteAccount = ({ username }: UseDeleteAccountProps): UseDelete
 				closeDeleteDialog();
 				await signOut({ callbackUrl: `${window.location.origin}/login?accountDeleted=1` });
 			} else {
-				toast.error(result.error || 'Failed to delete account');
+				toast.error(result.message || 'Failed to delete account');
 			}
 		} catch (error: unknown) {
 			const message = error instanceof Error ? error.message : 'Unknown error occurred.';

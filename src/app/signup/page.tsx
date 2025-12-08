@@ -6,13 +6,13 @@ import Link from 'next/link';
 import Button from '@components/Button/Button';
 import FooterOutside from '@components/FooterOutside/FooterOutside';
 import FormInput from '@components/FormInput/FormInput';
-import { validateUsername, validateEmail, validatePassword, validatePasswordConfirmation } from '@utils/validation';
+import { validateUsername, validateEmail, validatePassword, validatePasswordConfirmation } from '@utils/validators';
 
 import { useSignup } from './hooks/useSignup';
 import styles from './page.module.scss';
 
 import type { SignupFormData } from '@sharedTypes/form';
-import type { ValidationResult } from '@utils/validation';
+import type { ValidationResult } from '@utils/validateField';
 import type { JSX } from 'react';
 
 const SignupPage = (): JSX.Element => {

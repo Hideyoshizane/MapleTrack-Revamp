@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 import { useCharacterData } from '@hooks/useCharacterData';
-import { useExtraCharacterData } from '@hooks/useExtraCharacterData';
+import { useCharacterDataFromApi } from '@hooks/useCharacterDataFromApi';
 
 import type { Character } from '@sharedTypes/character';
 
@@ -19,8 +19,8 @@ interface UseCharacterPageDataReturn {
 	setCommittedName: React.Dispatch<React.SetStateAction<string>>;
 	loading: boolean;
 	error?: string;
-	extraData: any;
-	extraDataFailed: boolean;
+	characterDataApi: any;
+	characterDataApiFailed: boolean;
 	handleSyncToggle: () => void;
 }
 
@@ -48,10 +48,10 @@ export const useCharacterPageData = ({
 	};
 
 	const {
-		extraData,
-		extraDataFailed,
+		characterDataApi,
+		characterDataApiFailed,
 		loading: extraDataLoading,
-	} = useExtraCharacterData({
+	} = useCharacterDataFromApi({
 		character,
 		committedName,
 		server,
@@ -61,7 +61,11 @@ export const useCharacterPageData = ({
 
 	// Mark first load done after both character and extra data are fetched
 	useEffect((): void => {
-		if (!characterLoading && !extraDataLoading) setFirstLoadDone(true);
+		if (!characterLoading && !extraDataLoading) {
+			queueMicrotask(() => {
+				setFirstLoadDone(true);
+			});
+		}
 	}, [characterLoading, extraDataLoading]);
 
 	const loading = firstLoadDone ? false : characterLoading || extraDataLoading;
@@ -72,8 +76,8 @@ export const useCharacterPageData = ({
 		setCommittedName,
 		loading,
 		error: error ?? undefined,
-		extraData,
-		extraDataFailed,
+		characterDataApi,
+		characterDataApiFailed,
 		handleSyncToggle,
 	};
 };

@@ -3,13 +3,14 @@
 import { useCallback } from 'react';
 import { toast } from 'react-toastify';
 
-import { fetchWithTimeout } from '@utils/fetch/withTimeout';
-import { sanitizeInputFrontend } from '@utils/sanitize/sanitizeInputFrontEnd';
-import { validateEmail, handleFieldValidation } from '@utils/validation';
+import { handleFieldValidation } from '@/utils/validateField';
+import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
+import { validateEmail } from '@utils/validators';
+import { fetchWithTimeout } from '@utils/withTimeout';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { ForgotPasswordFormData } from '@sharedTypes/form';
-import type { ValidationResult } from '@utils/validation';
+import type { ValidationResult } from '@utils/validateField';
 import type { UseFormSetError } from 'react-hook-form';
 
 export const useForgotPassword = (
@@ -26,7 +27,9 @@ export const useForgotPassword = (
 				const hasErrors = (Object.entries(validations) as [keyof ForgotPasswordFormData, ValidationResult][]).some(
 					([field, result]): boolean => handleFieldValidation(field, result, setError)
 				);
-				if (hasErrors) return;
+				if (hasErrors) {
+					return;
+				}
 
 				// API request
 				const response = await fetchWithTimeout('/api/auth/forgot-password', {
@@ -43,10 +46,10 @@ export const useForgotPassword = (
 				}
 
 				if (!result.success) {
-					toast.error(result.error || 'Failed to process your request');
+					toast.error(result.message || 'Failed to process your request');
 
-					if (result.details) {
-						Object.entries(result.details).forEach(([field, msg]): void => {
+					if (result.message) {
+						Object.entries(result.message).forEach(([field, msg]): void => {
 							setError(field as keyof ForgotPasswordFormData, {
 								message: msg ?? 'Invalid input',
 							});

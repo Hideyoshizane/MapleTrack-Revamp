@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import Button from '@components/Button/Button';
 import FooterOutside from '@components/FooterOutside/FooterOutside';
 import FormInput from '@components/FormInput/FormInput';
-import { validateUsernameLogin, validatePasswordLogin } from '@utils/validation';
+import { validateUsernameLogin, validatePasswordLogin } from '@utils/validators';
 
 import { useAuthRedirect } from './hooks/useAuthRedirect';
 import { useLogin } from './hooks/useLogin';

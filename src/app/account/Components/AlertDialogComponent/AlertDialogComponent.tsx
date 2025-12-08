@@ -6,11 +6,11 @@ import styles from './AlertDialogComponent.module.scss';
 
 import type { JSX } from 'react';
 
-interface AlertDialogComponentProps {
+type AlertDialogComponentProps = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onConfirm: () => Promise<void> | void;
-}
+};
 
 const AlertDialogComponent = ({ open, onOpenChange, onConfirm }: AlertDialogComponentProps): JSX.Element => {
 	const handleConfirm = async (): Promise<void> => {

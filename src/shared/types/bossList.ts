@@ -1,11 +1,11 @@
 import type { ApiResponse } from './api';
-import type { BossListDocument, BossServer } from '@models/bossList';
+import type { BossListDocument, BossServer } from '@features/Boss/bossListModel';
 
 // Request payload for fetching the BossList
-export interface GetBossListRequestBody {
+export type GetBossListRequestBody = {
 	userOrigin: string;
 	server: string;
-}
+};
 
 // BossList type excluding Mongoose Document properties
 export type BossList = Omit<BossListDocument, keyof Document>;

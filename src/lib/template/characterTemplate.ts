@@ -1,6 +1,6 @@
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 
-import type { CharacterDocument } from '@models/character';
+import type { CharacterDocument } from '@features/character/characterModel';
 
 export const templateCharacter: Partial<CharacterDocument> = {
 	name: 'Character Name',

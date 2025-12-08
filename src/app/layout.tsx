@@ -3,7 +3,7 @@ import { Roboto } from 'next/font/google';
 import { cookies } from 'next/headers';
 
 import ClientToaster from '@components/CustomToaster/CustomToaster';
-import { type Theme } from '@lib/theme';
+import { type Theme } from '@lib/config/theme';
 
 import Providers from './providers';
 

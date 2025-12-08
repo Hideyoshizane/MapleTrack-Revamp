@@ -1,20 +1,20 @@
 'use client';
 
 import { clsx } from 'clsx';
-import React, { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 import styles from './ResponsiveText.module.scss';
 
 import type { JSX, ReactNode } from 'react';
 
-interface ResponsiveTextProps {
+type ResponsiveTextProps = {
 	children: ReactNode;
 	width: number;
 	height: number;
 	className?: string;
 	maxFontSize: number;
 	minFontSize: number;
-}
+};
 
 const ResponsiveText = ({
 	children,
@@ -28,7 +28,9 @@ const ResponsiveText = ({
 	const [fontSize, setFontSize] = useState<number>(maxFontSize);
 
 	useEffect((): void => {
-		if (!ref.current) return;
+		if (!ref.current) {
+			return;
+		}
 
 		const element = ref.current;
 		let size = maxFontSize;
@@ -40,7 +42,9 @@ const ResponsiveText = ({
 			element.style.fontSize = `${size}px`;
 		}
 
-		setFontSize(size);
+		queueMicrotask(() => {
+			setFontSize(size);
+		});
 	}, [children, width, height, maxFontSize, minFontSize]);
 
 	return (

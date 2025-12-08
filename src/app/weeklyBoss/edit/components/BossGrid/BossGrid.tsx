@@ -8,13 +8,13 @@ import BossItem from '../BossItem/BossItem';
 
 import styles from './BossGrid.module.scss';
 
-import type { Boss } from '@/models/bossList';
+import type { Boss } from '@features/Boss/bossListModel';
 import type { JSX } from 'react';
 
-interface BossGridProps {
+type BossGridProps = {
 	serverCookie: string;
 	selectedCharacterLevel: number;
-}
+};
 
 const BossGrid = ({ serverCookie, selectedCharacterLevel }: BossGridProps): JSX.Element => {
 	const selectedBosses = useBossListStore((s): Boss[] => s.selectedBosses);

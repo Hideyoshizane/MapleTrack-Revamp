@@ -4,12 +4,12 @@ import argon2 from 'argon2';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
+import User from '@features/user/userModel';
 import connectToDatabase from '@lib/mongooseConect';
-import User from '@models/user';
 import { resetPasswordRequestSchema } from '@schemas/authSchemas';
-import { createResponse } from '@utils/api/createResponse';
-import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
-import { validatePassword } from '@utils/validation/';
+import { createResponse } from '@utils/createResponse';
+import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
+import { validatePassword } from '@utils/validators';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextRequest, NextResponse } from 'next/server';
@@ -23,7 +23,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		// Validate request body with Zod
 		const parseResult = resetPasswordRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
 		// Sanitize input
@@ -31,16 +31,14 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 			sanitizeInputBackEnd
 		);
 		if (!sanitizedToken || !sanitizedPassword) {
-			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Missing required fields' }, 400);
 		}
 
 		// Validate sanitized inputs
 		const passwordValidation = validatePassword(sanitizedPassword);
 		if (!passwordValidation.isValid) {
-			return createResponse<ApiResponse>(
-				{ success: false, error: 'Validation failed', details: { password: passwordValidation.error } },
-				400
-			);
+			const message = [passwordValidation.error].filter(Boolean).join('\n');
+			return createResponse<ApiResponse>({ success: false, message: message }, 400);
 		}
 
 		// Hash the token to compare against the hashed one stored in the DB
@@ -49,14 +47,14 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		// Find user with matching reset token
 		const user = await User.findOne({ resetPasswordToken: token });
 		if (!user || !user.resetPasswordExpires || dayjs.utc(user.resetPasswordExpires).isBefore(dayjs.utc())) {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid or expired token' }, 404);
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid or expired token' }, 404);
 		}
 
 		// Compare new password with current one
 		const isSamePassword = await argon2.verify(user.password, sanitizedPassword);
 		if (isSamePassword) {
 			return createResponse<ApiResponse>(
-				{ success: false, error: 'New password must be different from the current password' },
+				{ success: false, message: 'New password must be different from the current password' },
 				400
 			);
 		}
@@ -74,6 +72,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		return createResponse<ApiResponse>({ success: true, message: 'Password reset successfully.' }, 200);
 	} catch (error) {
 		console.error('Signup error:', error);
-		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
+		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

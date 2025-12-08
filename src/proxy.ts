@@ -1,84 +1,68 @@
 import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-import { DARK_PATHS, themeFromPath, type Theme } from '@lib/theme';
+import { themeFromPath, isDarkPath, type Theme } from '@lib/config/theme';
 
 import { LASTVERSION } from './data/user/constants';
 
 import type { NextRequest } from 'next/server';
 
-// Middleware function to set 'theme' cookie and handle auth redirects
-export const proxy = async (req: NextRequest): Promise<ReturnType<typeof NextResponse.redirect>> => {
-	// Extract the current pathname from the request URL
+// Helper to clear NextAuth cookies
+const clearAuthCookies = (res: NextResponse): void => {
+	res.cookies.delete('next-auth.session-token');
+	res.cookies.delete('__Secure-next-auth.session-token');
+};
+
+// Middleware to set 'theme' cookie and handle auth redirects
+export const proxy = async (req: NextRequest): Promise<NextResponse> => {
 	const { pathname } = req.nextUrl;
 
 	// Skip static files and API routes
-	if (
-		pathname.startsWith('/_next') ||
-		pathname.startsWith('/api') ||
-		pathname.endsWith('.ico') ||
-		pathname.includes('.')
-	) {
+	if (/^\/(_next|api)|\.[a-z0-9]+$/i.test(pathname)) {
 		return NextResponse.next();
 	}
-	// Determine theme ('dark' or 'light') based on pathname
+
+	// Set theme cookie
 	const theme: Theme = themeFromPath(pathname);
 	const res = NextResponse.next();
 	res.cookies.set('theme', theme, { path: '/' });
 
-	// Retrieve the JWT token (if present) from the request to determine auth status
+	// Check auth token
 	const token = await getToken({ req });
-
-	// Check if user is authenticated (token is non-null object)
 	const isAuthenticated = !!token;
 
-	// VERSION CHECK: redirect immediately if token version mismatch
+	// VERSION CHECK: redirect if token version mismatch
 	if (isAuthenticated) {
 		const tokenVersion = Number(token?.version ?? 0);
+
 		if (tokenVersion !== LASTVERSION) {
 			const url = new URL('/login', req.url);
 			url.search = 'version_update=1';
 			const logoutResponse = NextResponse.redirect(url);
-
-			// Delete NextAuth session cookies
-			logoutResponse.cookies.delete('next-auth.session-token');
-			logoutResponse.cookies.delete('__Secure-next-auth.session-token');
+			clearAuthCookies(logoutResponse);
 
 			return logoutResponse;
 		}
 	}
 
-	// Narrow pathname to first segment for safer DARK_PATHS check
-	const topLevelPath = '/' + pathname.split('/')[1];
+	// Determine top-level path safely
+	const segments = pathname.split('/').filter(Boolean);
+	const topLevelPath = '/' + (segments[0] ?? '');
 
 	// Redirect authenticated users away from DARK_PATHS pages to /home
-	if (isAuthenticated && DARK_PATHS.includes(topLevelPath as (typeof DARK_PATHS)[number])) {
-		const url = req.nextUrl.clone();
-		url.pathname = '/home';
-		url.search = 'logged=1';
-		return NextResponse.redirect(url);
+	if (isAuthenticated && isDarkPath(topLevelPath)) {
+		return NextResponse.redirect(new URL('/home?logged=1', req.url));
 	}
 
 	// Redirect unauthenticated users from any page NOT in DARK_PATHS to login
-	if (!isAuthenticated && !DARK_PATHS.includes(topLevelPath as (typeof DARK_PATHS)[number])) {
-		const url = req.nextUrl.clone();
-		url.pathname = '/login';
-		url.search = 'unauthorized=1';
-		return NextResponse.redirect(url);
+	if (!isAuthenticated && !isDarkPath(topLevelPath)) {
+		return NextResponse.redirect(new URL('/login?unauthorized=1', req.url));
 	}
 
-	// Otherwise, continue as normal
 	return res;
 };
 
 // Only match real pages, excluding static assets, APIs, and files with extensions
 export const config = {
-	matcher: [
-		'/login',
-		'/signup',
-		'/forgot-password',
-		'/reset-password',
-		'/home',
-		'/((?!_next/static|_next/image|favicon.ico|api/characters/getAPICharacterImage|api|.*\\..*).*)',
-	],
+	matcher: ['/((?!_next/static|_next/image|favicon.ico|api).*)'],
 };

@@ -1,19 +1,18 @@
 import { redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth';
 
+import { auth } from '@/auth';
 import Navbar from '@components/Navbar/Navbar';
-import { authOptions } from '@lib/authOptions';
 
 import AccountPageClient from './AccountPageClient';
 
 import type { JSX } from 'react';
 
-interface AccountPageProps {
+type AccountPageProps = {
 	searchParams?: Record<string, string | undefined>;
-}
+};
 
 const AccountPage = async ({ searchParams }: AccountPageProps): Promise<JSX.Element> => {
-	const session = await getServerSession(authOptions);
+	const session = await auth();
 
 	// If no session, redirect to login with a query param
 	if (!session) {

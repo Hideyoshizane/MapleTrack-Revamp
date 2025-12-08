@@ -4,22 +4,22 @@ import { clsx } from 'clsx';
 import Image from 'next/image';
 import { useRef, useEffect, useState, useCallback, Fragment } from 'react';
 
-import { useBossListStore } from '@/store/bossListStore';
-import { codeToClass } from '@/utils/character/codeToClass';
+import { codeToClass } from '@/utils/codeToClass';
 import ChevronIcon from '@assets/svg/chevron-down.svg';
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
+import { useBossListStore } from '@store/bossListStore';
 
 import CharacterBossItem from './BossItem/CharacterBossItem';
 import styles from './WeeklyBossDropdown.module.scss';
 
-import type { BossCharacter } from '@/models/bossList';
+import type { BossCharacter } from '@features/Boss/bossListModel';
 import type { JSX } from 'react';
 
-interface WeeklyBossDropdownProps {
+type WeeklyBossDropdownProps = {
 	setSelectedCharacter?: (value: BossCharacter) => void;
 	selectedCharacter?: BossCharacter | null;
 	characters?: BossCharacter[];
-}
+};
 
 const WeeklyBossDropdown = ({
 	setSelectedCharacter,
@@ -51,14 +51,18 @@ const WeeklyBossDropdown = ({
 	// Close dropdown when clicking outside
 	useEffect((): (() => void) => {
 		const handleClickOutside = (event: MouseEvent): void => {
-			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) setIsOpen(false);
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+				setIsOpen(false);
+			}
 		};
 		document.addEventListener('mousedown', handleClickOutside);
 		return (): void => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
 
 	// Skeleton placeholder while selectedServer is not ready
-	if (!selectedCharacter) return <SkeletonWrapper width={502} height={368} color="light" variant="rounded" />;
+	if (!selectedCharacter) {
+		return <SkeletonWrapper width={502} height={368} color="light" variant="rounded" />;
+	}
 
 	return (
 		<div ref={dropdownRef} className={clsx(styles.characterDropdownWrapper, { [styles.open]: isOpen })}>

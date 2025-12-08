@@ -3,23 +3,24 @@ import { signOut } from 'next-auth/react';
 import { useCallback } from 'react';
 import { toast } from 'react-toastify';
 
-import { fetchWithTimeout } from '@utils/fetch/withTimeout';
-import { sanitizeInputFrontend } from '@utils/sanitize/sanitizeInputFrontEnd';
-import { validatePassword, validatePasswordConfirmation, handleFieldValidation } from '@utils/validation';
+import { handleFieldValidation } from '@/utils/validateField';
+import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
+import { validatePassword, validatePasswordConfirmation } from '@utils/validators';
+import { fetchWithTimeout } from '@utils/withTimeout';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { ChangePasswordFormData } from '@sharedTypes/form';
-import type { ValidationResult } from '@utils/validation';
+import type { ValidationResult } from '@utils/validateField';
 import type { UseFormSetError } from 'react-hook-form';
 
-interface UseChangePasswordProps {
+type UseChangePasswordProps = {
 	username: string;
 	setError: UseFormSetError<ChangePasswordFormData>;
-}
+};
 
-interface UseChangePasswordReturn {
+type UseChangePasswordReturn = {
 	onSubmit: (data: ChangePasswordFormData) => Promise<void>;
-}
+};
 
 export const useChangePassword = ({ username, setError }: UseChangePasswordProps): UseChangePasswordReturn => {
 	const onSubmit = useCallback(
@@ -56,9 +57,9 @@ export const useChangePassword = ({ username, setError }: UseChangePasswordProps
 					toast.success('Password changed successfully.');
 					await signOut({ callbackUrl: '/login' });
 				} else if (!result.success) {
-					toast.error(result.error || 'Failed to change password');
-					if (result.details) {
-						for (const [field, msg] of Object.entries(result.details)) {
+					toast.error(result.message || 'Failed to change password');
+					if (result.message) {
+						for (const [field, msg] of Object.entries(result.message)) {
 							setError(field as keyof ChangePasswordFormData, { message: msg ?? 'Invalid input' });
 						}
 					}

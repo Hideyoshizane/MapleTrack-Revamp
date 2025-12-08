@@ -29,23 +29,23 @@ import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { Character } from '@sharedTypes/character';
 import type { JSX } from 'react';
 
-interface CharacterPageProps {
+type CharacterPageProps = {
 	userOrigin: string;
 	server: string;
 	code: string;
-}
+};
 
 const BOSS_ICON_SIZE = 90;
 const ICON_SIZE = 64;
 
 // Helper Components
-interface ValidatedInputProps {
+type ValidatedInputProps = {
 	value?: string;
 	placeholder?: string;
 	error?: string | null;
 	onBlur?: (value: string) => void;
 	onCommit?: (value: string) => void;
-}
+};
 
 const ValidatedInput = ({ value, placeholder, error, onBlur, onCommit }: ValidatedInputProps): JSX.Element => {
 	// State to track current input value
@@ -93,14 +93,14 @@ const ValidatedInput = ({ value, placeholder, error, onBlur, onCommit }: Validat
 	);
 };
 
-interface CharacterBossLegionProps {
+type CharacterBossLegionProps = {
 	character: Character;
 	toggleBossing: () => void;
 	linkSkill: string;
 	code: string;
 	jobType: JobType;
 	legion: string;
-}
+};
 
 const CharacterBossLegion = ({
 	character,

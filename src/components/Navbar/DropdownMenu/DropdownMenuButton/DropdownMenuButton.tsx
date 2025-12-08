@@ -41,9 +41,9 @@ const MENU_CONFIG = {
 
 type DropdownMenuKey = keyof typeof MENU_CONFIG;
 
-interface DropdownMenuButtonProps {
+type DropdownMenuButtonProps = {
 	text: DropdownMenuKey;
-}
+};
 
 const DropdownMenuButton = ({ text }: DropdownMenuButtonProps): JSX.Element => {
 	const { href, label, Icon } = MENU_CONFIG[text];

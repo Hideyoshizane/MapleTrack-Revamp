@@ -1,38 +1,27 @@
-import type { ApiResponse } from './api';
-import type { CharacterDocument } from '@models/character';
+import type { CharacterDocument } from '@features/character/characterModel';
+import type { ApiRequest } from '@sharedTypes/api';
 
-// Request payload for fetching all characters of a user
-export interface GetAllCharactersRequestBody {
+export type Character = Omit<CharacterDocument, keyof Document>;
+
+export type GetAllCharactersRequestBody = ApiRequest<{
 	username: string;
 	server: string;
-}
+}>;
 
-// Request payload for fetching a specific character data
-export interface GetCharacterDataRequestBody {
+export type GetCharacterDataRequestBody = ApiRequest<{
 	userOrigin: string;
 	server: string;
 	code: string;
-}
+}>;
 
-// Request payload for fetching character data from Maplestory API
-export interface ExtraCharacterData {
-	level: number;
-	characterImgURL: string;
-}
-
-export interface UpdateCharacterRequestBody {
+export type UpdateCharacterRequestBody = ApiRequest<{
 	userOrigin: string;
 	server: string;
 	code: string;
 	data: Character;
-}
+}>;
 
-export type Character = Omit<CharacterDocument, keyof Document>;
-
-export type GetAllCharactersApiResponse = ApiResponse<Character[]>;
-
-export type GetCharacterDataApiResponse = ApiResponse<Character>;
-
-export type GetExtraCharacterDataApiResponse = ApiResponse<ExtraCharacterData>;
-
-export type GetUpdateCharacterDataApiResponse = ApiResponse;
+export type CharacterDataFromAPI = {
+	level: number;
+	characterImgURL: string;
+};

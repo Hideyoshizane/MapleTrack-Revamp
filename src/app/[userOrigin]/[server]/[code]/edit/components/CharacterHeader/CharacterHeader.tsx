@@ -4,13 +4,12 @@ import { toast } from 'react-toastify';
 
 import Button from '@components/Button/Button';
 import Tooltip from '@components/Tooltip/Tooltip';
-import { updateCharacterData } from '@service/characterService';
+import { characterApi } from '@service/characterService';
 import { sanitizeInputFrontend } from '@utils/sanitize/sanitizeInputFrontEnd';
 
 import styles from './CharacterHeader.module.scss';
 
 import type { UpdateCharacterRequestBody, Character } from '@/shared/types/character';
-import type { ApiResponse } from '@sharedTypes/api';
 import type { JSX } from 'react';
 
 interface Props {
@@ -47,13 +46,13 @@ export const CharacterHeader = ({
 				code: sanitizeInputFrontend(code),
 				data: character,
 			};
-			const result: ApiResponse = await updateCharacterData(payload);
+			const result = await characterApi.updateCharacterData(payload);
 
 			if (result.success) {
 				const basePath = pathname.replace(/\/edit$/, '');
 				router.push(`${basePath}?success=1`);
 			} else {
-				toast.error(result.error || 'Failed to update the character');
+				toast.error(result.message || 'Failed to update the character');
 			}
 		} catch (err) {
 			console.error(err);

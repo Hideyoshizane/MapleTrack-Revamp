@@ -10,11 +10,11 @@ import styles from './ServerItem.module.scss';
 import type { Server } from '@sharedTypes/server';
 import type { JSX, KeyboardEvent } from 'react';
 
-interface ServerItemProps {
+type ServerItemProps = {
 	server: Server;
 	isSelected: boolean;
 	onSelect: (server: Server) => void;
-}
+};
 
 export default function ServerItem({ server, isSelected, onSelect }: ServerItemProps): JSX.Element {
 	const handleKey = (event: KeyboardEvent<HTMLDivElement>): void => {

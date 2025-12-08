@@ -5,7 +5,7 @@ import { useEffect, useCallback, useState } from 'react';
 
 import { DEFAULT_WEEKLY_TRIES } from '@/data/character/constants';
 import Button from '@components/Button/Button';
-import { hasDailyResetOccurred, hasWeeklyQuestResetOccurred } from '@utils/time/time';
+import { hasDailyResetOccurred, hasWeeklyResetOccurred } from '@utils/time/time';
 
 import styles from './SymbolButtons.module.scss';
 
@@ -43,7 +43,7 @@ const SymbolButtons = ({
 	useEffect((): void => {
 		setLocalContent(content);
 		setIsResetDone(content[0]?.date ? hasDailyResetOccurred(content[0].date) : true);
-		setIsWeeklyDone(content[1]?.date ? hasWeeklyQuestResetOccurred(dayjs(content[1].date)) : true);
+		setIsWeeklyDone(content[1]?.date ? hasWeeklyResetOccurred(dayjs(content[1].date)) : true);
 	}, [content]);
 
 	const handleDailyUpdate = useCallback(async (): Promise<void> => {

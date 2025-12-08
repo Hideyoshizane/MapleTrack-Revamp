@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { userSchema } from '@schemas/user';
+import { userSchema } from '@features/user/userSchema';
 
 // Reuse userSchema
 const usernameSchema = userSchema.shape.username;

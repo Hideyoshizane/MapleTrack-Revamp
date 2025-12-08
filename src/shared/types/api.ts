@@ -1,8 +1,7 @@
-// Generic API response
-export interface ApiResponse<T = undefined> {
+export type ApiResponse<T = undefined> = {
 	success: boolean;
-	message?: string;
-	error?: string;
-	details?: Record<string, string | undefined>;
+	message: string;
 	data?: T;
-}
+};
+
+export type ApiRequest<T> = T;

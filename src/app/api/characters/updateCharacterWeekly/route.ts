@@ -2,12 +2,12 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
 import { getContentValue, calculateNewLevelFromExp } from '@data/symbols/symbolMappings';
+import { Character } from '@features/character/characterModel';
+import { updateCharacterWeeklySchema } from '@features/character/characterUpdateSchema';
 import connectToDatabase from '@lib/mongooseConect';
-import { Character } from '@models/character';
-import { updateCharacterWeeklySchema } from '@schemas/characterUpdateSchema';
-import { createResponse } from '@utils/api/createResponse';
-import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
-import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
+import { createResponse } from '@utils/createResponse';
+import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
+import { SERVER_OPTIONS } from '@utils/serverCookie';
 
 import type { LevelUpResult } from '@data/symbols/symbolMappings';
 import type { ApiResponse } from '@sharedTypes/api';
@@ -21,7 +21,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		// Validate request body using Zod
 		const parseResult = updateCharacterWeeklySchema.safeParse(await request.json());
 		if (!parseResult.success) {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 		const { symbolName: rawSymbolName, userOrigin: rawUsername, server: rawServer, code: rawCode } = parseResult.data;
 
@@ -29,12 +29,12 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 			sanitizeInputBackEnd
 		);
 		if (!symbolName || !username || !server || !code) {
-			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Missing required fields' }, 400);
 		}
 
 		// Validate allowed server
 		if (!SERVER_OPTIONS.includes(server)) {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid server' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid server' }, 400);
 		}
 
 		// Search for the character
@@ -47,11 +47,11 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		const allSymbols = [...character.ArcaneSymbol, ...character.SacredSymbol, ...character.GrandSacredSymbol];
 		const symbol = allSymbols.find((s): boolean => s.name === symbolName);
 		if (!symbol) {
-			return createResponse<ApiResponse>({ success: false, error: 'Symbol not found on character' }, 404);
+			return createResponse<ApiResponse>({ success: false, message: 'Symbol not found on character' }, 404);
 		}
 
 		if (symbol.content[1].cleared == true) {
-			return createResponse<ApiResponse>({ success: false, error: 'Weekly already cleared.' }, 404);
+			return createResponse<ApiResponse>({ success: false, message: 'Weekly already cleared.' }, 404);
 		}
 
 		// Find Symbol weekly Value
@@ -83,6 +83,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		);
 	} catch (error) {
 		console.error('Search error:', error);
-		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
+		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

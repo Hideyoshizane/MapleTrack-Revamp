@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { arcaneBonusCookie, sacredBonusCookie } from '@utils/cookies/bonusCookie';
+import { arcaneBonusCookie, sacredBonusCookie } from '@utils/bonusCookie';
 
 // Hook to manage ArcaneBonusEvent and SacredBonusEvent cookies safely.
 export const useBonusEventCookies = (): {
@@ -15,12 +15,16 @@ export const useBonusEventCookies = (): {
 	useEffect((): void => {
 		// Arcane
 		const arcane = arcaneBonusCookie.get() ?? 0;
-		setArcaneBonus(arcane);
+		queueMicrotask(() => {
+			setArcaneBonus(arcane);
+		});
 		arcaneBonusCookie.set(arcane);
 
 		// Sacred
 		const sacred = sacredBonusCookie.get() ?? 0;
-		setSacredBonus(sacred);
+		queueMicrotask(() => {
+			setSacredBonus(sacred);
+		});
 		sacredBonusCookie.set(sacred);
 	}, []);
 

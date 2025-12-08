@@ -1,13 +1,13 @@
 import argon2 from 'argon2';
 
 import { LASTVERSION } from '@data/user/constants';
+import { createBossList } from '@features/Boss/bossListService';
+import User from '@features/user/userModel';
 import connectToDatabase from '@lib/mongooseConect';
-import User from '@models/user';
 import { signupRequestSchema } from '@schemas/authSchemas';
-import { createBossList } from '@service/bossListService';
-import { createResponse } from '@utils/api/createResponse';
-import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
-import { validateUsername, validateEmail, validatePassword } from '@utils/validation';
+import { createResponse } from '@utils/createResponse';
+import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
+import { validateUsername, validateEmail, validatePassword } from '@utils/validators';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextRequest, NextResponse } from 'next/server';
@@ -23,7 +23,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		// Validate request body using Zod
 		const parseResult = signupRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
 		const { username: rawUsername, email: rawEmail, password: rawPassword } = parseResult.data;
@@ -31,7 +31,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		// Sanitize inputs
 		const [username, email, password] = [rawUsername, rawEmail, rawPassword].map(sanitizeInputBackEnd);
 		if (!username || !email || !password) {
-			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Missing required fields' }, 400);
 		}
 
 		// Validate sanitized inputs
@@ -39,15 +39,14 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		const emailValidation = validateEmail(email);
 		const passwordValidation = validatePassword(password);
 		if (!usernameValidation.isValid || !emailValidation.isValid || !passwordValidation.isValid) {
+			const message = [usernameValidation.error, emailValidation.error, passwordValidation.error]
+				.filter(Boolean)
+				.join('\n');
+
 			return createResponse<ApiResponse>(
 				{
 					success: false,
-					error: 'Validation failed',
-					details: {
-						username: usernameValidation.error,
-						email: emailValidation.error,
-						password: passwordValidation.error,
-					},
+					message: message,
 				},
 				400
 			);
@@ -56,7 +55,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		// Check if username or email already exists after validation
 		const existingUser = await User.findOne({ $or: [{ username }, { email }] });
 		if (existingUser)
-			return createResponse<ApiResponse>({ success: false, error: 'This username or email is not available.' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'This username or email is not available.' }, 400);
 
 		// Hash password
 		const hashedPassword = await argon2.hash(password, {
@@ -85,6 +84,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		);
 	} catch (error) {
 		console.error('Signup error:', error);
-		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
+		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

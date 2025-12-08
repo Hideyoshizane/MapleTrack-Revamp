@@ -2,18 +2,18 @@
 
 import { useState, useEffect } from 'react';
 
-import { fetchWithTimeout } from '@utils/fetch/withTimeout';
+import { characterApi } from '@features/character/characterService';
 
-import type { Character, GetCharacterDataRequestBody, GetCharacterDataApiResponse } from '@sharedTypes/character';
+import type { Character, GetCharacterDataRequestBody } from '@sharedTypes/character';
 
-interface UseCharacterDataReturn {
+type UseCharacterDataReturn = {
 	character?: Character;
 	setCharacter: React.Dispatch<React.SetStateAction<Character | undefined>>;
 	committedName: string;
 	setCommittedName: React.Dispatch<React.SetStateAction<string>>;
 	loading: boolean;
 	error: string | null;
-}
+};
 
 export const useCharacterData = ({ userOrigin, server, code }: GetCharacterDataRequestBody): UseCharacterDataReturn => {
 	const [character, setCharacter] = useState<Character>();
@@ -22,22 +22,24 @@ export const useCharacterData = ({ userOrigin, server, code }: GetCharacterDataR
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect((): void => {
-		if (!userOrigin || !server || !code) return;
+		if (!userOrigin || !server || !code) {
+			return;
+		}
 
 		const fetchData = async (): Promise<void> => {
-			try {
-				const res = await fetchWithTimeout('/api/characters/getCharacterData', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ userOrigin, server, code }),
-				});
-				const data = (await res.json()) as GetCharacterDataApiResponse;
+			setLoading(true);
+			setError(null);
 
-				if (data.success && data.data) {
-					setCharacter(data.data);
-					setCommittedName(data.data.name ?? '');
+			const payload: GetCharacterDataRequestBody = { userOrigin, server, code };
+
+			try {
+				const response = await characterApi.getCharacterData(payload);
+
+				if (response.success && response.data) {
+					setCharacter(response.data);
+					setCommittedName(response.data.name ?? '');
 				} else {
-					setError(data.error ?? 'Unknown error');
+					setError(response.message);
 				}
 			} catch (error) {
 				console.error('Error fetching character:', error);

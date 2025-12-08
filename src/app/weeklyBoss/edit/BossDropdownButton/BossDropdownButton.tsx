@@ -2,7 +2,7 @@
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { clsx } from 'clsx';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 import BanIcon from '@assets/svg/ban.svg';
 import CheckIcon from '@assets/svg/check.svg';
@@ -19,14 +19,14 @@ type Difficulty = {
 	value: number;
 };
 
-interface BossDropdownButtonProps {
+type BossDropdownButtonProps = {
 	selected: boolean;
 	value?: number;
 	locked?: boolean;
 	isSmallButtons: boolean;
 	difficulty: Difficulty;
 	onSelectDifficulty?: (difficulty: Difficulty, multiplier: number) => void;
-}
+};
 
 const DIFFICULTY_CLASS_MAP: Record<string, string> = {
 	Easy: styles.easy,

@@ -24,7 +24,9 @@ const Tooltip = ({ content, children, placement = 'top', enabled = true }: Custo
 
 		const themeCookie = cookies.get('theme') as unknown;
 		if (themeCookie === 'dark' || themeCookie === 'light') {
-			setTheme(themeCookie);
+			queueMicrotask(() => {
+				setTheme(themeCookie);
+			});
 		}
 	}, []);
 
@@ -36,7 +38,9 @@ const Tooltip = ({ content, children, placement = 'top', enabled = true }: Custo
 	const arrowClass = oppositeTheme === 'dark' ? styles.arrowDark : styles.arrowLight;
 
 	// Render children directly if tooltip is disabled
-	if (!enabled) return children;
+	if (!enabled) {
+		return children;
+	}
 
 	return (
 		<RadixTooltip.Provider delayDuration={50}>

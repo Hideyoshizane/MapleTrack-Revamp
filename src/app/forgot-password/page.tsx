@@ -8,7 +8,7 @@ import LockIcon from '@assets/svg/lock.svg';
 import Button from '@components/Button/Button';
 import FooterOutside from '@components/FooterOutside/FooterOutside';
 import FormInput from '@components/FormInput/FormInput';
-import { validateEmail } from '@utils/validation';
+import { validateEmail } from '@utils/validators';
 
 import { useForgotPassword } from './hooks/useForgotPassword';
 import styles from './page.module.scss';
@@ -71,9 +71,9 @@ const ForgotPasswordPage = (): JSX.Element => {
 				</Button>
 
 				<div className={styles.orDiv}>
-					<div className={styles.bar}></div>
+					<div className={styles.bar} />
 					<div className={styles.textBar}>OR</div>
-					<div className={styles.bar}></div>
+					<div className={styles.bar} />
 				</div>
 
 				<Link href="/signup" passHref className={styles.newAccount}>

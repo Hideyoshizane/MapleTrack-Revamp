@@ -3,14 +3,14 @@ import crypto from 'crypto';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
+import User from '@features/user/userModel';
 import connectToDatabase from '@lib/mongooseConect';
 import { sendEmail } from '@lib/sendEmail';
 import getForgotPasswordTemplate from '@lib/template/resetPasswordEmailTemplate';
-import User from '@models/user';
 import { forgotPasswordRequestSchema } from '@schemas/authSchemas';
-import { createResponse } from '@utils/api/createResponse';
-import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
-import { validateEmail } from '@utils/validation/';
+import { createResponse } from '@utils/createResponse';
+import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
+import { validateEmail } from '@utils/validators';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextRequest, NextResponse } from 'next/server';
@@ -24,22 +24,20 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		// Validate request body with zod
 		const parseResult = forgotPasswordRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
 		// Sanitize input
 		const email = sanitizeInputBackEnd(parseResult.data.email);
 		if (!email) {
-			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Missing required fields' }, 400);
 		}
 
 		// If validation fails, return early
 		const emailValidation = validateEmail(email);
 		if (!emailValidation.isValid) {
-			createResponse<ApiResponse>(
-				{ success: false, error: 'Validation failed', details: { email: emailValidation.error } },
-				400
-			);
+			const message = [emailValidation.error].filter(Boolean).join('\n');
+			createResponse<ApiResponse>({ success: false, message: message }, 400);
 		}
 
 		// search for user by the sanitized email
@@ -66,6 +64,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		return createResponse<ApiResponse>({ success: true, message: 'If the email exists, we sent a reset link.' }, 200);
 	} catch (error) {
 		console.error('Signup error:', error);
-		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
+		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

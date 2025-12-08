@@ -14,10 +14,10 @@ import ServerItem from './ServerItem/ServerItem';
 import type { Server } from '@sharedTypes/server';
 import type { JSX } from 'react';
 
-interface ServerDropdownProps {
+type ServerDropdownProps = {
 	serverCookie?: string;
 	setServerCookie?: (value: string) => void;
-}
+};
 
 const ServerDropdown = ({ serverCookie, setServerCookie }: ServerDropdownProps): JSX.Element => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -43,14 +43,18 @@ const ServerDropdown = ({ serverCookie, setServerCookie }: ServerDropdownProps):
 	// Close dropdown when clicking outside
 	useEffect((): (() => void) => {
 		const handleClickOutside = (event: MouseEvent): void => {
-			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) setIsOpen(false);
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+				setIsOpen(false);
+			}
 		};
 		document.addEventListener('mousedown', handleClickOutside);
 		return (): void => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
 
 	// Skeleton placeholder while selectedServer is not ready
-	if (!selectedServer) return <SkeletonWrapper width={502} height={368} color="light" variant="rounded" />;
+	if (!selectedServer) {
+		return <SkeletonWrapper width={502} height={368} color="light" variant="rounded" />;
+	}
 
 	return (
 		<div ref={dropdownRef} className={clsx(styles.serverDropdownWrapper, { [styles.open]: isOpen })}>

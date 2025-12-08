@@ -2,7 +2,7 @@ import { getRemainingExp, getExpForLevel, getLastLevel } from '@data/symbols/exp
 
 import { allSymbols } from './dailyExp';
 
-import type { CharacterSymbol, CharacterContent } from '@models/character';
+import type { CharacterSymbol, CharacterContent } from '@features/character/characterModel';
 
 // Symbol Name Types
 type ArcaneSymbolName = 'Vanishing Journey' | 'Chu Chu Island' | 'Lachelein' | 'Arcana' | 'Morass' | 'Esfera';
@@ -32,13 +32,12 @@ const FOLDER_MAP: Record<SymbolCategory, string> = {
 	grand: '/assets/grandsacredforce/',
 };
 
-// Symbol Info
-interface SymbolInfo {
+type SymbolInfo = {
 	category: SymbolCategory;
 	file: string;
 	minLevel?: number;
 	maxLevel: number;
-}
+};
 
 // Build a single lookup map
 const SYMBOL_MAP: Record<SymbolName, SymbolInfo> = Object.fromEntries(
@@ -85,7 +84,9 @@ export const getContentValue = (symbolName: string, contentType: string): number
 		return symbol ? Number(symbol.value) || 0 : 0;
 	};
 
-	if (contentType === 'Daily Quest') return resolve(symbolName);
+	if (contentType === 'Daily Quest') {
+		return resolve(symbolName);
+	}
 
 	const value = resolve(contentType);
 	return value !== 0 ? value : resolve('Weekly');
@@ -115,8 +116,12 @@ export const calculateDaysToCompleteSymbol = (
 	symbolExp: number
 ): number => {
 	let remaining = getRemainingExp(type, symbolLevel, symbolExp);
-	if (remaining <= 0) return 0;
-	if (daily <= 0 && weekly <= 0) return Infinity;
+	if (remaining <= 0) {
+		return 0;
+	}
+	if (daily <= 0 && weekly <= 0) {
+		return Infinity;
+	}
 
 	// total weekly gain
 	const weeklyTotal = weekly * 3;
@@ -134,7 +139,9 @@ export const calculateDaysToCompleteSymbol = (
 	while (remaining > 0) {
 		remainingDays++;
 		remaining -= daily;
-		if (remainingDays % 7 === 0) remaining -= weeklyTotal;
+		if (remainingDays % 7 === 0) {
+			remaining -= weeklyTotal;
+		}
 	}
 
 	return weeksNeeded * 7 + remainingDays;

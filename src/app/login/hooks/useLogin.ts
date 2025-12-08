@@ -4,11 +4,12 @@ import { signIn } from 'next-auth/react';
 import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 
-import { sanitizeInputFrontend } from '@utils/sanitize/sanitizeInputFrontEnd';
-import { validateUsernameLogin, validatePasswordLogin, handleFieldValidation } from '@utils/validation';
+import { handleFieldValidation } from '@/utils/validateField';
+import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
+import { validateUsernameLogin, validatePasswordLogin } from '@utils/validators';
 
 import type { LoginFormData } from '@sharedTypes/form';
-import type { ValidationResult } from '@utils/validation';
+import type { ValidationResult } from '@utils/validateField';
 import type { UseFormSetError } from 'react-hook-form';
 
 export const useLogin = (

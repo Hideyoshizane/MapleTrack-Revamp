@@ -21,7 +21,7 @@ const jobTypeClassMap: Record<JobType, string> = {
 	complete: styles.complete,
 };
 
-interface ProgressBarProps {
+type ProgressBarProps = {
 	value: number;
 	maxValue: number;
 	jobType: JobType;
@@ -29,7 +29,7 @@ interface ProgressBarProps {
 	height: number;
 	forceFull?: boolean;
 	disabled?: boolean;
-}
+};
 
 type IndicatorStyle = React.CSSProperties & { '--progress-value'?: string | number };
 
@@ -43,8 +43,12 @@ const ProgressBar = ({
 	disabled = false,
 }: ProgressBarProps): JSX.Element => {
 	const percentage = useMemo((): number => {
-		if (forceFull) return 100;
-		if (maxValue <= 0 || value === 0 || disabled) return 0;
+		if (forceFull) {
+			return 100;
+		}
+		if (maxValue <= 0 || value === 0 || disabled) {
+			return 0;
+		}
 
 		const rawPercent = (value / maxValue) * 100;
 		return Math.min(Math.max(rawPercent, 5.35), 100);

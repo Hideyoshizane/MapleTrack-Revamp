@@ -3,14 +3,14 @@ import grandSacredExpJson from './grandSacredForceExp.json';
 import sacredExpJson from './sacredForceExp.json';
 
 // Base type for each level entry
-interface ExpLevel {
+type ExpLevel = {
 	EXP: number;
-}
+};
 
 // Generic shape of EXP tables
-interface ExpData {
+type ExpData = {
 	level: Record<string, ExpLevel>;
-}
+};
 
 // Explicit constants for each system
 const arcaneExp: ExpData = arcaneExpJson as ExpData;

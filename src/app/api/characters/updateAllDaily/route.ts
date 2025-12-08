@@ -7,12 +7,12 @@ import {
 	canUseSymbol,
 	getSymbolMaxLevel,
 } from '@data/symbols/symbolMappings';
+import { Character } from '@features/character/characterModel';
+import { updateAllDailySchema } from '@features/character/characterUpdateSchema';
 import connectToDatabase from '@lib/mongooseConect';
-import { Character } from '@models/character';
-import { updateAllDailySchema } from '@schemas/characterUpdateSchema';
-import { createResponse } from '@utils/api/createResponse';
-import { SERVER_OPTIONS } from '@utils/cookies/serverCookie';
-import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
+import { createResponse } from '@utils/createResponse';
+import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
+import { SERVER_OPTIONS } from '@utils/serverCookie';
 
 import type { LevelUpResult } from '@data/symbols/symbolMappings';
 import type { ApiResponse } from '@sharedTypes/api';
@@ -26,19 +26,19 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		// Validate request body using Zod
 		const parseResult = updateAllDailySchema.safeParse(await request.json());
 		if (!parseResult.success) {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid request body' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 		const { userOrigin: rawUsername, server: rawServer, code: rawCode } = parseResult.data;
 
 		// Sanitize
 		const [username, server, code] = [rawUsername, rawServer, rawCode].map(sanitizeInputBackEnd);
 		if (!username || !server || !code) {
-			return createResponse<ApiResponse>({ success: false, error: 'Missing required fields' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Missing required fields' }, 400);
 		}
 
 		// Validate allowed server
 		if (!SERVER_OPTIONS.includes(server)) {
-			return createResponse<ApiResponse>({ success: false, error: 'Invalid server' }, 400);
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid server' }, 400);
 		}
 
 		// Search for the character
@@ -109,6 +109,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		);
 	} catch (error) {
 		console.error('Search error:', error);
-		return createResponse<ApiResponse>({ success: false, error: 'Internal Server Error' }, 500);
+		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

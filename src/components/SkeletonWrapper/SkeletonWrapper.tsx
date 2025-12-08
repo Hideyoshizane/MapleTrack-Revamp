@@ -6,12 +6,12 @@ import styles from './SkeletonWrapper.module.scss';
 
 import type { JSX } from 'react';
 
-interface SkeletonWrapperProps {
+type SkeletonWrapperProps = {
 	width: number | string;
 	height: number | string;
 	color: 'light' | 'dark';
 	variant?: 'text' | 'rectangular' | 'rounded' | 'circular';
-}
+};
 
 // Mapeia os backgrounds
 const SkeletonBgColors: Record<SkeletonWrapperProps['color'], string> = {

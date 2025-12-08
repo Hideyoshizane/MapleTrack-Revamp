@@ -3,19 +3,19 @@
 
 import Image from 'next/image';
 
-import { codeToClass } from '@/utils/character/codeToClass';
+import { codeToClass } from '@/utils/codeToClass';
 import CheckIcon from '@assets/svg/check.svg';
 
 import styles from './CharacterBossItem.module.scss';
 
-import type { BossCharacter } from '@/models/bossList';
+import type { BossCharacter } from '@features/Boss/bossListModel';
 import type { JSX, KeyboardEvent } from 'react';
 
-interface CharacterBossItemProps {
+type CharacterBossItemProps = {
 	character: BossCharacter;
 	isSelected: boolean;
 	onClick?: () => void;
-}
+};
 
 export default function CharacterBossItem({ character, isSelected, onClick }: CharacterBossItemProps): JSX.Element {
 	const handleKey = (event: KeyboardEvent<HTMLDivElement>): void => {

@@ -8,13 +8,13 @@ import styles from './Switch.module.scss';
 
 import type { JSX } from 'react';
 
-interface SwitchProps {
+type SwitchProps = {
 	title?: string;
 	checked: boolean;
 	tooltipMessage?: string;
 	onCheckedChange: (checked: boolean) => void;
 	disabled?: boolean;
-}
+};
 
 const Switch = ({ title, checked, tooltipMessage, onCheckedChange, disabled }: SwitchProps): JSX.Element => {
 	return (

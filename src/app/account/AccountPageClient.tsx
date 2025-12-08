@@ -1,11 +1,10 @@
 'use client';
 
-import React from 'react';
 import { useForm } from 'react-hook-form';
 
 import Button from '@components/Button/Button';
 import FormInput from '@components/FormInput/FormInput';
-import { validatePassword, validatePasswordConfirmation } from '@utils/validation';
+import { validatePassword, validatePasswordConfirmation } from '@utils/validators';
 
 import AlertDialogComponent from './Components/AlertDialogComponent/AlertDialogComponent';
 import { useChangePassword } from './hooks/useChangePassword';
@@ -13,13 +12,13 @@ import { useDeleteAccount } from './hooks/useDeleteAccount';
 import styles from './page.module.scss';
 
 import type { ChangePasswordFormData } from '@sharedTypes/form';
-import type { ValidationResult } from '@utils/validation';
+import type { ValidationResult } from '@utils/validateField';
 import type { JSX } from 'react';
 
-interface AccountClientProps {
+type AccountClientProps = {
 	searchParams?: Record<string, string | undefined>;
 	username: string;
-}
+};
 
 const AccountPageClient = ({ username }: AccountClientProps): JSX.Element => {
 	const {
@@ -103,12 +102,10 @@ const AccountPageClient = ({ username }: AccountClientProps): JSX.Element => {
 
 			<p className={styles.dangerText}>Danger Zone</p>
 
-			<>
-				<Button onClick={openDeleteDialog} className={styles.dangerButton}>
-					Delete Account
-				</Button>
-				<AlertDialogComponent open={isDeleteDialogOpen} onOpenChange={closeDeleteDialog} onConfirm={handleDelete} />
-			</>
+			<Button onClick={openDeleteDialog} className={styles.dangerButton}>
+				Delete Account
+			</Button>
+			<AlertDialogComponent open={isDeleteDialogOpen} onOpenChange={closeDeleteDialog} onConfirm={handleDelete} />
 		</section>
 	);
 };

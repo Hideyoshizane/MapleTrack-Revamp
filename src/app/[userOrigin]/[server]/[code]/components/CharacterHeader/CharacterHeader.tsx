@@ -11,13 +11,13 @@ import DropdownEventMenu from '../DropdownEventMenu/DropdownEventMenu';
 import styles from './CharacterHeader.module.scss';
 
 import type { CharacterDocument } from '@models/character';
-import type { ExtraCharacterData } from '@sharedTypes/character';
+import type { CharacterDataFromAPI } from '@sharedTypes/character';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import type { JSX } from 'react';
 
 interface CharacterHeaderProps {
 	character: CharacterDocument;
-	extraData: ExtraCharacterData | null;
+	extraData: CharacterDataFromAPI | null;
 	router: AppRouterInstance;
 	handleIncreaseAll: () => Promise<void>;
 }

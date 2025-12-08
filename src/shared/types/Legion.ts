@@ -1,10 +1,10 @@
-interface LegionBonusRank {
+type LegionBonusRank = {
 	rank: string;
 	description: string;
-}
+};
 
-export interface LegionBonus {
+export type LegionBonus = {
 	name: string;
 	class: string;
 	ranking: LegionBonusRank[];
-}
+};

@@ -9,7 +9,7 @@ import Tooltip from '@components/Tooltip/Tooltip';
 
 import styles from './ValidationIcon.module.scss';
 
-import type { JSX } from 'react';
+import type { FC, SVGProps, JSX } from 'react';
 
 type ValidationIconProps = {
 	showValid: boolean;
@@ -19,6 +19,11 @@ type ValidationIconProps = {
 	iconSize?: number;
 	className?: string;
 	isLightmode?: boolean;
+};
+
+const ICONS: Record<'invalid' | 'info', FC<SVGProps<SVGSVGElement>>> = {
+	invalid: ErrorIcon as FC<SVGProps<SVGSVGElement>>,
+	info: InfoIcon as FC<SVGProps<SVGSVGElement>>,
 };
 
 const ValidationIcon = ({
@@ -36,7 +41,7 @@ const ValidationIcon = ({
 	}
 
 	// Determine which icon to render
-	const IconComponent = showInvalid ? ErrorIcon : InfoIcon;
+	const IconComponent = ICONS[showInvalid ? 'invalid' : 'info'];
 	const iconClass = clsx(
 		showInvalid ? styles.invalidIcon : styles.defaultIcon,
 		!showInvalid && isLightmode && styles.lightModeDefaultIcon,

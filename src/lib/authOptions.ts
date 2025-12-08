@@ -2,11 +2,11 @@ import argon2 from 'argon2';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
 import { LASTVERSION } from '@data/user/constants';
+import UserMongo from '@features/user/userModel';
+import { updateLastLogin, updateUserVersion } from '@features/user/userService';
 import connectToDatabase from '@lib/mongooseConect';
-import UserMongo from '@models/user';
-import { updateLastLogin, updateUserVersion } from '@service/userService';
-import { sanitizeInputBackEnd } from '@utils/sanitize/sanitizeInputBackEnd';
-import { validateUsernameLogin, validatePasswordLogin } from '@utils/validation';
+import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
+import { validateUsernameLogin, validatePasswordLogin } from '@utils/validators';
 
 import type { AuthOptions, User, Session } from 'next-auth';
 import type { JWT } from 'next-auth/jwt';
@@ -98,8 +98,8 @@ export const authOptions: AuthOptions = {
 		session({ session, token }: { session: Session; token: JWT }): Session {
 			if (token) {
 				session.user = {
-					id: token.id as string,
-					username: token.username as string,
+					id: token.id,
+					username: token.username,
 					version: token.version as number,
 				};
 			}
