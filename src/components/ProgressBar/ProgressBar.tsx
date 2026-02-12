@@ -2,7 +2,6 @@
 
 import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { clsx } from 'clsx';
-import { useMemo } from 'react';
 
 import styles from './ProgressBar.module.scss';
 
@@ -42,17 +41,14 @@ const ProgressBar = ({
 	forceFull = false,
 	disabled = false,
 }: ProgressBarProps): JSX.Element => {
-	const percentage = useMemo((): number => {
-		if (forceFull) {
-			return 100;
-		}
-		if (maxValue <= 0 || value === 0 || disabled) {
-			return 0;
-		}
+	let percentage: number = 0;
 
-		const rawPercent = (value / maxValue) * 100;
-		return Math.min(Math.max(rawPercent, 5.35), 100);
-	}, [value, maxValue, forceFull, disabled]);
+	if (forceFull) {
+		percentage = 100;
+	} else if (maxValue > 0 && value > 0 && !disabled) {
+		const rawPercent: number = (value / maxValue) * 100;
+		percentage = Math.min(Math.max(rawPercent, 5.35), 100);
+	}
 
 	const indicatorStyle: IndicatorStyle = {
 		'--progress-value': percentage,

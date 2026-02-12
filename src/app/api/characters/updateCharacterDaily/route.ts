@@ -1,13 +1,11 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { getToken } from 'next-auth/jwt';
 
-import { getContentValue, calculateNewLevelFromExp } from '@data/symbols/symbolMappings';
-import { Character } from '@features/character/characterModel';
+import { getContentValue, calculateNewLevelFromExp, toSymbolName, isSymbolName } from '@data/symbols/symbolMappings';
 import { updateCharacterDailySchema } from '@features/character/characterUpdateSchema';
-import connectToDatabase from '@lib/mongooseConect';
+import { prisma } from '@lib/prisma';
 import { createResponse } from '@utils/createResponse';
-import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
-import { SERVER_OPTIONS } from '@utils/serverCookie';
 
 import type { LevelUpResult } from '@data/symbols/symbolMappings';
 import type { ApiResponse } from '@sharedTypes/api';
@@ -15,67 +13,114 @@ import type { NextResponse, NextRequest } from 'next/server';
 
 dayjs.extend(utc);
 
+const DAILY_QUEST_CONTENT_TYPE = 'Daily Quest' as const;
+
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
-		await connectToDatabase();
+		// Extract token from the request cookies
+		const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+		if (!token || typeof token.id !== 'string') {
+			return createResponse<ApiResponse>({ success: false, message: 'Unauthorized' }, 401);
+		}
+
+		let body: unknown;
+		try {
+			body = await request.json();
+		} catch {
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
+		}
+
 		// Validate request body using Zod
-		const parseResult = updateCharacterDailySchema.safeParse(await request.json());
+		const parseResult = updateCharacterDailySchema.safeParse(body);
 		if (!parseResult.success) {
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
-		const {
-			symbolName: rawSymbolName,
-			bonus,
-			userOrigin: rawUsername,
-			server: rawServer,
-			code: rawCode,
-		} = parseResult.data;
 
-		const [symbolName, username, server, code] = [rawSymbolName, rawUsername, rawServer, rawCode].map(
-			sanitizeInputBackEnd
-		);
-		if (!symbolName || !username || !server || !code) {
-			return createResponse<ApiResponse>({ success: false, message: 'Missing required fields' }, 400);
+		const { symbolName, bonus, server, code } = parseResult.data;
+		if (!isSymbolName(symbolName)) {
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid symbol name' }, 400);
 		}
-
-		// Validate allowed server
-		if (!SERVER_OPTIONS.includes(server)) {
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid server' }, 400);
-		}
+		const authenticatedUserId = token.id;
+		const now = dayjs().utc().toDate();
 
 		// Search for the character
-		const character = await Character.findOne({ userOrigin: username, server, code }).exec();
+		const character = await prisma.character.findUnique({
+			where: {
+				userId_server_code: {
+					userId: authenticatedUserId,
+					server,
+					code,
+				},
+			},
+			include: {
+				symbols: {
+					include: {
+						content: true,
+					},
+				},
+			},
+		});
+
 		if (!character) {
 			return createResponse<ApiResponse>({ success: true, message: 'Character not found.' }, 200);
 		}
 
 		// Find character Symbol
-		const allSymbols = [...character.ArcaneSymbol, ...character.SacredSymbol, ...character.GrandSacredSymbol];
-		const symbol = allSymbols.find((s): boolean => s.name === symbolName);
+		const symbol = character.symbols.find((s): boolean => s.name === symbolName);
 		if (!symbol) {
 			return createResponse<ApiResponse>({ success: false, message: 'Symbol not found on character' }, 404);
 		}
-		if (symbol.content[0].cleared == true) {
-			return createResponse<ApiResponse>({ success: false, message: 'Daily already cleared.' }, 404);
+
+		const dailyContent = symbol.content.find((content): boolean => content.contentType === DAILY_QUEST_CONTENT_TYPE);
+		if (!dailyContent) {
+			return createResponse<ApiResponse>({ success: false, message: 'Daily content not found for symbol' }, 404);
+		}
+		if (dailyContent.cleared === true) {
+			return createResponse<ApiResponse>({ success: false, message: 'Daily already cleared.' }, 409);
 		}
 
 		// Find Symbol daily Value
-		let dailyValue = getContentValue(symbolName, 'Daily Quest');
-		if (symbol.content[2]?.checked == true) {
-			dailyValue += getContentValue(symbol.content[2].contentType, 'Daily Quest');
+		let dailyValue = getContentValue(symbolName, DAILY_QUEST_CONTENT_TYPE);
+
+		const bonusContent = symbol.content.find(
+			(content): boolean => content.checked === true && content.contentType !== DAILY_QUEST_CONTENT_TYPE,
+		);
+
+		if (bonusContent) {
+			const bonusSymbolName = toSymbolName(bonusContent.contentType);
+
+			if (bonusSymbolName) {
+				dailyValue += getContentValue(bonusSymbolName, DAILY_QUEST_CONTENT_TYPE);
+			}
 		}
-		// Sum with bonus value
+
 		dailyValue += bonus;
 
 		// Update symbol exp and level
-		symbol.exp += dailyValue;
-		const newValues = calculateNewLevelFromExp(symbol.category, symbol.level, symbol.exp);
-		symbol.level = newValues.currentLevel;
-		symbol.exp = newValues.currentExp;
+		const updatedExp = symbol.exp + dailyValue;
+		const newValues = calculateNewLevelFromExp(symbol.category, symbol.level, updatedExp);
 
-		symbol.content[0].cleared = true;
-		symbol.content[0].date = dayjs().utc().toDate();
-		await character.save();
+		await prisma.$transaction([
+			prisma.characterSymbol.update({
+				where: { id: symbol.id },
+				data: {
+					level: newValues.currentLevel,
+					exp: newValues.currentExp,
+				},
+			}),
+			prisma.characterContent.update({
+				where: {
+					symbolId_contentType: {
+						symbolId: symbol.id,
+						contentType: dailyContent.contentType,
+					},
+				},
+				data: {
+					cleared: true,
+					date: now,
+				},
+			}),
+		]);
 
 		// Return value
 		return createResponse<ApiResponse<LevelUpResult>>(
@@ -84,7 +129,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 				message: 'Character updated successfully.',
 				data: newValues,
 			},
-			200
+			200,
 		);
 	} catch (error) {
 		console.error('Search error:', error);

@@ -2,12 +2,10 @@ import arcaneExpJson from './arcaneForceExp.json';
 import grandSacredExpJson from './grandSacredForceExp.json';
 import sacredExpJson from './sacredForceExp.json';
 
-// Base type for each level entry
 type ExpLevel = {
 	EXP: number;
 };
 
-// Generic shape of EXP tables
 type ExpData = {
 	level: Record<string, ExpLevel>;
 };
@@ -20,14 +18,11 @@ const grandSacredExp: ExpData = grandSacredExpJson as ExpData;
 // Enum to identify each system
 type ForceType = 'arcane' | 'sacred' | 'grand';
 
-// Mapping between type and dataset
 const expTables: Record<ForceType, ExpData> = { arcane: arcaneExp, sacred: sacredExp, grand: grandSacredExp };
 
-// Get EXP required for a specific level
 export const getExpForLevel = (type: ForceType, level: number): number =>
 	expTables[type].level[level.toString()]?.EXP ?? 0;
 
-// Get the last level in the table
 export const getLastLevel = (type: ForceType): number => {
 	const levels = Object.keys(expTables[type].level).map(Number);
 	return levels.length ? Math.max(...levels) : 0;

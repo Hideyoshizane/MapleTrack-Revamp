@@ -4,33 +4,29 @@ import { allSymbols } from './dailyExp';
 
 import type { CharacterSymbol, CharacterContent } from '@features/character/characterModel';
 
-// Symbol Name Types
-type ArcaneSymbolName = 'Vanishing Journey' | 'Chu Chu Island' | 'Lachelein' | 'Arcana' | 'Morass' | 'Esfera';
-type SacredSymbolName = 'Cernium' | 'Arcus' | 'Odium' | 'Shangri-La' | 'Arteria' | 'Carcion';
-type GrandSacredSymbolName = 'Tallahart';
-export type SymbolCategory = 'arcane' | 'sacred' | 'grand';
-export type SymbolName = ArcaneSymbolName | SacredSymbolName | GrandSacredSymbolName;
-
-// Maps category to names
-export const SYMBOL_NAMES: Record<SymbolCategory, readonly string[]> = {
-	arcane: ['Vanishing Journey', 'Chu Chu Island', 'Lachelein', 'Arcana', 'Morass', 'Esfera'],
-	sacred: ['Cernium', 'Arcus', 'Odium', 'Shangri-La', 'Arteria', 'Carcion'],
-	grand: ['Tallahart'],
+export const SYMBOL_CONFIG = {
+	arcane: {
+		folder: '/assets/arcaneforce/',
+		maxLevel: 20,
+		names: ['Vanishing Journey', 'Chu Chu Island', 'Lachelein', 'Arcana', 'Morass', 'Esfera'],
+	},
+	sacred: {
+		folder: '/assets/sacredforce/',
+		maxLevel: 11,
+		names: ['Cernium', 'Arcus', 'Odium', 'Shangri-La', 'Arteria', 'Carcion'],
+	},
+	grand: {
+		folder: '/assets/grandsacredforce/',
+		maxLevel: 11,
+		names: ['Tallahart'],
+	},
 } as const;
 
-// Category max levels
-export const CATEGORY_MAX_LEVEL: Record<SymbolCategory, number> = {
-	arcane: 20,
-	sacred: 11,
-	grand: 11,
-};
+export type SymbolCategory = keyof typeof SYMBOL_CONFIG;
 
-// Folder map for assets
-const FOLDER_MAP: Record<SymbolCategory, string> = {
-	arcane: '/assets/arcaneforce/',
-	sacred: '/assets/sacredforce/',
-	grand: '/assets/grandsacredforce/',
-};
+export type SymbolName = {
+	[C in SymbolCategory]: (typeof SYMBOL_CONFIG)[C]['names'][number];
+}[SymbolCategory];
 
 type SymbolInfo = {
 	category: SymbolCategory;
@@ -39,50 +35,54 @@ type SymbolInfo = {
 	maxLevel: number;
 };
 
-// Build a single lookup map
+const symbolExpIndex = new Map(allSymbols.map((symbol) => [symbol.name, symbol]));
+
+const contentValueIndex = new Map(allSymbols.map((symbol) => [symbol.name, Number(symbol.value) || 0]));
+
 const SYMBOL_MAP: Record<SymbolName, SymbolInfo> = Object.fromEntries(
-	Object.entries(SYMBOL_NAMES).flatMap(([category, names]): [SymbolName, SymbolInfo][] =>
-		names.map((name): [SymbolName, SymbolInfo] => {
-			const symbol = allSymbols.find((s): boolean => s.name === name);
+	Object.entries(SYMBOL_CONFIG).flatMap(([category, config]) =>
+		config.names.map((name) => {
+			const expSymbol = symbolExpIndex.get(name);
+
 			return [
-				name as SymbolName,
+				name,
 				{
 					category: category as SymbolCategory,
 					file: name.toLowerCase().replace(/ /g, '_'),
-					minLevel: symbol?.minLevel ? parseInt(symbol.minLevel, 10) : undefined,
-					maxLevel: CATEGORY_MAX_LEVEL[category as SymbolCategory],
+					minLevel: expSymbol?.minLevel ? Number(expSymbol.minLevel) : undefined,
+					maxLevel: config.maxLevel,
 				},
 			];
-		})
-	)
+		}),
+	),
 ) as Record<SymbolName, SymbolInfo>;
 
-// Get symbol image path
 export const getSymbolImagePath = (name: SymbolName): string => {
-	const symbol = SYMBOL_MAP[name];
-	return `${FOLDER_MAP[symbol.category]}${symbol.file}.webp`;
+	const info = SYMBOL_MAP[name];
+	const folder = SYMBOL_CONFIG[info.category].folder;
+	return `${folder}${info.file}.webp`;
 };
 
-// Check if character can use symbol
-export const canUseSymbol = (level: number, name: string): boolean => {
-	const minLevel = SYMBOL_MAP[name as SymbolName]?.minLevel;
-	return minLevel ? level >= minLevel : true;
+export const isSymbolName = (value: string): value is SymbolName => {
+	return value in SYMBOL_MAP;
 };
 
-// Get symbol min level
-export const getSymbolMinLevel = (name: string): number => SYMBOL_MAP[name as SymbolName]?.minLevel ?? 0;
+export const canUseSymbol = (level: number, name: SymbolName): boolean => {
+	const minLevel = SYMBOL_MAP[name].minLevel;
+	return minLevel === undefined || level >= minLevel;
+};
 
-// Get max level (by name or category)
-export const getSymbolMaxLevel = (input: SymbolCategory | SymbolName): number =>
-	CATEGORY_MAX_LEVEL[input as SymbolCategory] ?? SYMBOL_MAP[input as SymbolName].maxLevel;
+export const getSymbolMinLevel = (name: SymbolName): number => SYMBOL_MAP[name].minLevel ?? 0;
 
-// Get symbol value
-export const getContentValue = (symbolName: string, contentType: string): number => {
-	// Helper to resolve values safely
-	const resolve = (name: string): number => {
-		const symbol = allSymbols.find((s): boolean => s.name === name);
-		return symbol ? Number(symbol.value) || 0 : 0;
-	};
+export const getSymbolMaxLevel = (input: SymbolCategory | SymbolName): number => {
+	if (input in SYMBOL_CONFIG) {
+		return SYMBOL_CONFIG[input as SymbolCategory].maxLevel;
+	}
+	return SYMBOL_MAP[input as SymbolName].maxLevel;
+};
+
+export const getContentValue = (symbolName: SymbolName, contentType: string): number => {
+	const resolve = (name: string): number => contentValueIndex.get(name) ?? 0;
 
 	if (contentType === 'Daily Quest') {
 		return resolve(symbolName);
@@ -92,53 +92,49 @@ export const getContentValue = (symbolName: string, contentType: string): number
 	return value !== 0 ? value : resolve('Weekly');
 };
 
-// Compute daily and weekly values
 export const computeDailyWeeklyValues = (
 	symbol: CharacterSymbol,
-	content: CharacterContent[]
+	content: CharacterContent[],
 ): { dailyValue: number; weeklyValue: number } => {
 	const dailyValue =
-		(content[0]?.checked ? getContentValue(symbol.name, content[0].contentType) : 0) +
-		(content[2]?.checked ? getContentValue(symbol.name, content[2].contentType) : 0);
+		(content[0]?.checked ? getContentValue(symbol.name as SymbolName, content[0].contentType) : 0) +
+		(content[2]?.checked ? getContentValue(symbol.name as SymbolName, content[2].contentType) : 0);
 
-	// Weekly value comes from second content item
-	const weeklyValue = content[1]?.checked ? getContentValue(symbol.name, 'Weekly') : 0;
+	const weeklyValue = content[1]?.checked ? getContentValue(symbol.name as SymbolName, 'Weekly') : 0;
 
 	return { dailyValue, weeklyValue };
 };
 
-// Return Days to max Symbol
 export const calculateDaysToCompleteSymbol = (
 	daily: number,
 	weekly: number,
 	type: SymbolCategory,
 	symbolLevel: number,
-	symbolExp: number
+	symbolExp: number,
 ): number => {
 	let remaining = getRemainingExp(type, symbolLevel, symbolExp);
+
 	if (remaining <= 0) {
 		return 0;
 	}
+
 	if (daily <= 0 && weekly <= 0) {
 		return Infinity;
 	}
 
-	// total weekly gain
 	const weeklyTotal = weekly * 3;
-
 	const dailyGainPerWeek = daily * 7;
-
 	const totalExpPerWeek = dailyGainPerWeek + weeklyTotal;
 
-	// calculate full weeks needed
 	const weeksNeeded = Math.floor(remaining / totalExpPerWeek);
 	remaining -= weeksNeeded * totalExpPerWeek;
 
-	// remaining days in last partial week
 	let remainingDays = 0;
+
 	while (remaining > 0) {
 		remainingDays++;
 		remaining -= daily;
+
 		if (remainingDays % 7 === 0) {
 			remaining -= weeklyTotal;
 		}
@@ -155,21 +151,22 @@ export type LevelUpResult = {
 export const calculateNewLevelFromExp = (
 	type: SymbolCategory,
 	currentLevel: number,
-	currentExp: number
+	currentExp: number,
 ): LevelUpResult => {
 	let level = currentLevel;
 	let exp = currentExp;
 	const maxLevel = getLastLevel(type);
 
-	// Loop until we reach max level or can't level up anymore
 	while (level < maxLevel) {
 		const expForNextLevel = getExpForLevel(type, level);
+
 		if (exp >= expForNextLevel) {
 			exp -= expForNextLevel;
 			level++;
-		} else {
-			break;
+			continue;
 		}
+
+		break;
 	}
 
 	return { currentLevel: level, currentExp: exp };

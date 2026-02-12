@@ -1,47 +1,38 @@
-import { characterNameSchema } from '@features/character/characterNameSchema';
-import { fetchCharacterExternal } from '@lib/fetchCharacterExternal';
+import { characterApiSchema } from '@features/character/character.client.schema';
+import { fetchCharacterDataFromAPI } from '@lib/fetchCharacterDataFromAPI';
 import { createResponse } from '@utils/createResponse';
-import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
-import { SERVER_OPTIONS } from '@utils/serverCookie';
-import { validateField } from '@utils/validateField';
 
+import type { CharacterDataFromAPI } from '@features/character/characterApi';
 import type { ApiResponse } from '@sharedTypes/api';
-import type { CharacterDataFromAPI } from '@sharedTypes/character';
 import type { NextResponse, NextRequest } from 'next/server';
 
-export const GET = async (request: NextRequest): Promise<NextResponse> => {
+export const POST = async (request: NextRequest): Promise<NextResponse> => {
+	let body: unknown;
 	try {
-		// Validate user query parameter
-		const characterName = request.nextUrl.searchParams.get('character_name');
-		const server = request.nextUrl.searchParams.get('server');
+		body = await request.json();
+	} catch {
+		return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
+	}
 
-		// Early return if missing
-		if (!characterName || !server) {
-			return createResponse<ApiResponse>({ success: false, message: 'Missing parameters.' }, 400);
-		}
+	// Validate name
+	const parseResult = characterApiSchema.safeParse({ body });
 
-		// Validate name
-		const validation = validateField(characterNameSchema, 'name', characterName);
-		if (!validation.isValid) {
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid username.' }, 400);
-		}
+	if (!parseResult.success) {
+		return createResponse<ApiResponse>({ success: false, message: 'Invalid parameters.' }, 400);
+	}
 
-		// Validate allowed server
-		if (!SERVER_OPTIONS.includes(server)) {
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid server' }, 400);
-		}
+	const { characterName, server } = parseResult.data;
 
-		// Sanitize inputs
-		const sanitizedCharacterName = sanitizeInputBackEnd(characterName);
-		const sanitizedServer = sanitizeInputBackEnd(server);
+	try {
+		const data = await fetchCharacterDataFromAPI(characterName, server);
 
-		const data = await fetchCharacterExternal(sanitizedCharacterName, sanitizedServer);
 		return createResponse<ApiResponse<CharacterDataFromAPI>>(
 			{ success: true, message: 'Character fetched.', data },
-			200
+			200,
 		);
 	} catch (error: unknown) {
 		console.error('Error fetching character:', error);
-		return createResponse<ApiResponse>({ success: false, message: 'Internal server error' }, 400);
+
+		return createResponse<ApiResponse>({ success: false, message: 'Internal server error.' }, 500);
 	}
 };

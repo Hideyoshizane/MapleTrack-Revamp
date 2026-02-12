@@ -4,16 +4,15 @@ import Image from 'next/image';
 
 import Tooltip from '@components/Tooltip/Tooltip';
 import { getLegionData } from '@data/legion/legionSystems';
-import { getRank } from '@utils/getRank';
+import { getRank, codeToLegionThresholdSet } from '@features/character/characterAttributes';
 
 import styles from './LegionBlock.module.scss';
 
-import type { ThresholdSetCode } from '@utils/getRank';
 import type { JSX } from 'react';
 
 type LegionBlockProps = {
 	characterLevel: number;
-	characterCode: ThresholdSetCode;
+	characterCode: string;
 	characterJobType: string;
 	characterLegionType: string;
 	iconSize?: number;
@@ -60,7 +59,8 @@ const LegionBlock = ({
 	iconSize = 48,
 	showTooltip = false,
 }: LegionBlockProps): JSX.Element => {
-	const legionRank = getRank(characterLevel, characterCode);
+	const LegionThresholdCode = codeToLegionThresholdSet(characterCode);
+	const legionRank = getRank(characterLevel, LegionThresholdCode);
 	const legionData = getLegionData(characterLegionType);
 	const tooltipContent = getTooltipContent(legionRank, legionData);
 

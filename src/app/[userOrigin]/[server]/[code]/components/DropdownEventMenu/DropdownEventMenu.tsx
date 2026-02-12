@@ -7,6 +7,7 @@ import CheckIcon from '@assets/svg/check.svg';
 import SacredIcon from '@assets/svg/hexagon.svg';
 import MenuIcon from '@assets/svg/menu.svg';
 import ArcaneIcon from '@assets/svg/star.svg';
+import { MAX_VALUE_BONUS_COOKIE } from '@constants/cookiesConstants';
 
 import { useBonusContext } from '../../useBonusContext';
 
@@ -15,11 +16,10 @@ import styles from './DropdownEventMenu.module.scss';
 import type { JSX } from 'react';
 
 const ICON_SIZE = 40;
-const MAX_BONUS = 10;
 
 const DropdownEventMenu = (): JSX.Element => {
 	const { arcaneBonus, sacredBonus, setArcaneBonus, setSacredBonus } = useBonusContext();
-	const rows = Array.from({ length: MAX_BONUS + 1 }, (_, i): number => i);
+	const rows = Array.from({ length: MAX_VALUE_BONUS_COOKIE + 1 }, (_, i): number => i);
 
 	const renderBonusItem = (value: number, currentBonus: number, onSelect: (val: number) => void): JSX.Element => (
 		<DropdownMenu.Item className={styles.menuItem} onSelect={(): void => onSelect(value)} key={value}>

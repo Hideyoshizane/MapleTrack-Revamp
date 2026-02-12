@@ -1,0 +1,27 @@
+$bossIconSize: 90px;
+
+.characterBossLinkLegion {
+	display: flex;
+	justify-content: space-between;
+	width: 377px;
+	height: 98px;
+
+	.bossSlot {
+		width: $bossIconSize;
+		height: $bossIconSize;
+
+		.bossIcon {
+			color: var(--default-button-text);
+			transition: opacity 0.1s ease-in-out;
+			margin-top: 8px;
+
+			&.on {
+				opacity: 1;
+			}
+
+			&.off {
+				opacity: 0.3;
+			}
+		}
+	}
+}

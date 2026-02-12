@@ -1,31 +1,31 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import { useEffect, useCallback, useState } from 'react';
 
-import { DEFAULT_WEEKLY_TRIES } from '@/data/character/constants';
 import Button from '@components/Button/Button';
-import { hasDailyResetOccurred, hasWeeklyResetOccurred } from '@utils/time/time';
+import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
+import { characterQueryKeys } from '@features/character/character.queryKeys';
+import { characterApi } from '@features/character/characterApi';
+import { hasDailyResetOccurred, hasWeeklyResetOccurred } from '@utils/time';
 
 import styles from './SymbolButtons.module.scss';
 
-import type { CharacterContent, CharacterSymbol } from '@models/character';
+import type {
+	CharacterDraft as Character,
+	CharacterContent,
+	CharacterSymbol,
+} from '@features/character/characterModel';
 import type { JSX } from 'react';
 
-interface SymbolButtonsProps {
+type SymbolButtonsProps = {
 	symbol: CharacterSymbol;
 	dailyValue: number;
 	bonus: number;
 	content: CharacterContent[];
 	onValueChange?: (data: { currentExp: number; currentLevel: number }) => void;
 	disableAllDaily: boolean;
-}
-
-interface UpdateCharacterResponse {
-	success: boolean;
-	message: string;
-	data: { currentExp: number; currentLevel: number };
-}
+};
 
 const SymbolButtons = ({
 	symbol,
@@ -35,110 +35,145 @@ const SymbolButtons = ({
 	onValueChange,
 	disableAllDaily = false,
 }: SymbolButtonsProps): JSX.Element => {
-	const [isResetDone, setIsResetDone] = useState(true);
-	const [isWeeklyDone, setIsWeeklyDone] = useState(true);
-	const [localContent, setLocalContent] = useState(content);
+	const queryClient = useQueryClient();
 
-	// Compute Daily Button and Weekly Button
-	useEffect((): void => {
-		setLocalContent(content);
-		setIsResetDone(content[0]?.date ? hasDailyResetOccurred(content[0].date) : true);
-		setIsWeeklyDone(content[1]?.date ? hasWeeklyResetOccurred(dayjs(content[1].date)) : true);
-	}, [content]);
+	const dailyContent = content[0];
+	const weeklyContent = content[1];
 
-	const handleDailyUpdate = useCallback(async (): Promise<void> => {
+	const isDailyResetDone = dailyContent?.date ? hasDailyResetOccurred(dailyContent.date) : true;
+	const isWeeklyResetDone = weeklyContent?.date ? hasWeeklyResetOccurred(dayjs(weeklyContent.date)) : true;
+
+	const handleDailyUpdate = async (): Promise<void> => {
 		try {
-			// Compute URL segments here, local to this function
-			const pathname = window.location.pathname;
-			const [userOrigin, server, code] = pathname.split('/').filter(Boolean);
+			const [userOrigin, server, code] = window.location.pathname.split('/').filter(Boolean);
 
-			const payload = { symbolName: symbol.name, bonus, userOrigin, server, code };
-
-			const res = await fetch('/api/characters/updateCharacterDaily', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
+			const result = await characterApi.updateCharacterDaily({
+				symbolName: symbol.name,
+				bonus,
+				userOrigin,
+				server,
+				code,
 			});
 
-			const data: UpdateCharacterResponse = await res.json();
-			if (data.success) {
-				onValueChange?.(data.data);
-				setIsResetDone(false);
-
-				setLocalContent((prev): CharacterContent[] => {
-					const updated = [...prev];
-					if (updated[0]) {
-						updated[0].cleared = true;
-					}
-					return updated;
-				});
+			if (!result.success || !result.data) {
+				return;
 			}
+
+			onValueChange?.(result.data);
+
+			queryClient.setQueryData(
+				characterQueryKeys.detail(userOrigin, server, code),
+				(previousCharacter: Character | undefined): Character | undefined => {
+					if (!previousCharacter) {
+						return previousCharacter;
+					}
+
+					return {
+						...previousCharacter,
+						symbols: previousCharacter.symbols.map((characterSymbol) =>
+							characterSymbol.name !== symbol.name
+								? characterSymbol
+								: {
+										...characterSymbol,
+										content: characterSymbol.content.map((characterContent, index) =>
+											index === 0
+												? {
+														...characterContent,
+														cleared: true,
+														date: new Date(),
+												  }
+												: characterContent
+										),
+								  }
+						),
+					};
+				}
+			);
 		} catch (error) {
-			console.error('Error updating daily: ', error);
+			console.error('Error updating daily:', error);
 		}
-	}, [symbol.name, onValueChange, bonus]);
+	};
 
-	const handleWeeklyUpdate = useCallback(async (): Promise<void> => {
+	const handleWeeklyUpdate = async (): Promise<void> => {
 		try {
-			// Compute URL segments here, local to this function
-			const pathname = window.location.pathname;
-			const [userOrigin, server, code] = pathname.split('/').filter(Boolean);
+			const [userOrigin, server, code] = window.location.pathname.split('/').filter(Boolean);
 
-			const payload = { symbolName: symbol.name, userOrigin, server, code };
-
-			const res = await fetch('/api/characters/updateCharacterWeekly', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
+			const result = await characterApi.updateCharacterWeekly({
+				symbolName: symbol.name,
+				userOrigin,
+				server,
+				code,
 			});
 
-			const data: UpdateCharacterResponse = await res.json();
-			if (data.success) {
-				onValueChange?.(data.data);
-				setLocalContent((prev): CharacterContent[] => {
-					const updated = [...prev];
-					if (updated[1]) {
-						// Decrement tries and clear when zero
-						const currentTries =
-							typeof updated[1].tries === 'number' && updated[1].tries > 0 ? updated[1].tries : DEFAULT_WEEKLY_TRIES;
-						const newTries = Math.max(currentTries - 1, 0);
-
-						updated[1] = {
-							...updated[1],
-							tries: newTries,
-							cleared: newTries === 0,
-						};
-						if (newTries === 0) {
-							setIsWeeklyDone(false);
-						}
-					}
-					return updated;
-				});
+			if (!result.success || !result.data) {
+				return;
 			}
+
+			onValueChange?.(result.data);
+
+			queryClient.setQueryData(
+				characterQueryKeys.detail(userOrigin, server, code),
+				(previousCharacter: Character | undefined): Character | undefined => {
+					if (!previousCharacter) {
+						return previousCharacter;
+					}
+
+					return {
+						...previousCharacter,
+						symbols: previousCharacter.symbols.map((characterSymbol) =>
+							characterSymbol.name !== symbol.name
+								? characterSymbol
+								: {
+										...characterSymbol,
+										content: characterSymbol.content.map((characterContent, index) => {
+											if (index !== 1) {
+												return characterContent;
+											}
+
+											const currentTries =
+												typeof characterContent.tries === 'number' && characterContent.tries > 0
+													? characterContent.tries
+													: DEFAULT_WEEKLY_TRIES;
+
+											const newTries = Math.max(currentTries - 1, 0);
+
+											return {
+												...characterContent,
+												tries: newTries,
+												cleared: newTries === 0,
+												date: newTries === 0 ? new Date() : characterContent.date,
+											};
+										}),
+								  }
+						),
+					};
+				}
+			);
 		} catch (error) {
-			console.error('Error updating Weekly: ', error);
+			console.error('Error updating weekly:', error);
 		}
-	}, [symbol.name, onValueChange]);
+	};
 
 	// Determine button state and label for Daily Button
-	const dailyButtonDisabled = disableAllDaily || !localContent[0]?.checked || localContent[0]?.cleared || !isResetDone;
+	const dailyButtonDisabled = disableAllDaily || !dailyContent?.checked || dailyContent?.cleared || !isDailyResetDone;
+
 	const dailyButtonLabel = disableAllDaily
 		? 'Daily done!'
-		: !localContent[0]?.checked
+		: !dailyContent?.checked
 		? 'Disabled'
-		: !isResetDone
+		: !isDailyResetDone
 		? 'Daily done!'
 		: `Daily: +${dailyValue}`;
 
 	// Determine button state and label for Weekly Button
 	const weeklyButtonDisabled =
-		!localContent[1]?.checked || localContent[1]?.cleared || (localContent[1].tries === 0 && !isWeeklyDone);
+		!weeklyContent?.checked || weeklyContent?.cleared || (weeklyContent?.tries === 0 && !isWeeklyResetDone);
 
-	const weeklyButtonLabel = !localContent[1]?.checked
+	const weeklyButtonLabel = !weeklyContent?.checked
 		? 'Disabled'
-		: !isWeeklyDone && localContent[1].tries === 0
+		: !isWeeklyResetDone && weeklyContent?.tries === 0
 		? 'Weekly Done'
-		: `Weekly: ${localContent[1].tries}/${DEFAULT_WEEKLY_TRIES}`;
+		: `Weekly: ${weeklyContent?.tries}/${DEFAULT_WEEKLY_TRIES}`;
 
 	return (
 		<div className={styles.buttonLines}>
@@ -146,7 +181,7 @@ const SymbolButtons = ({
 				{dailyButtonLabel}
 			</Button>
 			<div className={styles.weeklyDiv}>
-				{localContent[1] && (
+				{weeklyContent && (
 					<Button
 						className={styles.button}
 						disabled={weeklyButtonDisabled}

@@ -1,32 +1,22 @@
 'use client';
-import { clsx } from 'clsx';
 import Image from 'next/image';
-import { notFound, useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
-// Assets
-import BossIcon from '@assets/svg/boss_slayer.svg';
 import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
-// Components
-import LegionBlock from '@components/LegionBlock/LegionBlock';
-import LinkSkillBlock from '@components/LinkSkillBlock/LinkSkillBlock';
-import Tooltip from '@components/Tooltip/Tooltip';
+import { getJob } from '@features/character/characterAttributes';
 
-// Local Components
+import CharacterBossLegion from './components/CharacterBossLegion/CharacterBossLegion';
 import { CharacterHeader } from './components/CharacterHeader/CharacterHeader';
 import { CharacterImageAndSync } from './components/CharacterImageAndSync/CharacterImageAndSync';
 import CharacterStats from './components/CharacterStats/CharacterStats';
 import CharacterSymbol from './components/CharacterSymbol/CharacterSymbol';
-// Hooks
-import { useCharacterDerived } from './hooks/useCharacterDerived';
+import ValidatedInput from './components/ValidadeInput/ValidatedInput';
 import { useCharacterInputs } from './hooks/useCharacterInputs';
 import { useCharacterPageData } from './hooks/useCharacterPageData';
-// Styling
 import styles from './page.module.scss';
 
-// Types
 import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { Character } from '@sharedTypes/character';
 import type { JSX } from 'react';
 
 type CharacterPageProps = {
@@ -35,132 +25,30 @@ type CharacterPageProps = {
 	code: string;
 };
 
-const BOSS_ICON_SIZE = 90;
-const ICON_SIZE = 64;
-
-// Helper Components
-type ValidatedInputProps = {
-	value?: string;
-	placeholder?: string;
-	error?: string | null;
-	onBlur?: (value: string) => void;
-	onCommit?: (value: string) => void;
-};
-
-const ValidatedInput = ({ value, placeholder, error, onBlur, onCommit }: ValidatedInputProps): JSX.Element => {
-	// State to track current input value
-	const [inputValue, setInputValue] = useState(value ?? '');
-
-	// State to remember the original value before editing
-	const [originalValue, setOriginalValue] = useState(value ?? '');
-
-	useEffect((): void => {
-		setInputValue(value ?? '');
-		setOriginalValue(value ?? '');
-	}, [value]);
-
-	const handleChange = (val: string): void => {
-		setInputValue(val);
-	};
-	// When user focuses the input: clear the field
-	const handleFocus = (): void => {
-		setInputValue('');
-	};
-
-	const handleBlur = (): void => {
-		// If user left it empty, restore original value
-		const finalValue = inputValue.trim() === '' ? originalValue : inputValue;
-
-		setInputValue(finalValue);
-		setOriginalValue(finalValue);
-
-		// Call external handlers
-		onBlur?.(finalValue);
-		onCommit?.(finalValue);
-	};
-
-	return (
-		<Tooltip content={error} placement="left" enabled={!!error}>
-			<input
-				className={clsx(styles.characterName, { [styles.invalid]: !!error })}
-				value={inputValue}
-				placeholder={placeholder}
-				onChange={(e): void => handleChange(e.target.value)}
-				onFocus={handleFocus}
-				onBlur={handleBlur}
-			/>
-		</Tooltip>
-	);
-};
-
-type CharacterBossLegionProps = {
-	character: Character;
-	toggleBossing: () => void;
-	linkSkill: string;
-	code: string;
-	jobType: JobType;
-	legion: string;
-};
-
-const CharacterBossLegion = ({
-	character,
-	toggleBossing,
-	linkSkill,
-	code,
-	jobType,
-	legion,
-}: CharacterBossLegionProps): JSX.Element => (
-	<div className={styles.characterBossLinkLegion}>
-		<div className={styles.bossSlot}>
-			<Tooltip content="Click to toggle Boss Slayer status" placement="bottom">
-				<div onClick={toggleBossing} style={{ cursor: 'pointer' }}>
-					<BossIcon
-						width={BOSS_ICON_SIZE}
-						height={BOSS_ICON_SIZE}
-						className={clsx(styles.bossIcon, {
-							[styles.on]: character.bossing,
-							[styles.off]: !character.bossing,
-						})}
-					/>
-				</div>
-			</Tooltip>
-		</div>
-		<LinkSkillBlock characterLevel={character.level} characterLinkSkill={linkSkill} iconSize={ICON_SIZE} showTooltip />
-		<LegionBlock
-			characterLevel={character.level}
-			characterCode={code}
-			characterJobType={jobType}
-			characterLegionType={legion}
-			iconSize={ICON_SIZE}
-			showTooltip
-		/>
-	</div>
-);
-
 const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.Element => {
 	const router = useRouter();
 	const pathname = usePathname();
 
-	const {
-		character: fetchedCharacter,
-		committedName,
-		setCommittedName,
-		loading: pageLoading,
-		error,
-		extraData,
-		extraDataFailed,
-		handleSyncToggle,
-	} = useCharacterPageData({
-		userOrigin,
-		server,
-		code,
-	});
+	const [committedName, setCommittedName] = useState<string>();
+	const [syncEnabled, setSyncEnabled] = useState(false);
+	const [firstLoad, setFirstLoad] = useState(true);
 
-	const inputsReady = !!fetchedCharacter;
+	const { character, updateCharacter, loading, error, CharacterDataFromAPI, CharacterDataFromAPIFailed } =
+		useCharacterPageData({
+			userOrigin,
+			server,
+			code,
+			nameOverride: committedName,
+			syncEnabled,
+			setFirstLoad,
+		});
 
+	useEffect(() => {
+		if (character?.syncing && !syncEnabled) {
+			setTimeout(() => setSyncEnabled(true), 0);
+		}
+	}, [character, syncEnabled]);
 	const {
-		character,
-		setCharacter,
 		levelInput,
 		setLevelInput,
 		targetLevelInput,
@@ -168,14 +56,31 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 		nameError,
 		handleNameBlur,
 		toggleBossing,
-	} = useCharacterInputs(inputsReady ? fetchedCharacter : undefined);
+		handleLevelBlur,
+		handleTargetLevelBlur,
+		toggleSync,
+	} = useCharacterInputs({ character, updateCharacter, setSyncEnabled });
 
-	const derived = useCharacterDerived({ character });
-	const { level, targetLevel, jobType, charClass, legion, linkSkill, job } = derived;
+	if (loading && firstLoad) {
+		return <FullPageLoader />;
+	}
 
-	if (pageLoading || !character) return <FullPageLoader />;
-	if (error) throw new Error(error);
-	if (!character) notFound();
+	if (error) {
+		throw new Error(error);
+	}
+
+	if (!character) {
+		return <FullPageLoader />;
+	}
+
+	const level = character.level;
+	const targetLevel = character.targetLevel;
+	const jobType = character.jobType as JobType;
+	const charClass = character.class;
+	const legion = character.legion;
+	const linkSkill = character.linkSkill;
+	const job = getJob(level);
+
 	return (
 		<section className="mainContent">
 			<div className={styles.mainDiv}>
@@ -203,16 +108,23 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 					<div className={styles.usernameLine}>
 						<CharacterImageAndSync
 							character={character}
-							extraData={extraData}
-							extraDataFailed={extraDataFailed}
-							onSyncToggle={handleSyncToggle}
+							CharacterDataFromAPI={CharacterDataFromAPI}
+							CharacterDataFromAPIFailed={CharacterDataFromAPIFailed}
+							syncEnabled={syncEnabled}
+							toggleSync={toggleSync}
 						/>
 						<ValidatedInput
-							value={committedName}
-							placeholder="Character Name"
+							value={committedName ?? ''}
+							placeholder={character.name ?? 'Character Name'}
 							error={nameError}
-							onBlur={handleNameBlur}
-							onCommit={setCommittedName}
+							onBlur={(value) => {
+								handleNameBlur(value);
+								setCommittedName(value);
+							}}
+							onCommit={(value) => {
+								handleNameBlur(value);
+								setCommittedName(value);
+							}}
 						/>
 					</div>
 
@@ -220,10 +132,10 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 						<CharacterBossLegion
 							character={character}
 							toggleBossing={toggleBossing}
-							linkSkill={linkSkill}
+							linkSkill={linkSkill ?? ''}
 							code={character.code ?? ''}
 							jobType={jobType}
-							legion={legion}
+							legion={legion ?? ''}
 						/>
 
 						<div className={styles.characterClassJob}>
@@ -238,17 +150,17 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 						targetLevelInput={targetLevelInput}
 						setTargetLevelInput={setTargetLevelInput}
 						character={character}
-						setCharacter={setCharacter}
+						handleLevelBlur={handleLevelBlur}
+						handleTargetLevelBlur={handleTargetLevelBlur}
 						level={level}
 						targetLevel={targetLevel}
 						jobType={jobType}
 					/>
-
 					<CharacterSymbol
 						characterLevel={level}
 						characterJobType={jobType}
 						character={character}
-						setCharacter={setCharacter}
+						updateCharacter={updateCharacter}
 					/>
 				</div>
 			</div>

@@ -1,19 +1,21 @@
 import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-import { themeFromPath, isDarkPath, type Theme } from '@lib/config/theme';
+import { isPublicPath } from '@/lib/config/access';
 
 import { LASTVERSION } from './data/user/constants';
 
 import type { NextRequest } from 'next/server';
 
-// Helper to clear NextAuth cookies
 const clearAuthCookies = (res: NextResponse): void => {
-	res.cookies.delete('next-auth.session-token');
-	res.cookies.delete('__Secure-next-auth.session-token');
+	// Main session token
+	res.cookies.delete('authjs.session-token');
+
+	// OAuth helpers
+	res.cookies.delete('authjs.callback-url');
+	res.cookies.delete('authjs.csrf-token');
 };
 
-// Middleware to set 'theme' cookie and handle auth redirects
 export const proxy = async (req: NextRequest): Promise<NextResponse> => {
 	const { pathname } = req.nextUrl;
 
@@ -22,14 +24,9 @@ export const proxy = async (req: NextRequest): Promise<NextResponse> => {
 		return NextResponse.next();
 	}
 
-	// Set theme cookie
-	const theme: Theme = themeFromPath(pathname);
-	const res = NextResponse.next();
-	res.cookies.set('theme', theme, { path: '/' });
+	const token = await getToken({ req, secret: process.env.AUTH_SECRET });
 
-	// Check auth token
-	const token = await getToken({ req });
-	const isAuthenticated = !!token;
+	const isAuthenticated = Boolean(token);
 
 	// VERSION CHECK: redirect if token version mismatch
 	if (isAuthenticated) {
@@ -38,28 +35,28 @@ export const proxy = async (req: NextRequest): Promise<NextResponse> => {
 		if (tokenVersion !== LASTVERSION) {
 			const url = new URL('/login', req.url);
 			url.search = 'version_update=1';
-			const logoutResponse = NextResponse.redirect(url);
-			clearAuthCookies(logoutResponse);
 
-			return logoutResponse;
+			const res = NextResponse.redirect(url);
+			clearAuthCookies(res);
+
+			return res;
 		}
 	}
 
-	// Determine top-level path safely
 	const segments = pathname.split('/').filter(Boolean);
 	const topLevelPath = '/' + (segments[0] ?? '');
 
-	// Redirect authenticated users away from DARK_PATHS pages to /home
-	if (isAuthenticated && isDarkPath(topLevelPath)) {
+	// Redirect authenticated users to /home
+	if (isAuthenticated && isPublicPath(topLevelPath)) {
 		return NextResponse.redirect(new URL('/home?logged=1', req.url));
 	}
 
-	// Redirect unauthenticated users from any page NOT in DARK_PATHS to login
-	if (!isAuthenticated && !isDarkPath(topLevelPath)) {
+	// Redirect unauthenticated users
+	if (!isAuthenticated && !isPublicPath(topLevelPath)) {
 		return NextResponse.redirect(new URL('/login?unauthorized=1', req.url));
 	}
 
-	return res;
+	return NextResponse.next();
 };
 
 // Only match real pages, excluding static assets, APIs, and files with extensions

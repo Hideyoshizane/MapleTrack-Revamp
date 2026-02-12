@@ -1,5 +1,4 @@
 'use client';
-import { useMemo } from 'react';
 
 import { useBossListStore } from '@/store/bossListStore';
 import { bosses } from '@data/bosses/bosses';
@@ -8,43 +7,34 @@ import BossItem from '../BossItem/BossItem';
 
 import styles from './BossGrid.module.scss';
 
-import type { Boss } from '@features/Boss/bossListModel';
+import type { BossCharacterDraft as BossCharacter, BossDraft as Boss } from '@features/Boss/bossListModel';
 import type { JSX } from 'react';
 
 type BossGridProps = {
 	serverCookie: string;
-	selectedCharacterLevel: number;
+	selectedCharacter: BossCharacter | null;
 };
 
-const BossGrid = ({ serverCookie, selectedCharacterLevel }: BossGridProps): JSX.Element => {
+const BossGrid = ({ serverCookie, selectedCharacter }: BossGridProps): JSX.Element => {
+	console.log(selectedCharacter);
 	const selectedBosses = useBossListStore((s): Boss[] => s.selectedBosses);
 
-	const addOrReplaceBoss = useBossListStore((s): ((boss: Boss) => void) => s.addOrReplaceBoss);
-
-	const removeBoss = useBossListStore((s): ((name: string, reset: Boss['reset']) => void) => s.removeBossFromSelected);
-
-	const selectedBossMap = useMemo((): Map<string, Boss> => {
-		const map = new Map<string, Boss>();
-		for (const b of selectedBosses) {
-			map.set(b.name + '_' + b.reset, b);
-		}
-		return map;
-	}, [selectedBosses]);
+	const selectedBossMap = new Map<string, Boss>();
+	for (const b of selectedBosses) {
+		selectedBossMap.set(b.name + '_' + b.reset, b);
+	}
 
 	// Render content
 	return (
 		<div className={styles.classGrid}>
 			{bosses.map((boss): JSX.Element => {
-				const selected = [...selectedBossMap.values()].find((x): boolean => x.name === boss.name) ?? null;
+				const selectedBoss = [...selectedBossMap.values()].find((x): boolean => x.name === boss.name) ?? null;
 				return (
 					<BossItem
 						key={boss.name}
 						serverCookie={serverCookie}
-						selectedCharacterLevel={selectedCharacterLevel}
+						selectedCharacterLevel={selectedCharacter?.level ?? 0}
 						boss={boss}
-						selectedBoss={selected}
-						onSelect={addOrReplaceBoss}
-						onRemove={(reset: Boss['reset']): void => removeBoss(boss.name, reset)}
 					/>
 				);
 			})}

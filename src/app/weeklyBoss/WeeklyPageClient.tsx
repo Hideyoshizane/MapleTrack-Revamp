@@ -1,8 +1,9 @@
 'use client';
 
+import { produce } from 'immer';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 import WeeklyBossDropdown from '@/components/WeeklyBossDropdown/WeeklyBossDropdown';
 import BossIcon from '@assets/svg/boss_slayer.svg';
@@ -12,37 +13,25 @@ import ProgressBar from '@components/ProgressBar/ProgressBar';
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import ServerDropdown from '@components/ServerDropdown/ServerDropdown';
 import { WEEKLY_BOSSES_TOTAL } from '@constants/bossConstants';
+import { bossListApi } from '@features/Boss/bossListApi';
 import { useServerCookie } from '@hooks/useServerCookie';
-import { fetchWithTimeout } from '@utils/withTimeout';
 
 import styles from './page.module.scss';
 
-import type { BossCharacter, BossServer } from '@features/Boss/bossListModel';
-import type { GetBossListRequestBody, GetBossListApiResponse } from '@sharedTypes/bossList';
+import type { ServerName } from '@data/servers/servers';
+import type { BossCharacterDraft as BossCharacter, BossServerDraft as BossServer } from '@features/Boss/bossListModel';
 import type { JSX } from 'react';
-
-const fetchBossList = async (
-	payload: GetBossListRequestBody,
-	signal?: AbortSignal
-): Promise<GetBossListApiResponse> => {
-	const res = await fetchWithTimeout('/api/bossList/getBossList', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(payload),
-		signal,
-	});
-	return res.json() as Promise<GetBossListApiResponse>;
-};
 
 type WeeklyPageClientProps = {
 	searchParams?: Record<string, string | undefined>;
 	username: string;
+	initialServer: ServerName;
 };
 
-const WeeklyPageClient = ({ username }: WeeklyPageClientProps): JSX.Element => {
+const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): JSX.Element => {
 	const pathname = usePathname();
 	const router = useRouter();
-	const { server: serverCookie, setServerCookie } = useServerCookie();
+	const { server, setServerCookie } = useServerCookie(initialServer);
 
 	const [serverData, setServerData] = useState<BossServer | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
@@ -51,50 +40,46 @@ const WeeklyPageClient = ({ username }: WeeklyPageClientProps): JSX.Element => {
 	const [totalGains, setTotalGains] = useState<number>(0);
 	const [characters, setCharacters] = useState<BossCharacter[]>([]);
 
-	const abortController = useRef<AbortController | null>(null);
-
 	const BOSS_ICON_SIZE = 96;
 
-	const loadBossList = useCallback(async (): Promise<void> => {
-		if (!serverCookie || !username) {
+	const loadBossList = async (): Promise<void> => {
+		if (!server || !username) {
 			return;
 		}
 
-		// Cancel any previous request
-		if (abortController.current) {
-			abortController.current.abort();
-		}
-		const controller = new AbortController();
-		abortController.current = controller;
-
 		setLoading(true);
 		try {
-			const response = await fetchBossList({ userOrigin: username, server: serverCookie }, controller.signal);
-			if (!controller.signal.aborted && response.success && response.data) {
-				setServerData(response.data);
-			} else {
+			const payload = { userOrigin: username, server };
+			const response = await bossListApi.getBossList(payload);
+
+			if (!response.success || !response.data) {
 				setServerData(null);
+				return;
 			}
+
+			const nextServerData = produce(response.data, (draft) => {
+				draft.weeklyBosses ??= 0;
+				draft.totalGains ??= 0;
+				draft.characters ??= [];
+			});
+
+			setServerData(nextServerData);
+			setWeeklyBosses(nextServerData.weeklyBosses);
+			setTotalGains(nextServerData.totalGains);
+			setCharacters(nextServerData.characters);
 		} catch (error) {
 			if (!(error instanceof DOMException && error.name === 'AbortError')) {
 				console.error(error);
 			}
 		} finally {
-			if (!controller.signal.aborted) {
-				setLoading(false);
-			}
+			setLoading(false);
 		}
-	}, [serverCookie, username]);
+	};
 
-	// Fetch on mount and when server changes
-	useEffect((): (() => void) => {
+	useEffect((): void => {
 		void loadBossList();
-		return (): void => {
-			if (abortController.current) {
-				abortController.current.abort();
-			}
-		};
-	}, [loadBossList]);
+		//eslint-disable-next-line
+	}, [server, username]);
 
 	const formattedTotalGains = (serverData?.totalGains ?? 0).toLocaleString('en-US');
 
@@ -149,7 +134,7 @@ const WeeklyPageClient = ({ username }: WeeklyPageClientProps): JSX.Element => {
 					</div>
 				</div>
 				<div className={styles.serverDropdown}>
-					<ServerDropdown serverCookie={serverCookie} setServerCookie={setServerCookie} />
+					<ServerDropdown server={server} setServerCookie={setServerCookie} />
 				</div>
 
 				<Button className={styles.editCharacterButton} onClick={(): void => router.push(`${pathname}/edit`)}>
@@ -169,7 +154,7 @@ const WeeklyPageClient = ({ username }: WeeklyPageClientProps): JSX.Element => {
 				)}
 			</div>
 			<div>
-				<WeeklyBossDropdown serverCookie={serverCookie} setServerCookie={setServerCookie} />
+				<WeeklyBossDropdown serverCookie={server} setServerCookie={setServerCookie} />
 			</div>
 		</section>
 	);

@@ -10,7 +10,7 @@ dayjs.extend(timezone);
 dayjs.tz.setDefault('UTC');
 
 // Returns current UTC time as a Dayjs instance
-export const nowUtc = (): dayjs.Dayjs => dayjs.utc();
+export const nowInUtc = (): dayjs.Dayjs => dayjs.utc();
 
 // Normalize input into a UTC Dayjs object
 export const toUtc = (date: string | Date | Dayjs): Dayjs => {
@@ -23,7 +23,6 @@ export const toUtc = (date: string | Date | Dayjs): Dayjs => {
 	return day;
 };
 
-// Weekday days to numbers
 export enum WEEKDAYS {
 	SUNDAY = 0,
 	MONDAY = 1,
@@ -44,11 +43,19 @@ export const getNextResetTime = (date: string | Date | Dayjs, targetWeekday: num
 	return givenDate.add(daysUntilReset, 'day').startOf('day');
 };
 
-// Utility to check if reset has occurred
-const hasResetOccurred = (resetTime: Dayjs): boolean => nowUtc().isAfter(resetTime);
+const hasResetOccurred = (resetTime: Dayjs): boolean => nowInUtc().isAfter(resetTime);
 
-export const hasDailyResetOccurred = (date: string | Date | Dayjs): boolean =>
-	hasResetOccurred(toUtc(date).add(1, 'day').startOf('day'));
+export const hasDailyResetOccurred = (date: string | Date | Dayjs | null | undefined): boolean => {
+	if (!date) {
+		return true;
+	}
 
-export const hasWeeklyResetOccurred = (date: string | Date | Dayjs): boolean =>
-	hasResetOccurred(getNextResetTime(date, WEEKDAYS.THURSDAY));
+	return hasResetOccurred(toUtc(date).add(1, 'day').startOf('day'));
+};
+
+export const hasWeeklyResetOccurred = (date: string | Date | Dayjs | null | undefined): boolean => {
+	if (!date) {
+		return true;
+	}
+	return hasResetOccurred(getNextResetTime(date, WEEKDAYS.THURSDAY));
+};

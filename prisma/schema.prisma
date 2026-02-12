@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model HealthCheck {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  username String @unique
+  email String @unique
+  password String
+
+  version Int
+
+  lastLogin DateTime @default(now())
+
+  characters Character[]
+
+  bossList BossList?
+
+  resetPasswordToken String?
+  resetPasswordExpires DateTime?
+
+  @@index([resetPasswordToken, resetPasswordExpires])
+
+}
+
+model Character {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String
+  level Int
+  targetLevel Int
+
+  class String?
+  code String?
+  jobType String?
+  legion String?
+  linkSkill String?
+  server String?
+  lastUpdate DateTime?
+
+  bossing Boolean @default(false)
+  syncing Boolean @default(false)
+
+  userId String @db.ObjectId
+  user User @relation(fields: [userId], references: [id])
+
+  symbols CharacterSymbol[]
+
+  @@index([name, userId])
+  @@index([server])
+  @@unique([userId, server, code])
+}
+
+enum SymbolCategory {
+  arcane
+  sacred
+  grand
+}
+
+model CharacterSymbol {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String
+  level Int
+  exp Int
+
+  category SymbolCategory
+
+  characterId String @db.ObjectId
+  character Character @relation(fields: [characterId], references: [id])
+
+  content CharacterContent[]
+  @@unique([characterId, name])
+}
+
+
+model CharacterContent {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  contentType String
+  checked Boolean @default(false)
+  cleared Boolean @default(false)
+  date DateTime?
+  tries Int?
+
+  symbolId String @db.ObjectId
+  symbol CharacterSymbol @relation(fields: [symbolId], references: [id])
+  @@unique([symbolId, contentType])
+}
+
+enum BossReset {
+  Daily
+  Weekly
+  Monthly
+}
+
+model BossList {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  userId String @unique @db.ObjectId
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  lastUpdate DateTime?
+
+  servers BossServer[]
+}
+
+
+model BossServer {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String
+
+  weeklyBosses Int @default(0)
+  totalGains Int @default(0)
+
+  bossListId String @db.ObjectId
+  bossList BossList @relation(fields: [bossListId], references: [id], onDelete: Cascade)
+
+  characters BossCharacter[]
+}
+
+model BossCharacter {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String
+  code String
+  class String
+  level Int
+
+  totalIncome Int @default(0)
+
+  serverId String @db.ObjectId
+  server BossServer @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  bosses Boss[]
+}
+
+model Boss {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String
+  difficulty String
+  reset BossReset
+
+  dailyTotal Int @default(0)
+
+  date DateTime?
+
+  cleared Boolean @default(false)
+  locked Boolean @default(false)
+
+  characterId String @db.ObjectId
+  character BossCharacter @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}

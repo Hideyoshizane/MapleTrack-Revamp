@@ -92,6 +92,7 @@ export default defineConfig([
 			'@typescript-eslint/consistent-type-definitions': ['error', 'type'],
 			'@typescript-eslint/no-floating-promises': 'error',
 			'@typescript-eslint/no-misused-promises': 'error',
+			'@typescript-eslint/explicit-function-return-type': 'warn',
 
 			// React Rules (Override for New JSX Transform)
 			'react/react-in-jsx-scope': 'off',

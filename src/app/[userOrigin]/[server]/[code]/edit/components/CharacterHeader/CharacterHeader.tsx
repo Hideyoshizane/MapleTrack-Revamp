@@ -4,15 +4,16 @@ import { toast } from 'react-toastify';
 
 import Button from '@components/Button/Button';
 import Tooltip from '@components/Tooltip/Tooltip';
-import { characterApi } from '@service/characterService';
-import { sanitizeInputFrontend } from '@utils/sanitize/sanitizeInputFrontEnd';
+import { characterApi } from '@features/character/characterApi';
+import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
 
 import styles from './CharacterHeader.module.scss';
 
-import type { UpdateCharacterRequestBody, Character } from '@/shared/types/character';
+import type { UpdateCharacterRequestBody } from '@features/character/characterApi';
+import type { CharacterDraft as Character } from '@features/character/characterModel';
 import type { JSX } from 'react';
 
-interface Props {
+type Props = {
 	character?: Character;
 	userOrigin: string;
 	server: string;
@@ -21,7 +22,7 @@ interface Props {
 	submitLoading: boolean;
 	setSubmitLoading: (value: boolean) => void;
 	onDiscard: () => void;
-}
+};
 export const CharacterHeader = ({
 	character,
 	userOrigin,
@@ -36,7 +37,9 @@ export const CharacterHeader = ({
 	const pathname = usePathname();
 
 	const onSubmit = async (): Promise<void> => {
-		if (!character) return;
+		if (!character) {
+			return;
+		}
 
 		try {
 			setSubmitLoading(true);

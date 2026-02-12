@@ -42,3 +42,6 @@ next-env.d.ts
 
 # testzone
 /src/app/testpage
+/generated/prisma
+
+/generated/prisma

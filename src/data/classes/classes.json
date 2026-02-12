@@ -246,6 +246,13 @@
 		"jobType": "warrior"
 	},
 	{
+		"linkSkill": "Grounded Body",
+		"legionType": "SPEED",
+		"className": "Ren",
+		"code": "ren",
+		"jobType": "warrior"
+	},
+	{
 		"linkSkill": "Adventurer's Curiosity",
 		"legionType": "DEX+",
 		"className": "Bowmaster",

@@ -1,25 +1,27 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-import { useCharacterDataFromApi } from '@/hooks/useCharacterDataFromApi';
-import { getJob } from '@/utils/getJob';
+import { getJob } from '@/features/character/characterAttributes';
 import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
-import { characterApi } from '@features/character/characterService';
-import { useCharacterData } from '@hooks/useCharacterData';
+import { characterQueryKeys } from '@features/character/character.queryKeys';
+import { useCharacterExternalQuery } from '@hooks/useCharacterExternalQuery';
+import { useCharacterQuery } from '@hooks/useCharacterQuery';
 
 import CharacterHeader from './components/CharacterHeader/CharacterHeader';
 import CharacterStats from './components/CharacterStats/CharacterStats';
 import SymbolsSection from './components/SymbolsSection/SymbolsSection';
+import { useIncreaseAllSymbols } from './hooks/useIncreaseAllSymbols';
 import styles from './page.module.scss';
 import { useBonusContext } from './useBonusContext';
 
 import type { LevelUpResult } from '@/data/symbols/symbolMappings';
 import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { CharacterContent, CharacterSymbol } from '@features/character/characterModel';
+import type { CharacterDraft as Character } from '@features/character/characterModel';
 import type { JSX } from 'react';
 
 type CharacterPageProps = {
@@ -39,6 +41,11 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 	const searchParams = useSearchParams();
 	const success = searchParams.get('success');
 
+	const queryClient = useQueryClient();
+
+	const [disableAllDaily, setDisableAllDaily] = useState(false);
+	const { arcaneBonus, sacredBonus } = useBonusContext();
+
 	useEffect((): void => {
 		if (success === '1') {
 			toast.success('Character updated successfully!');
@@ -47,92 +54,69 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 		}
 	}, [success, router]);
 
-	const { character, loading: characterLoading, error, setCharacter } = useCharacterData({ userOrigin, server, code });
-	const { characterDataApi } = useCharacterDataFromApi({ character, server, characterLoading });
-	const [disableAllDaily, setDisableAllDaily] = useState<boolean>(false);
+	const { data: character, isLoading, error } = useCharacterQuery({ userOrigin, server, code });
 
-	const { arcaneBonus, sacredBonus } = useBonusContext();
+	const { data: characterDataApi } = useCharacterExternalQuery({
+		name: character?.name,
+		server,
+		enabled: Boolean(character?.syncing),
+	});
 
-	// Redirect to /error if done loading and no character
-	if (!characterLoading && !character) {
+	const increaseAllMutation = useIncreaseAllSymbols({ userOrigin, server, code, arcaneBonus, sacredBonus });
+
+	const handleIncreaseAll = (): void => {
+		increaseAllMutation.mutate(undefined, {
+			onSuccess: (updates): void => {
+				queryClient.setQueryData(
+					characterQueryKeys.detail(userOrigin, server, code),
+					(prev: Character | undefined): Character | undefined => {
+						if (!prev) return prev;
+
+						return {
+							...prev,
+							symbols: prev.symbols.map((symbol) => {
+								const update = updates[symbol.name];
+								if (!update) {
+									return symbol;
+								}
+
+								return {
+									...symbol,
+									level: update.currentLevel,
+									exp: update.currentExp,
+									content: symbol.content.map((content, index) => {
+										if (index === 0) {
+											return {
+												...content,
+												cleared: true,
+												date: new Date(),
+											};
+										}
+
+										return content;
+									}),
+								};
+							}),
+						};
+					}
+				);
+			},
+		});
+	};
+
+	if (isLoading && !character) {
 		return <FullPageLoader />;
 	}
-	if (error) {
-		throw new Error(error);
-	}
-
 	if (!character) {
-		return <FullPageLoader />;
+		throw new Error('Character data missing after load');
+	}
+
+	if (error) {
+		throw error;
 	}
 
 	const job = getJob(character.level);
 	const jobType: JobType = (character.jobType ?? 'default') as JobType;
-
-	const handleIncreaseAll = async (): Promise<void> => {
-		try {
-			// Compute URL segments here, local to this function
-			const pathname = window.location.pathname;
-			const [userOrigin, server, code] = pathname.split('/').filter(Boolean);
-
-			const payload = { userOrigin, server, code, arcaneBonus, sacredBonus };
-
-			const updatedData: Record<string, LevelUpResult> = await characterApi.updateAllDaily(payload);
-
-			if (updatedData.success) {
-				const updatedCharacter = {
-					...character,
-					ArcaneSymbol: character.ArcaneSymbol.map((symbol): CharacterSymbol => {
-						const result = updatedData[symbol.name];
-						if (!result) {
-							return symbol;
-						}
-						return {
-							...symbol,
-							level: result.currentLevel,
-							exp: result.currentExp,
-							content: symbol.content.map(
-								(c, idx): CharacterContent => (idx === 0 ? { ...c, cleared: true, date: new Date() } : c)
-							),
-						};
-					}),
-					SacredSymbol: character.SacredSymbol.map((symbol): CharacterSymbol => {
-						const result = updatedData[symbol.name];
-						if (!result) {
-							return symbol;
-						}
-						return {
-							...symbol,
-							level: result.currentLevel,
-							exp: result.currentExp,
-							content: symbol.content.map(
-								(c, idx): CharacterContent => (idx === 0 ? { ...c, cleared: true, date: new Date() } : c)
-							),
-						};
-					}),
-					GrandSacredSymbol: character.GrandSacredSymbol.map((symbol): CharacterSymbol => {
-						const result = updatedData[symbol.name];
-						if (!result) {
-							return symbol;
-						}
-						return {
-							...symbol,
-							level: result.currentLevel,
-							exp: result.currentExp,
-							content: symbol.content.map(
-								(c, idx): CharacterContent => (idx === 0 ? { ...c, cleared: true, date: new Date() } : c)
-							),
-						};
-					}),
-				};
-				setCharacter(updatedCharacter);
-				setDisableAllDaily(true);
-
-				toast.success('All symbols updated successfully!');
-			}
-		} catch (error) {
-			console.error('Error updating Weekly: ', error);
-		}
-	};
 
 	return (
 		<section className="mainContent">
@@ -147,10 +131,12 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 				<div className={styles.characterContent}>
 					<CharacterHeader
 						character={character}
-						extraData={characterDataApi}
+						extraData={characterDataApi ?? null}
 						router={router}
-						handleIncreaseAll={handleIncreaseAll}
+						onIncreaseAll={handleIncreaseAll}
+						setDisableAllDaily={setDisableAllDaily}
 					/>
+
 					<CharacterStats character={character} job={job} jobType={jobType} />
 					<SymbolsSection character={character} disableAllDaily={disableAllDaily} />
 				</div>

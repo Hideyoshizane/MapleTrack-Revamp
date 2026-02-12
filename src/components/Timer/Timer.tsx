@@ -7,13 +7,12 @@ import utc from 'dayjs/plugin/utc';
 import { useEffect, useState } from 'react';
 
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
-import { nowUtc, getNextResetTime, toUtc, WEEKDAYS } from '@utils/time';
+import { nowInUtc, getNextResetTime, toUtc, WEEKDAYS } from '@utils/time';
 
 import styles from './Timer.module.scss';
 
 import type { JSX } from 'react';
 
-// Extend dayjs with UTC and Duration plugins for accurate time calculations
 dayjs.extend(utc);
 dayjs.extend(duration);
 
@@ -32,9 +31,8 @@ type TimerProps = {
 export default function Timer({ target }: TimerProps): JSX.Element {
 	const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
-	// Calculate time left until next reset
 	const computeTimeLeft = (resetType: 'daily' | 'weekly'): TimeLeft => {
-		const now = nowUtc();
+		const now = nowInUtc();
 
 		const targetTime =
 			resetType === 'daily' ? toUtc(now).add(1, 'day').startOf('day') : getNextResetTime(now, WEEKDAYS.THURSDAY);

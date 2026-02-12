@@ -2,7 +2,7 @@
 
 import { clsx } from 'clsx';
 import Image from 'next/image';
-import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 import ChevronIcon from '@assets/svg/chevron-down.svg';
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
@@ -11,34 +11,30 @@ import { servers } from '@data/servers/servers';
 import styles from './ServerDropdown.module.scss';
 import ServerItem from './ServerItem/ServerItem';
 
+import type { ServerName } from '@data/servers/servers';
 import type { Server } from '@sharedTypes/server';
 import type { JSX } from 'react';
 
 type ServerDropdownProps = {
-	serverCookie?: string;
-	setServerCookie?: (value: string) => void;
+	server: ServerName;
+	setServerCookie?: (value: ServerName) => void;
 };
 
-const ServerDropdown = ({ serverCookie, setServerCookie }: ServerDropdownProps): JSX.Element => {
+const ServerDropdown = ({ server, setServerCookie }: ServerDropdownProps): JSX.Element => {
 	const [isOpen, setIsOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
-	// Find selected server
-	const selectedServer = useMemo(
-		(): Server | undefined => servers.find((s): boolean => s.name === serverCookie),
-		[serverCookie]
-	);
+	const selectedServer: Server | undefined = servers.find((s: Server): boolean => s.name === server);
 
 	// Toggle dropdown open/close state
-	const handleToggle = useCallback((): void => setIsOpen((p): boolean => !p), []);
+	const handleToggle = (): void => {
+		setIsOpen((prev): boolean => !prev);
+	};
 
-	const handleSelectServer = useCallback(
-		(server: Server): void => {
-			setServerCookie?.(server.name);
-			setIsOpen(false);
-		},
-		[setServerCookie]
-	);
+	const handleSelectServer = (server: Server): void => {
+		setServerCookie?.(server.name);
+		setIsOpen(false);
+	};
 
 	// Close dropdown when clicking outside
 	useEffect((): (() => void) => {
@@ -51,7 +47,6 @@ const ServerDropdown = ({ serverCookie, setServerCookie }: ServerDropdownProps):
 		return (): void => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
 
-	// Skeleton placeholder while selectedServer is not ready
 	if (!selectedServer) {
 		return <SkeletonWrapper width={502} height={368} color="light" variant="rounded" />;
 	}

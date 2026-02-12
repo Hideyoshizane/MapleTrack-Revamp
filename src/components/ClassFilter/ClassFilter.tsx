@@ -16,7 +16,6 @@ type ClassFilterProps = {
 
 const toCapitalCase = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
-// Toggle a class selection. Updates parent state via `setSelectedClasses`
 export const ClassFilter = ({
 	selectedClasses,
 	setSelectedClasses,
@@ -29,7 +28,6 @@ export const ClassFilter = ({
 			? selectedClasses.filter((c): boolean => c !== lowerName)
 			: [...selectedClasses, lowerName];
 
-		// update parent state & cookie
 		setSelectedClasses(updated);
 	};
 

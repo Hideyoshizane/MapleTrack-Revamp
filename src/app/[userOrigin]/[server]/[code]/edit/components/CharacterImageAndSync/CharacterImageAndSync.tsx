@@ -8,49 +8,59 @@ import Tooltip from '@components/Tooltip/Tooltip';
 
 import styles from './CharacterImageAndSync.module.scss';
 
-import type { ExtraCharacterData, Character } from '@/shared/types/character';
+import type { CharacterDataFromAPI } from '@features/character/characterApi';
+import type { CharacterDraft as Character } from '@features/character/characterModel';
 import type { JSX } from 'react';
 
-interface Props {
+type Props = {
 	character?: Character;
-	extraData: ExtraCharacterData | null;
-	extraDataFailed: boolean;
-	onSyncToggle: () => void;
+	CharacterDataFromAPI: CharacterDataFromAPI | null;
+	CharacterDataFromAPIFailed: boolean;
+	syncEnabled: boolean;
+	toggleSync: () => void;
 	CHARACTER_IMG_SIZE?: number;
-}
+};
 
 export const CharacterImageAndSync = ({
 	character,
-	extraData,
-	extraDataFailed,
-	onSyncToggle,
+	CharacterDataFromAPI,
+	CharacterDataFromAPIFailed,
+	syncEnabled,
+	toggleSync,
 	CHARACTER_IMG_SIZE = 80,
 }: Props): JSX.Element => {
 	const syncing = character?.syncing ?? false;
 
 	const handleToggle = (): void => {
-		if (!character) return;
-		onSyncToggle();
+		if (!character) {
+			return;
+		}
+		toggleSync();
 	};
 
 	const characterImage = (): JSX.Element => {
-		if (!syncing) return <></>;
-		if (extraData?.characterImgURL)
+		if (!syncEnabled) {
+			return <div />;
+		}
+		if (CharacterDataFromAPI?.characterImgURL) {
 			return (
 				<Image
-					src={extraData.characterImgURL}
+					src={CharacterDataFromAPI.characterImgURL}
 					width={CHARACTER_IMG_SIZE}
 					height={CHARACTER_IMG_SIZE}
 					alt="Fetched from API"
 					className={styles.loadedImage}
+					quality={100}
 				/>
 			);
-		if (extraDataFailed)
+		}
+		if (CharacterDataFromAPIFailed) {
 			return (
 				<Tooltip content="Character not found." placement="top">
 					<ErrorIcon width={CHARACTER_IMG_SIZE} height={CHARACTER_IMG_SIZE} className={styles.errorIcon} />
 				</Tooltip>
 			);
+		}
 		return (
 			<SkeletonWrapper width={CHARACTER_IMG_SIZE} height={CHARACTER_IMG_SIZE} color="light" variant="rectangular" />
 		);

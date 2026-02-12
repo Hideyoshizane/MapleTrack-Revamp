@@ -10,21 +10,27 @@ import DropdownEventMenu from '../DropdownEventMenu/DropdownEventMenu';
 
 import styles from './CharacterHeader.module.scss';
 
-import type { CharacterDocument } from '@models/character';
-import type { CharacterDataFromAPI } from '@sharedTypes/character';
+import type { CharacterDataFromAPI } from '@features/character/characterApi';
+import type { CharacterDraft as Character } from '@features/character/characterModel';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import type { JSX } from 'react';
 
-interface CharacterHeaderProps {
-	character: CharacterDocument;
+type CharacterHeaderProps = {
+	character: Character;
 	extraData: CharacterDataFromAPI | null;
 	router: AppRouterInstance;
-	handleIncreaseAll: () => Promise<void>;
-}
+	onIncreaseAll: () => void;
+	setDisableAllDaily: (value: boolean) => void;
+};
 
-const CharacterHeader = ({ character, extraData, router, handleIncreaseAll }: CharacterHeaderProps): JSX.Element => {
+const CharacterHeader = ({
+	character,
+	extraData,
+	router,
+	onIncreaseAll,
+	setDisableAllDaily,
+}: CharacterHeaderProps): JSX.Element => {
 	const pathname = usePathname();
-
 	const characterImage = character.syncing ? (
 		extraData ? (
 			<Image
@@ -46,7 +52,8 @@ const CharacterHeader = ({ character, extraData, router, handleIncreaseAll }: Ch
 				<Button
 					className={styles.increaseAllButton}
 					onClick={(): void => {
-						void handleIncreaseAll();
+						setDisableAllDaily(true);
+						onIncreaseAll();
 					}}>
 					Increase All
 				</Button>

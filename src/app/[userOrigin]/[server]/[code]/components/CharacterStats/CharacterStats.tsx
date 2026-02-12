@@ -8,14 +8,14 @@ import ProgressBar from '@components/ProgressBar/ProgressBar';
 import styles from './CharacterStats.module.scss';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { CharacterDocument } from '@models/character';
+import type { CharacterDraft as Character } from '@features/character/characterModel';
 import type { JSX } from 'react';
 
-interface CharacterStatsProps {
-	character: CharacterDocument;
+type CharacterStatsProps = {
+	character: Character;
 	job: string;
 	jobType: JobType;
-}
+};
 
 const BOSS_ICON_SIZE = 90;
 const ICON_SIZE = 64;
@@ -27,7 +27,7 @@ const CharacterStats = ({ character, job, jobType }: CharacterStatsProps): JSX.E
 			<div className={styles.bigBlock}>
 				<div className={styles.characterBossLinkLegion}>
 					<div className={styles.bossSlot}>
-						{bossing ? <BossIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.bossIcon} /> : <></>}
+						{bossing && <BossIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.bossIcon} />}
 					</div>
 
 					<LinkSkillBlock

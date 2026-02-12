@@ -5,28 +5,28 @@ import type {
 	ForgotPasswordRequestBody,
 	ChangePasswordRequestBody,
 	DeleteAccountRequestBody,
-} from '@schemas/authSchemas';
+} from '@/schemas/auth.schemas';
 
-// --- Login ---
+// Login
 export type LoginFormData = Credentials;
 
-// --- Signup (adds confirmPassword) ---
+// Signup
 export type SignupFormData = SignupRequestBody & {
 	confirmPassword: string;
 };
 
-// --- Forgot Password ---
+// Forgot Password
 export type ForgotPasswordFormData = ForgotPasswordRequestBody;
 
-// --- Reset Password (adds confirmPassword) ---
+//  Reset Password
 export type ResetPasswordFormData = ResetPasswordRequestBody & {
 	confirmPassword: string;
 };
 
-// --- Change Password (adds confirmPassword) ---
+// Change Password
 export type ChangePasswordFormData = ChangePasswordRequestBody & {
 	confirmPassword: string;
 };
 
-// --- Delete Account ---
+// Delete Account
 export type DeleteAccountData = DeleteAccountRequestBody;

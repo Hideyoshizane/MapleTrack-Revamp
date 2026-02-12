@@ -1,11 +1,12 @@
 import { clsx } from 'clsx';
 import { Roboto } from 'next/font/google';
-import { cookies } from 'next/headers';
 
 import ClientToaster from '@components/CustomToaster/CustomToaster';
-import { type Theme } from '@lib/config/theme';
 
 import Providers from './providers';
+
+/* eslint-disable-next-line react-refresh/only-export-components */
+export { metadata } from './metadata';
 
 import type { JSX } from 'react';
 
@@ -14,15 +15,13 @@ import './globals.scss';
 const roboto = Roboto({
 	subsets: ['latin'],
 	weight: ['300', '400', '500', '600', '700'],
+	display: 'swap',
 });
 
-const RootLayout = async ({ children }: Readonly<{ children: React.ReactNode }>): Promise<JSX.Element> => {
-	const cookieStore = await cookies();
-	const theme = (cookieStore.get('theme')?.value ?? 'light') as Theme;
-
+const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>): JSX.Element => {
 	return (
 		<html lang="en">
-			<body className={clsx(roboto.className, theme)}>
+			<body className={clsx(roboto.className)}>
 				<Providers>
 					<ClientToaster position="top-right" rtl={false} theme="dark" />
 					<main>{children}</main>

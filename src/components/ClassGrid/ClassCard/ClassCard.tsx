@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { getJob } from '@/utils/getJob';
 import BossIcon from '@assets/svg/boss_slayer.svg';
 import LegionBlock from '@components/LegionBlock/LegionBlock';
 import LinkSkillBlock from '@components/LinkSkillBlock/LinkSkillBlock';
@@ -13,16 +12,17 @@ import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import { getLinkSkillByName } from '@data/linkSkill/linkSkill';
 import { getLastLevel } from '@data/symbols/exp/expTable';
 import { getSymbolImagePath, canUseSymbol } from '@data/symbols/symbolMappings';
+import { separateSymbolsByCategory, getJob } from '@features/character/characterAttributes';
 
 import styles from './ClassCard.module.scss';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { SymbolName } from '@data/symbols/symbolMappings';
-import type { CharacterDocument } from '@features/character/characterModel';
+import type { CharacterDraft as Character } from '@features/character/characterModel';
 import type { JSX } from 'react';
 
 type ClassCardProps = {
-	character: CharacterDocument;
+	character: Character;
 };
 
 type SymbolProps = {
@@ -101,8 +101,6 @@ const ClassCard = ({ character }: ClassCardProps): JSX.Element => {
 		legion,
 		linkSkill: ls,
 		level,
-		ArcaneSymbol,
-		SacredSymbol,
 		name,
 		bossing,
 		targetLevel,
@@ -110,6 +108,8 @@ const ClassCard = ({ character }: ClassCardProps): JSX.Element => {
 		server,
 		class: className,
 	} = character;
+
+	const { ArcaneSymbol, SacredSymbol } = separateSymbolsByCategory(character.symbols);
 
 	const SYMBOL_SIZE = 20;
 	const BOSS_ICON_SIZE = 48;

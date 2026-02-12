@@ -12,19 +12,19 @@ import { useServerCookie } from '@hooks/useServerCookie';
 
 import styles from './page.module.scss';
 
+import type { ServerName } from '@data/servers/servers';
 import type { JSX } from 'react';
 
 type HomePageClientProps = {
 	searchParams?: Record<string, string | undefined>;
 	username: string;
+	initialServer: ServerName;
 };
 
-const HomePageClient = ({ username }: HomePageClientProps): JSX.Element => {
-	// Cookie hooks
-	const { server: serverCookie, setServerCookie } = useServerCookie();
+const HomePageClient = ({ username, initialServer }: HomePageClientProps): JSX.Element => {
+	const { server, setServerCookie } = useServerCookie(initialServer);
 	const { selectedClasses, setClasses, loading } = useClassFilterCookie();
 
-	// Navigation hooks
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
@@ -50,14 +50,14 @@ const HomePageClient = ({ username }: HomePageClientProps): JSX.Element => {
 	return (
 		<section className="mainContent">
 			<div className={styles.serverDropdown}>
-				<ServerDropdown serverCookie={serverCookie} setServerCookie={setServerCookie} />
+				<ServerDropdown server={server} setServerCookie={setServerCookie} />
 			</div>
 			<div className={styles.classFilter}>
 				<ClassFilter selectedClasses={selectedClasses} setSelectedClasses={setClasses} loading={loading} />
 			</div>
 			<ClassGrid
 				username={username}
-				serverCookie={serverCookie}
+				serverCookie={server}
 				selectedClasses={selectedClasses}
 				selectedClassesLoading={loading}
 			/>

@@ -5,18 +5,13 @@ import { useForm, type Control, type UseFormHandleSubmit, type UseFormGetValues 
 import { toast } from 'react-toastify';
 
 import { handleFieldValidation } from '@/utils/validateField';
+import { userApi } from '@features/user/userApi';
 import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
 import { validatePassword, validatePasswordConfirmation } from '@utils/validators';
-import { fetchWithTimeout } from '@utils/withTimeout';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { ResetPasswordFormData } from '@sharedTypes/form';
 import type { ValidationResult } from '@utils/validateField';
-
-type ResetPasswordPayload = {
-	password: string;
-	token: string;
-};
 
 type UseResetPasswordReturn = {
 	control: Control<ResetPasswordFormData>;
@@ -41,7 +36,6 @@ export const useResetPassword = (rawToken: string): UseResetPasswordReturn => {
 		defaultValues: { password: '', confirmPassword: '' },
 	});
 
-	// sanitize once
 	const token = sanitizeInputFrontend(rawToken);
 
 	// helper to avoid repeated toast calls
@@ -64,26 +58,16 @@ export const useResetPassword = (rawToken: string): UseResetPasswordReturn => {
 				confirmPassword: validatePasswordConfirmation(sanitizedData.password, sanitizedData.confirmPassword),
 			};
 
-			// abort if validations fail
 			const hasErrors = (Object.entries(validations) as [keyof ResetPasswordFormData, ValidationResult][]).some(
 				([field, result]): boolean => handleFieldValidation(field, result, setError)
 			);
 			if (hasErrors) return;
 
-			const payload: ResetPasswordPayload = {
-				password: sanitizedData.password,
-				token,
-			};
+			const payload = { password: sanitizedData.password, token };
 
-			const response = await fetchWithTimeout('/api/auth/reset-password', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
-			});
+			const result: ApiResponse = await userApi.resetPassword(payload);
 
-			const result = (await response.json()) as ApiResponse;
-
-			if (response.ok && result.success) {
+			if (result.success) {
 				router.push('/login?reset=1');
 			} else if (!result.success) {
 				showResetError(result.message);

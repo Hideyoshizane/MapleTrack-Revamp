@@ -1,80 +1,129 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
-import { checkCharacterName } from '@schemas/characterNameSchema';
+import { characterClientSchema } from '@features/character/character.client.schema';
 
-import type { Character } from '@sharedTypes/character';
+import type { CharacterDraft as Character } from '@features/character/characterModel';
+import type { Dispatch, SetStateAction } from 'react';
 
-interface UseCharacterInputsReturn {
-	character?: Character;
-	setCharacter: React.Dispatch<React.SetStateAction<Character | undefined>>;
-	committedName?: string;
+type UseCharacterInputsProps = {
+	character: Character | null;
+	updateCharacter: (recipe: (draft: Character) => void) => void;
+	setSyncEnabled: (value: boolean) => void;
+};
+
+export type UseCharacterInputsReturn = {
 	levelInput: string;
-	setLevelInput: React.Dispatch<React.SetStateAction<string>>;
+	setLevelInput: Dispatch<SetStateAction<string>>;
 	targetLevelInput: string;
-	setTargetLevelInput: React.Dispatch<React.SetStateAction<string>>;
+	setTargetLevelInput: Dispatch<SetStateAction<string>>;
 	nameError: string | null;
 	handleNameBlur: (value: string) => void;
-	updateCharacter: (patch: Partial<Character>) => void;
 	toggleBossing: () => void;
-}
+	handleLevelBlur: () => void;
+	handleTargetLevelBlur: () => void;
+	syncEnabled: boolean;
+	toggleSync: () => void;
+};
 
-export const useCharacterInputs = (initialCharacter?: Character): UseCharacterInputsReturn => {
-	const [character, setCharacter] = useState<Character | undefined>(initialCharacter);
-	const committedName = initialCharacter?.name;
-	const [levelInput, setLevelInput] = useState('');
-	const [targetLevelInput, setTargetLevelInput] = useState('');
-	const [nameError, setNameError] = useState<string | null>(null);
+export const useCharacterInputs = ({
+	character,
+	updateCharacter,
+	setSyncEnabled,
+}: UseCharacterInputsProps): UseCharacterInputsReturn => {
+	const [levelInput, setLevelInput] = useState<string>(() => character?.level.toString() ?? '');
+	const [targetLevelInput, setTargetLevelInput] = useState<string>(() => character?.targetLevel.toString() ?? '');
+	const [syncEnabled, setLocalSyncEnabled] = useState<boolean>(() => !!character?.syncing);
 
-	// Set initial nameError when initialCharacter.name is "Character Name"
-	useEffect((): void => {
-		if (initialCharacter?.name === 'Character Name') {
-			setNameError('Please enter a valid name');
-		} else {
-			setNameError(null);
+	useEffect(() => {
+		if (character?.syncing) {
+			setTimeout(() => {
+				setLocalSyncEnabled(true);
+				setSyncEnabled(true);
+			}, 0);
 		}
-	}, [initialCharacter?.name]);
+	}, [character, setSyncEnabled]);
 
-	// Sync when initialCharacter changes
-	useEffect((): void => {
-		if (!initialCharacter) return;
-		setCharacter(initialCharacter);
-		setLevelInput(initialCharacter.level?.toString() ?? '');
-		setTargetLevelInput(initialCharacter.targetLevel?.toString() ?? '');
-	}, [initialCharacter]);
+	if (!character) {
+		return {
+			levelInput,
+			setLevelInput,
+			targetLevelInput,
+			setTargetLevelInput,
+			nameError: null,
+			syncEnabled,
+			handleNameBlur: (): void => {},
+			toggleBossing: (): void => {},
+			handleLevelBlur: (): void => {},
+			handleTargetLevelBlur: (): void => {},
+			toggleSync: (): void => {},
+		};
+	}
 
-	const updateCharacter = (patch: Partial<Character>): void => {
-		setCharacter((prev): Character | undefined => (prev ? { ...prev, ...patch } : undefined));
-	};
+	const nameError: string | null =
+		character.name === 'Character Name' || !character.name.trim() ? 'Please enter a valid name' : null;
 
 	const handleNameBlur = (value: string): void => {
-		const error: string | null = checkCharacterName(value);
-		setNameError(error);
-		// Only update parent if name is valid
-		if (!error) {
-			updateCharacter({ name: value });
+		const result = characterClientSchema.shape.name.safeParse(value);
+		if (!result.success) {
+			return;
 		}
-	};
 
-	const toggleBossing = (): void => {
-		setCharacter((prev): Character | undefined => {
-			if (!prev) return undefined;
-			return { ...prev, bossing: !prev.bossing };
+		updateCharacter((draft) => {
+			draft.name = result.data;
 		});
 	};
 
+	const toggleBossing = (): void => {
+		updateCharacter((draft) => {
+			draft.bossing = !draft.bossing;
+		});
+	};
+
+	const handleLevelBlur = (): void => {
+		updateCharacter((draft) => {
+			if (!draft) {
+				return;
+			}
+			draft.level = levelInput === '' ? draft.level : Number(levelInput);
+		});
+	};
+
+	const handleTargetLevelBlur = (): void => {
+		updateCharacter((draft) => {
+			if (!draft) {
+				return;
+			}
+			draft.targetLevel = targetLevelInput === '' ? draft.targetLevel : Number(targetLevelInput);
+		});
+	};
+
+	const toggleSync = (): void => {
+		if (!character) {
+			return;
+		}
+		const next = !syncEnabled;
+
+		updateCharacter((draft) => {
+			draft.syncing = next;
+		});
+
+		setLocalSyncEnabled(next);
+		setSyncEnabled(next);
+	};
+
 	return {
-		character,
-		setCharacter,
-		committedName,
 		levelInput,
 		setLevelInput,
 		targetLevelInput,
 		setTargetLevelInput,
 		nameError,
 		handleNameBlur,
-		updateCharacter,
 		toggleBossing,
+		handleLevelBlur,
+		handleTargetLevelBlur,
+		syncEnabled,
+		toggleSync,
 	};
 };

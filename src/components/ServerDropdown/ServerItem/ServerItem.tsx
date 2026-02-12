@@ -1,4 +1,3 @@
-// src/components/ServerDropdown/ServerItem.tsx
 'use client';
 
 import Image from 'next/image';

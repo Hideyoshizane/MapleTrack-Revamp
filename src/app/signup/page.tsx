@@ -16,7 +16,7 @@ import type { ValidationResult } from '@utils/validateField';
 import type { JSX } from 'react';
 
 const SignupPage = (): JSX.Element => {
-	const { control, handleSubmit, isSubmitting, isSubmitted, getValues, onSubmit } = useSignup();
+	const { control, handleSubmit, isSubmitting, isSubmitted, isValid, getValues, onSubmit } = useSignup();
 	const commonInputProps = { control, isSubmitted };
 
 	return (
@@ -66,6 +66,7 @@ const SignupPage = (): JSX.Element => {
 					type="submit"
 					className={styles.submitButton}
 					isLoading={isSubmitting}
+					disabled={!isValid || isSubmitting}
 					loadingText="Submitting..."
 					loaderSize={16}
 					loaderColor="#121212"

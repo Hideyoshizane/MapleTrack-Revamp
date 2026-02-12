@@ -10,7 +10,8 @@
 	transition: background 0.2s ease-in-out;
 	cursor: pointer;
 
-	&:disabled {
+	&.disabled,
+	&[aria-disabled='true'] {
 		gap: 12px;
 		border: 1px solid var(--disabled);
 		background-color: var(--disabled);

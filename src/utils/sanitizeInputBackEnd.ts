@@ -7,7 +7,9 @@ const DOMPurify = createDOMPurify(window);
 
 export const sanitizeInputBackEnd = (input: string): string => {
 	try {
-		return DOMPurify.sanitize(input);
+		const sanitized = DOMPurify.sanitize(input);
+
+		return sanitized.replace(/\$/g, '').replace(/\./g, '').trim();
 	} catch (error) {
 		console.error('Backend Sanitization failed:', error);
 		return 'Backend sanitization failed';

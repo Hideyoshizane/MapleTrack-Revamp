@@ -1,7 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Controller, type Control, type Path, type FieldValues } from 'react-hook-form';
 
 import styles from './FormInput.module.scss';
@@ -31,11 +31,9 @@ const FormInput = <TFieldValues extends FieldValues>({
 }: FormInputProps<TFieldValues>): JSX.Element => {
 	const [touched, setTouched] = useState(false);
 
-	// Compute container & input styles
-	const containerClass = useMemo(
-		(): string => clsx(styles.inputContainer, { [styles.marginSignUp]: !isLogin }),
-		[isLogin]
-	);
+	const containerClass: string = clsx(styles.inputContainer, {
+		[styles.marginSignUp]: !isLogin,
+	});
 
 	return (
 		<Controller

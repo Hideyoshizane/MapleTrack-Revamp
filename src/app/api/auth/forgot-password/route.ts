@@ -3,23 +3,24 @@ import crypto from 'crypto';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-import User from '@features/user/userModel';
-import connectToDatabase from '@lib/mongooseConect';
+import { forgotPasswordRequestSchema } from '@/schemas/auth.schemas';
+import { prisma } from '@lib/prisma';
 import { sendEmail } from '@lib/sendEmail';
 import getForgotPasswordTemplate from '@lib/template/resetPasswordEmailTemplate';
-import { forgotPasswordRequestSchema } from '@schemas/authSchemas';
 import { createResponse } from '@utils/createResponse';
-import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
-import { validateEmail } from '@utils/validators';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextRequest, NextResponse } from 'next/server';
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+if (!BASE_URL) {
+	throw new Error('NEXT_PUBLIC_BASE_URL is not defined');
+}
+
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
 		dayjs.extend(utc);
-
-		await connectToDatabase();
 
 		// Validate request body with zod
 		const parseResult = forgotPasswordRequestSchema.safeParse(await request.json());
@@ -27,43 +28,58 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
-		// Sanitize input
-		const email = sanitizeInputBackEnd(parseResult.data.email);
-		if (!email) {
-			return createResponse<ApiResponse>({ success: false, message: 'Missing required fields' }, 400);
-		}
+		const email = parseResult.data.email;
 
-		// If validation fails, return early
-		const emailValidation = validateEmail(email);
-		if (!emailValidation.isValid) {
-			const message = [emailValidation.error].filter(Boolean).join('\n');
-			createResponse<ApiResponse>({ success: false, message: message }, 400);
-		}
-
-		// search for user by the sanitized email
-		const user = await User.findOne({ email: email });
+		// search for user by the email
+		const user = await prisma.user.findUnique({
+			where: { email },
+			select: {
+				id: true,
+				username: true,
+			},
+		});
 		if (!user) {
 			return createResponse<ApiResponse>({ success: true, message: 'If the email exists, we sent a reset link.' }, 200);
 		}
 
-		// Generate the Token to be send and stored
-		const token = crypto.randomBytes(32).toString('hex');
+		// Generate raw token
+		const rawToken = crypto.randomBytes(32).toString('hex');
+		const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
 
-		// Store on user database
-		user.resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
-		user.resetPasswordExpires = dayjs().add(15, 'minute').utc().toDate(); // 15 minutes from now
-		await user.save();
+		// Expiration: 15 minutes from now (UTC)
+		const resetPasswordExpires = dayjs().add(15, 'minute').utc().toDate();
 
-		// Send email here
-		const domainURL = process.env.NEXT_PUBLIC_BASE_URL;
-		if (!domainURL) throw new Error('NEXT_PUBLIC_BASE_URL is not defined');
+		const resetUrl = `${BASE_URL}/reset-password?token=${rawToken}`;
+		const html = getForgotPasswordTemplate(resetUrl, user.username);
 
-		const html = getForgotPasswordTemplate(`${domainURL}/reset-password?token=${token}`, user.username);
-		await sendEmail({ to: email, subject: 'Reset Your Password', html });
+		try {
+			await sendEmail({
+				to: email,
+				subject: 'Reset Your Password',
+				html,
+			});
+		} catch (emailError) {
+			console.error('forgot_password_email_failed', {
+				error: emailError instanceof Error ? emailError.message : 'unknown',
+				userId: user.id,
+			});
+
+			return createResponse<ApiResponse>({ success: false, message: 'Failed to send reset email' }, 500);
+		}
+
+		// Persist reset token atomically
+		await prisma.user.update({
+			where: { id: user.id },
+			data: {
+				resetPasswordToken: hashedToken,
+				resetPasswordExpires,
+			},
+		});
 
 		return createResponse<ApiResponse>({ success: true, message: 'If the email exists, we sent a reset link.' }, 200);
 	} catch (error) {
-		console.error('Signup error:', error);
+		console.error('forgot_password_failed', { error: error instanceof Error ? error.message : 'unknown' });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

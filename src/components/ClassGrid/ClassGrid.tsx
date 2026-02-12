@@ -1,16 +1,17 @@
 'use client';
 import { redirect } from 'next/navigation';
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 import { JobClasses } from '@data/classes/classes';
-import { generateCharacterObject, characterApi } from '@features/character/characterService';
+import { characterApi } from '@features/character/characterApi';
+import { generateCharacterObject } from '@features/character/characterService';
 
 import ClassCard from './ClassCard/ClassCard';
 import styles from './ClassGrid.module.scss';
 
-import type { CharacterDocument } from '@features/character/characterModel';
-import type { GetAllCharactersRequestBody } from '@sharedTypes/character';
+import type { GetAllCharactersRequestBody } from '@features/character/characterApi';
+import type { CharacterDraft as Character } from '@features/character/characterModel';
 import type { ClassFilterOption } from '@utils/classFilterCookie';
 import type { JSX } from 'react';
 
@@ -23,7 +24,7 @@ type ClassGridProps = {
 	selectedClassesLoading: boolean;
 };
 
-const filterCharacters = (results: CharacterDocument[], selectedClasses: ClassFilterOption[]): CharacterDocument[] => {
+const filterCharacters = (results: Character[], selectedClasses: ClassFilterOption[]): Character[] => {
 	return results.filter((char): boolean => {
 		if (!selectedClasses.length) {
 			return true;
@@ -39,7 +40,7 @@ const filterCharacters = (results: CharacterDocument[], selectedClasses: ClassFi
 	});
 };
 
-const sortCharacters = (characters: CharacterDocument[]): CharacterDocument[] => {
+const sortCharacters = (characters: Character[]): Character[] => {
 	return [...characters].sort((a, b): number => {
 		const aType = a.jobType === 'xenon' ? 'thief' : a.jobType ?? 'zzz';
 		const bType = b.jobType === 'xenon' ? 'thief' : b.jobType ?? 'zzz';
@@ -60,35 +61,31 @@ const ClassGrid = ({
 	selectedClasses,
 	selectedClassesLoading,
 }: ClassGridProps): JSX.Element => {
-	const [jobResults, setJobResults] = useState<CharacterDocument[]>([]);
+	const [jobResults, setJobResults] = useState<Character[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 
-	// Pre-build skeletons only once
-	const skeletons = useMemo<JSX.Element[]>(
-		(): JSX.Element[] =>
-			JobClasses.map(
-				(job): JSX.Element => (
-					<div key={job.className} className={styles.skeletonWrapper}>
-						<SkeletonWrapper width={502} height={368} color="light" variant="rounded" />
-					</div>
-				)
-			),
-		[]
+	const skeletons: JSX.Element[] = JobClasses.map(
+		(job): JSX.Element => (
+			<div key={job.className} className={styles.skeletonWrapper}>
+				<SkeletonWrapper width={502} height={368} color="light" variant="rounded" />
+			</div>
+		)
 	);
 
-	// Main fetch logic wrapped in useCallback to avoid re-creation
-	const fetchCharacters = useCallback(async (): Promise<void> => {
+	const fetchCharacters = async (): Promise<void> => {
 		try {
 			setLoading(true);
 			setError(null);
 
-			// Redirect to error page
 			if (!serverCookie) {
 				redirect('/error');
 			}
 
-			const payload: GetAllCharactersRequestBody = { username: username, server: serverCookie };
+			const payload: GetAllCharactersRequestBody = {
+				username,
+				server: serverCookie,
+			};
 
 			const response = await characterApi.getAllCharacters(payload);
 
@@ -96,12 +93,13 @@ const ClassGrid = ({
 				throw new Error(response.message ?? 'Failed to fetch characters');
 			}
 
-			const fetchedCharacters: CharacterDocument[] = Array.isArray(response.data) ? response.data : [];
+			const fetchedCharacters: Character[] = Array.isArray(response.data) ? response.data : [];
 
-			// Build all characters
-			const results: CharacterDocument[] = JobClasses.map((job): CharacterDocument => {
+			const results: Character[] = JobClasses.map((job): Character => {
 				const match = fetchedCharacters.find((char): boolean => char.class === job.className);
-				return (match ??
+
+				return (
+					match ??
 					generateCharacterObject({
 						jobClassName: job.className,
 						jobType: job.jobType,
@@ -110,28 +108,30 @@ const ClassGrid = ({
 						linkSkill: job.linkSkill,
 						server: serverCookie,
 						userOrigin: username,
-					})) as CharacterDocument;
+					})
+				);
 			});
 
-			// Apply filters + sorting
-			setJobResults(sortCharacters(filterCharacters(results, selectedClasses)));
-		} catch (error: unknown) {
-			console.error('Error fetching characters:', error);
-			setError(error instanceof Error ? error.message : String(error));
+			const filteredAndSorted: Character[] = sortCharacters(filterCharacters(results, selectedClasses));
+
+			setJobResults(filteredAndSorted);
+		} catch (err: unknown) {
+			console.error('Error fetching characters:', err);
+			setError(err instanceof Error ? err.message : String(err));
 		} finally {
 			setLoading(false);
 		}
-	}, [username, serverCookie, selectedClasses]);
+	};
 
-	// Trigger fetch on dependency changes
 	useEffect((): void => {
 		if (!username || !serverCookie) {
 			return;
 		}
-		void fetchCharacters();
-	}, [fetchCharacters, username, serverCookie]);
 
-	// Render error state
+		void fetchCharacters();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [username, serverCookie, selectedClasses]);
+
 	if (error) {
 		return (
 			<div className={styles.error}>
@@ -141,7 +141,6 @@ const ClassGrid = ({
 		);
 	}
 
-	// Render content
 	return (
 		<div className={styles.classGrid}>
 			{loading ? skeletons : jobResults.map((char): JSX.Element => <ClassCard key={char.class} character={char} />)}

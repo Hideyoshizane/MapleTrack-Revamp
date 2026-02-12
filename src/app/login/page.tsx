@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 import Button from '@components/Button/Button';
@@ -27,9 +28,9 @@ const LoginPage = (): JSX.Element => {
 		mode: 'onBlur',
 		defaultValues: { username: '', password: '' },
 	});
-
+	const router = useRouter();
 	// Track if the user just logged in successfully on this page
-	const { submitLogin, justLoggedIn } = useLogin(setError);
+	const { submitLogin, justLoggedIn } = useLogin(setError, router);
 
 	useAuthRedirect(justLoggedIn);
 	useToastQueryParams();

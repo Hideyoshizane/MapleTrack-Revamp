@@ -1,40 +1,83 @@
+import { getToken } from 'next-auth/jwt';
+
 import { JobClasses } from '@data/classes/classes';
-import { Character } from '@features/character/characterModel';
 import { getCharacterDataRequestSchema } from '@features/character/characterRequestSchema';
 import { generateCharacterObject } from '@features/character/characterService';
-import connectToDatabase from '@lib/mongooseConect';
+import { syncCharacterInfo } from '@lib/characters';
+import { prisma } from '@lib/prisma';
 import { createResponse } from '@utils/createResponse';
-import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
-import { SERVER_OPTIONS } from '@utils/serverCookie';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
-		await connectToDatabase();
+		// Extract token from the request cookies
+		const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+
+		if (!token || typeof token.id !== 'string') {
+			return createResponse<ApiResponse>({ success: false, message: 'Unauthorized' }, 401);
+		}
+
+		const authenticatedUserId = token.id;
+
+		let body: unknown;
+		try {
+			body = await request.json();
+		} catch {
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
+		}
 
 		// Validate request body using Zod
-		const parseResult = getCharacterDataRequestSchema.safeParse(await request.json());
+		const parseResult = getCharacterDataRequestSchema.safeParse(body);
 		if (!parseResult.success) {
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
-		const { userOrigin, server: rawServer, code: rawCode } = parseResult.data;
+		const { server, code } = parseResult.data;
 
-		// Sanitize inputs
-		const [username, server, code] = [userOrigin, rawServer, rawCode].map(sanitizeInputBackEnd);
-		if (!username || !server || !code) {
-			return createResponse<ApiResponse>({ success: false, message: 'Missing required fields' }, 400);
-		}
-
-		// Validate allowed server
-		if (!SERVER_OPTIONS.includes(server)) {
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid server' }, 400);
-		}
+		await syncCharacterInfo({ authenticatedUserId, server, code });
 
 		// Search for the character
-		const character = await Character.findOne({ userOrigin: username, server, code }).lean().exec();
+		const character = await prisma.character.findUnique({
+			where: {
+				userId_server_code: {
+					userId: authenticatedUserId,
+					server,
+					code,
+				},
+			},
+			select: {
+				name: true,
+				level: true,
+				targetLevel: true,
+				class: true,
+				code: true,
+				jobType: true,
+				legion: true,
+				linkSkill: true,
+				bossing: true,
+				syncing: true,
+				server: true,
+				symbols: {
+					select: {
+						name: true,
+						level: true,
+						exp: true,
+						category: true,
+						content: {
+							select: {
+								contentType: true,
+								checked: true,
+								cleared: true,
+								date: true,
+								tries: true,
+							},
+						},
+					},
+				},
+			},
+		});
 
 		//if not in database, return a generic object.
 		if (!character) {
@@ -51,18 +94,17 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 				code: job.code,
 				linkSkill: job.linkSkill,
 				server: server,
-				userOrigin: username,
 			});
+
 			return createResponse<ApiResponse<typeof genericCharacter>>(
 				{ success: true, message: 'Character not found, returning new Character.', data: genericCharacter },
-				200
+				200,
 			);
 		}
 
-		// Success response
 		return createResponse<ApiResponse<typeof character>>(
 			{ success: true, message: 'Found character.', data: character },
-			200
+			200,
 		);
 	} catch (error) {
 		console.error('Search error:', error);

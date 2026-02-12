@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import Button from '@components/Button/Button';
 import FormInput from '@components/FormInput/FormInput';
@@ -27,7 +27,6 @@ const AccountPageClient = ({ username }: AccountClientProps): JSX.Element => {
 		formState: { isSubmitting, isSubmitted },
 		getValues,
 		setError,
-		watch,
 	} = useForm<ChangePasswordFormData>({
 		mode: 'onBlur',
 		defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
@@ -40,8 +39,9 @@ const AccountPageClient = ({ username }: AccountClientProps): JSX.Element => {
 
 	const handleFormSubmit = handleSubmit(onSubmit);
 
-	const newPassword = watch('newPassword');
-	const confirmPassword = watch('confirmPassword');
+	const newPassword: string = useWatch({ control, name: 'newPassword' });
+
+	const confirmPassword: string = useWatch({ control, name: 'confirmPassword' });
 
 	const isSubmitDisabled =
 		isSubmitting ||

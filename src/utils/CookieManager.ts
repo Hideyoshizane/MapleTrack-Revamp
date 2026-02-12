@@ -4,7 +4,7 @@ import { COOKIE_EXPIRES_DAYS, MIN_VALUE_BONUS_COOKIE, MAX_VALUE_BONUS_COOKIE } f
 
 const cookies = new Cookies();
 
-const daysToSeconds = (days: number) => days * 24 * 60 * 60;
+const daysToSeconds = (days: number): number => days * 24 * 60 * 60;
 
 type StringCookieManager<T extends string> = {
 	get: () => T[] | undefined;
@@ -20,7 +20,7 @@ type NumericCookieManager = {
 export const createCookieManager = <T extends string>(
 	key: string,
 	allowed: readonly T[],
-	expiresDays = 60
+	expiresDays = 60,
 ): StringCookieManager<T> => {
 	return {
 		get: (): T[] | undefined => {
@@ -31,15 +31,17 @@ export const createCookieManager = <T extends string>(
 
 			return value
 				.split(',')
-				.map((v) => v.trim())
-				.filter((v): v is T => allowed.includes(v as T));
+				.map((value) => value.trim())
+				.filter((value): value is T => allowed.includes(value as T));
 		},
 
 		set: (values: T[]): void => {
-			const invalid = values.filter((v): boolean => !allowed.includes(v));
+			const invalid = values.filter((value): boolean => !allowed.includes(value));
+
 			if (invalid.length) {
 				throw new Error(`Invalid ${key}: "${invalid.join(',')}"`);
 			}
+
 			const uniqueValues = Array.from(new Set(values));
 			cookies.set(key, uniqueValues.join(','), { path: '/', maxAge: daysToSeconds(expiresDays) });
 		},
@@ -50,11 +52,12 @@ export const createNumericCookieManager = (
 	key: string,
 	min = MIN_VALUE_BONUS_COOKIE,
 	max = MAX_VALUE_BONUS_COOKIE,
-	expiresDays = COOKIE_EXPIRES_DAYS
+	expiresDays = COOKIE_EXPIRES_DAYS,
 ): NumericCookieManager => {
 	return {
 		get: (): number | undefined => {
 			const value = cookies.get(key) as string | undefined;
+
 			if (!value) {
 				return;
 			}

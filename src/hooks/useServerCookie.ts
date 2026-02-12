@@ -1,30 +1,29 @@
-import { useState, useEffect } from 'react';
+'use client';
 
-import { serverCookie, SERVER_OPTIONS, type ServerOption } from '@utils/serverCookie';
+import { useCallback, useEffect, useState } from 'react';
 
-export const useServerCookie = (): { server: ServerOption; setServerCookie: (name: ServerOption) => void } => {
-	// State typed to exact allowed server names
-	const [server, setServer] = useState<ServerOption>('Scania');
+import { serverCookie } from '@utils/serverCookie';
+
+import type { ServerName } from '@data/servers/servers';
+
+export const useServerCookie = (
+	initialServer: ServerName
+): {
+	server: ServerName;
+	setServerCookie: (name: ServerName) => void;
+} => {
+	const [server, setServer] = useState<ServerName>(initialServer);
 
 	useEffect((): void => {
-		// Get current cookie (can be array or undefined)
-		const current = serverCookie.get();
-		const first = Array.isArray(current) ? current[0] : current;
+		serverCookie.set([server]);
+	}, [server]);
 
-		// Validate cookie: fallback to 'Scania' if missing or invalid
-		const validServer: ServerOption = SERVER_OPTIONS.includes(first ?? '') ? (first as ServerOption) : 'Scania';
-
-		queueMicrotask(() => {
-			setServer(validServer);
-		});
-
-		serverCookie.set([validServer]);
+	const setServerCookieHandler = useCallback((name: ServerName): void => {
+		setServer(name);
 	}, []);
 
-	const setServerCookie = (name: ServerOption): void => {
-		setServer(name);
-		serverCookie.set([name]);
+	return {
+		server,
+		setServerCookie: setServerCookieHandler,
 	};
-
-	return { server, setServerCookie };
 };

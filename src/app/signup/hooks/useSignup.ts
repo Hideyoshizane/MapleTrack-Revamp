@@ -1,30 +1,24 @@
 'use client';
-
+import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useForm, type Control, type UseFormHandleSubmit, type UseFormGetValues } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
+import { userApi } from '@features/user/userApi';
 import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
 import { handleFieldValidation } from '@utils/validateField';
 import { validateUsername, validateEmail, validatePassword, validatePasswordConfirmation } from '@utils/validators';
-import { fetchWithTimeout } from '@utils/withTimeout';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { SignupFormData } from '@sharedTypes/form';
 import type { ValidationResult } from '@utils/validateField';
-
-type SignupPayload = {
-	username: string;
-	email: string;
-	password: string;
-	confirmPassword: string;
-};
 
 type UseSignupReturn = {
 	control: Control<SignupFormData>;
 	handleSubmit: UseFormHandleSubmit<SignupFormData>;
 	isSubmitting: boolean;
 	isSubmitted: boolean;
+	isValid: boolean;
 	getValues: UseFormGetValues<SignupFormData>;
 	onSubmit: (data: SignupFormData) => Promise<void>;
 };
@@ -35,22 +29,17 @@ export const useSignup = (): UseSignupReturn => {
 	const {
 		control,
 		handleSubmit,
-		formState: { isSubmitting, isSubmitted },
+		formState: { isSubmitting, isSubmitted, isValid },
 		setError,
 		getValues,
 	} = useForm<SignupFormData>({
 		mode: 'onBlur',
+		criteriaMode: 'firstError',
 		defaultValues: { username: '', email: '', password: '', confirmPassword: '' },
 	});
 
-	const showError = (msg?: string): void => {
-		console.log(msg);
-		toast.error(msg ?? 'Failed to create user');
-	};
-
 	const onSubmit = async (data: SignupFormData): Promise<void> => {
 		try {
-			// Sanitize inputs to avoid XSS
 			const sanitizedData: SignupFormData = {
 				username: sanitizeInputFrontend(data.username),
 				email: sanitizeInputFrontend(data.email),
@@ -58,7 +47,6 @@ export const useSignup = (): UseSignupReturn => {
 				confirmPassword: sanitizeInputFrontend(data.confirmPassword),
 			};
 
-			// Client-side validation results
 			const validations = {
 				username: validateUsername(sanitizedData.username),
 				email: validateEmail(sanitizedData.email),
@@ -66,30 +54,21 @@ export const useSignup = (): UseSignupReturn => {
 				confirmPassword: validatePasswordConfirmation(sanitizedData.password, sanitizedData.confirmPassword),
 			};
 
-			// Apply errors from validation results to form, abort if any found
 			const hasErrors = (Object.entries(validations) as [keyof SignupFormData, ValidationResult][]).some(
 				([field, result]): boolean => handleFieldValidation(field, result, setError)
 			);
-			console.log(hasErrors);
+
 			if (hasErrors) {
 				toast.error('Invalid input.');
 				return;
 			}
 
-			const payload: SignupPayload = sanitizedData;
+			const result: ApiResponse = await userApi.signup(sanitizedData);
 
-			const response = await fetchWithTimeout('/api/auth/signup', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
-			});
-
-			const result = (await response.json()) as ApiResponse;
-
-			if (response.ok && result.success) {
+			if (result.success) {
 				router.push('/login?success=1');
 			} else {
-				showError(result.message);
+				toast.error(result.message);
 				if (result.message) {
 					for (const [field, msg] of Object.entries(result.message)) {
 						setError(field as keyof SignupFormData, { message: msg ?? 'Invalid input' });
@@ -97,14 +76,31 @@ export const useSignup = (): UseSignupReturn => {
 				}
 			}
 		} catch (error: unknown) {
+			if (axios.isAxiosError<ApiResponse>(error) && error.response) {
+				const apiMessage = error.response.data?.message;
+
+				toast.error(apiMessage ?? 'Signup failed');
+
+				return;
+			}
+
 			if (error instanceof DOMException && error.name === 'AbortError') {
 				toast.error('Request timed out. Please try again.');
-			} else {
-				showError('Unexpected error occurred');
-				console.error('[Signup] Unexpected error', error);
+				return;
 			}
+
+			console.error('[Signup] Unexpected error', error);
+			toast.error('Unexpected error occurred');
 		}
 	};
 
-	return { control, handleSubmit, isSubmitting, isSubmitted, getValues, onSubmit };
+	return {
+		control,
+		handleSubmit,
+		isSubmitting,
+		isSubmitted,
+		isValid,
+		getValues,
+		onSubmit,
+	};
 };

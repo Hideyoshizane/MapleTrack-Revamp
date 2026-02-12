@@ -1,5 +1,7 @@
+'use client';
+
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import Timer from '@components/Timer/Timer';
 import { APP_VERSION } from '@lib/config/version';
@@ -15,12 +17,18 @@ type NavbarProps = {
 };
 
 const Navbar = ({ username }: NavbarProps): JSX.Element => {
+	const router = useRouter();
+
+	const handleLogoClick = (): void => {
+		router.push('/home');
+	};
+
 	return (
 		<nav className={styles.navBody}>
-			<Link href="/home" className={styles.logoDiv}>
+			<button type="button" onClick={handleLogoClick} className={styles.logoDiv} aria-label="Go to home">
 				<Image src="/assets/logo/logo-nav.webp" priority fill sizes="312px" alt="MapleTrack Logo" />
 				<p className={styles.version}>{APP_VERSION}</p>
-			</Link>
+			</button>
 			<Timer target="daily" />
 			<SearchBar />
 			<Timer target="weekly" />

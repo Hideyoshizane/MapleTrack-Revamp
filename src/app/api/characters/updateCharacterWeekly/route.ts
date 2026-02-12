@@ -1,13 +1,11 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { getToken } from 'next-auth/jwt';
 
-import { getContentValue, calculateNewLevelFromExp } from '@data/symbols/symbolMappings';
-import { Character } from '@features/character/characterModel';
+import { getContentValue, calculateNewLevelFromExp, isSymbolName } from '@data/symbols/symbolMappings';
 import { updateCharacterWeeklySchema } from '@features/character/characterUpdateSchema';
-import connectToDatabase from '@lib/mongooseConect';
+import { prisma } from '@lib/prisma';
 import { createResponse } from '@utils/createResponse';
-import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
-import { SERVER_OPTIONS } from '@utils/serverCookie';
 
 import type { LevelUpResult } from '@data/symbols/symbolMappings';
 import type { ApiResponse } from '@sharedTypes/api';
@@ -17,61 +15,98 @@ dayjs.extend(utc);
 
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
-		await connectToDatabase();
+		const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+		if (!token || typeof token.id !== 'string') {
+			return createResponse<ApiResponse>({ success: false, message: 'Unauthorized' }, 401);
+		}
+
+		let body: unknown;
+		try {
+			body = await request.json();
+		} catch {
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
+		}
 		// Validate request body using Zod
-		const parseResult = updateCharacterWeeklySchema.safeParse(await request.json());
+		const parseResult = updateCharacterWeeklySchema.safeParse(body);
 		if (!parseResult.success) {
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
-		const { symbolName: rawSymbolName, userOrigin: rawUsername, server: rawServer, code: rawCode } = parseResult.data;
 
-		const [symbolName, username, server, code] = [rawSymbolName, rawUsername, rawServer, rawCode].map(
-			sanitizeInputBackEnd
-		);
-		if (!symbolName || !username || !server || !code) {
-			return createResponse<ApiResponse>({ success: false, message: 'Missing required fields' }, 400);
+		const { symbolName, server, code } = parseResult.data;
+		if (!isSymbolName(symbolName)) {
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid symbol name' }, 400);
 		}
 
-		// Validate allowed server
-		if (!SERVER_OPTIONS.includes(server)) {
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid server' }, 400);
-		}
+		const authenticatedUserId = token.id;
+		const now = dayjs().utc().toDate();
 
 		// Search for the character
-		const character = await Character.findOne({ userOrigin: username, server, code }).exec();
+		const character = await prisma.character.findUnique({
+			where: {
+				userId_server_code: {
+					userId: authenticatedUserId,
+					server,
+					code,
+				},
+			},
+			include: {
+				symbols: {
+					include: {
+						content: true,
+					},
+				},
+			},
+		});
+
 		if (!character) {
 			return createResponse<ApiResponse>({ success: true, message: 'Character not found.' }, 200);
 		}
 
 		// Find character Symbol
-		const allSymbols = [...character.ArcaneSymbol, ...character.SacredSymbol, ...character.GrandSacredSymbol];
-		const symbol = allSymbols.find((s): boolean => s.name === symbolName);
+		const symbol = character.symbols.find((s): boolean => s.name === symbolName);
 		if (!symbol) {
 			return createResponse<ApiResponse>({ success: false, message: 'Symbol not found on character' }, 404);
 		}
 
-		if (symbol.content[1].cleared == true) {
-			return createResponse<ApiResponse>({ success: false, message: 'Weekly already cleared.' }, 404);
+		const weeklyContent = symbol.content.find((content): boolean => content.tries !== null);
+		if (!weeklyContent) {
+			return createResponse<ApiResponse>({ success: false, message: 'Weekly content not found for symbol' }, 404);
+		}
+		if (weeklyContent.cleared === true) {
+			return createResponse<ApiResponse>({ success: false, message: 'Weekly already cleared.' }, 409);
 		}
 
 		// Find Symbol weekly Value
 		const weeklyValue = getContentValue(symbolName, 'Weekly');
 
 		// Update symbol exp and level
-		symbol.exp += weeklyValue;
-		const newValues = calculateNewLevelFromExp(symbol.category, symbol.level, symbol.exp);
-		symbol.level = newValues.currentLevel;
-		symbol.exp = newValues.currentExp;
+		const updatedExp = symbol.exp + weeklyValue;
+		const newValues = calculateNewLevelFromExp(symbol.category, symbol.level, updatedExp);
+		const remainingTries = Math.max((weeklyContent.tries ?? 1) - 1, 0);
+		const isCleared = remainingTries === 0;
 
-		// Reduce weekly tries. When it reaches 0, the symbol is marked as cleared.
-		symbol.content[1].tries = Math.max((symbol.content[1].tries || 1) - 1, 0);
-		if (symbol.content[1].tries === 0) {
-			symbol.content[1].cleared = true;
-		}
-
-		// Return value
-		symbol.content[1].date = dayjs().utc().toDate();
-		await character.save();
+		await prisma.$transaction([
+			prisma.characterSymbol.update({
+				where: { id: symbol.id },
+				data: {
+					level: newValues.currentLevel,
+					exp: newValues.currentExp,
+				},
+			}),
+			prisma.characterContent.update({
+				where: {
+					symbolId_contentType: {
+						symbolId: symbol.id,
+						contentType: weeklyContent.contentType,
+					},
+				},
+				data: {
+					tries: remainingTries,
+					cleared: isCleared,
+					date: now,
+				},
+			}),
+		]);
 
 		return createResponse<ApiResponse<LevelUpResult>>(
 			{
@@ -79,7 +114,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 				message: 'Character updated successfully.',
 				data: newValues,
 			},
-			200
+			200,
 		);
 	} catch (error) {
 		console.error('Search error:', error);

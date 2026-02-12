@@ -10,55 +10,58 @@ import { validateUsernameLogin, validatePasswordLogin } from '@utils/validators'
 
 import type { LoginFormData } from '@sharedTypes/form';
 import type { ValidationResult } from '@utils/validateField';
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import type { UseFormSetError } from 'react-hook-form';
 
 export const useLogin = (
-	setError: UseFormSetError<LoginFormData>
+	setError: UseFormSetError<LoginFormData>,
+	router: AppRouterInstance
 ): {
 	submitLogin: (data: LoginFormData) => Promise<void>;
 	justLoggedIn: boolean;
 } => {
-	// Track if the user just logged in successfully on this page
 	const [justLoggedIn, setJustLoggedIn] = useState(false);
 
 	const submitLogin = useCallback(
 		async (data: LoginFormData): Promise<void> => {
 			try {
-				// Sanitize input to avoid XSS
 				const username = sanitizeInputFrontend(data.username);
 				const password = sanitizeInputFrontend(data.password);
 
-				// Client-side validation
 				const validations = {
 					username: validateUsernameLogin(username),
 					password: validatePasswordLogin(password),
 				};
 
-				// If any validation fails, set errors and abort submission
 				const hasErrors = (Object.entries(validations) as [keyof LoginFormData, ValidationResult][]).some(
 					([field, result]): boolean => handleFieldValidation(field, result, setError)
 				);
-				if (hasErrors) return;
-
-				// Use NextAuth signIn with credentials
-				const res = await signIn('credentials', { redirect: false, username, password });
-
-				if (res?.error) {
-					toast.error(res.error);
-				} else {
-					// Mark fresh login to avoid redirect in effect
-					setJustLoggedIn(true);
-					toast.success('Login successful!');
-					// redirect after login success
-					// Used instead of router to force page reload and theme cookie change.
-					window.location.href = '/home';
+				if (hasErrors) {
+					return;
 				}
+
+				const response = (await signIn('credentials', { redirect: false, username, password })) as
+					| { ok: boolean; error?: string; status?: number }
+					| undefined;
+
+				if (!response) {
+					toast.error('Login failed: unknown error');
+					return;
+				}
+
+				if (response.error) {
+					toast.error('Invalid username or password');
+					return;
+				}
+				setJustLoggedIn(true);
+				toast.success('Login successful!');
+				void router.push('/home');
 			} catch (err) {
 				toast.error('Unexpected error occurred');
 				console.error('Login error:', err);
 			}
 		},
-		[setError]
+		[setError, router]
 	);
 
 	return { submitLogin, justLoggedIn };

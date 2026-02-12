@@ -24,5 +24,10 @@
 		background-color: var(--primary-color-button);
 		margin-left: 32px;
 		margin-top: 24px;
+
+		&:disabled {
+			border: 1px solid var(--disabled);
+			background-color: var(--disabled);
+		}
 	}
 }

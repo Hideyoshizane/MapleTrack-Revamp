@@ -6,47 +6,34 @@ import { CHARACTER_MAX_LEVEL } from '@data/character/constants';
 import styles from './CharacterStats.module.scss';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { Character } from '@sharedTypes/character';
-import type { Dispatch, SetStateAction, JSX } from 'react';
+import type { CharacterDraft as Character } from '@features/character/characterModel';
+import type { JSX } from 'react';
 
-interface CharacterStatsProps {
-	levelInput: string;
-	setLevelInput: Dispatch<SetStateAction<string>>;
-	targetLevelInput: string;
-	setTargetLevelInput: Dispatch<SetStateAction<string>>;
+type CharacterStatsProps = {
 	character?: Character;
-	setCharacter: Dispatch<SetStateAction<Character | undefined>>;
+	levelInput: string;
+	setLevelInput: (value: string) => void;
+	targetLevelInput: string;
+	setTargetLevelInput: (value: string) => void;
+	handleLevelBlur: () => void;
+	handleTargetLevelBlur: () => void;
+	jobType: JobType;
 	level: number;
 	targetLevel: number;
-	jobType: JobType;
-}
+};
+
 const CharacterStats = ({
+	character,
 	levelInput,
 	setLevelInput,
 	targetLevelInput,
 	setTargetLevelInput,
-	character,
-	setCharacter,
+	handleLevelBlur,
+	handleTargetLevelBlur,
+	jobType,
 	level,
 	targetLevel,
-	jobType,
 }: CharacterStatsProps): JSX.Element => {
-	const handleLevelBlur = (): void => {
-		setCharacter((prev): Character | undefined => {
-			if (!prev) return prev;
-			const newLevel = levelInput === '' ? prev.level : Number(levelInput);
-			return { ...prev, level: newLevel };
-		});
-	};
-
-	const handleTargetLevelBlur = (): void => {
-		setCharacter((prev): Character | undefined => {
-			if (!prev) return prev;
-			const newTargetLevel = targetLevelInput === '' ? prev.targetLevel : Number(targetLevelInput);
-			return { ...prev, targetLevel: newTargetLevel };
-		});
-	};
-
 	return (
 		<div className={styles.levelDiv}>
 			<div className={styles.levelArea}>

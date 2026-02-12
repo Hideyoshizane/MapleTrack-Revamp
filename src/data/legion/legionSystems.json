@@ -234,6 +234,32 @@
 		]
 	},
 	{
+		"name": "SPEED",
+		"class": "warrior",
+		"ranking": [
+			{
+				"rank": "B",
+				"description": "Movement Speed and Maximum Movement Speed: +2"
+			},
+			{
+				"rank": "A",
+				"description": "Movement Speed and Maximum Movement Speed: +4"
+			},
+			{
+				"rank": "S",
+				"description": "Movement Speed and Maximum Movement Speed: +6"
+			},
+			{
+				"rank": "SS",
+				"description": "Movement Speed and Maximum Movement Speed: +8"
+			},
+			{
+				"rank": "SSS",
+				"description": "Movement Speed and Maximum Movement Speed: +10"
+			}
+		]
+	},
+	{
 		"name": "MAXMP%",
 		"class": "magician",
 		"ranking": [

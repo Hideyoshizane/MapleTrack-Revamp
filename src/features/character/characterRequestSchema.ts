@@ -1,15 +1,15 @@
 import { z } from 'zod';
 
+import { userSchema } from '@/features/user/user.schema';
 import { JobClasses } from '@data/classes/classes';
 import { servers } from '@data/servers/servers';
-import { userSchema } from '@features/user/userSchema';
 
 // Reuse only the username part of userSchema
 const usernameSchema = userSchema.shape.username;
 
 // Server validation
 const serverNames = servers.map((s): string => s.name);
-const serverSchema = z.enum(serverNames, {
+export const serverSchema = z.enum(serverNames, {
 	message: 'Invalid server selected',
 });
 
@@ -25,7 +25,6 @@ export const getAllCharactersRequestSchema = z.object({
 });
 
 export const getCharacterDataRequestSchema = z.object({
-	userOrigin: usernameSchema,
 	server: serverSchema,
 	code: jobClassSchema,
 });

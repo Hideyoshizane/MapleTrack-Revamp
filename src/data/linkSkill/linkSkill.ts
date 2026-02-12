@@ -1,37 +1,39 @@
 import linkSkillsData from './linkSkill.json';
 
-// Define interface for each level of a link skill
 type LinkSkillLevel = {
 	level: number;
 	description: string;
 };
 
-// Define interface for a link skill
 type LinkSkill = {
 	name: string;
 	image: string;
 	levels: LinkSkillLevel[];
 };
 
-// Typed JSON import
 const linkSkills: LinkSkill[] = linkSkillsData as LinkSkill[];
 
-// Find link skill by name
 export const getLinkSkillByName = (name: string): LinkSkill | undefined =>
 	linkSkills.find((skill): boolean => skill.name === name);
 
-// Get link skill description for a character level
 export const getLinkSkillDescription = (linkSkill: LinkSkill, characterLevel: number): string => {
-	if (!linkSkill?.levels?.length) {
+	const levels = linkSkill?.levels;
+
+	if (!levels?.length) {
 		return '';
 	}
 
-	// Determine skill level based on character level
-	const skillLevel = characterLevel >= 210 ? 3 : characterLevel >= 120 ? 2 : 1;
+	const rhinneThresholds = [0, 128, 138, 176, 177, 178];
+	const defaultThresholds = [0, 120, 210];
 
-	// Find the matching level or fallback to highest available
-	const selectedLevel =
-		linkSkill.levels.find((l): boolean => l.level === skillLevel) || linkSkill.levels[linkSkill.levels.length - 1];
+	const thresholds = linkSkill.name === "Rhinne's Blessing" ? rhinneThresholds : defaultThresholds;
 
-	return selectedLevel.description;
+	const levelIndex = Math.min(
+		thresholds.reduce<number>((index, threshold, i) => {
+			return characterLevel >= threshold ? i : index;
+		}, 0),
+		levels.length - 1,
+	);
+
+	return levels[levelIndex]?.description ?? '';
 };

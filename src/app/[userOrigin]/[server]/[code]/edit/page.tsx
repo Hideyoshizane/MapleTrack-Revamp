@@ -1,8 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
 import Navbar from '@components/Navbar/Navbar';
-import { validateUserAccess, syncCharacterInfo } from '@lib/characters';
+import { validateUserAccess } from '@lib/characters';
 
 import CharacterPage from './CharacterPage';
 
@@ -26,13 +28,6 @@ const CharactersPage = async ({ params }: CharactersPageProps): Promise<JSX.Elem
 	if (!isValid) {
 		redirect('/home?unauthorized=1');
 	}
-
-	// Fetch character data
-	await syncCharacterInfo({
-		userOrigin: userOrigin,
-		server: server,
-		code: code,
-	});
 
 	return (
 		<main className="container">

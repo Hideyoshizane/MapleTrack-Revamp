@@ -24,6 +24,7 @@ const LinkSkillBlock = ({
 	showTooltip = false,
 }: LinkSkillProps): JSX.Element | null => {
 	const linkSkill = getLinkSkillByName(characterLinkSkill);
+
 	if (!linkSkill) {
 		return null;
 	}

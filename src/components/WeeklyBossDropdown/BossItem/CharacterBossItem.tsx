@@ -1,14 +1,13 @@
-// src/components/ServerDropdown/ServerItem.tsx
 'use client';
 
 import Image from 'next/image';
 
-import { codeToClass } from '@/utils/codeToClass';
 import CheckIcon from '@assets/svg/check.svg';
+import { codeToClass } from '@features/character/characterAttributes';
 
 import styles from './CharacterBossItem.module.scss';
 
-import type { BossCharacter } from '@features/Boss/bossListModel';
+import type { BossCharacterDraft as BossCharacter } from '@features/Boss/bossListModel';
 import type { JSX, KeyboardEvent } from 'react';
 
 type CharacterBossItemProps = {

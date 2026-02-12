@@ -3,7 +3,7 @@
 import NumberFlow from '@number-flow/react';
 import { clsx } from 'clsx';
 import Image from 'next/image';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 import { isRebootServer } from '@/data/servers/servers';
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
@@ -43,28 +43,23 @@ type BossItemProps = {
 	boss: Boss;
 	selectedBoss: BossProgress | null;
 	selectedCharacterLevel: number;
-
-	onSelect: (boss: BossProgress) => void;
-	onRemove: (reset: BossProgress['reset']) => void;
 };
 
-const BossItem = ({
-	serverCookie,
-	boss,
-	selectedBoss,
-	selectedCharacterLevel,
-	onSelect,
-	onRemove,
-}: BossItemProps): JSX.Element => {
+const BossItem = ({ serverCookie, boss, selectedBoss, selectedCharacterLevel }: BossItemProps): JSX.Element => {
 	const [dailyGold, setDailyGold] = useState<number>(0);
 	const [weeklyGold, setWeeklyGold] = useState<number>(0);
 	const [monthlyGold, setMonthlyGold] = useState<number>(0);
+
+	const prevTotalGoldRef = useRef<number>(0);
+	const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+	const bossSlotRef = useRef<HTMLDivElement>(null);
 
 	const [totalGold, setTotalGold] = useState<number>(0);
 	const [animatedGold, setAnimatedGold] = useState<number>(0);
 
 	const [isOpen, setIsOpen] = useState<boolean>(false);
-	const [isOpenAfter, setIsOpenAfter] = useState<boolean>(false);
+	const [showNumber, setShowNumber] = useState<boolean>(true);
 	const [isClosing, setIsClosing] = useState<boolean>(false);
 
 	const [dailyMultiplier, setDailyMultiplier] = useState<number>(0);
@@ -136,9 +131,15 @@ const BossItem = ({
 
 		const base = isRebootServer(serverCookie) ? found.value * 5 : found.value;
 
-		if (found.reset === 'Daily') setDailyGold(base);
-		if (found.reset === 'Weekly') setWeeklyGold(base);
-		if (found.reset === 'Monthly') setMonthlyGold(base);
+		if (found.reset === 'Daily') {
+			setDailyGold(base);
+		}
+		if (found.reset === 'Weekly') {
+			setWeeklyGold(base);
+		}
+		if (found.reset === 'Monthly') {
+			setMonthlyGold(base);
+		}
 	}, [selectedBoss, boss.difficulties, serverCookie]);
 
 	// Total Gold
@@ -147,45 +148,44 @@ const BossItem = ({
 	}, [dailyGold, weeklyGold, monthlyGold]);
 
 	// Enter Animation
-	useEffect((): void => {
-		if (totalGold > 0) {
-			setIsClosing(false);
+	useEffect(() => {
+		const bossSlot = bossSlotRef.current;
+		if (!bossSlot) return;
+
+		const handleTransitionEnd = (event: TransitionEvent): void => {
+			if (event.propertyName === 'width') {
+				console.log('Width transition finished!');
+				// Put the code you want to run after the full transition here
+			}
+		};
+
+		bossSlot.addEventListener('transitionend', handleTransitionEnd);
+
+		// Trigger the transition
+		requestAnimationFrame(() => {
 			setIsOpen(true);
-		} else if (totalGold === 0 && isOpen) {
-			setIsClosing(true);
-			setAnimatedGold(0);
-		}
-	}, [totalGold, isOpen]);
+		});
 
-	useEffect((): void | (() => void) => {
-		if (isOpen && totalGold > 0) {
-			setIsOpenAfter(true);
-			setAnimatedGold(0);
-			const timeout = setTimeout((): void => setAnimatedGold(totalGold), 5);
-			return (): void => clearTimeout(timeout);
-		}
-	}, [isOpen, totalGold]);
+		return (): void => {
+			bossSlot.removeEventListener('transitionend', handleTransitionEnd);
+		};
+	}, []);
 
-	// Close Animation
-	useEffect((): void | (() => void) => {
-		if (isClosing) {
-			const timeout = setTimeout((): void => {
-				setIsOpen(false);
-				setIsOpenAfter(false);
-				setIsClosing(false);
-			}, 300);
-			return (): void => clearTimeout(timeout);
-		}
-	}, [isClosing]);
-
-	const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>): void => {
-		if (e.propertyName === 'width' && isOpen && totalGold > 0) {
-			setIsOpenAfter(true);
-		}
-	};
+	useEffect(() => {
+		console.log('Debug state:', {
+			totalGold,
+			animatedGold,
+			isOpen,
+			showNumber,
+			isClosing,
+			dailyGold,
+			weeklyGold,
+			monthlyGold,
+		});
+	}, [totalGold, animatedGold, isOpen, showNumber, isClosing, dailyGold, weeklyGold, monthlyGold]);
 
 	return (
-		<div className={clsx(styles.bossSlotBody, { [styles.open]: isOpen })} onTransitionEnd={handleTransitionEnd}>
+		<div className={clsx(styles.bossSlotBody, { [styles.open]: isOpen })}>
 			<div className={styles.bossSlotContent}>
 				<Image
 					className={styles.bossIcon}
@@ -250,11 +250,9 @@ const BossItem = ({
 					})}
 				</div>
 
-				{isOpenAfter && (
-					<div className={clsx(styles.goldValue)}>
-						<NumberFlow className={styles.goldText} value={animatedGold} format={{ maximumFractionDigits: 0 }} />
-					</div>
-				)}
+				<div className={clsx(styles.goldValue, { [styles.show]: showNumber && !isClosing })}>
+					<NumberFlow className={styles.goldText} value={animatedGold} format={{ maximumFractionDigits: 0 }} />
+				</div>
 			</div>
 		</div>
 	);

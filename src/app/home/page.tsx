@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
 import Navbar from '@components/Navbar/Navbar';
+import { resolveServerFromCookies } from '@data/servers/resolveServerFromCookies';
 
 import HomePageClient from './HomePageClient';
 
@@ -14,7 +15,9 @@ type HomePageProps = {
 const HomePage = async ({ searchParams }: HomePageProps): Promise<JSX.Element> => {
 	const session = await auth();
 
-	// If no session, redirect to login with a query param
+	const initialServer = await resolveServerFromCookies();
+
+	// If no session, redirect to login
 	if (!session) {
 		redirect('/login?unauthorized=1');
 	}
@@ -22,7 +25,7 @@ const HomePage = async ({ searchParams }: HomePageProps): Promise<JSX.Element> =
 	return (
 		<main className="container">
 			<Navbar username={session.user.username} />
-			<HomePageClient searchParams={searchParams} username={session.user.username} />
+			<HomePageClient searchParams={searchParams} username={session.user.username} initialServer={initialServer} />
 		</main>
 	);
 };

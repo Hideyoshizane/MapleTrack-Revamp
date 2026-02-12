@@ -4,7 +4,7 @@ import Loader from '@components/Loader/Loader';
 
 import styles from './Button.module.scss';
 
-import type { JSX } from 'react';
+import type { JSX, MouseEvent, KeyboardEvent } from 'react';
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 	isLoading?: boolean;
@@ -23,10 +23,42 @@ const Button = ({
 	loaderBorderWidth = 5,
 	children,
 	disabled,
+	onClick,
+	onKeyDown,
 	...props
 }: ButtonProps): JSX.Element => {
+	const isActuallyDisabled = Boolean(isLoading || disabled);
+
+	const handleClick = (event: MouseEvent<HTMLButtonElement>): void => {
+		if (isActuallyDisabled) {
+			event.preventDefault();
+			event.stopPropagation();
+			return;
+		}
+
+		onClick?.(event);
+	};
+
+	const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>): void => {
+		if (isActuallyDisabled && (event.key === 'Enter' || event.key === ' ')) {
+			event.preventDefault();
+			event.stopPropagation();
+			return;
+		}
+
+		onKeyDown?.(event);
+	};
+
 	return (
-		<button className={clsx(styles.button, className)} disabled={isLoading || disabled} {...props}>
+		<button
+			className={clsx(styles.button, className, {
+				[styles.disabled]: isActuallyDisabled,
+			})}
+			aria-disabled={isActuallyDisabled}
+			tabIndex={0}
+			onClick={handleClick}
+			onKeyDown={handleKeyDown}
+			{...props}>
 			{isLoading && (
 				<Loader width={loaderSize} height={loaderSize} color={loaderColor} borderWidth={loaderBorderWidth} />
 			)}

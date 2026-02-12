@@ -2,16 +2,13 @@ import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
 import Navbar from '@components/Navbar/Navbar';
+import { resolveServerFromCookies } from '@data/servers/resolveServerFromCookies';
 
-import WeeklyPageClient from './EditWeeklyPageClient';
+import EditWeeklyPageClient from './EditWeeklyPageClient';
 
 import type { JSX } from 'react';
 
-type HomePageProps = {
-	searchParams?: Record<string, string | undefined>;
-};
-
-const HomePage = async ({ searchParams }: HomePageProps): Promise<JSX.Element> => {
+const HomePage = async (): Promise<JSX.Element> => {
 	const session = await auth();
 
 	// If no session, redirect to login with a query param
@@ -19,13 +16,15 @@ const HomePage = async ({ searchParams }: HomePageProps): Promise<JSX.Element> =
 		redirect('/login?unauthorized=1');
 	}
 
-	// Execute function here to updat weekly bosses.
+	const initialServer = await resolveServerFromCookies();
+
+	// Execute function here to update weekly bosses.
 	// Function here
 
 	return (
 		<main className="container">
 			<Navbar username={session.user.username} />
-			<WeeklyPageClient searchParams={searchParams} username={session.user.username} />
+			<EditWeeklyPageClient username={session.user.username} initialServer={initialServer} />
 		</main>
 	);
 };

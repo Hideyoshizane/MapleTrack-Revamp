@@ -4,9 +4,9 @@ import { useCallback } from 'react';
 import { toast } from 'react-toastify';
 
 import { handleFieldValidation } from '@/utils/validateField';
+import { userApi } from '@features/user/userApi';
 import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
 import { validateEmail } from '@utils/validators';
-import { fetchWithTimeout } from '@utils/withTimeout';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { ForgotPasswordFormData } from '@sharedTypes/form';
@@ -19,10 +19,8 @@ export const useForgotPassword = (
 	const submitForgotPassword = useCallback(
 		async (data: ForgotPasswordFormData): Promise<void> => {
 			try {
-				// Sanitize input
 				const email = sanitizeInputFrontend(data.email);
 
-				// Run validations
 				const validations = { email: validateEmail(email) };
 				const hasErrors = (Object.entries(validations) as [keyof ForgotPasswordFormData, ValidationResult][]).some(
 					([field, result]): boolean => handleFieldValidation(field, result, setError)
@@ -31,16 +29,9 @@ export const useForgotPassword = (
 					return;
 				}
 
-				// API request
-				const response = await fetchWithTimeout('/api/auth/forgot-password', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ email }),
-				});
+				const result: ApiResponse = await userApi.forgotPassword({ email });
 
-				const result = (await response.json()) as ApiResponse;
-
-				if (response.ok && result.success) {
+				if (result.success) {
 					toast.success(result.message ?? 'Success');
 					return;
 				}

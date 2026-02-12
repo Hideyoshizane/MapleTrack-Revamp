@@ -3,31 +3,30 @@ import { z } from 'zod';
 import { bosses } from '@data/bosses/bosses';
 import { CHARACTER_MAX_LEVEL } from '@data/character/constants';
 import { JobClasses } from '@data/classes/classes';
-import { servers } from '@data/servers/servers';
-import { characterNameSchema } from '@features/character/characterNameSchema';
-import { userSchema } from '@features/user/userSchema';
+import { characterServerSideSchema } from '@features/character/character.server.schema';
+import { serverSchema } from '@features/character/characterRequestSchema';
+import { normalizeDayjsDate } from '@utils/dateFromDayjs';
+import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
 
 // Build a map of valid difficulties for each boss.
 const bossDifficultyMap = Object.fromEntries(
-	bosses.map((b): [string, string[]] => [b.name, b.difficulties.map((d): string => d.name)])
+	bosses.map((b): [string, string[]] => [b.name, b.difficulties.map((d): string => d.name)]),
 );
 
 // Precompute boss names for enum validation
-const bossNames = bosses.map((b): string => b.name);
+const bossNames = bosses.map((b) => b.name) as [string, ...string[]];
 
 export const BossSchema = z
 	.object({
-		name: z.enum([...(bossNames as [string, ...string[]])]),
-		difficulty: z.string(),
+		name: z.enum([...bossNames]),
+		difficulty: z.string().transform(sanitizeInputBackEnd),
 		reset: z.enum(['Daily', 'Weekly', 'Monthly']),
+
 		checked: z.boolean().default(false),
-		DailyTotal: z.number().min(0).max(7).optional().default(0),
-		date: z
-			.preprocess(
-				(val): Date | null => (val === null ? null : val instanceof Date ? val : new Date(val as string)),
-				z.date().nullable()
-			)
-			.optional(),
+
+		dailyTotal: z.number().min(0).max(7).optional().default(0),
+		date: z.preprocess(normalizeDayjsDate, z.date().nullable()).optional(),
+
 		locked: z.boolean().optional().default(false),
 	})
 	.superRefine((data, ctx): void => {
@@ -41,7 +40,7 @@ export const BossSchema = z
 		}
 	});
 
-const characterNameField = characterNameSchema.shape.name;
+const characterNameField = characterServerSideSchema;
 const classNames = JobClasses.map((c): string => c.className) as [string, ...string[]];
 const codes = JobClasses.map((c): string => c.code) as [string, ...string[]];
 
@@ -54,38 +53,18 @@ export const BossCharacterSchema = z.object({
 	bosses: z.array(BossSchema).default([]),
 });
 
-// Extract allowed server names
-const serverNames = servers.map((s): string => s.name) as [string, ...string[]];
-
 export const BossServerSchema = z.object({
-	server: z.enum(serverNames),
+	server: serverSchema,
 	weeklyBosses: z.number().default(0),
 	totalGains: z.number().default(0),
 	characters: z.array(BossCharacterSchema).default([]),
 });
 
-// Reuse schema for userOrigin
-const usernameSchema = userSchema.shape.username;
-
-export const BossListSchema = z.object({
-	userOrigin: usernameSchema,
-	lastUpdate: z
-		.preprocess(
-			(val): Date | null => (val === null ? null : val instanceof Date ? val : new Date(val as string)),
-			z.date().nullable()
-		)
-		.optional(),
-	server: z.array(BossServerSchema).default([]),
-});
-
 export const BossListRequestSchema = z.object({
-	userOrigin: usernameSchema,
-
-	server: z.enum(serverNames),
+	server: serverSchema,
 });
 
 export type ZodBossRequest = z.infer<typeof BossListRequestSchema>;
 export type ZodBoss = z.infer<typeof BossSchema>;
 export type ZodBossCharacter = z.infer<typeof BossCharacterSchema>;
 export type ZodBossServer = z.infer<typeof BossServerSchema>;
-export type ZodBossList = z.infer<typeof BossListSchema>;

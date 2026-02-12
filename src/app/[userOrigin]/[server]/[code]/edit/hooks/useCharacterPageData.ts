@@ -1,83 +1,80 @@
 'use client';
-
+import { produce } from 'immer';
 import { useState, useEffect } from 'react';
 
-import { useCharacterData } from '@hooks/useCharacterData';
-import { useCharacterDataFromApi } from '@hooks/useCharacterDataFromApi';
+import { useCharacterExternalQuery } from '@hooks/useCharacterExternalQuery';
+import { useCharacterQuery } from '@hooks/useCharacterQuery';
 
-import type { Character } from '@sharedTypes/character';
+import type { CharacterDataFromAPI } from '@features/character/characterApi';
+import type { CharacterDraft as Character } from '@features/character/characterModel';
 
-interface UseCharacterPageDataProps {
+type UseCharacterPageDataProps = {
 	userOrigin: string;
 	server: string;
 	code: string;
-}
+	nameOverride?: string;
+	syncEnabled: boolean;
+	setFirstLoad: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-interface UseCharacterPageDataReturn {
-	character?: Character;
-	committedName: string;
-	setCommittedName: React.Dispatch<React.SetStateAction<string>>;
+type UseCharacterPageDataReturn = {
+	character: Character | null;
+	updateCharacter: (recipe: (draft: Character) => void) => void;
 	loading: boolean;
 	error?: string;
-	characterDataApi: any;
-	characterDataApiFailed: boolean;
-	handleSyncToggle: () => void;
-}
+	CharacterDataFromAPI: CharacterDataFromAPI | null;
+	CharacterDataFromAPIFailed: boolean;
+};
 
 export const useCharacterPageData = ({
 	userOrigin,
 	server,
 	code,
+	nameOverride,
+	syncEnabled,
+	setFirstLoad,
 }: UseCharacterPageDataProps): UseCharacterPageDataReturn => {
-	const {
-		character,
-		setCharacter,
-		committedName,
-		setCommittedName,
-		loading: characterLoading,
-		error,
-	} = useCharacterData({ userOrigin, server, code });
+	// Main character data
+	const { data: serverCharacter, isLoading: characterLoading, error } = useCharacterQuery({ userOrigin, server, code });
+	const [editableCharacter, setEditableCharacter] = useState<Character | null>(() => serverCharacter ?? null);
 
-	const [refreshKey, setRefreshKey] = useState(0);
-	const [firstLoadDone, setFirstLoadDone] = useState(false);
+	useEffect(() => {
+		if (serverCharacter && serverCharacter !== editableCharacter) {
+			setEditableCharacter(serverCharacter);
+		}
+		setFirstLoad(false);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [serverCharacter]);
 
-	const handleSyncToggle = (): void => {
-		if (!character) return;
-		setCharacter({ ...character, syncing: !character.syncing });
-		setRefreshKey((prev): number => prev + 1); // triggers re-fetch
+	const updateCharacter = (recipe: (draft: Character) => void): void => {
+		setEditableCharacter((prev) => {
+			if (!prev) {
+				return prev;
+			}
+
+			return produce(prev, recipe);
+		});
 	};
 
+	const resolvedName: string | undefined = nameOverride ?? editableCharacter?.name;
+
+	// External API data
 	const {
-		characterDataApi,
-		characterDataApiFailed,
-		loading: extraDataLoading,
-	} = useCharacterDataFromApi({
-		character,
-		committedName,
+		data: extraData,
+		isLoading: extraLoading,
+		isError: CharacterDataFromAPIFailed,
+	} = useCharacterExternalQuery({
+		name: resolvedName,
 		server,
-		characterLoading,
-		refreshKey,
+		enabled: syncEnabled && !!resolvedName,
 	});
 
-	// Mark first load done after both character and extra data are fetched
-	useEffect((): void => {
-		if (!characterLoading && !extraDataLoading) {
-			queueMicrotask(() => {
-				setFirstLoadDone(true);
-			});
-		}
-	}, [characterLoading, extraDataLoading]);
-
-	const loading = firstLoadDone ? false : characterLoading || extraDataLoading;
-
 	return {
-		character,
-		committedName,
-		setCommittedName,
-		loading,
-		error: error ?? undefined,
-		characterDataApi,
-		characterDataApiFailed,
-		handleSyncToggle,
+		character: editableCharacter,
+		updateCharacter,
+		loading: characterLoading || extraLoading,
+		error: error instanceof Error ? error.message : undefined,
+		CharacterDataFromAPI: extraData ?? null,
+		CharacterDataFromAPIFailed,
 	};
 };

@@ -1,8 +1,8 @@
 'use client';
 
 import * as RadixTooltip from '@radix-ui/react-tooltip';
-import { useEffect, useState } from 'react';
-import Cookies from 'universal-cookie';
+
+import { useTheme } from '@context/useTheme';
 
 import styles from './Tooltip.module.scss';
 
@@ -16,28 +16,14 @@ type CustomTooltipProps = {
 };
 
 const Tooltip = ({ content, children, placement = 'top', enabled = true }: CustomTooltipProps): JSX.Element => {
-	const [theme, setTheme] = useState<'light' | 'dark'>('light');
+	const { theme } = useTheme();
 
-	// Read theme cookie
-	useEffect((): void => {
-		const cookies = new Cookies();
-
-		const themeCookie = cookies.get('theme') as unknown;
-		if (themeCookie === 'dark' || themeCookie === 'light') {
-			queueMicrotask(() => {
-				setTheme(themeCookie);
-			});
-		}
-	}, []);
-
-	// Determine opposite theme
+	// Tooltip uses the opposite theme for contrast
 	const oppositeTheme = theme === 'dark' ? 'light' : 'dark';
 
-	// Choose styles based on opposite theme
 	const tooltipClass = oppositeTheme === 'dark' ? styles.tooltipDark : styles.tooltipLight;
 	const arrowClass = oppositeTheme === 'dark' ? styles.arrowDark : styles.arrowLight;
 
-	// Render children directly if tooltip is disabled
 	if (!enabled) {
 		return children;
 	}

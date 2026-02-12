@@ -1,60 +1,127 @@
-import { addCharacterToBossList, removeCharacterFromBossList } from '@features/Boss/bossListService';
-import { Character } from '@features/character/characterModel';
-import { getUpdateCharacterDataRequestSchema } from '@features/character/characterUpdateSchema';
-import connectToDatabase from '@lib/mongooseConect';
-import { createResponse } from '@utils/createResponse';
-import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
-import { SERVER_OPTIONS } from '@utils/serverCookie';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import { getToken } from 'next-auth/jwt';
 
-import type { CharacterDocument } from '@features/character/characterModel';
+import { characterToBossList } from '@features/Boss/bossListService';
+import { getUpdateCharacterDataRequestSchema } from '@features/character/characterUpdateSchema';
+import { prisma } from '@lib/prisma';
+import { createResponse } from '@utils/createResponse';
+
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
+dayjs.extend(utc);
+
 export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
 	try {
-		await connectToDatabase();
+		// Extract token from the request cookies
+		const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+		if (!token || typeof token.id !== 'string') {
+			return createResponse<ApiResponse>({ success: false, message: 'Unauthorized' }, 401);
+		}
+
+		let body: unknown;
+		try {
+			body = await request.json();
+		} catch {
+			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
+		}
 
 		// Validate request body using Zod
-		const body = await request.json();
-		if (!body?.data) return createResponse<ApiResponse>({ success: false, message: 'Missing request data' }, 400);
-		delete body.data._id;
-
 		const parseResult = getUpdateCharacterDataRequestSchema.safeParse(body);
-		if (!parseResult.success)
+		if (!parseResult.success) {
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
-
-		const { userOrigin: rawUser, server: rawServer, code: rawCode, data } = parseResult.data;
-
-		// Sanitize inputs
-		const [username, server, code, characterName] = [rawUser, rawServer, rawCode, data.name].map(sanitizeInputBackEnd);
-		if (!username || !server || !code || !characterName) {
-			return createResponse<ApiResponse>({ success: false, message: 'Missing required fields' }, 400);
 		}
 
-		// Validate allowed server
-		if (!SERVER_OPTIONS.includes(server)) {
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid server' }, 400);
-		}
+		const { server, code, data } = parseResult.data;
+		const authenticatedUserId = token.id;
+		const now = dayjs().utc().toDate();
 
-		// Fetch existing character
-		let character: CharacterDocument | null = await Character.findOne({ userOrigin: username, server, code }).exec();
-		if (!character) {
-			// Create new character
-			character = new Character({ ...data, userOrigin: username, server, code });
-		} else {
-			if (character.bossing != data.bossing) {
-				// Character need to be removed from database;
-				await removeCharacterFromBossList(username, server, code);
+		await prisma.$transaction(async (tx) => {
+			const character = await tx.character.upsert({
+				where: {
+					userId_server_code: {
+						userId: authenticatedUserId,
+						server,
+						code,
+					},
+				},
+				create: {
+					name: data.name,
+					level: data.level,
+					targetLevel: data.targetLevel,
+					class: data.class,
+					jobType: data.jobType,
+					legion: data.legion,
+					linkSkill: data.linkSkill,
+					bossing: data.bossing,
+					syncing: data.syncing,
+					userId: authenticatedUserId,
+					server,
+					code,
+					lastUpdate: now,
+				},
+				update: {
+					name: data.name,
+					level: data.level,
+					targetLevel: data.targetLevel,
+					class: data.class,
+					jobType: data.jobType,
+					legion: data.legion,
+					linkSkill: data.linkSkill,
+					bossing: data.bossing,
+					syncing: data.syncing,
+					lastUpdate: now,
+				},
+			});
+
+			for (const symbol of data.symbols) {
+				const symbolRecord = await tx.characterSymbol.upsert({
+					where: {
+						characterId_name: {
+							characterId: character.id,
+							name: symbol.name,
+						},
+					},
+					create: {
+						name: symbol.name,
+						level: symbol.level,
+						exp: symbol.exp,
+						category: symbol.category,
+						characterId: character.id,
+					},
+					update: {
+						level: symbol.level,
+						exp: symbol.exp,
+						category: symbol.category,
+					},
+				});
+
+				for (const content of symbol.content) {
+					await tx.characterContent.upsert({
+						where: {
+							symbolId_contentType: {
+								symbolId: symbolRecord.id,
+								contentType: content.contentType,
+							},
+						},
+						create: {
+							contentType: content.contentType,
+							checked: content.checked,
+							tries: content.tries ?? null,
+							symbolId: symbolRecord.id,
+						},
+						update: {
+							checked: content.checked,
+							tries: content.tries ?? null,
+						},
+					});
+				}
 			}
-			// Update character
-			Object.assign(character, data);
-		}
-		// If character bossing is true add to BossList
-		if (character.bossing) {
-			await addCharacterToBossList(username, server, character.name, code, data.class, character.level);
-		}
+		});
 
-		await character.save();
+		await characterToBossList(authenticatedUserId, server, data.name, code, data.class, data.level, data.bossing);
+
 		return createResponse<ApiResponse>({ success: true, message: 'Character updated successfully.' }, 200);
 	} catch (error) {
 		console.error('Search error:', error);
