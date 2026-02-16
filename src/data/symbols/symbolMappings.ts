@@ -67,6 +67,14 @@ export const isSymbolName = (value: string): value is SymbolName => {
 	return value in SYMBOL_MAP;
 };
 
+export const toSymbolName = (value: string): SymbolName | null => {
+	if (isSymbolName(value)) {
+		return value;
+	}
+
+	return null;
+};
+
 export const canUseSymbol = (level: number, name: SymbolName): boolean => {
 	const minLevel = SYMBOL_MAP[name].minLevel;
 	return minLevel === undefined || level >= minLevel;

@@ -1,5 +1,5 @@
 'use client';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
@@ -18,7 +18,6 @@ import type { JSX } from 'react';
 const CLASS_ORDER = ['mage', 'warrior', 'thief', 'bowman', 'pirate'];
 
 type ClassGridProps = {
-	username: string;
 	serverCookie: string | undefined;
 	selectedClasses: ClassFilterOption[];
 	selectedClassesLoading: boolean;
@@ -29,9 +28,11 @@ const filterCharacters = (results: Character[], selectedClasses: ClassFilterOpti
 		if (!selectedClasses.length) {
 			return true;
 		}
+
 		if (char.bossing && selectedClasses.includes('bossing')) {
 			return true;
 		}
+
 		if (char.jobType === 'xenon' && (selectedClasses.includes('pirate') || selectedClasses.includes('thief'))) {
 			return true;
 		}
@@ -42,8 +43,8 @@ const filterCharacters = (results: Character[], selectedClasses: ClassFilterOpti
 
 const sortCharacters = (characters: Character[]): Character[] => {
 	return [...characters].sort((a, b): number => {
-		const aType = a.jobType === 'xenon' ? 'thief' : a.jobType ?? 'zzz';
-		const bType = b.jobType === 'xenon' ? 'thief' : b.jobType ?? 'zzz';
+		const aType = a.jobType === 'xenon' ? 'thief' : (a.jobType ?? 'zzz');
+		const bType = b.jobType === 'xenon' ? 'thief' : (b.jobType ?? 'zzz');
 
 		const aIndex = CLASS_ORDER.indexOf(aType);
 		const bIndex = CLASS_ORDER.indexOf(bType);
@@ -55,13 +56,10 @@ const sortCharacters = (characters: Character[]): Character[] => {
 	});
 };
 
-const ClassGrid = ({
-	username,
-	serverCookie,
-	selectedClasses,
-	selectedClassesLoading,
-}: ClassGridProps): JSX.Element => {
-	const [jobResults, setJobResults] = useState<Character[]>([]);
+const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: ClassGridProps): JSX.Element => {
+	const router = useRouter();
+
+	const [allCharacters, setAllCharacters] = useState<Character[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -70,7 +68,7 @@ const ClassGrid = ({
 			<div key={job.className} className={styles.skeletonWrapper}>
 				<SkeletonWrapper width={502} height={368} color="light" variant="rounded" />
 			</div>
-		)
+		),
 	);
 
 	const fetchCharacters = async (): Promise<void> => {
@@ -79,16 +77,13 @@ const ClassGrid = ({
 			setError(null);
 
 			if (!serverCookie) {
-				redirect('/error');
+				router.replace('/error');
+				return;
 			}
 
-			const payload: GetAllCharactersRequestBody = {
-				username,
-				server: serverCookie,
-			};
+			const payload: GetAllCharactersRequestBody = { server: serverCookie };
 
 			const response = await characterApi.getAllCharacters(payload);
-
 			if (!response.success) {
 				throw new Error(response.message ?? 'Failed to fetch characters');
 			}
@@ -97,7 +92,6 @@ const ClassGrid = ({
 
 			const results: Character[] = JobClasses.map((job): Character => {
 				const match = fetchedCharacters.find((char): boolean => char.class === job.className);
-
 				return (
 					match ??
 					generateCharacterObject({
@@ -107,14 +101,11 @@ const ClassGrid = ({
 						code: job.code,
 						linkSkill: job.linkSkill,
 						server: serverCookie,
-						userOrigin: username,
 					})
 				);
 			});
 
-			const filteredAndSorted: Character[] = sortCharacters(filterCharacters(results, selectedClasses));
-
-			setJobResults(filteredAndSorted);
+			setAllCharacters(results);
 		} catch (err: unknown) {
 			console.error('Error fetching characters:', err);
 			setError(err instanceof Error ? err.message : String(err));
@@ -124,13 +115,15 @@ const ClassGrid = ({
 	};
 
 	useEffect((): void => {
-		if (!username || !serverCookie) {
+		if (!serverCookie) {
 			return;
 		}
 
 		void fetchCharacters();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [username, serverCookie, selectedClasses]);
+	}, [serverCookie]);
+
+	const jobResults: Character[] = sortCharacters(filterCharacters(allCharacters, selectedClasses));
 
 	if (error) {
 		return (
@@ -143,7 +136,6 @@ const ClassGrid = ({
 
 	return (
 		<div className={styles.classGrid}>
-			{loading ? skeletons : jobResults.map((char): JSX.Element => <ClassCard key={char.class} character={char} />)}
 			{loading || selectedClassesLoading
 				? skeletons
 				: jobResults.map((char): JSX.Element => <ClassCard key={char.class} character={char} />)}

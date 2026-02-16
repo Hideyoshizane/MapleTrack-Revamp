@@ -5,7 +5,6 @@ import type { LevelUpResult } from '@data/symbols/symbolMappings';
 import type { ApiRequest, ApiResponse } from '@sharedTypes/api';
 
 export type GetAllCharactersRequestBody = ApiRequest<{
-	username: string;
 	server: string;
 }>;
 
@@ -95,7 +94,6 @@ export const characterApi = {
 
 	updateCharacterWeekly: async (payload: {
 		symbolName: string;
-		userOrigin: string;
 		server: string;
 		code: string;
 	}): Promise<ApiResponse<UpdateCharacterResponseData>> => {

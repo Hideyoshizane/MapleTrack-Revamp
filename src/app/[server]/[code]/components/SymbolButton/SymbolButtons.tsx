@@ -45,14 +45,13 @@ const SymbolButtons = ({
 
 	const handleDailyUpdate = async (): Promise<void> => {
 		try {
-			const [userOrigin, server, code] = window.location.pathname.split('/').filter(Boolean);
+			const [server, code] = window.location.pathname.split('/').filter(Boolean);
 
 			const result = await characterApi.updateCharacterDaily({
 				symbolName: symbol.name,
-				bonus,
-				userOrigin,
-				server,
-				code,
+				bonus: bonus,
+				server: server,
+				code: code,
 			});
 
 			if (!result.success || !result.data) {
@@ -62,7 +61,7 @@ const SymbolButtons = ({
 			onValueChange?.(result.data);
 
 			queryClient.setQueryData(
-				characterQueryKeys.detail(userOrigin, server, code),
+				characterQueryKeys.detail(server, code),
 				(previousCharacter: Character | undefined): Character | undefined => {
 					if (!previousCharacter) {
 						return previousCharacter;
@@ -81,13 +80,13 @@ const SymbolButtons = ({
 														...characterContent,
 														cleared: true,
 														date: new Date(),
-												  }
-												: characterContent
+													}
+												: characterContent,
 										),
-								  }
+									},
 						),
 					};
-				}
+				},
 			);
 		} catch (error) {
 			console.error('Error updating daily:', error);
@@ -96,11 +95,10 @@ const SymbolButtons = ({
 
 	const handleWeeklyUpdate = async (): Promise<void> => {
 		try {
-			const [userOrigin, server, code] = window.location.pathname.split('/').filter(Boolean);
+			const [server, code] = window.location.pathname.split('/').filter(Boolean);
 
 			const result = await characterApi.updateCharacterWeekly({
 				symbolName: symbol.name,
-				userOrigin,
 				server,
 				code,
 			});
@@ -112,7 +110,7 @@ const SymbolButtons = ({
 			onValueChange?.(result.data);
 
 			queryClient.setQueryData(
-				characterQueryKeys.detail(userOrigin, server, code),
+				characterQueryKeys.detail(server, code),
 				(previousCharacter: Character | undefined): Character | undefined => {
 					if (!previousCharacter) {
 						return previousCharacter;
@@ -144,10 +142,10 @@ const SymbolButtons = ({
 												date: newTries === 0 ? new Date() : characterContent.date,
 											};
 										}),
-								  }
+									},
 						),
 					};
-				}
+				},
 			);
 		} catch (error) {
 			console.error('Error updating weekly:', error);
@@ -160,10 +158,10 @@ const SymbolButtons = ({
 	const dailyButtonLabel = disableAllDaily
 		? 'Daily done!'
 		: !dailyContent?.checked
-		? 'Disabled'
-		: !isDailyResetDone
-		? 'Daily done!'
-		: `Daily: +${dailyValue}`;
+			? 'Disabled'
+			: !isDailyResetDone
+				? 'Daily done!'
+				: `Daily: +${dailyValue}`;
 
 	// Determine button state and label for Weekly Button
 	const weeklyButtonDisabled =
@@ -172,8 +170,8 @@ const SymbolButtons = ({
 	const weeklyButtonLabel = !weeklyContent?.checked
 		? 'Disabled'
 		: !isWeeklyResetDone && weeklyContent?.tries === 0
-		? 'Weekly Done'
-		: `Weekly: ${weeklyContent?.tries}/${DEFAULT_WEEKLY_TRIES}`;
+			? 'Weekly Done'
+			: `Weekly: ${weeklyContent?.tries}/${DEFAULT_WEEKLY_TRIES}`;
 
 	return (
 		<div className={styles.buttonLines}>

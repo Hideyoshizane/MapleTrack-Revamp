@@ -1,4 +1,4 @@
-import { characterApiSchema } from '@features/character/character.client.schema';
+import { characterApiSchema } from '@features/character/character.server.schema';
 import { fetchCharacterDataFromAPI } from '@lib/fetchCharacterDataFromAPI';
 import { createResponse } from '@utils/createResponse';
 
@@ -15,8 +15,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	}
 
 	// Validate name
-	const parseResult = characterApiSchema.safeParse({ body });
-
+	const parseResult = characterApiSchema.safeParse(body);
 	if (!parseResult.success) {
 		return createResponse<ApiResponse>({ success: false, message: 'Invalid parameters.' }, 400);
 	}

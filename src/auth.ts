@@ -60,9 +60,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 					}
 
 					const { username, password } = credentials as LoginCredentials;
+
 					const cleanUsername = canonicalizeUsername(username);
 					const cleanPassword = sanitizeInputBackEnd(password);
-
 					if (!cleanUsername || !cleanPassword) {
 						return null;
 					}

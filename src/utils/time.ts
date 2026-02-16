@@ -15,7 +15,6 @@ export const nowInUtc = (): dayjs.Dayjs => dayjs.utc();
 // Normalize input into a UTC Dayjs object
 export const toUtc = (date: string | Date | Dayjs): Dayjs => {
 	const day = dayjs.utc(date);
-
 	if (!day.isValid()) {
 		throw new Error(`Invalid date provided to toUtc(): ${date.toLocaleString()}`);
 	}

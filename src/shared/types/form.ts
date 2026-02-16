@@ -4,7 +4,6 @@ import type {
 	ResetPasswordRequestBody,
 	ForgotPasswordRequestBody,
 	ChangePasswordRequestBody,
-	DeleteAccountRequestBody,
 } from '@/schemas/auth.schemas';
 
 // Login
@@ -27,6 +26,3 @@ export type ResetPasswordFormData = ResetPasswordRequestBody & {
 export type ChangePasswordFormData = ChangePasswordRequestBody & {
 	confirmPassword: string;
 };
-
-// Delete Account
-export type DeleteAccountData = DeleteAccountRequestBody;

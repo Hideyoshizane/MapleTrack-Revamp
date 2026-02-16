@@ -25,7 +25,7 @@ const HomePage = async ({ searchParams }: HomePageProps): Promise<JSX.Element> =
 	return (
 		<main className="container">
 			<Navbar username={session.user.username} />
-			<HomePageClient searchParams={searchParams} username={session.user.username} initialServer={initialServer} />
+			<HomePageClient searchParams={searchParams} initialServer={initialServer} />
 		</main>
 	);
 };

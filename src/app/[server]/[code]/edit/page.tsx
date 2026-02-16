@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
 import Navbar from '@components/Navbar/Navbar';
-import { validateUserAccess } from '@lib/characters';
 
 import CharacterPage from './CharacterPage';
 
@@ -21,12 +20,6 @@ const CharactersPage = async ({ params }: CharactersPageProps): Promise<JSX.Elem
 	const session = await auth();
 	if (!session) {
 		redirect('/login?unauthorized=1');
-	}
-
-	// Validate if user is trying to access its own data
-	const isValid = validateUserAccess({ userOrigin, server, code }, session.user.username);
-	if (!isValid) {
-		redirect('/home?unauthorized=1');
 	}
 
 	return (

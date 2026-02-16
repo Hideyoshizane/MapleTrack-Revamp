@@ -1,17 +1,19 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { type UseMutationResult } from '@tanstack/react-query';
 
 import { characterQueryKeys } from '@features/character/character.queryKeys';
 import { characterApi } from '@features/character/characterApi';
 
 type Payload = {
 	symbolName: string;
-	userOrigin: string;
 	server: string;
 	code: string;
 	bonus: number;
 };
 
-export const useUpdateSymbolDaily = () => {
+type UpdateSymbolDailyResponse = Awaited<ReturnType<typeof characterApi.updateCharacterDaily>>;
+
+export const useUpdateSymbolDaily = (): UseMutationResult<UpdateSymbolDailyResponse, Error, Payload, unknown> => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
@@ -19,7 +21,7 @@ export const useUpdateSymbolDaily = () => {
 
 		onSuccess: (_data, variables): void => {
 			void queryClient.invalidateQueries({
-				queryKey: characterQueryKeys.detail(variables.userOrigin, variables.server, variables.code),
+				queryKey: characterQueryKeys.detail(variables.server, variables.code),
 			});
 		},
 	});

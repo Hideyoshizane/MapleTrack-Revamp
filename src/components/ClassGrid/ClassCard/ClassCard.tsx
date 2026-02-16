@@ -2,7 +2,7 @@
 import { clsx } from 'clsx';
 import Image from 'next/image';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import BossIcon from '@assets/svg/boss_slayer.svg';
 import LegionBlock from '@components/LegionBlock/LegionBlock';
@@ -11,7 +11,7 @@ import ProgressBar from '@components/ProgressBar/ProgressBar';
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import { getLinkSkillByName } from '@data/linkSkill/linkSkill';
 import { getLastLevel } from '@data/symbols/exp/expTable';
-import { getSymbolImagePath, canUseSymbol } from '@data/symbols/symbolMappings';
+import { toSymbolName, getSymbolImagePath, canUseSymbol } from '@data/symbols/symbolMappings';
 import { separateSymbolsByCategory, getJob } from '@features/character/characterAttributes';
 
 import styles from './ClassCard.module.scss';
@@ -49,7 +49,9 @@ const jobLevelClassMap: Record<JobType, string> = {
 const SymbolGrid = ({ symbols, maxLevel, size = 16, characterLevel }: SymbolProps): JSX.Element => (
 	<div className={styles.symbolGrid}>
 		{symbols.map((symbol, index): JSX.Element => {
-			const usable = canUseSymbol(characterLevel, symbol.name);
+			const symbolName = toSymbolName(symbol.name);
+
+			const usable = symbolName !== null && canUseSymbol(characterLevel, symbolName);
 			const displayLevel = usable ? (symbol.level < maxLevel ? `Lv. ${symbol.level}` : 'MAX') : 'Lv. 0';
 
 			return (
@@ -90,9 +92,12 @@ const IconSection = ({
 	</div>
 );
 
-const ClassCard = ({ character }: ClassCardProps): JSX.Element => {
+const ClassCard = ({ character }: ClassCardProps): JSX.Element | null => {
+	const router = useRouter();
+
 	if (!character?.code || !character.jobType || !character.legion) {
-		redirect('/error');
+		router.replace('/error');
+		return null;
 	}
 
 	const {
@@ -104,12 +109,11 @@ const ClassCard = ({ character }: ClassCardProps): JSX.Element => {
 		name,
 		bossing,
 		targetLevel,
-		userOrigin,
 		server,
 		class: className,
 	} = character;
 
-	const { ArcaneSymbol, SacredSymbol } = separateSymbolsByCategory(character.symbols);
+	const { arcane: ArcaneSymbol, sacred: SacredSymbol } = separateSymbolsByCategory(character.symbols);
 
 	const SYMBOL_SIZE = 20;
 	const BOSS_ICON_SIZE = 48;
@@ -117,13 +121,13 @@ const ClassCard = ({ character }: ClassCardProps): JSX.Element => {
 	const arcaneMaxLevel = getLastLevel('arcane');
 	const sacredMaxLevel = getLastLevel('sacred');
 
-	const linkSkill = ls ? getLinkSkillByName(ls) ?? null : null;
+	const linkSkill = ls ? (getLinkSkillByName(ls) ?? null) : null;
 
 	const jobKey: JobType = (jobType ?? 'default') as JobType;
 	const job: string = getJob(character.level);
 
 	return (
-		<Link href={`/${userOrigin}/${server}/${code}`} passHref>
+		<Link href={`/${server}/${code}`} passHref>
 			<div className={styles.cardBody}>
 				{/* Top section */}
 				<div className={styles.topPart}>

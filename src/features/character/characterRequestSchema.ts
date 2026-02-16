@@ -1,11 +1,7 @@
 import { z } from 'zod';
 
-import { userSchema } from '@/features/user/user.schema';
 import { JobClasses } from '@data/classes/classes';
 import { servers } from '@data/servers/servers';
-
-// Reuse only the username part of userSchema
-const usernameSchema = userSchema.shape.username;
 
 // Server validation
 const serverNames = servers.map((s): string => s.name);
@@ -20,7 +16,6 @@ const jobClassSchema = z.enum(jobClassCodes, {
 });
 
 export const getAllCharactersRequestSchema = z.object({
-	username: usernameSchema,
 	server: serverSchema,
 });
 

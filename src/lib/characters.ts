@@ -17,24 +17,6 @@ const sanitizeString = (input: unknown): string | null => {
 	return sanitizeInputBackEnd(input) || null;
 };
 
-export const validateUserAccess = (
-	params: { userOrigin: string; server: string; code: string },
-	sessionUsername: string,
-): boolean => {
-	try {
-		// Validate that the properties are strings
-		const username = sanitizeString(sessionUsername);
-		const userOrigin = sanitizeString(params.userOrigin);
-		const server = sanitizeString(params.server);
-		const code = sanitizeString(params.code);
-
-		return !!username && !!userOrigin && !!server && !!code && isValidServerName(server) && username === userOrigin;
-	} catch (error) {
-		console.error('User validation error:', error);
-		return false;
-	}
-};
-
 const getArcaneSymbol = async (
 	tx: Prisma.TransactionClient,
 	characterId: string,

@@ -41,15 +41,23 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 				id: true,
 				name: true,
 				server: true,
+				code: true,
+				class: true,
+				jobType: true,
+				legion: true,
+				level: true,
+				targetLevel: true,
+				linkSkill: true,
 				symbols: {
 					select: {
 						id: true,
 						content: true,
+						category: true,
+						name: true,
 					},
 				},
 			},
 		});
-
 		return createResponse<ApiResponse<typeof characters>>(
 			{
 				success: true,

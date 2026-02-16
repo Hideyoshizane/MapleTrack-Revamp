@@ -17,11 +17,10 @@ import type { JSX } from 'react';
 
 type HomePageClientProps = {
 	searchParams?: Record<string, string | undefined>;
-	username: string;
 	initialServer: ServerName;
 };
 
-const HomePageClient = ({ username, initialServer }: HomePageClientProps): JSX.Element => {
+const HomePageClient = ({ initialServer }: HomePageClientProps): JSX.Element => {
 	const { server, setServerCookie } = useServerCookie(initialServer);
 	const { selectedClasses, setClasses, loading } = useClassFilterCookie();
 
@@ -55,12 +54,7 @@ const HomePageClient = ({ username, initialServer }: HomePageClientProps): JSX.E
 			<div className={styles.classFilter}>
 				<ClassFilter selectedClasses={selectedClasses} setSelectedClasses={setClasses} loading={loading} />
 			</div>
-			<ClassGrid
-				username={username}
-				serverCookie={server}
-				selectedClasses={selectedClasses}
-				selectedClassesLoading={loading}
-			/>
+			<ClassGrid serverCookie={server} selectedClasses={selectedClasses} selectedClassesLoading={loading} />
 		</section>
 	);
 };

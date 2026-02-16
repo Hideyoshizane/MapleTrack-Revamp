@@ -16,7 +16,6 @@ type BossGridProps = {
 };
 
 const BossGrid = ({ serverCookie, selectedCharacter }: BossGridProps): JSX.Element => {
-	console.log(selectedCharacter);
 	const selectedBosses = useBossListStore((s): Boss[] => s.selectedBosses);
 
 	const selectedBossMap = new Map<string, Boss>();
