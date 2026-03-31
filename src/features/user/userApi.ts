@@ -38,16 +38,19 @@ export const userApi = {
 
 	signup: async (payload: SignupPayload): Promise<ApiResponse> => {
 		const { data } = await axiosInstance.post<ApiResponse>('/auth/signup', payload);
+
 		return data;
 	},
 
 	resetPassword: async (payload: ResetPasswordPayload): Promise<ApiResponse> => {
 		const { data } = await axiosInstance.post<ApiResponse>('/auth/reset-password', payload);
+
 		return data;
 	},
 
 	forgotPassword: async (payload: ForgotPasswordPayload): Promise<ApiResponse> => {
 		const { data } = await axiosInstance.post<ApiResponse>('/auth/forgot-password', payload);
+
 		return data;
 	},
 };

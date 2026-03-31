@@ -13,14 +13,19 @@ type ThemeContextProps = {
 const ThemeContext = createContext<ThemeContextProps | null>(null);
 
 const getInitialTheme = (): Theme => {
-	if (typeof window === 'undefined') return 'dark';
+	if (typeof window === 'undefined') {
+		return 'dark';
+	}
 
 	const stored = localStorage.getItem('theme') as Theme | null;
-	if (stored) return stored;
+	if (stored) {
+		return stored;
+	}
 
 	const domTheme = document.documentElement.dataset.theme as Theme | undefined;
-	if (domTheme) return domTheme;
-
+	if (domTheme) {
+		return domTheme;
+	}
 	return 'dark';
 };
 

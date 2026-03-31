@@ -1,39 +1,40 @@
 'use client';
 
-import { useBossListStore } from '@/store/bossListStore';
 import { bosses } from '@data/bosses/bosses';
 
 import BossItem from '../BossItem/BossItem';
 
 import styles from './BossGrid.module.scss';
 
-import type { BossCharacterDraft as BossCharacter, BossDraft as Boss } from '@features/Boss/bossListModel';
+import type { BossCharacterDraft as BossCharacter } from '@features/Boss/bossListModel';
 import type { JSX } from 'react';
 
 type BossGridProps = {
 	serverCookie: string;
 	selectedCharacter: BossCharacter | null;
+	onBossUpdate: (
+		bossName: string,
+		difficulty: string,
+		reset: 'Daily' | 'Weekly' | 'Monthly',
+		dailyTotal?: number,
+	) => void;
 };
 
-const BossGrid = ({ serverCookie, selectedCharacter }: BossGridProps): JSX.Element => {
-	const selectedBosses = useBossListStore((s): Boss[] => s.selectedBosses);
+const BossGrid = ({ serverCookie, selectedCharacter, onBossUpdate }: BossGridProps): JSX.Element => {
+	const selectedBosses = selectedCharacter?.bosses ?? [];
 
-	const selectedBossMap = new Map<string, Boss>();
-	for (const b of selectedBosses) {
-		selectedBossMap.set(b.name + '_' + b.reset, b);
-	}
-
-	// Render content
 	return (
 		<div className={styles.classGrid}>
 			{bosses.map((boss): JSX.Element => {
-				const selectedBoss = [...selectedBossMap.values()].find((x): boolean => x.name === boss.name) ?? null;
+				const selections = selectedBosses.filter((b) => b.name === boss.name);
 				return (
 					<BossItem
 						key={boss.name}
 						serverCookie={serverCookie}
 						selectedCharacterLevel={selectedCharacter?.level ?? 0}
 						boss={boss}
+						selectedBosses={selections}
+						onBossUpdate={onBossUpdate}
 					/>
 				);
 			})}

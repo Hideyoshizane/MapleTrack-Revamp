@@ -24,6 +24,14 @@ const DIFFICULTY_CLASS_MAP: Record<string, string> = {
 	Extreme: styles.extreme,
 };
 
+const DIFFICULTY_ICON_CLASS_MAP: Record<string, string> = {
+	Easy: styles.iconEasy,
+	Normal: styles.iconNormal,
+	Hard: styles.iconHard,
+	Chaos: styles.iconChaos,
+	Extreme: styles.iconExtreme,
+};
+
 type BossButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 	selected: boolean;
 	characterLevel: number;
@@ -41,30 +49,37 @@ const BossButton = ({
 	onSelect,
 }: BossButtonProps): JSX.Element => {
 	const difficultyClass = DIFFICULTY_CLASS_MAP[difficulty.name] ?? '';
+	const iconColor = DIFFICULTY_ICON_CLASS_MAP[difficulty.name] ?? '';
 
 	const sizeClass = isSmallButtons ? styles.smallButton : styles.bigButton;
 	const minTextSize = isSmallButtons ? 12 : 16;
-	const iconColor = difficulty.name == 'Normal' || difficulty.name == 'Hard' ? styles.black : styles.white;
 	const widthSize = isSmallButtons ? 45 : 60;
+
 	const locked = characterLevel < difficulty.minLevel;
 	const content = `Required Level: ${difficulty.minLevel}`;
 
 	return (
 		<Tooltip content={content} enabled={locked}>
 			<button className={clsx(styles.button, difficultyClass, sizeClass)} disabled={locked} onClick={onSelect}>
-				{locked ? (
-					<BanIcon width={24} height={24} className={styles.banIcon} />
-				) : (
-					<ResponsiveText
-						className={styles.buttonText}
-						width={widthSize}
-						height={40}
-						maxFontSize={minTextSize}
-						minFontSize={minTextSize}>
-						{difficulty.name}
-					</ResponsiveText>
-				)}
-				{selected && !locked && <CheckedIcon width={24} height={24} className={iconColor} />}
+				<div className={styles.content}>
+					{locked ? (
+						<BanIcon width={24} height={24} className={styles.banIcon} />
+					) : (
+						<ResponsiveText
+							className={clsx(styles.buttonText, selected && styles.textShift)}
+							width={widthSize}
+							height={40}
+							maxFontSize={minTextSize}
+							minFontSize={minTextSize}>
+							{difficulty.name}
+						</ResponsiveText>
+					)}
+					<CheckedIcon
+						width={24}
+						height={24}
+						className={clsx(styles.icon, iconColor, selected && !locked && styles.iconVisible)}
+					/>
+				</div>
 			</button>
 		</Tooltip>
 	);

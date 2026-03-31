@@ -97,10 +97,7 @@ export const separateSymbolsByCategory = (
 	};
 
 	for (const symbol of symbols) {
-		result[symbol.category].push({
-			name: symbol.name,
-			level: symbol.level,
-		});
+		result[symbol.category].push({ name: symbol.name, level: symbol.level });
 	}
 
 	return result;

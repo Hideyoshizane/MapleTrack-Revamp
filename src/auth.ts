@@ -120,14 +120,14 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 			return token;
 		},
 		session: ({ session, token }) => {
-			const t = token as AppJWT;
+			const tokenData = token as AppJWT;
 			return {
 				...session,
 				user: {
 					...session.user,
-					id: t.id,
-					username: t.username,
-					version: t.version ?? 0,
+					id: tokenData.id,
+					username: tokenData.username,
+					version: tokenData.version ?? 0,
 				},
 			} as AppSession;
 		},

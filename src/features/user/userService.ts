@@ -13,9 +13,7 @@ export const updateLastLogin = async (userId: string): Promise<void> => {
 	}
 	await prisma.user.update({
 		where: { id: userId },
-		data: {
-			lastLogin: dayjs().utc().toDate(),
-		},
+		data: { lastLogin: dayjs().utc().toDate() },
 	});
 };
 
@@ -26,8 +24,6 @@ export const updateUserVersion = async (userId: string): Promise<void> => {
 	}
 	await prisma.user.update({
 		where: { id: userId },
-		data: {
-			version: LASTVERSION,
-		},
+		data: { version: LASTVERSION },
 	});
 };

@@ -1,15 +1,60 @@
+@use 'sass:map';
+
+$difficulties: (
+	'easy': (
+		bg: var(--boss-easy),
+		text: var(--default-white),
+		icon: var(--default-white),
+	),
+	'normal': (
+		bg: var(--boss-normal),
+		text: var(--default-button-text),
+		icon: var(--default-button-text),
+	),
+	'hard': (
+		bg: var(--boss-hard),
+		text: var(--default-button-text),
+		icon: var(--default-button-text),
+	),
+	'chaos': (
+		bg: var(--boss-chaos),
+		text: var(--boss-chaos-secondary),
+		border: var(--boss-chaos-secondary),
+	),
+	'extreme': (
+		bg: var(--boss-extreme),
+		text: var(--boss-extreme-secondary),
+		border: var(--boss-extreme-secondary),
+	),
+);
+
 .button {
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	height: 40px;
+	box-sizing: border-box;
 	border: none;
 	border-radius: 25px;
-	transition: background 0.2s ease-in-out;
+	font-weight: 500;
+	transition:
+		background 0.2s ease-in-out,
+		border 0.2s ease-in-out;
 	cursor: pointer;
 
 	&:disabled {
 		cursor: not-allowed;
+		opacity: 0.8;
+	}
+
+	.content {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
 	}
 
 	.buttonText {
@@ -17,43 +62,43 @@
 		align-items: center;
 		justify-content: center;
 		height: 40px;
-		font-weight: 500;
+		transition: transform 0.1s ease-in-out;
 		margin-right: 2px;
 	}
-}
 
-.easy {
-	background-color: var(--boss-easy);
-	font-weight: 500;
-	color: var(--default-white);
-}
+	.textShift {
+		transform: translateX(-6px);
+	}
 
-.normal {
-	background-color: var(--boss-normal);
-	font-weight: 500;
-	color: var(--default-button-text);
-}
+	.icon {
+		position: absolute;
+		right: 6px;
+		transition:
+			transform 0.1s ease,
+			opacity 0.1s ease;
+		transform: scale(0.75);
+		opacity: 0;
+	}
 
-.hard {
-	background-color: var(--boss-hard);
-	font-weight: 500;
-	color: var(--default-button-text);
-}
+	.iconVisible {
+		transform: scale(1);
+		opacity: 1;
+	}
 
-.chaos {
-	box-sizing: border-box;
-	border: solid 2px var(--boss-chaos-secondary);
-	background-color: var(--boss-chaos);
-	font-weight: 500;
-	color: var(--boss-chaos-secondary);
-}
+	@each $name, $colors in $difficulties {
+		&.#{$name} {
+			background-color: map.get($colors, bg);
+			color: map.get($colors, text);
 
-.extreme {
-	box-sizing: border-box;
-	border: solid 2px var(--boss-extreme-secondary);
-	background-color: var(--boss-extreme);
-	font-weight: 500;
-	color: var(--boss-extreme-secondary);
+			@if map.has-key($colors, border) {
+				border: solid 2px map.get($colors, border);
+			}
+
+			.icon {
+				color: map.get($colors, icon);
+			}
+		}
+	}
 }
 
 .smallButton {
@@ -62,14 +107,6 @@
 
 .bigButton {
 	width: 112px;
-}
-
-.white {
-	color: var(--default-white);
-}
-
-.black {
-	color: var(--default-button-text);
 }
 
 .banIcon {

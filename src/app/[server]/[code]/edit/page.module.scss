@@ -6,6 +6,8 @@ $bigBlockHeight: 115px;
 .mainDiv {
 	display: flex;
 	flex-direction: row;
+	height: 826px;
+	overflow: hidden;
 
 	.characterContent {
 		display: flex;

@@ -33,11 +33,13 @@ type UpdateCharacterResponseData = {
 export const characterApi = {
 	getAllCharacters: async (payload: GetAllCharactersRequestBody): Promise<ApiResponse<Character[]>> => {
 		const { data } = await axiosInstance.post<ApiResponse<Character[]>>('/characters/getAllCharacters', payload);
+
 		return data;
 	},
 
 	getCharacterData: async (payload: GetCharacterDataRequestBody): Promise<ApiResponse<Character>> => {
 		const { data } = await axiosInstance.post<ApiResponse<Character>>('/characters/getCharacterData', payload);
+
 		return data;
 	},
 
@@ -57,6 +59,7 @@ export const characterApi = {
 
 	updateCharacterData: async (payload: UpdateCharacterRequestBody): Promise<ApiResponse> => {
 		const { data } = await axiosInstance.patch<ApiResponse>('/characters/updateCharacter', payload);
+
 		return data;
 	},
 
@@ -75,6 +78,7 @@ export const characterApi = {
 		if (!data.success) {
 			throw new Error(data.message ?? 'Failed to update all daily symbols');
 		}
+
 		return data.data;
 	},
 

@@ -11,10 +11,7 @@ dayjs.extend(utc);
 export const createBossList = async (tx: Prisma.TransactionClient, authenticatedUserId: string): Promise<void> => {
 	try {
 		await tx.bossList.create({
-			data: {
-				userId: authenticatedUserId,
-				lastUpdate: new Date(),
-			},
+			data: { userId: authenticatedUserId, lastUpdate: new Date() },
 		});
 	} catch (error) {
 		console.error('Error creating BossList:', error);
@@ -30,12 +27,7 @@ const addServerToBossList = async (authenticatedUserId: string, serverName: stri
 			where: { userId: authenticatedUserId },
 			select: {
 				id: true,
-				servers: {
-					select: {
-						id: true,
-						name: true,
-					},
-				},
+				servers: { select: { id: true, name: true } },
 			},
 		});
 
@@ -53,13 +45,9 @@ const addServerToBossList = async (authenticatedUserId: string, serverName: stri
 				name: serverName,
 				weeklyBosses: 0,
 				totalGains: 0,
-				bossList: {
-					connect: { id: bossList.id },
-				},
+				bossList: { connect: { id: bossList.id } },
 			},
-			select: {
-				id: true,
-			},
+			select: { id: true },
 		});
 
 		return createdServer.id;
@@ -85,13 +73,8 @@ export const characterToBossList = async (
 	}
 
 	const existingCharacter = await prisma.bossCharacter.findFirst({
-		where: {
-			code,
-			serverId,
-		},
-		select: {
-			id: true,
-		},
+		where: { code, serverId },
+		select: { id: true },
 	});
 
 	// Remove Character flow
@@ -111,11 +94,7 @@ export const characterToBossList = async (
 	if (existingCharacter) {
 		await prisma.bossCharacter.update({
 			where: { id: existingCharacter.id },
-			data: {
-				name: characterName,
-				level,
-				class: charClass,
-			},
+			data: { name: characterName, level, class: charClass },
 		});
 
 		return;
@@ -128,9 +107,7 @@ export const characterToBossList = async (
 			class: charClass,
 			level,
 			totalIncome: 0,
-			server: {
-				connect: { id: serverId },
-			},
+			server: { connect: { id: serverId } },
 		},
 	});
 };
@@ -147,14 +124,10 @@ export const updateCharacterLevelFromBossList = async (
 				code,
 				server: {
 					name: serverName,
-					bossList: {
-						userId: authenticatedUserId,
-					},
+					bossList: { userId: authenticatedUserId },
 				},
 			},
-			data: {
-				level,
-			},
+			data: { level },
 		});
 
 		if (result.count === 0) {

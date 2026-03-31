@@ -1,8 +1,10 @@
-$divHeight: 827px;
+$divHeight: 826px;
 
 .mainDiv {
 	display: flex;
 	flex-direction: row;
+	height: 826px;
+	overflow: hidden;
 
 	.characterContent {
 		display: flex;

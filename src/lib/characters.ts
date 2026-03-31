@@ -71,10 +71,7 @@ const resetDailyQuests = async (tx: Prisma.TransactionClient, characterId: strin
 };
 
 const resetWeeklyQuests = async (tx: Prisma.TransactionClient, characterId: string): Promise<void> => {
-	const symbols = await tx.characterSymbol.findMany({
-		where: { characterId },
-		select: { id: true },
-	});
+	const symbols = await tx.characterSymbol.findMany({ where: { characterId }, select: { id: true } });
 
 	if (!symbols.length) {
 		return;
@@ -83,10 +80,7 @@ const resetWeeklyQuests = async (tx: Prisma.TransactionClient, characterId: stri
 	const symbolIds = symbols.map((symbol) => symbol.id);
 
 	const quests = await tx.characterContent.findMany({
-		where: {
-			symbolId: { in: symbolIds },
-			tries: { not: null },
-		},
+		where: { symbolId: { in: symbolIds }, tries: { not: null } },
 		select: { id: true, date: true },
 	});
 
@@ -97,10 +91,7 @@ const resetWeeklyQuests = async (tx: Prisma.TransactionClient, characterId: stri
 
 	await tx.characterContent.updateMany({
 		where: { id: { in: questsToReset } },
-		data: {
-			tries: DEFAULT_WEEKLY_TRIES,
-			cleared: false,
-		},
+		data: { tries: DEFAULT_WEEKLY_TRIES, cleared: false },
 	});
 };
 
@@ -151,10 +142,7 @@ export const syncCharacterInfo = async ({
 
 				await tx.characterContent.update({
 					where: {
-						symbolId_contentType: {
-							symbolId: symbol.id,
-							contentType: 'Reverse City',
-						},
+						symbolId_contentType: { symbolId: symbol.id, contentType: 'Reverse City' },
 					},
 					data: { checked: true },
 				});
@@ -165,10 +153,7 @@ export const syncCharacterInfo = async ({
 
 				await tx.characterContent.update({
 					where: {
-						symbolId_contentType: {
-							symbolId: symbol.id,
-							contentType: 'Yum Yum Island',
-						},
+						symbolId_contentType: { symbolId: symbol.id, contentType: 'Yum Yum Island' },
 					},
 					data: { checked: true },
 				});

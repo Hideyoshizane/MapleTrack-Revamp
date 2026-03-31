@@ -62,11 +62,11 @@ export const createNumericCookieManager = (
 				return;
 			}
 
-			const n = Number(value);
-			if (Number.isNaN(n) || n < min || n > max) {
+			const numberValue = Number(value);
+			if (Number.isNaN(numberValue) || numberValue < min || numberValue > max) {
 				return undefined;
 			}
-			return n;
+			return numberValue;
 		},
 
 		set: (value: number): void => {

@@ -4,18 +4,26 @@ import NumberFlow from '@number-flow/react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 import BossIcon from '@assets/svg/boss_slayer.svg';
 import Button from '@components/Button/Button';
 import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
-import WeeklyBossDropdown from '@components/WeeklyBossDropdown/WeeklyBossDropdown';
 import {
 	WEEKLY_BOSSES_TOTAL,
 	WEEKLY_BOSSES_PER_CHARACTER,
 	MONTHLY_BOSSES_PER_CHARACTER,
 } from '@constants/bossConstants';
 import { bossListApi } from '@features/Boss/bossListApi';
+import {
+	updateCharacterBoss,
+	countCharacterBosses,
+	countMonthlyBosses,
+	countServerBosses,
+} from '@features/Boss/bossListUtils';
 import { useServerCookie } from '@hooks/useServerCookie';
+
+import WeeklyBossDropdown from '../components/WeeklyBossDropdown/WeeklyBossDropdown';
 
 import BossGrid from './components/BossGrid/BossGrid';
 import styles from './page.module.scss';
@@ -35,37 +43,39 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 	const { server } = useServerCookie(initialServer);
 
 	const [loading, setLoading] = useState<boolean>(true);
+
 	const [serverData, setServerData] = useState<BossServer | null>(null);
 	const [selectedCharacter, setSelectedCharacter] = useState<BossCharacter | null>(null);
+	const [totalBosses, setTotalBosses] = useState<number>(0);
+	const [totalGains, setTotalGains] = useState<number>(0);
+	const [characterWeeklyIncome, setCharacterWeeklyIncome] = useState<number>(0);
+	const [characterWeeklyBossAmount, setCharacterWeeklyBossAmount] = useState<number>(0);
+	const [characterMonthlyBossAmount, setCharacterMonthlyBossAmount] = useState<number>(0);
 
 	const BOSS_ICON_SIZE = 96;
 
-	useEffect((): (() => void) | void => {
+	useEffect(() => {
 		if (!server || !username) {
 			return;
 		}
 
 		const fetchBossList = async (): Promise<void> => {
 			setLoading(true);
-
 			try {
 				const payload = { userOrigin: username, server };
 				const response = await bossListApi.getBossList(payload);
 
-				if (!response.success || !response.data) {
-					return;
+				if (response.success && response.data) {
+					setServerData(response.data);
+					setSelectedCharacter(response.data.characters[0] || null);
+					setTotalBosses(countServerBosses(response.data));
+					setTotalGains(response.data.totalGains);
+					setCharacterWeeklyIncome(response.data.characters[0].totalIncome);
+					setCharacterWeeklyBossAmount(countCharacterBosses(response.data.characters[0]));
+					setCharacterMonthlyBossAmount(countMonthlyBosses(response.data.characters[0]));
 				}
-
-				const data = response.data;
-
-				setServerData(data);
-
-				// Auto-select first character if none selected
-				setSelectedCharacter((prev) => prev ?? data.characters[0] ?? null);
 			} catch (error) {
-				if (!(error instanceof DOMException && error.name === 'AbortError')) {
-					console.error(error);
-				}
+				console.error(error);
 			} finally {
 				setLoading(false);
 			}
@@ -74,13 +84,69 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 		void fetchBossList();
 	}, [server, username]);
 
+	useEffect(() => {
+		if (!serverData || !selectedCharacter) {
+			return;
+		}
+
+		const freshCharacter = serverData.characters.find((c) => c.name === selectedCharacter.name);
+		if (freshCharacter && freshCharacter !== selectedCharacter) {
+			setSelectedCharacter(freshCharacter);
+		}
+
+		// eslint-disable-next-line
+	}, [serverData]);
+
+	useEffect(() => {
+		if (!selectedCharacter) {
+			return;
+		}
+
+		setCharacterWeeklyIncome(selectedCharacter.totalIncome);
+		setCharacterWeeklyBossAmount(countCharacterBosses(selectedCharacter));
+		setCharacterMonthlyBossAmount(countMonthlyBosses(selectedCharacter));
+	}, [selectedCharacter]);
+
 	if (loading || !serverData || !selectedCharacter) {
 		return <FullPageLoader />;
 	}
 
-	const weeklyBosses = serverData.weeklyBosses;
-	const characters = serverData.characters;
+	const handleSaveChanges = async (): Promise<void> => {
+		try {
+			const payload = { data: serverData };
+			const result = await bossListApi.updateBossList(payload);
+			if (result.success) {
+				const basePath = pathname.replace(/\/edit$/, '');
+				router.push(`${basePath}?success=1`);
+			} else {
+				toast.error(result.message || 'Failed to update Boss List.');
+			}
+		} catch (error) {
+			console.error('Failed to save:', error);
+		}
+	};
 
+	const handleBossUpdate = (
+		bossName: string,
+		difficulty: string,
+		reset: 'Daily' | 'Weekly' | 'Monthly',
+		dailyTotal?: number,
+	): void => {
+		const updatedData = updateCharacterBoss(serverData, {
+			characterName: selectedCharacter.name,
+			bossName,
+			difficulty,
+			reset,
+			dailyTotal,
+		});
+		setServerData(updatedData);
+		setTotalBosses(countServerBosses(updatedData));
+		setTotalGains(updatedData.totalGains);
+
+		console.log('Updated serverData:', updatedData);
+	};
+
+	const characters = serverData.characters;
 	return (
 		<section className="mainContent">
 			<div className={styles.topBar}>
@@ -101,7 +167,8 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 					<div className={styles.content}>
 						<p className={styles.bossOverview}>Boss Overview</p>
 						<p className={styles.weekProgressNumber}>
-							{weeklyBosses}/{WEEKLY_BOSSES_TOTAL}
+							<NumberFlow value={totalBosses} />
+							{`/${WEEKLY_BOSSES_TOTAL}`}
 						</p>
 					</div>
 				</div>
@@ -117,7 +184,12 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 					/>
 					<div className={styles.content}>
 						<p className={styles.charactersIncome}>Total Earnings Overview</p>
-						<NumberFlow className={styles.totalIncome} value={46945733125} format={{ maximumFractionDigits: 0 }} />
+						<NumberFlow
+							className={styles.totalIncome}
+							value={totalGains}
+							format={{ maximumFractionDigits: 0 }}
+							transformTiming={{ duration: 300 }}
+						/>
 					</div>
 				</div>
 				<Button
@@ -125,7 +197,11 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 					onClick={(): void => router.push(pathname.replace(/\/edit$/, ''))}>
 					Discard Changes
 				</Button>
-				<Button className={styles.saveChangesButton} onClick={(): void => router.push(`${pathname}/edit`)}>
+				<Button
+					className={styles.saveChangesButton}
+					onClick={() => {
+						void handleSaveChanges();
+					}}>
 					Save Changes
 				</Button>
 			</div>
@@ -150,7 +226,12 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 					/>
 					<div className={styles.content}>
 						<p className={styles.goldTitle}>Character Income</p>
-						<NumberFlow className={styles.goldTotal} value={46945733125} format={{ maximumFractionDigits: 0 }} />
+						<NumberFlow
+							className={styles.goldTotal}
+							value={characterWeeklyIncome}
+							transformTiming={{ duration: 300 }}
+							format={{ maximumFractionDigits: 0 }}
+						/>
 					</div>
 				</div>
 
@@ -167,7 +248,8 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 					<div className={styles.content}>
 						<p className={styles.weeklyBoss}>Weekly Boss Count</p>
 						<p className={styles.weeklyNumber}>
-							{WEEKLY_BOSSES_PER_CHARACTER}/{WEEKLY_BOSSES_PER_CHARACTER}
+							<NumberFlow value={characterWeeklyBossAmount} />
+							{`/${WEEKLY_BOSSES_PER_CHARACTER}`}
 						</p>
 					</div>
 				</div>
@@ -184,12 +266,13 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 					<div className={styles.content}>
 						<p className={styles.monthlyBoss}>Monthly Boss Count</p>
 						<p className={styles.monthlyNumber}>
-							{MONTHLY_BOSSES_PER_CHARACTER}/{MONTHLY_BOSSES_PER_CHARACTER}
+							<NumberFlow value={characterMonthlyBossAmount} />
+							{`/${MONTHLY_BOSSES_PER_CHARACTER}`}
 						</p>
 					</div>
 				</div>
 			</div>
-			<BossGrid serverCookie={server} selectedCharacter={selectedCharacter} />
+			<BossGrid serverCookie={server} selectedCharacter={selectedCharacter} onBossUpdate={handleBossUpdate} />
 		</section>
 	);
 };

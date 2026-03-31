@@ -32,7 +32,9 @@ export const getLastLevel = (type: ForceType): number => {
 export const getRemainingExp = (type: ForceType, currentLevel: number, currentExp: number): number => {
 	try {
 		const lastLevel = getLastLevel(type);
-		if (currentLevel >= lastLevel) return 0;
+		if (currentLevel >= lastLevel) {
+			return 0;
+		}
 
 		// EXP needed to finish current level
 		let remaining = Math.max(getExpForLevel(type, currentLevel) - currentExp, 0);

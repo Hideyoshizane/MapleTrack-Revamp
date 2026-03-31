@@ -24,9 +24,7 @@ export const SYMBOL_CONFIG = {
 
 export type SymbolCategory = keyof typeof SYMBOL_CONFIG;
 
-export type SymbolName = {
-	[C in SymbolCategory]: (typeof SYMBOL_CONFIG)[C]['names'][number];
-}[SymbolCategory];
+export type SymbolName = { [C in SymbolCategory]: (typeof SYMBOL_CONFIG)[C]['names'][number] }[SymbolCategory];
 
 type SymbolInfo = {
 	category: SymbolCategory;
@@ -77,6 +75,7 @@ export const toSymbolName = (value: string): SymbolName | null => {
 
 export const canUseSymbol = (level: number, name: SymbolName): boolean => {
 	const minLevel = SYMBOL_MAP[name].minLevel;
+
 	return minLevel === undefined || level >= minLevel;
 };
 
@@ -86,6 +85,7 @@ export const getSymbolMaxLevel = (input: SymbolCategory | SymbolName): number =>
 	if (input in SYMBOL_CONFIG) {
 		return SYMBOL_CONFIG[input as SymbolCategory].maxLevel;
 	}
+
 	return SYMBOL_MAP[input as SymbolName].maxLevel;
 };
 
@@ -97,6 +97,7 @@ export const getContentValue = (symbolName: SymbolName, contentType: string): nu
 	}
 
 	const value = resolve(contentType);
+
 	return value !== 0 ? value : resolve('Weekly');
 };
 

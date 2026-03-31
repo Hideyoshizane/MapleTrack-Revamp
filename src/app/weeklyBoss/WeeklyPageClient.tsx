@@ -1,21 +1,22 @@
 'use client';
 
+import NumberFlow from '@number-flow/react';
 import { produce } from 'immer';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
-import WeeklyBossDropdown from '@/components/WeeklyBossDropdown/WeeklyBossDropdown';
 import BossIcon from '@assets/svg/boss_slayer.svg';
 import ErrorIcon from '@assets/svg/octagon-x.svg';
 import Button from '@components/Button/Button';
 import ProgressBar from '@components/ProgressBar/ProgressBar';
-import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import ServerDropdown from '@components/ServerDropdown/ServerDropdown';
 import { WEEKLY_BOSSES_TOTAL } from '@constants/bossConstants';
 import { bossListApi } from '@features/Boss/bossListApi';
 import { useServerCookie } from '@hooks/useServerCookie';
 
+import WeeklyBossDropdown from './components/WeeklyBossDropdown/WeeklyBossDropdown';
 import styles from './page.module.scss';
 
 import type { ServerName } from '@data/servers/servers';
@@ -31,6 +32,9 @@ type WeeklyPageClientProps = {
 const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): JSX.Element => {
 	const pathname = usePathname();
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const success = searchParams.get('success');
+
 	const { server, setServerCookie } = useServerCookie(initialServer);
 
 	const [serverData, setServerData] = useState<BossServer | null>(null);
@@ -39,6 +43,14 @@ const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): J
 	const [weeklyBosses, setWeeklyBosses] = useState<number>(0);
 	const [totalGains, setTotalGains] = useState<number>(0);
 	const [characters, setCharacters] = useState<BossCharacter[]>([]);
+
+	useEffect((): void => {
+		if (success === '1') {
+			toast.success('Boss List updated successfully!');
+			const basePath = window.location.pathname;
+			router.replace(basePath, { scroll: false });
+		}
+	}, [success, router]);
 
 	const BOSS_ICON_SIZE = 96;
 
@@ -80,8 +92,6 @@ const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): J
 		void loadBossList();
 		//eslint-disable-next-line
 	}, [server, username]);
-
-	const formattedTotalGains = (serverData?.totalGains ?? 0).toLocaleString('en-US');
 
 	return (
 		<section className="mainContent">
@@ -128,9 +138,7 @@ const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): J
 					/>
 					<div className={styles.content}>
 						<p className={styles.totalGainTitle}>Total Gain</p>
-						<ResponsiveText className={styles.totalGainValue} width={272} height={38} maxFontSize={32} minFontSize={12}>
-							{formattedTotalGains}
-						</ResponsiveText>
+						<NumberFlow className={styles.totalGainValue} value={totalGains} />
 					</div>
 				</div>
 				<div className={styles.serverDropdown}>

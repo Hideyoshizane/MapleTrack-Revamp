@@ -6,6 +6,7 @@ $spacingMedium: 8px;
 
 .characterDropdownWrapper {
 	position: absolute;
+	z-index: 100;
 	width: 480px;
 	max-height: $dropdownHeight;
 	overflow: hidden;

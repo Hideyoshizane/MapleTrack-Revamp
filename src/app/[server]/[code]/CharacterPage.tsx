@@ -21,7 +21,6 @@ import { useBonusContext } from './useBonusContext';
 
 import type { LevelUpResult } from '@/data/symbols/symbolMappings';
 import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { CharacterDraft as Character } from '@features/character/characterModel';
 import type { JSX } from 'react';
 
 type CharacterPageProps = {
@@ -54,7 +53,7 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 		}
 	}, [success, router]);
 
-	const { data: character, isLoading, error } = useCharacterQuery({ userOrigin, server, code });
+	const { data: character, isLoading, error } = useCharacterQuery({ server, code });
 
 	const { data: characterDataApi } = useCharacterExternalQuery({
 		name: character?.name,
@@ -66,40 +65,10 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 
 	const handleIncreaseAll = (): void => {
 		increaseAllMutation.mutate(undefined, {
-			onSuccess: (updates): void => {
-				queryClient.setQueryData(
-					characterQueryKeys.detail(userOrigin, server, code),
-					(prev: Character | undefined): Character | undefined => {
-						if (!prev) return prev;
-
-						return {
-							...prev,
-							symbols: prev.symbols.map((symbol) => {
-								const update = updates[symbol.name];
-								if (!update) {
-									return symbol;
-								}
-
-								return {
-									...symbol,
-									level: update.currentLevel,
-									exp: update.currentExp,
-									content: symbol.content.map((content, index) => {
-										if (index === 0) {
-											return {
-												...content,
-												cleared: true,
-												date: new Date(),
-											};
-										}
-
-										return content;
-									}),
-								};
-							}),
-						};
-					}
-				);
+			onSuccess: (): void => {
+				void queryClient.invalidateQueries({
+					queryKey: characterQueryKeys.detail(server, code),
+				});
 			},
 		});
 	};

@@ -22,7 +22,7 @@ export const BossSchema = z
 		difficulty: z.string().transform(sanitizeInputBackEnd),
 		reset: z.enum(['Daily', 'Weekly', 'Monthly']),
 
-		checked: z.boolean().default(false),
+		cleared: z.boolean().default(false),
 
 		dailyTotal: z.number().min(0).max(7).optional().default(0),
 		date: z.preprocess(normalizeDayjsDate, z.date().nullable()).optional(),
@@ -54,7 +54,7 @@ export const BossCharacterSchema = z.object({
 });
 
 export const BossServerSchema = z.object({
-	server: serverSchema,
+	name: serverSchema,
 	weeklyBosses: z.number().default(0),
 	totalGains: z.number().default(0),
 	characters: z.array(BossCharacterSchema).default([]),
@@ -64,7 +64,12 @@ export const BossListRequestSchema = z.object({
 	server: serverSchema,
 });
 
+export const UpdateBossListRequestSchema = z.object({
+	data: BossServerSchema,
+});
+
 export type ZodBossRequest = z.infer<typeof BossListRequestSchema>;
 export type ZodBoss = z.infer<typeof BossSchema>;
 export type ZodBossCharacter = z.infer<typeof BossCharacterSchema>;
 export type ZodBossServer = z.infer<typeof BossServerSchema>;
+export type UpdateBossListRequest = z.infer<typeof UpdateBossListRequestSchema>;

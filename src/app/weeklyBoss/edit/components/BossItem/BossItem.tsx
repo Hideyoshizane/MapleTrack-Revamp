@@ -2,11 +2,12 @@
 
 import NumberFlow from '@number-flow/react';
 import { clsx } from 'clsx';
+import { motion, AnimatePresence } from 'motion/react';
 import Image from 'next/image';
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
-import { isRebootServer } from '@/data/servers/servers';
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
+import { isRebootServer } from '@data/servers/servers';
 
 import BossDropdownButton from '../../BossDropdownButton/BossDropdownButton';
 import BossButton from '../BossButton/BossButton';
@@ -33,164 +34,104 @@ export type BossProgress = {
 	difficulty: string;
 	reset: 'Daily' | 'Weekly' | 'Monthly';
 	cleared: boolean;
-	DailyTotal?: number;
-	date?: Date;
+	dailyTotal?: number;
+	date?: Date | null;
 	locked?: boolean;
 };
 
 type BossItemProps = {
 	serverCookie: string;
 	boss: Boss;
-	selectedBoss: BossProgress | null;
+	selectedBosses: BossProgress[];
 	selectedCharacterLevel: number;
+	onBossUpdate: (
+		bossName: string,
+		difficulty: string,
+		reset: 'Daily' | 'Weekly' | 'Monthly',
+		dailyTotal?: number,
+	) => void;
 };
 
-const BossItem = ({ serverCookie, boss, selectedBoss, selectedCharacterLevel }: BossItemProps): JSX.Element => {
-	const [dailyGold, setDailyGold] = useState<number>(0);
-	const [weeklyGold, setWeeklyGold] = useState<number>(0);
-	const [monthlyGold, setMonthlyGold] = useState<number>(0);
-
-	const prevTotalGoldRef = useRef<number>(0);
-	const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-	const bossSlotRef = useRef<HTMLDivElement>(null);
-
-	const [totalGold, setTotalGold] = useState<number>(0);
-	const [animatedGold, setAnimatedGold] = useState<number>(0);
-
-	const [isOpen, setIsOpen] = useState<boolean>(false);
-	const [showNumber, setShowNumber] = useState<boolean>(true);
-	const [isClosing, setIsClosing] = useState<boolean>(false);
-
-	const [dailyMultiplier, setDailyMultiplier] = useState<number>(0);
-
-	const goldSetters = useMemo(
-		(): Record<string, (value: number) => void> => ({
-			Daily: setDailyGold,
-			Weekly: setWeeklyGold,
-			Monthly: setMonthlyGold,
-		}),
-		[]
-	);
-
-	const [selectedByReset, setSelectedByReset] = useState<Record<string, string | null>>({
-		Daily: null,
-		Weekly: null,
-		Monthly: null,
-	});
-
+const BossItem = ({
+	serverCookie,
+	boss,
+	selectedBosses,
+	selectedCharacterLevel,
+	onBossUpdate,
+}: BossItemProps): JSX.Element => {
 	const isSmallButtons = boss.difficulties.length > 3;
 	const gapClass = isSmallButtons ? styles.smallGap : styles.largeGap;
 
-	const handleSelectDifficulty = useCallback(
-		(difficulty: BossDifficulty): void => {
-			setSelectedByReset((prev): Record<string, string | null> => {
-				const current = prev[difficulty.reset];
+	const getSelection = (diffName: string, reset: string): BossProgress | undefined => {
+		return selectedBosses.find((b) => b.difficulty === diffName && b.reset === reset);
+	};
 
-				if (current === difficulty.name) {
-					goldSetters[difficulty.reset]?.(0);
-					queueMicrotask((): void => onRemove(difficulty.reset as BossProgress['reset']));
-					return { ...prev, [difficulty.reset]: null };
+	const totalGold: number = selectedBosses.reduce((total, progress) => {
+		const difficulty = boss.difficulties.find((d) => d.name === progress.difficulty && d.reset === progress.reset);
+
+		if (!difficulty) {
+			return total;
+		}
+
+		const baseValue: number = difficulty.value ?? 0;
+		const goldValue: number = isRebootServer(serverCookie) ? baseValue * 5 : baseValue;
+
+		return progress.reset === 'Daily' ? total + goldValue * (progress.dailyTotal ?? 0) : total + goldValue;
+	}, 0);
+
+	const handleBossUpdate = (
+		bossName: string,
+		difficulty: string,
+		reset: 'Daily' | 'Weekly' | 'Monthly',
+		dailyTotal?: number,
+	): void => {
+		onBossUpdate(bossName, difficulty, reset, dailyTotal);
+	};
+
+	const anySelected = boss.difficulties.some((d) => !!getSelection(d.name, d.reset));
+
+	// Animation
+	const [parentWidthExpanded, setParentWidthExpanded] = useState(false);
+	const [showGoldContainer, setShowGoldContainer] = useState(false);
+	const [goldOpacity, setGoldOpacity] = useState(0);
+	const [numberFlowValue, setNumberFlowValue] = useState(0);
+	const [closing, setClosing] = useState(false);
+
+	useEffect(() => {
+		if (anySelected) {
+			// OPENING
+			queueMicrotask(() => setParentWidthExpanded(true));
+			queueMicrotask(() => {
+				setShowGoldContainer(true);
+
+				if (!showGoldContainer) {
+					setGoldOpacity(0);
+					setNumberFlowValue(0);
 				}
-
-				const bossValue = isRebootServer(serverCookie) ? difficulty.value * 5 : difficulty.value;
-				goldSetters[difficulty.reset]?.(bossValue);
-
-				queueMicrotask((): void => {
-					onSelect({
-						name: boss.name,
-						difficulty: difficulty.name,
-						reset: difficulty.reset as BossProgress['reset'],
-						cleared: false,
-					});
-				});
-				return { ...prev, [difficulty.reset]: difficulty.name };
 			});
-		},
-		[goldSetters, serverCookie, onSelect, onRemove, boss.name]
-	);
 
-	useEffect((): void => {
-		if (!selectedBoss) {
-			return;
+			setTimeout(() => setGoldOpacity(1), 100);
+			setTimeout(() => setNumberFlowValue(totalGold), 150);
+		} else if (!anySelected && showGoldContainer) {
+			// CLOSING
+			queueMicrotask(() => {
+				setClosing(true);
+				setNumberFlowValue(0);
+			});
 		}
-
-		setSelectedByReset(
-			(prev): Record<string, string | null> => ({
-				...prev,
-				[selectedBoss.reset]: selectedBoss.difficulty,
-			})
-		);
-
-		const found = boss.difficulties.find(
-			(d): boolean => d.name === selectedBoss.difficulty && d.reset === selectedBoss.reset
-		);
-		if (!found) {
-			return;
-		}
-
-		const base = isRebootServer(serverCookie) ? found.value * 5 : found.value;
-
-		if (found.reset === 'Daily') {
-			setDailyGold(base);
-		}
-		if (found.reset === 'Weekly') {
-			setWeeklyGold(base);
-		}
-		if (found.reset === 'Monthly') {
-			setMonthlyGold(base);
-		}
-	}, [selectedBoss, boss.difficulties, serverCookie]);
-
-	// Total Gold
-	useEffect((): void => {
-		setTotalGold(dailyGold + weeklyGold + monthlyGold);
-	}, [dailyGold, weeklyGold, monthlyGold]);
-
-	// Enter Animation
-	useEffect(() => {
-		const bossSlot = bossSlotRef.current;
-		if (!bossSlot) return;
-
-		const handleTransitionEnd = (event: TransitionEvent): void => {
-			if (event.propertyName === 'width') {
-				console.log('Width transition finished!');
-				// Put the code you want to run after the full transition here
-			}
-		};
-
-		bossSlot.addEventListener('transitionend', handleTransitionEnd);
-
-		// Trigger the transition
-		requestAnimationFrame(() => {
-			setIsOpen(true);
-		});
-
-		return (): void => {
-			bossSlot.removeEventListener('transitionend', handleTransitionEnd);
-		};
-	}, []);
-
-	useEffect(() => {
-		console.log('Debug state:', {
-			totalGold,
-			animatedGold,
-			isOpen,
-			showNumber,
-			isClosing,
-			dailyGold,
-			weeklyGold,
-			monthlyGold,
-		});
-	}, [totalGold, animatedGold, isOpen, showNumber, isClosing, dailyGold, weeklyGold, monthlyGold]);
+	}, [anySelected, totalGold, showGoldContainer]);
 
 	return (
-		<div className={clsx(styles.bossSlotBody, { [styles.open]: isOpen })}>
+		<motion.div
+			layout
+			className={styles.bossSlotBody}
+			animate={{ width: parentWidthExpanded ? 720 : 576 }}
+			transition={{ duration: 0.2, ease: 'easeInOut' }}>
 			<div className={styles.bossSlotContent}>
 				<Image
 					className={styles.bossIcon}
 					src={boss.img}
-					alt={`${boss.name} portrait image`}
+					alt={`${boss.name} portrait`}
 					width={64}
 					height={64}
 					priority
@@ -201,36 +142,21 @@ const BossItem = ({ serverCookie, boss, selectedBoss, selectedCharacterLevel }: 
 				</ResponsiveText>
 
 				<div className={clsx(styles.bossButtons, gapClass)}>
-					{boss.difficulties.map((difficulty): JSX.Element => {
-						const isSelected = selectedByReset[difficulty.reset] === difficulty.name;
+					{boss.difficulties.map((difficulty) => {
+						const selection = getSelection(difficulty.name, difficulty.reset);
+						const isSelected = !!selection;
 
 						if (difficulty.reset === 'Daily') {
 							return (
 								<BossDropdownButton
 									key={difficulty.name}
-									selected={false}
-									value={selectedByReset.Daily === difficulty.name ? dailyMultiplier : 0}
+									selected={isSelected}
+									value={selection?.dailyTotal ?? 0}
 									locked={selectedCharacterLevel < difficulty.minLevel}
 									difficulty={difficulty}
 									isSmallButtons={isSmallButtons}
-									onSelectDifficulty={(difficulty, multiplier): void => {
-										setDailyGold(0);
-										setSelectedByReset((prev): Record<string, string | null> => ({ ...prev, Daily: null }));
-
-										const calculatedGold = isRebootServer(serverCookie)
-											? difficulty.value * 5 * multiplier
-											: difficulty.value * multiplier;
-										setDailyMultiplier(0);
-										setDailyGold(calculatedGold);
-
-										setSelectedByReset(
-											(prev): Record<string, string | null> => ({
-												...prev,
-												Daily: difficulty.name,
-											})
-										);
-
-										setDailyMultiplier(multiplier);
+									onSelectDifficulty={(diff, multiplier) => {
+										handleBossUpdate(boss.name, diff.name, 'Daily', multiplier);
 									}}
 								/>
 							);
@@ -239,22 +165,48 @@ const BossItem = ({ serverCookie, boss, selectedBoss, selectedCharacterLevel }: 
 						return (
 							<BossButton
 								key={difficulty.name}
-								type="button"
 								selected={isSelected}
 								difficulty={difficulty}
 								isSmallButtons={isSmallButtons}
 								characterLevel={selectedCharacterLevel}
-								onSelect={(): void => handleSelectDifficulty(difficulty)}
+								onSelect={() => {
+									handleBossUpdate(boss.name, difficulty.name, difficulty.reset as 'Weekly' | 'Monthly');
+								}}
 							/>
 						);
 					})}
 				</div>
 
-				<div className={clsx(styles.goldValue, { [styles.show]: showNumber && !isClosing })}>
-					<NumberFlow className={styles.goldText} value={animatedGold} format={{ maximumFractionDigits: 0 }} />
-				</div>
+				<AnimatePresence>
+					{showGoldContainer && (
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: goldOpacity }}
+							exit={{ opacity: 0 }}
+							transition={{ duration: 0.2 }}
+							className={styles.goldValue}
+							onAnimationComplete={() => {
+								if (closing && goldOpacity === 0) {
+									setParentWidthExpanded(false);
+									setShowGoldContainer(false);
+									setClosing(false);
+								}
+							}}>
+							<NumberFlow
+								className={styles.goldText}
+								value={numberFlowValue}
+								transformTiming={{ duration: 200 }}
+								onAnimationsFinish={() => {
+									if (closing) {
+										setGoldOpacity(0);
+									}
+								}}
+							/>
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
-		</div>
+		</motion.div>
 	);
 };
 

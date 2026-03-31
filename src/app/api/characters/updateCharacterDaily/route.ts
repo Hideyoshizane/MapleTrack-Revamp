@@ -115,10 +115,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 						contentType: dailyContent.contentType,
 					},
 				},
-				data: {
-					cleared: true,
-					date: now,
-				},
+				data: { cleared: true, date: now },
 			}),
 		]);
 
