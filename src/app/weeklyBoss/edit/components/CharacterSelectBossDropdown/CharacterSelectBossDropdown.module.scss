@@ -1,0 +1,86 @@
+$dropdownHeight: 80px;
+$dropdownRadius: 15px;
+$iconSize: 48px;
+$spacingSmall: 4px;
+$spacingMedium: 8px;
+
+.characterDropdownWrapper {
+	position: absolute;
+	z-index: 100;
+	width: 480px;
+	max-height: $dropdownHeight;
+	overflow: hidden;
+	border-radius: 15px;
+	background-color: var(--default-color-button);
+	transition: max-height 0.3s ease;
+
+	&.open {
+		position: absolute;
+		max-height: 394px;
+	}
+}
+
+.selectedCharacterWrapper {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: $dropdownHeight;
+	cursor: pointer;
+
+	.classIcon {
+		position: absolute;
+		opacity: 0.25;
+	}
+
+	.nameDiv {
+		display: flex;
+		flex-direction: column;
+		margin-left: 112px;
+
+		.characterName {
+			font-size: 28px;
+			font-weight: 500;
+			color: var(--default-button-text);
+		}
+
+		.characterClass {
+			font-size: 24px;
+			color: var(--default-button-text);
+		}
+	}
+
+	.iconsDiv {
+		right: 0;
+		display: flex;
+		gap: 16px;
+		margin-left: auto;
+		margin-right: 16px;
+
+		.chevronIcon {
+			right: 0;
+			display: flex;
+			width: $iconSize;
+			height: $iconSize;
+			color: var(--default-button-text);
+
+			&.rotated {
+				transition: transform 0.3s ease;
+				transform: rotate(0deg);
+			}
+
+			&.rotatedActive {
+				transform: rotate(180deg);
+			}
+		}
+	}
+}
+
+.hr {
+	border: none;
+	border-bottom: 2px solid #707070;
+}
+
+.characterList {
+	display: flex;
+	flex-direction: column;
+}

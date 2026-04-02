@@ -17,6 +17,26 @@ export type updateBossListRequestBody = {
 
 export type GetBossListResponse = BossServer;
 
+export type toggleBossRequestBody = {
+	server: string;
+	characterCode: string;
+	bossName: string;
+	difficulty: string;
+};
+
+export type toggleBossApiResponse = ApiResponse<toggleBossResponse>;
+
+export type toggleBossResponse = {
+	weeklyBosses: number;
+	totalGains: number;
+
+	characterCode: string;
+	bossName: string;
+	difficulty: string;
+
+	clearedUpdate: boolean;
+};
+
 export const bossListApi = {
 	getBossList: async (payload: GetBossListRequestBody): Promise<GetBossListApiResponse> => {
 		const { data } = await axiosInstance.post<ApiResponse<GetBossListResponse>>('/bossList/getBossList', payload);
@@ -25,6 +45,12 @@ export const bossListApi = {
 	},
 	updateBossList: async (payload: updateBossListRequestBody): Promise<GetBossListApiResponse> => {
 		const { data } = await axiosInstance.post<ApiResponse<GetBossListResponse>>('/bossList/updateBossList', payload);
+
+		return data;
+	},
+
+	toggleBoss: async (payload: toggleBossRequestBody): Promise<toggleBossApiResponse> => {
+		const { data } = await axiosInstance.post<ApiResponse<toggleBossResponse>>('/bossList/toggleBoss', payload);
 
 		return data;
 	},

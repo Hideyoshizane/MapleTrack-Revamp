@@ -53,17 +53,14 @@ axiosInstance.interceptors.response.use(
 
 			// Optional logging
 			if (error.code === 'ECONNABORTED') {
-				console.error('Axios request timed out', {
-					url: error.config?.url,
-					method: error.config?.method,
-				});
+				console.error('Axios request timed out', { url: error.config?.url, method: error.config?.method });
 			}
 
 			throw error;
 		}
 
 		throw new Error('Unknown Axios error');
-	}
+	},
 );
 
 export default axiosInstance;

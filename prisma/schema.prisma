@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-
 }
 
 datasource db {
@@ -16,7 +15,7 @@ model User {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   username String @unique
-  email String @unique
+  email    String @unique
   password String
 
   version Int
@@ -27,7 +26,7 @@ model User {
 
   bossList BossList?
 
-  resetPasswordToken String?
+  resetPasswordToken   String?
   resetPasswordExpires DateTime?
 
   @@index([resetPasswordToken, resetPasswordExpires])
@@ -36,29 +35,29 @@ model User {
 model Character {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  name String
-  level Int
+  name        String
+  level       Int
   targetLevel Int
 
-  class String?
-  code String?
-  jobType String?
-  legion String?
-  linkSkill String?
-  server String?
-  lastUpdate DateTime?
+  class      String
+  jobType    String
+  legion     String
+  linkSkill  String
+  server     String
+  lastUpdate DateTime
 
   bossing Boolean @default(false)
   syncing Boolean @default(false)
 
   userId String @db.ObjectId
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  symbols CharacterSymbol[]
+  symbols        CharacterSymbol[]
+  bossCharacters BossCharacter[]
 
-  @@index([name, userId])
+  @@unique([userId, server, class])
+  @@index([userId, name])
   @@index([server])
-  @@unique([userId, server, code])
 }
 
 enum SymbolCategory {
@@ -70,14 +69,14 @@ enum SymbolCategory {
 model CharacterSymbol {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  name String
+  name  String
   level Int
-  exp Int
+  exp   Int
 
   category SymbolCategory
 
-  characterId String @db.ObjectId
-  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  characterId String    @db.ObjectId
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   content CharacterContent[]
 
@@ -88,13 +87,13 @@ model CharacterContent {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   contentType String
-  checked Boolean @default(false)
-  cleared Boolean @default(false)
-  date DateTime?
-  tries Int?
+  checked     Boolean   @default(false)
+  cleared     Boolean   @default(false)
+  date        DateTime?
+  tries       Int?
 
-  symbolId String @db.ObjectId
-  symbol CharacterSymbol @relation(fields: [symbolId], references: [id], onDelete: Cascade)
+  symbolId String          @db.ObjectId
+  symbol   CharacterSymbol @relation(fields: [symbolId], references: [id], onDelete: Cascade)
 
   @@unique([symbolId, contentType])
 }
@@ -109,7 +108,7 @@ model BossList {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   userId String @unique @db.ObjectId
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   lastUpdate DateTime?
 
@@ -119,13 +118,13 @@ model BossList {
 model BossServer {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  name String
+  serverName String
 
   weeklyBosses Int @default(0)
-  totalGains Int @default(0)
+  totalGains   Int @default(0)
 
-  bossListId String @db.ObjectId
-  bossList BossList @relation(fields: [bossListId], references: [id], onDelete: Cascade)
+  bossListId String   @db.ObjectId
+  bossList   BossList @relation(fields: [bossListId], references: [id], onDelete: Cascade)
 
   characters BossCharacter[]
 }
@@ -133,33 +132,33 @@ model BossServer {
 model BossCharacter {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  name String
-  code String
-  class String
-  level Int
-
   totalIncome Int @default(0)
 
-  serverId String @db.ObjectId
-  server BossServer @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  characterId String    @db.ObjectId
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  serverId String     @db.ObjectId
+  server   BossServer @relation(fields: [serverId], references: [id], onDelete: Cascade)
 
   bosses Boss[]
+
+  @@unique([serverId, characterId])
 }
 
 model Boss {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  name String
+  name       String
   difficulty String
-  reset BossReset
+  reset      BossReset
 
-  dailyTotal Int @default(0)
+  dailyTotal Int? @default(0)
 
   date DateTime?
 
-  cleared Boolean @default(false)
-  locked Boolean @default(false)
+  cleared Boolean  @default(false)
+  locked  Boolean? @default(false)
 
-  characterId String @db.ObjectId
-  character BossCharacter @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  characterId String        @db.ObjectId
+  character   BossCharacter @relation(fields: [characterId], references: [id], onDelete: Cascade)
 }

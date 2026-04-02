@@ -1,22 +1,30 @@
 import type {
+	Character as PrismaCharacter,
 	CharacterSymbol as PrismaCharacterSymbol,
 	CharacterContent as PrismaCharacterContent,
-	SymbolCategory,
 } from '@prisma/client';
 
-export { SymbolCategory };
-
-export type CharacterContentDraft = Omit<PrismaCharacterContent, 'id' | 'symbolId' | 'tries' | 'date'> & {
-	tries?: number | null;
-	date?: Date | null;
-};
-export type CharacterSymbolDraft = Omit<PrismaCharacterSymbol, 'id' | 'characterId'> & {
-	content: CharacterContentDraft[];
-};
-
 export type CharacterContent = PrismaCharacterContent;
+
 export type CharacterSymbol = PrismaCharacterSymbol & {
 	content: CharacterContent[];
+};
+
+export type Character = PrismaCharacter & {
+	symbols: CharacterSymbol[];
+};
+
+export type CharacterContentDraft = Pick<PrismaCharacterContent, 'id' | 'checked'>;
+
+export type CharacterSymbolEntity = PrismaCharacterSymbol & {
+	content: CharacterContent[];
+};
+
+export type CharacterSymbolDraft = {
+	id: string;
+	level: number;
+	exp: number;
+	content: CharacterContentDraft[];
 };
 
 export type CharacterDraft = {
@@ -25,7 +33,6 @@ export type CharacterDraft = {
 	targetLevel: number;
 
 	class: string | null;
-	code: string | null;
 	jobType: string | null;
 	legion: string | null;
 	linkSkill: string | null;

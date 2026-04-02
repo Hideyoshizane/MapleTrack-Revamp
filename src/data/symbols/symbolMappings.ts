@@ -8,17 +8,17 @@ export const SYMBOL_CONFIG = {
 	arcane: {
 		folder: '/assets/arcaneforce/',
 		maxLevel: 20,
-		names: ['Vanishing Journey', 'Chu Chu Island', 'Lachelein', 'Arcana', 'Morass', 'Esfera'],
+		names: ['Vanishing Journey', 'Chu Chu Island', 'Lachelein', 'Arcana', 'Morass', 'Esfera'] as const,
 	},
 	sacred: {
 		folder: '/assets/sacredforce/',
 		maxLevel: 11,
-		names: ['Cernium', 'Arcus', 'Odium', 'Shangri-La', 'Arteria', 'Carcion'],
+		names: ['Cernium', 'Arcus', 'Odium', 'Shangri-La', 'Arteria', 'Carcion'] as const,
 	},
 	grand: {
 		folder: '/assets/grandsacredforce/',
 		maxLevel: 11,
-		names: ['Tallahart'],
+		names: ['Tallahart'] as const,
 	},
 } as const;
 
@@ -31,51 +31,50 @@ type SymbolInfo = {
 	file: string;
 	minLevel?: number;
 	maxLevel: number;
+	value: number;
 };
 
-const symbolExpIndex = new Map(allSymbols.map((symbol) => [symbol.name, symbol]));
+export const parseSymbolCategory = (value: string): SymbolCategory | undefined => {
+	const key = value.toLowerCase() as keyof typeof SYMBOL_CONFIG;
+	if (key in SYMBOL_CONFIG) {
+		return key;
+	}
+	return undefined;
+};
 
-const contentValueIndex = new Map(allSymbols.map((symbol) => [symbol.name, Number(symbol.value) || 0]));
+const symbolRawMap = new Map(allSymbols.map((s) => [s.name, s]));
 
 const SYMBOL_MAP: Record<SymbolName, SymbolInfo> = Object.fromEntries(
 	Object.entries(SYMBOL_CONFIG).flatMap(([category, config]) =>
 		config.names.map((name) => {
-			const expSymbol = symbolExpIndex.get(name);
-
+			const raw = symbolRawMap.get(name);
 			return [
 				name,
 				{
 					category: category as SymbolCategory,
 					file: name.toLowerCase().replace(/ /g, '_'),
-					minLevel: expSymbol?.minLevel ? Number(expSymbol.minLevel) : undefined,
+					minLevel: raw?.minLevel ? Number(raw.minLevel) : undefined,
 					maxLevel: config.maxLevel,
+					value: raw ? Number(raw.value) : 0,
 				},
 			];
 		}),
 	),
 ) as Record<SymbolName, SymbolInfo>;
 
+const contentValueMap = new Map<string, number>(allSymbols.map((s) => [s.name, Number(s.value) || 0]));
+
 export const getSymbolImagePath = (name: SymbolName): string => {
 	const info = SYMBOL_MAP[name];
-	const folder = SYMBOL_CONFIG[info.category].folder;
-	return `${folder}${info.file}.webp`;
+	return `${SYMBOL_CONFIG[info.category].folder}${info.file}.webp`;
 };
 
-export const isSymbolName = (value: string): value is SymbolName => {
-	return value in SYMBOL_MAP;
-};
+export const isSymbolName = (value: string): value is SymbolName => value in SYMBOL_MAP;
 
-export const toSymbolName = (value: string): SymbolName | null => {
-	if (isSymbolName(value)) {
-		return value;
-	}
-
-	return null;
-};
+export const toSymbolName = (value: string): SymbolName | null => (isSymbolName(value) ? value : null);
 
 export const canUseSymbol = (level: number, name: SymbolName): boolean => {
 	const minLevel = SYMBOL_MAP[name].minLevel;
-
 	return minLevel === undefined || level >= minLevel;
 };
 
@@ -85,20 +84,15 @@ export const getSymbolMaxLevel = (input: SymbolCategory | SymbolName): number =>
 	if (input in SYMBOL_CONFIG) {
 		return SYMBOL_CONFIG[input as SymbolCategory].maxLevel;
 	}
-
 	return SYMBOL_MAP[input as SymbolName].maxLevel;
 };
 
 export const getContentValue = (symbolName: SymbolName, contentType: string): number => {
-	const resolve = (name: string): number => contentValueIndex.get(name) ?? 0;
-
 	if (contentType === 'Daily Quest') {
-		return resolve(symbolName);
+		return SYMBOL_MAP[symbolName].value;
 	}
-
-	const value = resolve(contentType);
-
-	return value !== 0 ? value : resolve('Weekly');
+	// Return value of contentType if exists, otherwise fallback to 'Weekly'
+	return contentValueMap.get(contentType) ?? contentValueMap.get('Weekly') ?? 0;
 };
 
 export const computeDailyWeeklyValues = (
@@ -126,36 +120,30 @@ export const calculateDaysToCompleteSymbol = (
 	if (remaining <= 0) {
 		return 0;
 	}
-
 	if (daily <= 0 && weekly <= 0) {
 		return Infinity;
 	}
 
 	const weeklyTotal = weekly * 3;
-	const dailyGainPerWeek = daily * 7;
-	const totalExpPerWeek = dailyGainPerWeek + weeklyTotal;
+	const dailyPerWeek = daily * 7;
+	const totalPerWeek = dailyPerWeek + weeklyTotal;
 
-	const weeksNeeded = Math.floor(remaining / totalExpPerWeek);
-	remaining -= weeksNeeded * totalExpPerWeek;
+	const weeks = Math.floor(remaining / totalPerWeek);
+	remaining -= weeks * totalPerWeek;
 
 	let remainingDays = 0;
-
 	while (remaining > 0) {
 		remainingDays++;
 		remaining -= daily;
-
 		if (remainingDays % 7 === 0) {
 			remaining -= weeklyTotal;
 		}
 	}
 
-	return weeksNeeded * 7 + remainingDays;
+	return weeks * 7 + remainingDays;
 };
 
-export type LevelUpResult = {
-	currentLevel: number;
-	currentExp: number;
-};
+export type LevelUpResult = { currentLevel: number; currentExp: number };
 
 export const calculateNewLevelFromExp = (
 	type: SymbolCategory,
@@ -167,14 +155,12 @@ export const calculateNewLevelFromExp = (
 	const maxLevel = getLastLevel(type);
 
 	while (level < maxLevel) {
-		const expForNextLevel = getExpForLevel(type, level);
-
-		if (exp >= expForNextLevel) {
-			exp -= expForNextLevel;
+		const expForNext = getExpForLevel(type, level);
+		if (exp >= expForNext) {
+			exp -= expForNext;
 			level++;
 			continue;
 		}
-
 		break;
 	}
 

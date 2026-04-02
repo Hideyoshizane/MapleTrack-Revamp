@@ -63,9 +63,8 @@ export const useCharacterInputs = ({
 
 	const nameError: string | null =
 		character.name === 'Character Name' || !character.name.trim() ? 'Please enter a valid name' : null;
-
 	const handleNameBlur = (value: string): void => {
-		const result = characterClientSchema.shape.name.safeParse(value);
+		const result = characterClientSchema.shape.characterName.safeParse(value);
 		if (!result.success) {
 			return;
 		}

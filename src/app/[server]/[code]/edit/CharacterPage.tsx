@@ -1,9 +1,11 @@
 'use client';
 import Image from 'next/image';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
+import ErrorPage from '@components/ErrorPage/ErrorPage';
 import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
+import { getClassNameByCode } from '@data/classes/classes';
 import { getJob } from '@features/character/characterAttributes';
 
 import CharacterBossLegion from './components/CharacterBossLegion/CharacterBossLegion';
@@ -29,15 +31,19 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 	const router = useRouter();
 	const pathname = usePathname();
 
+	const className = getClassNameByCode(code);
+	if (!className) {
+		redirect('/error');
+	}
+
 	const [committedName, setCommittedName] = useState<string>();
 	const [syncEnabled, setSyncEnabled] = useState(false);
 	const [firstLoad, setFirstLoad] = useState(true);
 
-	const { character, updateCharacter, loading, error, CharacterDataFromAPI, CharacterDataFromAPIFailed } =
+	const { character, updateCharacter, loading, CharacterDataFromAPI, CharacterDataFromAPIFailed } =
 		useCharacterPageData({
-			userOrigin,
 			server,
-			code,
+			className,
 			nameOverride: committedName,
 			syncEnabled,
 			setFirstLoad,
@@ -65,12 +71,12 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 		return <FullPageLoader />;
 	}
 
-	if (error) {
-		throw new Error(error);
-	}
-
 	if (!character) {
-		return <FullPageLoader />;
+		return (
+			<section className="mainContent">
+				<ErrorPage />
+			</section>
+		);
 	}
 
 	const level = character.level;
@@ -85,7 +91,7 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 		<section className="mainContent">
 			<div className={styles.mainDiv}>
 				<Image
-					src={`/assets/profile/${character.code}.webp`}
+					src={`/assets/profile/${code}.webp`}
 					width={650}
 					height={827}
 					quality={100}
@@ -98,7 +104,7 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 						character={character}
 						userOrigin={userOrigin}
 						server={server}
-						code={code}
+						className={className}
 						nameError={nameError}
 						submitLoading={false}
 						setSubmitLoading={(): void => {}}
@@ -133,7 +139,7 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 							character={character}
 							toggleBossing={toggleBossing}
 							linkSkill={linkSkill ?? ''}
-							code={character.code ?? ''}
+							code={code ?? ''}
 							jobType={jobType}
 							legion={legion ?? ''}
 						/>

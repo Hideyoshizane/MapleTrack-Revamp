@@ -3,8 +3,7 @@
 import Image from 'next/image';
 
 import Tooltip from '@components/Tooltip/Tooltip';
-import { getLegionData } from '@data/legion/legionSystems';
-import { getRank, codeToLegionThresholdSet } from '@features/character/characterAttributes';
+import { getLegionData, getRank, codeToLegionThresholdSet } from '@data/legion/legionSystems';
 
 import styles from './LegionBlock.module.scss';
 

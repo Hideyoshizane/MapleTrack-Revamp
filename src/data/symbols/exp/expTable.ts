@@ -2,51 +2,61 @@ import arcaneExpJson from './arcaneForceExp.json';
 import grandSacredExpJson from './grandSacredForceExp.json';
 import sacredExpJson from './sacredForceExp.json';
 
-type ExpLevel = {
-	EXP: number;
+type ExpLevel = { EXP: number };
+type ExpData = { level: Record<string, ExpLevel> };
+
+type ForceType = 'arcane' | 'sacred' | 'grand';
+
+type ExpDataNumeric = {
+	level: Record<number, ExpLevel>;
+	lastLevel: number;
+	cumulativeExp: number[];
 };
 
-type ExpData = {
-	level: Record<string, ExpLevel>;
+const buildExpData = (data: ExpData): ExpDataNumeric => {
+	const numericLevel: Record<number, ExpLevel> = {};
+	const levels = Object.keys(data.level)
+		.map(Number)
+		.sort((a, b) => a - b);
+
+	const cumulativeExp: number[] = [];
+	let total = 0;
+
+	for (const lvl of levels) {
+		const exp = data.level[lvl.toString()]?.EXP ?? 0;
+		numericLevel[lvl] = { EXP: exp };
+		total += exp;
+		cumulativeExp[lvl] = total;
+	}
+
+	return { level: numericLevel, lastLevel: Math.max(...levels), cumulativeExp };
 };
 
 // Explicit constants for each system
-const arcaneExp: ExpData = arcaneExpJson as ExpData;
-const sacredExp: ExpData = sacredExpJson as ExpData;
-const grandSacredExp: ExpData = grandSacredExpJson as ExpData;
+const arcaneExp: ExpDataNumeric = buildExpData(arcaneExpJson as ExpData);
+const sacredExp: ExpDataNumeric = buildExpData(sacredExpJson as ExpData);
+const grandSacredExp: ExpDataNumeric = buildExpData(grandSacredExpJson as ExpData);
 
-// Enum to identify each system
-type ForceType = 'arcane' | 'sacred' | 'grand';
+const expTables: Record<ForceType, ExpDataNumeric> = { arcane: arcaneExp, sacred: sacredExp, grand: grandSacredExp };
 
-const expTables: Record<ForceType, ExpData> = { arcane: arcaneExp, sacred: sacredExp, grand: grandSacredExp };
+export const getExpForLevel = (type: ForceType, level: number): number => expTables[type].level[level]?.EXP ?? 0;
 
-export const getExpForLevel = (type: ForceType, level: number): number =>
-	expTables[type].level[level.toString()]?.EXP ?? 0;
-
-export const getLastLevel = (type: ForceType): number => {
-	const levels = Object.keys(expTables[type].level).map(Number);
-	return levels.length ? Math.max(...levels) : 0;
-};
+export const getLastLevel = (type: ForceType): number => expTables[type].lastLevel;
 
 // Get remaining EXP to reach max level
 export const getRemainingExp = (type: ForceType, currentLevel: number, currentExp: number): number => {
-	try {
-		const lastLevel = getLastLevel(type);
-		if (currentLevel >= lastLevel) {
-			return 0;
-		}
+	const table = expTables[type];
+	const lastLevel = table.lastLevel;
 
-		// EXP needed to finish current level
-		let remaining = Math.max(getExpForLevel(type, currentLevel) - currentExp, 0);
-
-		// Add EXP for all remaining levels
-		for (let lvl = currentLevel + 1; lvl <= lastLevel; lvl++) {
-			remaining += getExpForLevel(type, lvl);
-		}
-
-		return remaining;
-	} catch (error) {
-		console.error(`Error calculating remaining EXP for ${type}:`, error);
+	if (currentLevel >= lastLevel) {
 		return 0;
 	}
+
+	// Total EXP needed to reach last level
+	const totalExpToLast = table.cumulativeExp[lastLevel] ?? 0;
+
+	// Total EXP already obtained (current level's previous levels + current EXP)
+	const expSoFar = (table.cumulativeExp[currentLevel - 1] ?? 0) + currentExp;
+
+	return Math.max(totalExpToLast - expSoFar, 0);
 };

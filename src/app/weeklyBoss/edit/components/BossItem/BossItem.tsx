@@ -9,8 +9,8 @@ import { useState, useEffect } from 'react';
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import { isRebootServer } from '@data/servers/servers';
 
-import BossDropdownButton from '../../BossDropdownButton/BossDropdownButton';
 import BossButton from '../BossButton/BossButton';
+import BossDropdownButton from '../BossDropdownButton/BossDropdownButton';
 
 import styles from './BossItem.module.scss';
 

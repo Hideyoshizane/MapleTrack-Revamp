@@ -10,7 +10,7 @@ type NexonRankingResponse = {
 
 export const fetchCharacterDataFromAPI = async (
 	characterName: string,
-	server: string
+	server: string,
 ): Promise<CharacterDataFromAPI> => {
 	const serverObj = getServerByName(server);
 
@@ -20,7 +20,6 @@ export const fetchCharacterDataFromAPI = async (
 
 	// Determine reboot index based on server type
 	const rebootIndex = isRebootServer(server) ? 1 : 0;
-
 	const serverLocation = getRegion(serverObj);
 
 	try {
@@ -38,7 +37,7 @@ export const fetchCharacterDataFromAPI = async (
 				headers: {
 					'Cache-Control': 'no-store',
 				},
-			}
+			},
 		);
 
 		// Extract first ranked character
@@ -48,19 +47,12 @@ export const fetchCharacterDataFromAPI = async (
 			throw new Error('Character not found');
 		}
 
-		return {
-			characterImgURL: character.characterImgURL,
-			level: character.level,
-		};
+		return { characterImgURL: character.characterImgURL, level: character.level };
 	} catch (error) {
 		if ((error as AxiosError).isAxiosError) {
 			const axiosError = error as AxiosError;
 
-			console.error('Nexon API request failed', {
-				status: axiosError.response?.status,
-				url: axiosError.config?.url,
-			});
-
+			console.error('Nexon API request failed', { status: axiosError.response?.status, url: axiosError.config?.url });
 			throw new Error(`External API failed: ${axiosError.response?.status ?? 'unknown'}`);
 		}
 

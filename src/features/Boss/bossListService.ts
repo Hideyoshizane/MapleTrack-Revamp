@@ -25,32 +25,34 @@ const addServerToBossList = async (authenticatedUserId: string, serverName: stri
 		// Return early if server already exists
 		const bossList = await prisma.bossList.findUnique({
 			where: { userId: authenticatedUserId },
-			select: {
-				id: true,
-				servers: { select: { id: true, name: true } },
-			},
+			select: { id: true },
 		});
 
 		if (!bossList) {
 			throw new Error('BossList not found for user.');
 		}
 
-		const existingServer = bossList.servers.find((server): boolean => server.name === serverName);
-		if (existingServer) {
-			return existingServer.id;
-		}
-
-		const createdServer = await prisma.bossServer.create({
-			data: {
-				name: serverName,
-				weeklyBosses: 0,
-				totalGains: 0,
-				bossList: { connect: { id: bossList.id } },
+		let server = await prisma.bossServer.findFirst({
+			where: {
+				bossListId: bossList.id,
+				serverName,
 			},
 			select: { id: true },
 		});
 
-		return createdServer.id;
+		if (!server) {
+			server = await prisma.bossServer.create({
+				data: {
+					serverName,
+					weeklyBosses: 0,
+					totalGains: 0,
+					bossList: { connect: { id: bossList.id } },
+				},
+				select: { id: true },
+			});
+		}
+
+		return server.id;
 	} catch (error) {
 		console.error('Error adding server to BossList:', error);
 		throw error;
@@ -60,10 +62,7 @@ const addServerToBossList = async (authenticatedUserId: string, serverName: stri
 export const characterToBossList = async (
 	authenticatedUserId: string,
 	serverName: string,
-	characterName: string,
-	code: string,
-	charClass: string,
-	level: number,
+	characterId: string,
 	isBossCharacter: boolean,
 ): Promise<void> => {
 	// Ensure server exists and get its id
@@ -73,7 +72,7 @@ export const characterToBossList = async (
 	}
 
 	const existingCharacter = await prisma.bossCharacter.findFirst({
-		where: { code, serverId },
+		where: { characterId, serverId },
 		select: { id: true },
 	});
 
@@ -94,47 +93,20 @@ export const characterToBossList = async (
 	if (existingCharacter) {
 		await prisma.bossCharacter.update({
 			where: { id: existingCharacter.id },
-			data: { name: characterName, level, class: charClass },
+			data: {
+				character: { connect: { id: existingCharacter.id } },
+				server: { connect: { id: serverId } },
+				totalIncome: 0,
+			},
 		});
 
 		return;
 	}
-
 	await prisma.bossCharacter.create({
 		data: {
-			name: characterName,
-			code,
-			class: charClass,
-			level,
-			totalIncome: 0,
+			character: { connect: { id: characterId } },
 			server: { connect: { id: serverId } },
+			totalIncome: 0,
 		},
 	});
-};
-
-export const updateCharacterLevelFromBossList = async (
-	authenticatedUserId: string,
-	serverName: string,
-	code: string,
-	level: number,
-): Promise<void> => {
-	try {
-		const result = await prisma.bossCharacter.updateMany({
-			where: {
-				code,
-				server: {
-					name: serverName,
-					bossList: { userId: authenticatedUserId },
-				},
-			},
-			data: { level },
-		});
-
-		if (result.count === 0) {
-			return;
-		}
-	} catch (error) {
-		console.error('Error updating character level in BossList:', error);
-		throw error;
-	}
 };

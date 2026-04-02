@@ -2,6 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import ErrorPage from '@components/ErrorPage/ErrorPage';
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 import { JobClasses } from '@data/classes/classes';
 import { characterApi } from '@features/character/characterApi';
@@ -10,7 +11,7 @@ import { generateCharacterObject } from '@features/character/characterService';
 import ClassCard from './ClassCard/ClassCard';
 import styles from './ClassGrid.module.scss';
 
-import type { GetAllCharactersRequestBody } from '@features/character/characterApi';
+import type { GetAllCharactersPayload } from '@features/character/characterApi';
 import type { CharacterDraft as Character } from '@features/character/characterModel';
 import type { ClassFilterOption } from '@utils/classFilterCookie';
 import type { JSX } from 'react';
@@ -81,7 +82,7 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Cl
 				return;
 			}
 
-			const payload: GetAllCharactersRequestBody = { server: serverCookie };
+			const payload: GetAllCharactersPayload = { server: serverCookie };
 
 			const response = await characterApi.getAllCharacters(payload);
 			if (!response.success) {
@@ -98,7 +99,6 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Cl
 						jobClassName: job.className,
 						jobType: job.jobType,
 						legion: job.legionType,
-						code: job.code,
 						linkSkill: job.linkSkill,
 						server: serverCookie,
 					})
@@ -126,12 +126,7 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Cl
 	const jobResults: Character[] = sortCharacters(filterCharacters(allCharacters, selectedClasses));
 
 	if (error) {
-		return (
-			<div className={styles.error}>
-				<p>Error: {error}</p>
-				<button onClick={(): undefined => void fetchCharacters()}>Retry</button>
-			</div>
-		);
+		return <ErrorPage />;
 	}
 
 	return (

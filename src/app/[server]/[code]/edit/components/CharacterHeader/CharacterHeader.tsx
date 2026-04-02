@@ -9,7 +9,7 @@ import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
 
 import styles from './CharacterHeader.module.scss';
 
-import type { UpdateCharacterRequestBody } from '@features/character/characterApi';
+import type { UpdateCharacterPayload } from '@features/character/characterApi';
 import type { CharacterDraft as Character } from '@features/character/characterModel';
 import type { JSX } from 'react';
 
@@ -17,7 +17,7 @@ type Props = {
 	character?: Character;
 	userOrigin: string;
 	server: string;
-	code: string;
+	className: string;
 	nameError: string | null;
 	submitLoading: boolean;
 	setSubmitLoading: (value: boolean) => void;
@@ -27,7 +27,7 @@ export const CharacterHeader = ({
 	character,
 	userOrigin,
 	server,
-	code,
+	className,
 	nameError,
 	submitLoading,
 	setSubmitLoading,
@@ -43,10 +43,10 @@ export const CharacterHeader = ({
 
 		try {
 			setSubmitLoading(true);
-			const payload: UpdateCharacterRequestBody = {
+			const payload: UpdateCharacterPayload = {
 				userOrigin: sanitizeInputFrontend(userOrigin),
 				server: sanitizeInputFrontend(server),
-				code: sanitizeInputFrontend(code),
+				className: sanitizeInputFrontend(className),
 				data: character,
 			};
 			const result = await characterApi.updateCharacterData(payload);

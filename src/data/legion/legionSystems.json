@@ -1,7 +1,7 @@
 [
 	{
 		"name": "STR+",
-		"class": "warrior",
+		"jobType": "warrior",
 		"ranking": [
 			{
 				"rank": "B",
@@ -27,7 +27,7 @@
 	},
 	{
 		"name": "MAXHP%",
-		"class": "warrior",
+		"jobType": "warrior",
 		"ranking": [
 			{
 				"rank": "B",
@@ -53,7 +53,7 @@
 	},
 	{
 		"name": "MAXHP+",
-		"class": "warrior",
+		"jobType": "warrior",
 		"ranking": [
 			{
 				"rank": "B",
@@ -79,7 +79,7 @@
 	},
 	{
 		"name": "RECVRHP+",
-		"class": "warrior",
+		"jobType": "warrior",
 		"ranking": [
 			{
 				"rank": "B",
@@ -105,7 +105,7 @@
 	},
 	{
 		"name": "STATRES+",
-		"class": "warrior",
+		"jobType": "warrior",
 		"ranking": [
 			{
 				"rank": "B",
@@ -131,7 +131,7 @@
 	},
 	{
 		"name": "BOSSDMG+",
-		"class": "warrior",
+		"jobType": "warrior",
 		"ranking": [
 			{
 				"rank": "B",
@@ -157,7 +157,7 @@
 	},
 	{
 		"name": "IED+",
-		"class": "warrior",
+		"jobType": "warrior",
 		"ranking": [
 			{
 				"rank": "B",
@@ -183,7 +183,7 @@
 	},
 	{
 		"name": "CRIT",
-		"class": "warrior",
+		"jobType": "warrior",
 		"ranking": [
 			{
 				"rank": "B",
@@ -209,7 +209,7 @@
 	},
 	{
 		"name": "EXP",
-		"class": "warrior",
+		"jobType": "warrior",
 		"ranking": [
 			{
 				"rank": "B",
@@ -235,7 +235,7 @@
 	},
 	{
 		"name": "SPEED",
-		"class": "warrior",
+		"jobType": "warrior",
 		"ranking": [
 			{
 				"rank": "B",
@@ -261,7 +261,7 @@
 	},
 	{
 		"name": "MAXMP%",
-		"class": "magician",
+		"jobType": "magician",
 		"ranking": [
 			{
 				"rank": "B",
@@ -287,7 +287,7 @@
 	},
 	{
 		"name": "INT+",
-		"class": "magician",
+		"jobType": "magician",
 		"ranking": [
 			{
 				"rank": "B",
@@ -313,7 +313,7 @@
 	},
 	{
 		"name": "RECVRMP",
-		"class": "magician",
+		"jobType": "magician",
 		"ranking": [
 			{
 				"rank": "B",
@@ -339,7 +339,7 @@
 	},
 	{
 		"name": "BOSSDMGM",
-		"class": "magician",
+		"jobType": "magician",
 		"ranking": [
 			{
 				"rank": "B",
@@ -365,7 +365,7 @@
 	},
 	{
 		"name": "IEDM",
-		"class": "magician",
+		"jobType": "magician",
 		"ranking": [
 			{
 				"rank": "B",
@@ -391,7 +391,7 @@
 	},
 	{
 		"name": "ABDAMAGE",
-		"class": "magician",
+		"jobType": "magician",
 		"ranking": [
 			{
 				"rank": "B",
@@ -417,7 +417,7 @@
 	},
 	{
 		"name": "DEX+",
-		"class": "bowman",
+		"jobType": "bowman",
 		"ranking": [
 			{
 				"rank": "B",
@@ -443,7 +443,7 @@
 	},
 	{
 		"name": "CRITRT",
-		"class": "bowman",
+		"jobType": "bowman",
 		"ranking": [
 			{
 				"rank": "B",
@@ -469,7 +469,7 @@
 	},
 	{
 		"name": "SKILLCD",
-		"class": "bowman",
+		"jobType": "bowman",
 		"ranking": [
 			{
 				"rank": "B",
@@ -495,7 +495,7 @@
 	},
 	{
 		"name": "%DMGUP",
-		"class": "bowman",
+		"jobType": "bowman",
 		"ranking": [
 			{
 				"rank": "B",
@@ -521,7 +521,7 @@
 	},
 	{
 		"name": "CRITRTT",
-		"class": "thief",
+		"jobType": "thief",
 		"ranking": [
 			{
 				"rank": "B",
@@ -548,7 +548,7 @@
 	},
 	{
 		"name": "LUK+",
-		"class": "thief",
+		"jobType": "thief",
 		"ranking": [
 			{
 				"rank": "B",
@@ -574,7 +574,7 @@
 	},
 	{
 		"name": "MESO%",
-		"class": "thief",
+		"jobType": "thief",
 		"ranking": [
 			{
 				"rank": "B",
@@ -600,7 +600,7 @@
 	},
 	{
 		"name": "STR+P",
-		"class": "pirate",
+		"jobType": "pirate",
 		"ranking": [
 			{
 				"rank": "B",
@@ -626,7 +626,7 @@
 	},
 	{
 		"name": "SUMMND",
-		"class": "pirate",
+		"jobType": "pirate",
 		"ranking": [
 			{
 				"rank": "B",
@@ -652,7 +652,7 @@
 	},
 	{
 		"name": "CRTDMG+",
-		"class": "pirate",
+		"jobType": "pirate",
 		"ranking": [
 			{
 				"rank": "B",
@@ -678,7 +678,7 @@
 	},
 	{
 		"name": "BUFFDUR",
-		"class": "pirate",
+		"jobType": "pirate",
 		"ranking": [
 			{
 				"rank": "B",
@@ -704,7 +704,7 @@
 	},
 	{
 		"name": "DEX+P",
-		"class": "pirate",
+		"jobType": "pirate",
 		"ranking": [
 			{
 				"rank": "B",
@@ -730,7 +730,7 @@
 	},
 	{
 		"name": "STDELU",
-		"class": "xenon",
+		"jobType": "xenon",
 		"ranking": [
 			{
 				"rank": "B",

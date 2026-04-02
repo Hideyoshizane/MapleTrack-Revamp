@@ -4,7 +4,6 @@ import utc from 'dayjs/plugin/utc';
 
 import type { Dayjs } from 'dayjs';
 
-// Extend dayjs with UTC and timezone support
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault('UTC');

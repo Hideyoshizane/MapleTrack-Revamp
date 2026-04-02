@@ -2,13 +2,15 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-import { getJob } from '@/features/character/characterAttributes';
+import ErrorPage from '@components/ErrorPage/ErrorPage';
 import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
+import { getClassNameByCode } from '@data/classes/classes';
 import { characterQueryKeys } from '@features/character/character.queryKeys';
+import { getJob } from '@features/character/characterAttributes';
 import { useCharacterExternalQuery } from '@hooks/useCharacterExternalQuery';
 import { useCharacterQuery } from '@hooks/useCharacterQuery';
 
@@ -40,6 +42,11 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 	const searchParams = useSearchParams();
 	const success = searchParams.get('success');
 
+	const className = getClassNameByCode(code);
+	if (!className) {
+		redirect('/error');
+	}
+
 	const queryClient = useQueryClient();
 
 	const [disableAllDaily, setDisableAllDaily] = useState(false);
@@ -53,7 +60,7 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 		}
 	}, [success, router]);
 
-	const { data: character, isLoading, error } = useCharacterQuery({ server, code });
+	const { data: character, isLoading } = useCharacterQuery({ server, className });
 
 	const { data: characterDataApi } = useCharacterExternalQuery({
 		name: character?.name,
@@ -77,11 +84,11 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 		return <FullPageLoader />;
 	}
 	if (!character) {
-		throw new Error('Character data missing after load');
-	}
-
-	if (error) {
-		throw error;
+		return (
+			<section className="mainContent">
+				<ErrorPage />
+			</section>
+		);
 	}
 
 	const job = getJob(character.level);
@@ -91,7 +98,7 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 		<section className="mainContent">
 			<div className={styles.mainDiv}>
 				<Image
-					src={`/assets/profile/${character.code}.webp`}
+					src={`/assets/profile/${code}.webp`}
 					width={650}
 					height={827}
 					priority

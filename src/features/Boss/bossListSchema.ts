@@ -1,24 +1,17 @@
 import { z } from 'zod';
 
-import { bosses } from '@data/bosses/bosses';
+import { isValidBossDifficulty, bossDifficultySet } from '@data/bosses/bosses';
 import { CHARACTER_MAX_LEVEL } from '@data/character/constants';
-import { JobClasses } from '@data/classes/classes';
+import { JOB_CLASSES } from '@data/classes/classes';
 import { characterServerSideSchema } from '@features/character/character.server.schema';
 import { serverSchema } from '@features/character/characterRequestSchema';
 import { normalizeDayjsDate } from '@utils/dateFromDayjs';
 import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
 
-// Build a map of valid difficulties for each boss.
-const bossDifficultyMap = Object.fromEntries(
-	bosses.map((b): [string, string[]] => [b.name, b.difficulties.map((d): string => d.name)]),
-);
-
-// Precompute boss names for enum validation
-const bossNames = bosses.map((b) => b.name) as [string, ...string[]];
-
+export const bossNames = Object.keys(bossDifficultySet) as readonly string[];
 export const BossSchema = z
 	.object({
-		name: z.enum([...bossNames]),
+		name: z.enum(bossNames),
 		difficulty: z.string().transform(sanitizeInputBackEnd),
 		reset: z.enum(['Daily', 'Weekly', 'Monthly']),
 
@@ -30,26 +23,22 @@ export const BossSchema = z
 		locked: z.boolean().optional().default(false),
 	})
 	.superRefine((data, ctx): void => {
-		const validDifficulties = bossDifficultyMap[data.name];
-		if (!validDifficulties.includes(data.difficulty)) {
+		if (!isValidBossDifficulty(data.name, data.difficulty)) {
 			ctx.addIssue({
 				code: 'custom',
-				message: `Invalid difficulty.`,
+				message: 'Invalid difficulty.',
 				path: ['difficulty'],
 			});
 		}
 	});
 
 const characterNameField = characterServerSideSchema;
-const classNames = JobClasses.map((c): string => c.className) as [string, ...string[]];
-const codes = JobClasses.map((c): string => c.code) as [string, ...string[]];
 
 export const BossCharacterSchema = z.object({
 	name: characterNameField,
-	code: z.enum(codes),
-	class: z.enum(classNames),
+	class: z.enum(JOB_CLASSES),
 	level: z.number().min(0).max(CHARACTER_MAX_LEVEL),
-	totalIncome: z.number().optional().default(0),
+	totalIncome: z.number().default(0),
 	bosses: z.array(BossSchema).default([]),
 });
 
@@ -68,8 +57,26 @@ export const UpdateBossListRequestSchema = z.object({
 	data: BossServerSchema,
 });
 
+export const ToggleBossRequestSchema = z
+	.object({
+		class: z.enum(JOB_CLASSES),
+		bossName: z.enum(bossNames),
+		difficulty: z.string().transform(sanitizeInputBackEnd),
+		server: serverSchema,
+	})
+	.superRefine((data, ctx): void => {
+		if (!isValidBossDifficulty(data.bossName, data.difficulty)) {
+			ctx.addIssue({
+				code: 'custom',
+				message: 'Invalid difficulty.',
+				path: ['difficulty'],
+			});
+		}
+	});
+
 export type ZodBossRequest = z.infer<typeof BossListRequestSchema>;
 export type ZodBoss = z.infer<typeof BossSchema>;
 export type ZodBossCharacter = z.infer<typeof BossCharacterSchema>;
 export type ZodBossServer = z.infer<typeof BossServerSchema>;
 export type UpdateBossListRequest = z.infer<typeof UpdateBossListRequestSchema>;
+export type ToggleBossRequestSchema = z.infer<typeof ToggleBossRequestSchema>;

@@ -23,9 +23,8 @@ import {
 } from '@features/Boss/bossListUtils';
 import { useServerCookie } from '@hooks/useServerCookie';
 
-import WeeklyBossDropdown from '../components/WeeklyBossDropdown/WeeklyBossDropdown';
-
 import BossGrid from './components/BossGrid/BossGrid';
+import WeeklyBossDropdown from './components/CharacterSelectBossDropdown/CharacterSelectBossDropdown';
 import styles from './page.module.scss';
 
 import type { ServerName } from '@data/servers/servers';
@@ -142,8 +141,6 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 		setServerData(updatedData);
 		setTotalBosses(countServerBosses(updatedData));
 		setTotalGains(updatedData.totalGains);
-
-		console.log('Updated serverData:', updatedData);
 	};
 
 	const characters = serverData.characters;

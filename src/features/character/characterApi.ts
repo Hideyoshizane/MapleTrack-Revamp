@@ -4,19 +4,19 @@ import type { CharacterDraft as Character } from './characterModel';
 import type { LevelUpResult } from '@data/symbols/symbolMappings';
 import type { ApiRequest, ApiResponse } from '@sharedTypes/api';
 
-export type GetAllCharactersRequestBody = ApiRequest<{
+export type GetAllCharactersPayload = ApiRequest<{
 	server: string;
 }>;
 
-export type GetCharacterDataRequestBody = ApiRequest<{
+export type GetCharacterDataPayload = ApiRequest<{
 	server: string;
-	code: string;
+	className: string;
 }>;
 
-export type UpdateCharacterRequestBody = ApiRequest<{
+export type UpdateCharacterPayload = ApiRequest<{
 	userOrigin: string;
 	server: string;
-	code: string;
+	className: string;
 	data: Character;
 }>;
 
@@ -31,13 +31,13 @@ type UpdateCharacterResponseData = {
 };
 
 export const characterApi = {
-	getAllCharacters: async (payload: GetAllCharactersRequestBody): Promise<ApiResponse<Character[]>> => {
+	getAllCharacters: async (payload: GetAllCharactersPayload): Promise<ApiResponse<Character[]>> => {
 		const { data } = await axiosInstance.post<ApiResponse<Character[]>>('/characters/getAllCharacters', payload);
 
 		return data;
 	},
 
-	getCharacterData: async (payload: GetCharacterDataRequestBody): Promise<ApiResponse<Character>> => {
+	getCharacterData: async (payload: GetCharacterDataPayload): Promise<ApiResponse<Character>> => {
 		const { data } = await axiosInstance.post<ApiResponse<Character>>('/characters/getCharacterData', payload);
 
 		return data;
@@ -57,7 +57,7 @@ export const characterApi = {
 		return data;
 	},
 
-	updateCharacterData: async (payload: UpdateCharacterRequestBody): Promise<ApiResponse> => {
+	updateCharacterData: async (payload: UpdateCharacterPayload): Promise<ApiResponse> => {
 		const { data } = await axiosInstance.patch<ApiResponse>('/characters/updateCharacter', payload);
 
 		return data;

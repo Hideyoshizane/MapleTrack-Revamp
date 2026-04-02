@@ -3,11 +3,12 @@ import crypto from 'crypto';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-import { forgotPasswordRequestSchema } from '@/schemas/auth.schemas';
+import { forgotPasswordRequestSchema } from '@features/user/schemas/user.schema';
 import { prisma } from '@lib/prisma';
 import { sendEmail } from '@lib/sendEmail';
 import getForgotPasswordTemplate from '@lib/template/resetPasswordEmailTemplate';
 import { createResponse } from '@utils/createResponse';
+import { logError, logApiFailure, logZodError } from '@utils/logger';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextRequest, NextResponse } from 'next/server';
@@ -18,31 +19,27 @@ if (!BASE_URL) {
 	throw new Error('NEXT_PUBLIC_BASE_URL is not defined');
 }
 
+dayjs.extend(utc);
+
+const route = '/api/auth/forgot-password';
+
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
-		dayjs.extend(utc);
-
 		// Validate request body with zod
 		const parseResult = forgotPasswordRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
+			logZodError(parseResult.error, { route: route });
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
-
 		const email = parseResult.data.email;
 
 		// search for user by the email
-		const user = await prisma.user.findUnique({
-			where: { email },
-			select: {
-				id: true,
-				username: true,
-			},
-		});
+		const user = await prisma.user.findUnique({ where: { email }, select: { id: true, username: true } });
 		if (!user) {
+			logApiFailure('User not found for forgot password', { route: route, additional: { email } });
 			return createResponse<ApiResponse>({ success: true, message: 'If the email exists, we sent a reset link.' }, 200);
 		}
 
-		// Generate raw token
 		const rawToken = crypto.randomBytes(32).toString('hex');
 		const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
 
@@ -59,27 +56,23 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 				html,
 			});
 		} catch (emailError) {
-			console.error('forgot_password_email_failed', {
-				error: emailError instanceof Error ? emailError.message : 'unknown',
+			logApiFailure('Failed to send reset email', {
+				route,
 				userId: user.id,
+				additional: { error: emailError instanceof Error ? emailError.message : String(emailError) },
 			});
-
 			return createResponse<ApiResponse>({ success: false, message: 'Failed to send reset email' }, 500);
 		}
 
-		// Persist reset token atomically
+		// Persist reset token
 		await prisma.user.update({
 			where: { id: user.id },
-			data: {
-				resetPasswordToken: hashedToken,
-				resetPasswordExpires,
-			},
+			data: { resetPasswordToken: hashedToken, resetPasswordExpires },
 		});
 
 		return createResponse<ApiResponse>({ success: true, message: 'If the email exists, we sent a reset link.' }, 200);
 	} catch (error) {
-		console.error('forgot_password_failed', { error: error instanceof Error ? error.message : 'unknown' });
-
+		logError(error, { route: route });
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

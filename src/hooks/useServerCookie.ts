@@ -7,7 +7,7 @@ import { serverCookie } from '@utils/serverCookie';
 import type { ServerName } from '@data/servers/servers';
 
 export const useServerCookie = (
-	initialServer: ServerName
+	initialServer: ServerName,
 ): {
 	server: ServerName;
 	setServerCookie: (name: ServerName) => void;
@@ -22,8 +22,5 @@ export const useServerCookie = (
 		setServer(name);
 	}, []);
 
-	return {
-		server,
-		setServerCookie: setServerCookieHandler,
-	};
+	return { server, setServerCookie: setServerCookieHandler };
 };

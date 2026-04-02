@@ -40,10 +40,5 @@ export const useBonusEventCookies = (): {
 		sacredBonusCookie.set(value);
 	};
 
-	return {
-		arcaneBonus,
-		sacredBonus,
-		setArcaneBonusCookie,
-		setSacredBonusCookie,
-	};
+	return { arcaneBonus, sacredBonus, setArcaneBonusCookie, setSacredBonusCookie };
 };

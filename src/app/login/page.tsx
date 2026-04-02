@@ -24,11 +24,9 @@ const LoginPage = (): JSX.Element => {
 		handleSubmit,
 		formState: { isSubmitting, isSubmitted },
 		setError,
-	} = useForm<LoginFormData>({
-		mode: 'onBlur',
-		defaultValues: { username: '', password: '' },
-	});
+	} = useForm<LoginFormData>({ mode: 'onBlur', defaultValues: { username: '', password: '' } });
 	const router = useRouter();
+
 	// Track if the user just logged in successfully on this page
 	const { submitLogin, justLoggedIn } = useLogin(setError, router);
 

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { generateClassCode } from '@/data/classes/classes';
 import BossIcon from '@assets/svg/boss_slayer.svg';
 import LegionBlock from '@components/LegionBlock/LegionBlock';
 import LinkSkillBlock from '@components/LinkSkillBlock/LinkSkillBlock';
@@ -71,7 +72,6 @@ const SymbolGrid = ({ symbols, maxLevel, size = 16, characterLevel }: SymbolProp
 	</div>
 );
 
-// Bottom section: Link Skill + Legion
 const IconSection = ({
 	character,
 	iconSize = 48,
@@ -95,23 +95,12 @@ const IconSection = ({
 const ClassCard = ({ character }: ClassCardProps): JSX.Element | null => {
 	const router = useRouter();
 
-	if (!character?.code || !character.jobType || !character.legion) {
+	if (!character.jobType || !character.legion) {
 		router.replace('/error');
 		return null;
 	}
 
-	const {
-		code,
-		jobType,
-		legion,
-		linkSkill: ls,
-		level,
-		name,
-		bossing,
-		targetLevel,
-		server,
-		class: className,
-	} = character;
+	const { jobType, legion, linkSkill: ls, level, name, bossing, targetLevel, server, class: className } = character;
 
 	const { arcane: ArcaneSymbol, sacred: SacredSymbol } = separateSymbolsByCategory(character.symbols);
 
@@ -125,6 +114,7 @@ const ClassCard = ({ character }: ClassCardProps): JSX.Element | null => {
 
 	const jobKey: JobType = (jobType ?? 'default') as JobType;
 	const job: string = getJob(character.level);
+	const code: string = generateClassCode(character.class ?? '');
 
 	return (
 		<Link href={`/${server}/${code}`} passHref>

@@ -14,7 +14,7 @@ import type { ValidationResult } from '@utils/validateField';
 import type { UseFormSetError } from 'react-hook-form';
 
 export const useForgotPassword = (
-	setError: UseFormSetError<ForgotPasswordFormData>
+	setError: UseFormSetError<ForgotPasswordFormData>,
 ): { submitForgotPassword: (data: ForgotPasswordFormData) => Promise<void> } => {
 	const submitForgotPassword = useCallback(
 		async (data: ForgotPasswordFormData): Promise<void> => {
@@ -23,7 +23,7 @@ export const useForgotPassword = (
 
 				const validations = { email: validateEmail(email) };
 				const hasErrors = (Object.entries(validations) as [keyof ForgotPasswordFormData, ValidationResult][]).some(
-					([field, result]): boolean => handleFieldValidation(field, result, setError)
+					([field, result]): boolean => handleFieldValidation(field, result, setError),
 				);
 				if (hasErrors) {
 					return;
@@ -41,9 +41,7 @@ export const useForgotPassword = (
 
 					if (result.message) {
 						Object.entries(result.message).forEach(([field, msg]): void => {
-							setError(field as keyof ForgotPasswordFormData, {
-								message: msg ?? 'Invalid input',
-							});
+							setError(field as keyof ForgotPasswordFormData, { message: msg ?? 'Invalid input' });
 						});
 					}
 				} else {
@@ -54,7 +52,7 @@ export const useForgotPassword = (
 				console.error('Forgot password error:', err);
 			}
 		},
-		[setError]
+		[setError],
 	);
 
 	return { submitForgotPassword };

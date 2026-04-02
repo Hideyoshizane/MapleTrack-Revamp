@@ -41,7 +41,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 				id: true,
 				name: true,
 				server: true,
-				code: true,
 				class: true,
 				jobType: true,
 				legion: true,

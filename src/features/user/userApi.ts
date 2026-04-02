@@ -1,56 +1,24 @@
-import axiosInstance from '@lib/axios/axios';
+import { requestApi } from '@/lib/axios/apiClient';
 
+import type {
+	SignupRequestBody,
+	ResetPasswordRequestBody,
+	ForgotPasswordRequestBody,
+	ChangePasswordRequestBody,
+} from '@features/user/schemas/user.schema';
 import type { ApiResponse } from '@sharedTypes/api';
 
-type changePasswordPayload = {
-	currentPassword: string;
-	newPassword: string;
-};
-
-type SignupPayload = {
-	username: string;
-	email: string;
-	password: string;
-	confirmPassword: string;
-};
-
-type ResetPasswordPayload = {
-	password: string;
-	token: string;
-};
-
-type ForgotPasswordPayload = {
-	email: string;
-};
-
 export const userApi = {
-	deleteAccount: async (): Promise<ApiResponse> => {
-		const { data } = await axiosInstance.delete<ApiResponse>('/account/delete');
+	deleteAccount: (): Promise<ApiResponse> => requestApi('/account/delete', 'DELETE'),
 
-		return data;
-	},
+	changePassword: (payload: ChangePasswordRequestBody): Promise<ApiResponse> =>
+		requestApi('/auth/change-password', 'POST', payload),
 
-	changePassword: async (payload: changePasswordPayload): Promise<ApiResponse> => {
-		const { data } = await axiosInstance.post<ApiResponse>('/auth/change-password', payload);
+	signup: (payload: SignupRequestBody): Promise<ApiResponse> => requestApi('/auth/signup', 'POST', payload),
 
-		return data;
-	},
+	resetPassword: (payload: ResetPasswordRequestBody): Promise<ApiResponse> =>
+		requestApi('/auth/reset-password', 'POST', payload),
 
-	signup: async (payload: SignupPayload): Promise<ApiResponse> => {
-		const { data } = await axiosInstance.post<ApiResponse>('/auth/signup', payload);
-
-		return data;
-	},
-
-	resetPassword: async (payload: ResetPasswordPayload): Promise<ApiResponse> => {
-		const { data } = await axiosInstance.post<ApiResponse>('/auth/reset-password', payload);
-
-		return data;
-	},
-
-	forgotPassword: async (payload: ForgotPasswordPayload): Promise<ApiResponse> => {
-		const { data } = await axiosInstance.post<ApiResponse>('/auth/forgot-password', payload);
-
-		return data;
-	},
+	forgotPassword: (payload: ForgotPasswordRequestBody): Promise<ApiResponse> =>
+		requestApi('/auth/forgot-password', 'POST', payload),
 };

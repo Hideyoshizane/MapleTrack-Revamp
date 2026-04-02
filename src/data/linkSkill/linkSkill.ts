@@ -13,8 +13,16 @@ type LinkSkill = {
 
 const linkSkills: LinkSkill[] = linkSkillsData as LinkSkill[];
 
-export const getLinkSkillByName = (name: string): LinkSkill | undefined =>
-	linkSkills.find((skill): boolean => skill.name === name);
+export const linkSkillsByName: ReadonlyMap<string, LinkSkill> = new Map(
+	linkSkills.map((skill): [string, LinkSkill] => [skill.name, skill]),
+);
+
+export const getLinkSkillByName = (name: string): LinkSkill | undefined => linkSkillsByName.get(name);
+
+export const getLinkSkillImageByName = (name: string): string | null => {
+	const skill: LinkSkill | undefined = linkSkillsByName.get(name);
+	return skill?.image ?? null;
+};
 
 export const getLinkSkillDescription = (linkSkill: LinkSkill, characterLevel: number): string => {
 	const levels = linkSkill?.levels;

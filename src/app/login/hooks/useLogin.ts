@@ -15,11 +15,8 @@ import type { UseFormSetError } from 'react-hook-form';
 
 export const useLogin = (
 	setError: UseFormSetError<LoginFormData>,
-	router: AppRouterInstance
-): {
-	submitLogin: (data: LoginFormData) => Promise<void>;
-	justLoggedIn: boolean;
-} => {
+	router: AppRouterInstance,
+): { submitLogin: (data: LoginFormData) => Promise<void>; justLoggedIn: boolean } => {
 	const [justLoggedIn, setJustLoggedIn] = useState(false);
 
 	const submitLogin = useCallback(
@@ -34,7 +31,7 @@ export const useLogin = (
 				};
 
 				const hasErrors = (Object.entries(validations) as [keyof LoginFormData, ValidationResult][]).some(
-					([field, result]): boolean => handleFieldValidation(field, result, setError)
+					([field, result]): boolean => handleFieldValidation(field, result, setError),
 				);
 				if (hasErrors) {
 					return;
@@ -61,7 +58,7 @@ export const useLogin = (
 				console.error('Login error:', err);
 			}
 		},
-		[setError, router]
+		[setError, router],
 	);
 
 	return { submitLogin, justLoggedIn };

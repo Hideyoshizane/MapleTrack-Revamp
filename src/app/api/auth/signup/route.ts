@@ -1,31 +1,24 @@
-import { Prisma } from '@prisma/client';
 import argon2 from 'argon2';
 
-import { signupRequestSchema } from '@/schemas/auth.schemas';
 import { LASTVERSION } from '@data/user/constants';
 import { createBossList } from '@features/Boss/bossListService';
+import { signupRequestSchema } from '@features/user/schemas/user.schema';
 import { prisma } from '@lib/prisma';
 import { createResponse } from '@utils/createResponse';
+import { logError, logZodError } from '@utils/logger';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextRequest, NextResponse } from 'next/server';
 
+const route = '/api/account/signup';
+
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
-		let body: unknown;
-
-		try {
-			body = await request.json();
-		} catch {
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
-		}
-
-		// Validate request body using Zod
-		const parseResult = signupRequestSchema.safeParse(body);
+		const parseResult = signupRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
+			logZodError(parseResult.error, { route: route });
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
-
 		const { username, email, password } = parseResult.data;
 
 		const hashedPassword = await argon2.hash(password, {
@@ -35,7 +28,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 			parallelism: 1,
 		});
 
-		// Save user
 		await prisma.$transaction(async (tx) => {
 			const newUser = await tx.user.create({
 				data: {
@@ -43,12 +35,8 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 					email,
 					password: hashedPassword,
 					version: LASTVERSION,
-					resetPasswordToken: null,
-					resetPasswordExpires: null,
 				},
-				select: {
-					id: true,
-				},
+				select: { id: true },
 			});
 
 			await createBossList(tx, newUser.id);
@@ -56,11 +44,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
 		return createResponse<ApiResponse>({ success: true, message: 'User created successfully' }, 201);
 	} catch (error) {
-		if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-			return createResponse<ApiResponse>({ success: false, message: 'This username or email is not available.' }, 400);
-		}
-
-		console.error('signup_failed', { error: error instanceof Error ? error.message : 'unknown' });
+		logError(error, { route: route });
 		return createResponse<ApiResponse>({ success: false, message: 'An error occurred during signup' }, 500);
 	}
 };

@@ -9,9 +9,8 @@ import type { CharacterDataFromAPI } from '@features/character/characterApi';
 import type { CharacterDraft as Character } from '@features/character/characterModel';
 
 type UseCharacterPageDataProps = {
-	userOrigin: string;
 	server: string;
-	code: string;
+	className: string;
 	nameOverride?: string;
 	syncEnabled: boolean;
 	setFirstLoad: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,15 +26,14 @@ type UseCharacterPageDataReturn = {
 };
 
 export const useCharacterPageData = ({
-	userOrigin,
 	server,
-	code,
+	className,
 	nameOverride,
 	syncEnabled,
 	setFirstLoad,
 }: UseCharacterPageDataProps): UseCharacterPageDataReturn => {
 	// Main character data
-	const { data: serverCharacter, isLoading: characterLoading, error } = useCharacterQuery({ userOrigin, server, code });
+	const { data: serverCharacter, isLoading: characterLoading, error } = useCharacterQuery({ server, className });
 	const [editableCharacter, setEditableCharacter] = useState<Character | null>(() => serverCharacter ?? null);
 
 	useEffect(() => {

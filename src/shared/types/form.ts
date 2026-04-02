@@ -4,25 +4,14 @@ import type {
 	ResetPasswordRequestBody,
 	ForgotPasswordRequestBody,
 	ChangePasswordRequestBody,
-} from '@/schemas/auth.schemas';
+} from '@/features/user/schemas/user.schema';
 
-// Login
 export type LoginFormData = Credentials;
 
-// Signup
-export type SignupFormData = SignupRequestBody & {
-	confirmPassword: string;
-};
+export type SignupFormData = SignupRequestBody;
 
-// Forgot Password
 export type ForgotPasswordFormData = ForgotPasswordRequestBody;
 
-//  Reset Password
-export type ResetPasswordFormData = ResetPasswordRequestBody & {
-	confirmPassword: string;
-};
+export type ResetPasswordFormData = ResetPasswordRequestBody & { confirmPassword: string };
 
-// Change Password
-export type ChangePasswordFormData = ChangePasswordRequestBody & {
-	confirmPassword: string;
-};
+export type ChangePasswordFormData = ChangePasswordRequestBody & { confirmPassword: string };

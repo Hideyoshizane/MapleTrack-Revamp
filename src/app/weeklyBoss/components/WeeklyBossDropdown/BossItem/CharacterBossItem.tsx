@@ -2,27 +2,33 @@
 
 import Image from 'next/image';
 
-import CheckIcon from '@assets/svg/check.svg';
-import { codeToClass } from '@features/character/characterAttributes';
+import { getBossImage, getBossDifficultyValue } from '@/data/bosses/bosses';
+import BossCheckedIcon from '@assets/svg/check-boss.svg';
+import CircleBossIcon from '@assets/svg/circle-boss.svg';
+import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 
 import styles from './CharacterBossItem.module.scss';
 
-import type { BossCharacterDraft as BossCharacter } from '@features/Boss/bossListModel';
+import type { BossDraft as Boss } from '@features/Boss/bossListModel';
 import type { JSX, KeyboardEvent } from 'react';
 
 type CharacterBossItemProps = {
-	character: BossCharacter;
+	boss: Boss;
+	server: string;
 	isSelected: boolean;
 	onClick?: () => void;
 };
 
-export default function CharacterBossItem({ character, isSelected, onClick }: CharacterBossItemProps): JSX.Element {
+export default function CharacterBossItem({ boss, server, isSelected, onClick }: CharacterBossItemProps): JSX.Element {
 	const handleKey = (event: KeyboardEvent<HTMLDivElement>): void => {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();
 			onClick?.();
 		}
 	};
+
+	const bossImg = getBossImage(boss.name);
+	const bossValue = getBossDifficultyValue(boss.name, boss.difficulty, server)?.toLocaleString('de-DE');
 
 	return (
 		<div
@@ -33,22 +39,23 @@ export default function CharacterBossItem({ character, isSelected, onClick }: Ch
 			onKeyDown={handleKey}
 			onClick={onClick}>
 			<Image
-				className={styles.classIcon}
-				src={`/assets/buttom_profile/${character.code}.webp`}
-				alt={character.name}
-				width={480}
-				height={80}
+				className={styles.bossIcon}
+				src={bossImg}
+				alt={`${boss.difficulty} ${boss.name}`}
+				width={64}
+				height={64}
 				priority
 			/>
 			<div className={styles.nameDiv}>
-				<p className={styles.characterName}>{character.name}</p>
-				<p className={styles.characterClass}>{codeToClass(character.code)}</p>
+				<ResponsiveText className={styles.bossName} width={284} height={34} maxFontSize={28} minFontSize={20}>
+					{boss.difficulty} {boss.name}
+				</ResponsiveText>
+				<p className={styles.bossValue}>{bossValue}</p>
 			</div>
-			{isSelected && (
-				<div className={styles.iconsDiv}>
-					<CheckIcon className={styles.icon} />
-				</div>
-			)}
+
+			<div className={styles.iconsDiv}>
+				{boss.cleared ? <BossCheckedIcon className={styles.icon} /> : <CircleBossIcon className={styles.icon} />}
+			</div>
 		</div>
 	);
 }

@@ -4,7 +4,10 @@ import EditPageSymbolObject from '../EditPageSymbolObject/EditPageSymbolObject';
 
 import styles from './EditPageSymbolGrid.module.scss';
 
-import type { CharacterSymbol, CharacterDraft as Character } from '@features/character/characterModel';
+import type {
+	CharacterSymbolDraft as CharacterSymbol,
+	CharacterDraft as Character,
+} from '@features/character/characterModel';
 import type { JSX } from 'react';
 
 type EditPageSymbolGridProps = {
@@ -37,7 +40,7 @@ const EditPageSymbolGrid = ({
 						size={size}
 						updateCharacter={updateCharacter}
 					/>
-				)
+				),
 			)}
 		</div>
 	);

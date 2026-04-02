@@ -3,12 +3,11 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
 import { LASTVERSION } from '@data/user/constants';
+import { userSchema } from '@features/user/schemas/user.schema';
 import { updateLastLogin, updateUserVersion } from '@features/user/userService';
 import { prisma } from '@lib/prisma';
 import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
 import { validateUsernameLogin, validatePasswordLogin } from '@utils/validators';
-
-import { canonicalizeUsername } from './features/user/canonicalUsername';
 
 import type { DefaultSession } from 'next-auth';
 
@@ -61,7 +60,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
 					const { username, password } = credentials as LoginCredentials;
 
-					const cleanUsername = canonicalizeUsername(username);
+					const cleanUsername = userSchema.shape.username.parse(username);
 					const cleanPassword = sanitizeInputBackEnd(password);
 					if (!cleanUsername || !cleanPassword) {
 						return null;
@@ -73,9 +72,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 						return null;
 					}
 
-					const user = await prisma.user.findUnique({
-						where: { username: cleanUsername },
-					});
+					const user = await prisma.user.findUnique({ where: { username: cleanUsername } });
 
 					const dummyHash =
 						'$argon2id$v=19$m=65536,t=3,p=4$uX1p9U1nE8p4cXb3rFxNcg$hX57IVHIUi7fYcl0jYxA/0hhQ2PzefRgQdIMZcPgYG8';

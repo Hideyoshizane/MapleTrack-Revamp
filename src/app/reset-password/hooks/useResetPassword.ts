@@ -1,5 +1,4 @@
 'use client';
-
 import { useRouter } from 'next/navigation';
 import { useForm, type Control, type UseFormHandleSubmit, type UseFormGetValues } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -12,6 +11,7 @@ import { validatePassword, validatePasswordConfirmation } from '@utils/validator
 import type { ApiResponse } from '@sharedTypes/api';
 import type { ResetPasswordFormData } from '@sharedTypes/form';
 import type { ValidationResult } from '@utils/validateField';
+import type { Id } from 'react-toastify';
 
 type UseResetPasswordReturn = {
 	control: Control<ResetPasswordFormData>;
@@ -31,15 +31,12 @@ export const useResetPassword = (rawToken: string): UseResetPasswordReturn => {
 		formState: { isSubmitting, isSubmitted },
 		setError,
 		getValues,
-	} = useForm<ResetPasswordFormData>({
-		mode: 'onBlur',
-		defaultValues: { password: '', confirmPassword: '' },
-	});
+	} = useForm<ResetPasswordFormData>({ mode: 'onBlur', defaultValues: { password: '', confirmPassword: '' } });
 
 	const token = sanitizeInputFrontend(rawToken);
 
 	// helper to avoid repeated toast calls
-	const showResetError = (msg?: string) => toast.error(msg ?? 'Failed to reset the password');
+	const showResetError = (msg?: string): Id => toast.error(msg ?? 'Failed to reset the password');
 
 	const onSubmit = async (data: ResetPasswordFormData): Promise<void> => {
 		try {
@@ -59,7 +56,7 @@ export const useResetPassword = (rawToken: string): UseResetPasswordReturn => {
 			};
 
 			const hasErrors = (Object.entries(validations) as [keyof ResetPasswordFormData, ValidationResult][]).some(
-				([field, result]): boolean => handleFieldValidation(field, result, setError)
+				([field, result]): boolean => handleFieldValidation(field, result, setError),
 			);
 			if (hasErrors) return;
 
@@ -73,9 +70,7 @@ export const useResetPassword = (rawToken: string): UseResetPasswordReturn => {
 				showResetError(result.message);
 				if (result.message) {
 					for (const [field, msg] of Object.entries(result.message)) {
-						setError(field as keyof ResetPasswordFormData, {
-							message: msg ?? 'Invalid input',
-						});
+						setError(field as keyof ResetPasswordFormData, { message: msg ?? 'Invalid input' });
 					}
 				}
 			} else {

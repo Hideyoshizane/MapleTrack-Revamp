@@ -1,5 +1,4 @@
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
-import { updateCharacterLevelFromBossList } from '@features/Boss/bossListService';
 import { prisma } from '@lib/prisma';
 import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
 import { type ServerOption } from '@utils/serverCookie';
@@ -23,11 +22,7 @@ const getArcaneSymbol = async (
 	name: string,
 ): Promise<{ id: string }> => {
 	const symbol = await tx.characterSymbol.findFirst({
-		where: {
-			characterId,
-			name,
-			category: 'arcane',
-		},
+		where: { characterId, name, category: 'arcane' },
 		select: { id: true },
 	});
 
@@ -39,10 +34,7 @@ const getArcaneSymbol = async (
 };
 
 const resetDailyQuests = async (tx: Prisma.TransactionClient, characterId: string): Promise<void> => {
-	const symbols = await tx.characterSymbol.findMany({
-		where: { characterId },
-		select: { id: true },
-	});
+	const symbols = await tx.characterSymbol.findMany({ where: { characterId }, select: { id: true } });
 
 	if (!symbols.length) {
 		return;
@@ -51,23 +43,16 @@ const resetDailyQuests = async (tx: Prisma.TransactionClient, characterId: strin
 	const symbolIds = symbols.map((symbol) => symbol.id);
 
 	const quests = await tx.characterContent.findMany({
-		where: {
-			symbolId: { in: symbolIds },
-			contentType: 'Daily Quest',
-		},
+		where: { symbolId: { in: symbolIds }, contentType: 'Daily Quest' },
 		select: { id: true, date: true },
 	});
 
 	const questsToReset = quests.filter((quest) => hasDailyResetOccurred(quest.date)).map((quest) => quest.id);
-
 	if (!questsToReset.length) {
 		return;
 	}
 
-	await tx.characterContent.updateMany({
-		where: { id: { in: questsToReset } },
-		data: { cleared: false },
-	});
+	await tx.characterContent.updateMany({ where: { id: { in: questsToReset } }, data: { cleared: false } });
 };
 
 const resetWeeklyQuests = async (tx: Prisma.TransactionClient, characterId: string): Promise<void> => {
@@ -98,31 +83,25 @@ const resetWeeklyQuests = async (tx: Prisma.TransactionClient, characterId: stri
 type syncCharacterInfoParams = {
 	authenticatedUserId: string;
 	server: ServerOption;
-	code: string;
+	className: string;
 };
 export const syncCharacterInfo = async ({
 	authenticatedUserId,
 	server,
-	code,
+	className,
 }: syncCharacterInfoParams): Promise<void> => {
 	// Validate that the properties are strings
 	const cleanUserId = sanitizeString(authenticatedUserId);
 	const cleanServer = sanitizeString(server);
-	const cleanCode = sanitizeString(code);
-
+	const cleanCode = sanitizeString(className);
 	if (!cleanUserId || !cleanServer || !cleanCode) {
 		return;
 	}
 
 	await prisma.$transaction(async (tx) => {
 		const character = await tx.character.findFirst({
-			where: { userId: cleanUserId, server: cleanServer, code: cleanCode },
-			select: {
-				id: true,
-				name: true,
-				level: true,
-				syncing: true,
-			},
+			where: { userId: cleanUserId, server: cleanServer, class: className },
+			select: { id: true, name: true, level: true, syncing: true },
 		});
 
 		if (!character || !character.syncing) {
@@ -132,18 +111,13 @@ export const syncCharacterInfo = async ({
 		const externalData = await fetchCharacterDataFromAPI(character.name, server);
 
 		if (externalData.level > character.level) {
-			await tx.character.update({
-				where: { id: character.id },
-				data: { level: externalData.level },
-			});
+			await tx.character.update({ where: { id: character.id }, data: { level: externalData.level } });
 
 			if (externalData.level > 205) {
 				const symbol = await getArcaneSymbol(tx, character.id, 'Vanishing Journey');
 
 				await tx.characterContent.update({
-					where: {
-						symbolId_contentType: { symbolId: symbol.id, contentType: 'Reverse City' },
-					},
+					where: { symbolId_contentType: { symbolId: symbol.id, contentType: 'Reverse City' } },
 					data: { checked: true },
 				});
 			}
@@ -152,14 +126,10 @@ export const syncCharacterInfo = async ({
 				const symbol = await getArcaneSymbol(tx, character.id, 'Chu Chu Island');
 
 				await tx.characterContent.update({
-					where: {
-						symbolId_contentType: { symbolId: symbol.id, contentType: 'Yum Yum Island' },
-					},
+					where: { symbolId_contentType: { symbolId: symbol.id, contentType: 'Yum Yum Island' } },
 					data: { checked: true },
 				});
 			}
-
-			await updateCharacterLevelFromBossList(cleanUserId, server, code, externalData.level);
 		}
 
 		await resetDailyQuests(tx, character.id);

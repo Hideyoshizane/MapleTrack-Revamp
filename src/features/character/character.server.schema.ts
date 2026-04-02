@@ -13,3 +13,5 @@ export const characterApiSchema = z.object({
 	characterName: characterNameRawSchema,
 	server: serverSchema,
 });
+
+export type CharacterServerInput = z.infer<typeof characterServerSideSchema>;

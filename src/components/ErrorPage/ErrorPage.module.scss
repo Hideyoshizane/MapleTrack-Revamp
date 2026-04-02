@@ -1,0 +1,30 @@
+$iconSize: 240px;
+
+.mainBody {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	flex-grow: 1;
+
+	.title {
+		font-size: 40px;
+		font-weight: 500;
+		color: var(--default-button-text);
+		margin-bottom: 60px;
+	}
+
+	.icon {
+		width: $iconSize;
+		height: $iconSize;
+		color: var(--icon-danger-color);
+	}
+
+	.infoText {
+		font-size: 24px;
+		font-weight: 400;
+		color: var(--default-button-text);
+		margin-bottom: 40px;
+		margin-top: 64px;
+	}
+}

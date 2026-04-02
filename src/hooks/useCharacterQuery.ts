@@ -10,14 +10,14 @@ import type { UseQueryResult } from '@tanstack/react-query';
 
 type Params = {
 	server: string;
-	code: string;
+	className: string;
 };
 
-export const useCharacterQuery = ({ server, code }: Params): UseQueryResult<Character, Error> => {
+export const useCharacterQuery = ({ server, className }: Params): UseQueryResult<Character, Error> => {
 	return useQuery<Character>({
-		queryKey: characterQueryKeys.detail(server, code),
+		queryKey: characterQueryKeys.detail(server, className),
 		queryFn: async (): Promise<Character> => {
-			const res = await characterApi.getCharacterData({ server, code });
+			const res = await characterApi.getCharacterData({ server, className });
 
 			if (!res.success || !res.data) {
 				throw new Error(res.message ?? 'Failed to fetch character');

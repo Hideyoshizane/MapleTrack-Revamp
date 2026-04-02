@@ -1,86 +1,118 @@
 $dropdownHeight: 80px;
 $dropdownRadius: 15px;
-$iconSize: 48px;
+$iconSize: 40px;
+$chevronIconSize: 48px;
 $spacingSmall: 4px;
 $spacingMedium: 8px;
 
-.characterDropdownWrapper {
-	position: absolute;
-	z-index: 100;
+.outerWrap {
+	position: relative;
 	width: 480px;
-	max-height: $dropdownHeight;
-	overflow: hidden;
-	border-radius: 15px;
-	background-color: var(--default-color-button);
-	transition: max-height 0.3s ease;
-
-	&.open {
-		position: absolute;
-		max-height: 394px;
-	}
-}
-
-.selectedCharacterWrapper {
-	display: flex;
-	align-items: center;
-	width: 100%;
 	height: $dropdownHeight;
-	cursor: pointer;
 
-	.classIcon {
-		position: absolute;
-		opacity: 0.25;
-	}
-
-	.nameDiv {
+	.characterDropdownWrapper {
+		position: relative;
+		z-index: 1;
 		display: flex;
 		flex-direction: column;
-		margin-left: 112px;
+		width: 100%;
+		max-height: $dropdownHeight;
+		overflow: hidden;
+		border-radius: $dropdownRadius;
+		background-color: var(--default-color-button);
+		transition: max-height 0.3s ease;
+		cursor: pointer;
 
-		.characterName {
-			font-size: 28px;
-			font-weight: 500;
-			color: var(--default-button-text);
+		&.stayOnTop {
+			z-index: 2;
 		}
 
-		.characterClass {
-			font-size: 24px;
-			color: var(--default-button-text);
+		&.open {
+			max-height: 408px;
 		}
-	}
 
-	.iconsDiv {
-		right: 0;
-		display: flex;
-		gap: 16px;
-		margin-left: auto;
-		margin-right: 16px;
+		&.cleared {
+			background-color: var(--bar-default);
+		}
 
-		.chevronIcon {
-			right: 0;
+		&.disabled {
+			background-color: var(--disabled);
+			cursor: not-allowed;
+		}
+
+		.selectedCharacterWrapper {
+			position: relative;
 			display: flex;
-			width: $iconSize;
-			height: $iconSize;
-			color: var(--default-button-text);
+			align-items: center;
+			width: 100%;
+			height: $dropdownHeight;
 
-			&.rotated {
-				transition: transform 0.3s ease;
-				transform: rotate(0deg);
+			flex-shrink: 0;
+
+			.classIcon {
+				position: absolute;
+				opacity: 0.25;
 			}
 
-			&.rotatedActive {
-				transform: rotate(180deg);
+			.nameDiv {
+				display: flex;
+				flex-direction: column;
+				margin-left: 112px;
+
+				.characterName {
+					font-size: 28px;
+					font-weight: 500;
+					color: var(--default-button-text);
+				}
+
+				.characterClass {
+					font-size: 24px;
+					color: var(--default-button-text);
+				}
+			}
+
+			.iconsDiv {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				margin-left: auto;
+				margin-right: 16px;
+
+				.bossNumber {
+					font-size: 26px;
+					font-weight: 500;
+					color: var(--default-button-text);
+				}
+
+				.iconClear {
+					width: $iconSize;
+					height: $iconSize;
+					color: var(--default-button-text);
+				}
+
+				.icon {
+					width: $chevronIconSize;
+					height: $chevronIconSize;
+					color: var(--default-button-text);
+					transition: transform 0.3s ease;
+
+					&.rotatedActive {
+						transform: rotate(180deg);
+					}
+				}
 			}
 		}
+
+		.hr {
+			border: none;
+			border-bottom: 2px solid #707070;
+			flex-shrink: 0;
+		}
+
+		.characterList {
+			flex: 1 1 auto;
+			min-height: 0;
+			overflow-y: auto;
+		}
 	}
-}
-
-.hr {
-	border: none;
-	border-bottom: 2px solid #707070;
-}
-
-.characterList {
-	display: flex;
-	flex-direction: column;
 }

@@ -55,7 +55,7 @@ export const useSignup = (): UseSignupReturn => {
 			};
 
 			const hasErrors = (Object.entries(validations) as [keyof SignupFormData, ValidationResult][]).some(
-				([field, result]): boolean => handleFieldValidation(field, result, setError)
+				([field, result]): boolean => handleFieldValidation(field, result, setError),
 			);
 
 			if (hasErrors) {
@@ -80,7 +80,6 @@ export const useSignup = (): UseSignupReturn => {
 				const apiMessage = error.response.data?.message;
 
 				toast.error(apiMessage ?? 'Signup failed');
-
 				return;
 			}
 
@@ -94,13 +93,5 @@ export const useSignup = (): UseSignupReturn => {
 		}
 	};
 
-	return {
-		control,
-		handleSubmit,
-		isSubmitting,
-		isSubmitted,
-		isValid,
-		getValues,
-		onSubmit,
-	};
+	return { control, handleSubmit, isSubmitting, isSubmitted, isValid, getValues, onSubmit };
 };

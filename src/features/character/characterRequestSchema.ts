@@ -1,25 +1,22 @@
 import { z } from 'zod';
 
-import { JobClasses } from '@data/classes/classes';
-import { servers } from '@data/servers/servers';
+import { JOB_CLASSES } from '@data/classes/classes';
+import { SERVER_NAMES } from '@data/servers/servers';
 
 // Server validation
-const serverNames = servers.map((s): string => s.name);
-export const serverSchema = z.enum(serverNames, {
+export const serverSchema = z.enum(SERVER_NAMES, {
 	message: 'Invalid server selected',
 });
 
 // Character job validation
-const jobClassCodes = JobClasses.map((c): string => c.code);
-const jobClassSchema = z.enum(jobClassCodes, {
+export const jobClassSchema = z.enum(JOB_CLASSES, {
 	message: 'Invalid job class selected',
 });
-
 export const getAllCharactersRequestSchema = z.object({
 	server: serverSchema,
 });
 
 export const getCharacterDataRequestSchema = z.object({
 	server: serverSchema,
-	code: jobClassSchema,
+	className: jobClassSchema,
 });

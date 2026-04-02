@@ -1,6 +1,10 @@
 import serversJson from './servers.json';
 
-import type { Server } from '@sharedTypes/server';
+export type Server = {
+	name: string;
+	img: string;
+	Reboot: boolean;
+};
 
 export const servers: Server[] = serversJson as Server[];
 
@@ -10,23 +14,24 @@ export type ServerName = (typeof SERVER_NAMES)[number];
 
 export const DEFAULT_SERVER_NAME: ServerName = 'Scania';
 
-if (!servers.some((s): boolean => s.name === DEFAULT_SERVER_NAME)) {
-	throw new Error(`Default server "${DEFAULT_SERVER_NAME}" does not exist`);
-}
+const serversMap: ReadonlyMap<string, Server> = new Map(
+	servers.map((server): [string, Server] => [server.name.toLowerCase(), server]),
+);
 
 export const getServerByName = (name: string | undefined): Server | undefined => {
 	if (!name) {
 		return undefined;
 	}
+	return serversMap.get(name.toLowerCase());
+};
 
-	return servers.find((server): boolean => server.name.toLowerCase() === name.toLowerCase());
+export const getServerImageByName = (serverName: string): string | null => {
+	const server: Server | undefined = serversMap.get(serverName.toLowerCase());
+	return server?.img ?? null;
 };
 
 export const isRebootServer = (serverName: string): boolean => {
-	const server = servers.find((s): boolean => s.name.toLowerCase() === serverName.toLowerCase());
-
-	// If server exists, return its Reboot status, otherwise return false
-	return server?.Reboot ?? false;
+	return serversMap.get(serverName.toLowerCase())?.Reboot ?? false;
 };
 
 export const getRegion = (server: Server): 'eu' | 'na' =>

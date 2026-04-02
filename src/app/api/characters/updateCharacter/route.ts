@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { getToken } from 'next-auth/jwt';
 
+import { parseSymbolCategory } from '@/data/symbols/symbolMappings';
 import { characterToBossList } from '@features/Boss/bossListService';
 import { getUpdateCharacterDataRequestSchema } from '@features/character/characterUpdateSchema';
 import { prisma } from '@lib/prisma';
@@ -30,20 +31,21 @@ export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
 		// Validate request body using Zod
 		const parseResult = getUpdateCharacterDataRequestSchema.safeParse(body);
 		if (!parseResult.success) {
+			console.log(parseResult.error);
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
-		const { server, code, data } = parseResult.data;
+		const { server, className, data } = parseResult.data;
 		const authenticatedUserId = token.id;
 		const now = dayjs().utc().toDate();
 
 		await prisma.$transaction(async (tx) => {
 			const character = await tx.character.upsert({
 				where: {
-					userId_server_code: {
+					userId_server_class: {
 						userId: authenticatedUserId,
 						server,
-						code,
+						class: className,
 					},
 				},
 				create: {
@@ -58,7 +60,6 @@ export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
 					syncing: data.syncing,
 					userId: authenticatedUserId,
 					server,
-					code,
 					lastUpdate: now,
 				},
 				update: {
@@ -76,6 +77,12 @@ export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
 			});
 
 			for (const symbol of data.symbols) {
+				const category = parseSymbolCategory(symbol.category);
+
+				if (!category) {
+					return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
+				}
+
 				const symbolRecord = await tx.characterSymbol.upsert({
 					where: {
 						characterId_name: {
@@ -87,13 +94,13 @@ export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
 						name: symbol.name,
 						level: symbol.level,
 						exp: symbol.exp,
-						category: symbol.category,
+						category: category,
 						characterId: character.id,
 					},
 					update: {
 						level: symbol.level,
 						exp: symbol.exp,
-						category: symbol.category,
+						category: category,
 					},
 				});
 
@@ -118,9 +125,9 @@ export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
 					});
 				}
 			}
-		});
 
-		await characterToBossList(authenticatedUserId, server, data.name, code, data.class, data.level, data.bossing);
+			await characterToBossList(authenticatedUserId, server, character.id, data.bossing);
+		});
 
 		return createResponse<ApiResponse>({ success: true, message: 'Character updated successfully.' }, 200);
 	} catch (error) {

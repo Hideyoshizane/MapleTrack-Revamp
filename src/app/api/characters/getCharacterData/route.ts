@@ -1,6 +1,6 @@
 import { getToken } from 'next-auth/jwt';
 
-import { JobClasses } from '@data/classes/classes';
+import { getClassByName } from '@data/classes/classes';
 import { getCharacterDataRequestSchema } from '@features/character/characterRequestSchema';
 import { generateCharacterObject } from '@features/character/characterService';
 import { syncCharacterInfo } from '@lib/characters';
@@ -31,20 +31,21 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		// Validate request body using Zod
 		const parseResult = getCharacterDataRequestSchema.safeParse(body);
 		if (!parseResult.success) {
+			console.log('hi');
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
-		const { server, code } = parseResult.data;
+		const { server, className } = parseResult.data;
 
-		await syncCharacterInfo({ authenticatedUserId, server, code });
+		await syncCharacterInfo({ authenticatedUserId, server, className });
 
 		// Search for the character
 		const character = await prisma.character.findUnique({
 			where: {
-				userId_server_code: {
+				userId_server_class: {
 					userId: authenticatedUserId,
 					server,
-					code,
+					class: className,
 				},
 			},
 			select: {
@@ -52,7 +53,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 				level: true,
 				targetLevel: true,
 				class: true,
-				code: true,
 				jobType: true,
 				legion: true,
 				linkSkill: true,
@@ -81,18 +81,16 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
 		//if not in database, return a generic object.
 		if (!character) {
-			const job = JobClasses.find((job): boolean => job.code === code);
-
-			if (!job) {
-				return createResponse<ApiResponse>({ success: false, message: `Job with code ${code} not found` }, 404);
+			const classData = getClassByName(className);
+			if (!classData) {
+				return createResponse<ApiResponse>({ success: false, message: `Class with name ${className} not found` }, 404);
 			}
 
 			const genericCharacter = generateCharacterObject({
-				jobClassName: job.className,
-				jobType: job.jobType,
-				legion: job.legionType,
-				code: job.code,
-				linkSkill: job.linkSkill,
+				jobClassName: classData.className,
+				jobType: classData.jobType,
+				legion: classData.legionType,
+				linkSkill: classData.linkSkill,
 				server: server,
 			});
 

@@ -14,24 +14,23 @@ $iconSize: 48px;
 		background-color: #b8b8b8;
 	}
 
-	.classIcon {
-		position: absolute;
-		opacity: 0.25;
+	.bossIcon {
+		margin-left: 24px;
 	}
 
 	.nameDiv {
 		display: flex;
 		flex-direction: column;
-		margin-left: 112px;
+		margin-left: 24px;
 
-		.characterName {
-			font-size: 28px;
+		.bossName {
 			font-weight: 500;
 			color: var(--default-button-text);
 		}
 
-		.characterClass {
+		.bossValue {
 			font-size: 24px;
+			font-weight: 400;
 			color: var(--default-button-text);
 		}
 	}
