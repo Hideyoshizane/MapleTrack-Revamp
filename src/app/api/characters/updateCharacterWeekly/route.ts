@@ -1,11 +1,13 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { getToken } from 'next-auth/jwt';
 
-import { getContentValue, calculateNewLevelFromExp, isSymbolName } from '@data/symbols/symbolMappings';
-import { updateCharacterWeeklySchema } from '@features/character/characterUpdateSchema';
+import { getContentValue, calculateNewLevelFromExp, toSymbolName } from '@data/symbols/symbolMappings';
+import { updateCharacterWeeklyRequestSchema } from '@features/character/schemas/character.request.schema';
+import { updateCharacterWeeklyResponseSchema } from '@features/character/schemas/character.response.schema';
 import { prisma } from '@lib/prisma';
+import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
+import { logError, logApiFailure, logZodError } from '@utils/logger';
 
 import type { LevelUpResult } from '@data/symbols/symbolMappings';
 import type { ApiResponse } from '@sharedTypes/api';
@@ -13,111 +15,79 @@ import type { NextResponse, NextRequest } from 'next/server';
 
 dayjs.extend(utc);
 
-export const POST = async (request: NextRequest): Promise<NextResponse> => {
+const route = 'api/characters/updateCharacterDaily';
+
+const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
 	try {
-		const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
-		if (!token || typeof token.id !== 'string') {
-			return createResponse<ApiResponse>({ success: false, message: 'Unauthorized' }, 401);
-		}
-
-		let body: unknown;
-		try {
-			body = await request.json();
-		} catch {
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
-		}
 		// Validate request body using Zod
-		const parseResult = updateCharacterWeeklySchema.safeParse(body);
+		const parseResult = updateCharacterWeeklyRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
+			logZodError(parseResult.error, { route: route });
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
+		const id = parseResult.data.id;
 
-		const { symbolName, server, code } = parseResult.data;
-		if (!isSymbolName(symbolName)) {
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid symbol name' }, 400);
-		}
-
-		const authenticatedUserId = token.id;
 		const now = dayjs().utc().toDate();
 
-		// Search for the character
-		const character = await prisma.character.findUnique({
-			where: {
-				userId_server_code: {
-					userId: authenticatedUserId,
-					server,
-					code,
-				},
-			},
-			include: {
-				symbols: {
-					include: {
-						content: true,
-					},
-				},
-			},
+		// Search for the symbol
+		const symbol = await prisma.characterSymbol.findUnique({
+			where: { id: id, character: { userId: authenticatedUserId } },
+			select: { id: true, name: true, level: true, exp: true, category: true, contents: true },
 		});
 
-		if (!character) {
+		if (!symbol) {
+			logApiFailure('Symbol not found', { route });
 			return createResponse<ApiResponse>({ success: true, message: 'Character not found.' }, 200);
 		}
 
-		// Find character Symbol
-		const symbol = character.symbols.find((s): boolean => s.name === symbolName);
-		if (!symbol) {
-			return createResponse<ApiResponse>({ success: false, message: 'Symbol not found on character' }, 404);
-		}
-
-		const weeklyContent = symbol.content.find((content): boolean => content.tries !== null);
+		const weeklyContent = symbol.contents.find((content): boolean => content.tries !== null);
 		if (!weeklyContent) {
-			return createResponse<ApiResponse>({ success: false, message: 'Weekly content not found for symbol' }, 404);
+			logApiFailure('Weekly not found', { route });
+			return createResponse<ApiResponse>({ success: false, message: 'Weekly content not found for symbol.' }, 404);
 		}
 		if (weeklyContent.cleared === true) {
+			logApiFailure('Weekly already cleared', { route });
 			return createResponse<ApiResponse>({ success: false, message: 'Weekly already cleared.' }, 409);
 		}
 
 		// Find Symbol weekly Value
-		const weeklyValue = getContentValue(symbolName, 'Weekly');
+		const weeklyValue = getContentValue(toSymbolName(symbol.name), 'Weekly');
 
 		// Update symbol exp and level
 		const updatedExp = symbol.exp + weeklyValue;
 		const newValues = calculateNewLevelFromExp(symbol.category, symbol.level, updatedExp);
+
 		const remainingTries = Math.max((weeklyContent.tries ?? 1) - 1, 0);
 		const isCleared = remainingTries === 0;
 
 		await prisma.$transaction([
 			prisma.characterSymbol.update({
 				where: { id: symbol.id },
-				data: {
-					level: newValues.currentLevel,
-					exp: newValues.currentExp,
-				},
+				data: { level: newValues.currentLevel, exp: newValues.currentExp },
 			}),
 			prisma.characterContent.update({
 				where: {
-					symbolId_contentType: {
-						symbolId: symbol.id,
-						contentType: weeklyContent.contentType,
-					},
+					symbolId_contentType: { symbolId: symbol.id, contentType: weeklyContent.contentType },
 				},
-				data: {
-					tries: remainingTries,
-					cleared: isCleared,
-					date: now,
-				},
+				data: { tries: remainingTries, cleared: isCleared, date: now },
 			}),
 		]);
 
+		const returnData = { id: id, currentExp: newValues.currentExp, currentLevel: newValues.currentLevel };
+		const validation = updateCharacterWeeklyResponseSchema.safeParse(returnData);
+		if (!validation.success) {
+			logZodError(validation.error, { route: route });
+			return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
+		}
+
 		return createResponse<ApiResponse<LevelUpResult>>(
-			{
-				success: true,
-				message: 'Character updated successfully.',
-				data: newValues,
-			},
+			{ success: true, message: 'Character updated successfully.', data: returnData },
 			200,
 		);
 	} catch (error) {
-		console.error('Search error:', error);
+		logError(error, { route: route });
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };
+
+export const POST = routeGuard(handler);

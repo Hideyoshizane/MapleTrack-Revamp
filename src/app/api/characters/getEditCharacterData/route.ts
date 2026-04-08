@@ -1,14 +1,14 @@
 import { getClassByName } from '@data/classes/classes';
-import { generateCharacterObjectCharacterPage, groupSymbolsByCategory } from '@features/character/characterService';
+import { generateCharacterObjectEditCharacterPage, groupSymbolsByCategory } from '@features/character/characterService';
 import { getCharacterDataRequestSchema } from '@features/character/schemas/character.request.schema';
-import { getCharacterDataResponseSchema } from '@features/character/schemas/character.response.schema';
+import { getEditCharacterDataResponseSchema } from '@features/character/schemas/character.response.schema';
 import { syncCharacterInfo } from '@lib/characters';
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
 import { logError, logZodError, logApiFailure } from '@utils/logger';
 
-import type { getCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
+import type { getEditCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
@@ -53,7 +53,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			},
 		});
 
-		let responseData: getCharacterDataResponseBody;
+		let responseData: getEditCharacterDataResponseBody;
 
 		//if not in database, return a generic object.
 		if (!character) {
@@ -63,7 +63,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				return createResponse<ApiResponse>({ success: false, message: `Class with name ${className} not found` }, 404);
 			}
 
-			responseData = generateCharacterObjectCharacterPage({
+			responseData = generateCharacterObjectEditCharacterPage({
 				jobClassName: classData.className,
 				jobType: classData.jobType,
 				legion: classData.legionType,
@@ -72,13 +72,25 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		} else {
 			const normalizedSymbols = character.symbols.map((symbol) => ({
 				...symbol,
-				contents: symbol.contents.map((content) => ({ ...content, tries: content.tries ?? undefined })),
+				contents: symbol.contents.map((content) => ({
+					contentType: content.contentType,
+					checked: content.checked,
+					cleared: content.cleared,
+					tries: content.tries ?? undefined,
+				})),
 			}));
 			const symbols = groupSymbolsByCategory(normalizedSymbols);
-			responseData = getCharacterDataResponseSchema.parse({ ...character, symbols: symbols });
+
+			responseData = { ...character, symbols: symbols };
+
+			const validation = getEditCharacterDataResponseSchema.safeParse(responseData);
+			if (!validation.success) {
+				logZodError(validation.error, { route: route });
+				return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
+			}
 		}
 
-		return createResponse<ApiResponse<getCharacterDataResponseBody>>(
+		return createResponse<ApiResponse<getEditCharacterDataResponseBody>>(
 			{ success: true, message: 'Request processed.', data: responseData },
 			200,
 		);

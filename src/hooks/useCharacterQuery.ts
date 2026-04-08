@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { characterQueryKeys } from '@features/character/character.queryKeys';
 import { characterApi } from '@features/character/characterApi';
 
-import type { CharacterDraft as Character } from '@features/character/characterModel';
+import type { getCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { UseQueryResult } from '@tanstack/react-query';
 
 type Params = {
@@ -13,10 +13,13 @@ type Params = {
 	className: string;
 };
 
-export const useCharacterQuery = ({ server, className }: Params): UseQueryResult<Character, Error> => {
-	return useQuery<Character>({
+export const useCharacterQuery = ({
+	server,
+	className,
+}: Params): UseQueryResult<getCharacterDataResponseBody, Error> => {
+	return useQuery<getCharacterDataResponseBody>({
 		queryKey: characterQueryKeys.detail(server, className),
-		queryFn: async (): Promise<Character> => {
+		queryFn: async (): Promise<getCharacterDataResponseBody> => {
 			const res = await characterApi.getCharacterData({ server, className });
 
 			if (!res.success || !res.data) {

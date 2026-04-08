@@ -1,9 +1,9 @@
 'use client';
 
+import { codeToClass } from '@features/character/characterAttributes';
 import Image from 'next/image';
 
 import CheckIcon from '@assets/svg/check.svg';
-import { codeToClass } from '@features/character/characterAttributes';
 
 import styles from './CharacterBossItem.module.scss';
 

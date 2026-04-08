@@ -8,9 +8,7 @@
 
 		"selector-class-pattern": [
 			"^[a-z][a-zA-Z0-9]+$",
-			{
-				"message": "Class names should be written in camelCase (for CSS Modules)."
-			}
+			{ "message": "Class names should be written in camelCase (for CSS Modules)." }
 		],
 
 		"order/properties-order": [
@@ -61,9 +59,7 @@
 				"cursor",
 				"user-select"
 			],
-			{
-				"unspecified": "bottomAlphabetical"
-			}
+			{ "unspecified": "bottomAlphabetical" }
 		],
 		"at-rule-no-unknown": null,
 		"scss/at-rule-no-unknown": true,

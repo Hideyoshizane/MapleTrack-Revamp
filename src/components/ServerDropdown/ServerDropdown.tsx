@@ -11,8 +11,7 @@ import { servers } from '@data/servers/servers';
 import styles from './ServerDropdown.module.scss';
 import ServerItem from './ServerItem/ServerItem';
 
-import type { ServerName } from '@data/servers/servers';
-import type { Server } from '@sharedTypes/server';
+import type { Server, ServerName } from '@data/servers/servers';
 import type { JSX } from 'react';
 
 type ServerDropdownProps = {
@@ -88,7 +87,7 @@ const ServerDropdown = ({ server, setServerCookie }: ServerDropdownProps): JSX.E
 							isSelected={server.name === selectedServer.name}
 							onSelect={handleSelectServer}
 						/>
-					)
+					),
 				)}
 			</div>
 		</div>

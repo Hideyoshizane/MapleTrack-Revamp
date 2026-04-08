@@ -1,20 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-import { isPublicPath } from '@/lib/config/access';
-
-import { LASTVERSION } from './data/user/constants';
+import { generateCsrfToken } from '@/lib/security/security';
+import { isPublicPath } from '@lib/config/access';
+import { enforceVersion } from '@lib/config/tokenChange';
 
 import type { NextRequest } from 'next/server';
-
-const clearAuthCookies = (res: NextResponse): void => {
-	// Main session token
-	res.cookies.delete('authjs.session-token');
-
-	// OAuth helpers
-	res.cookies.delete('authjs.callback-url');
-	res.cookies.delete('authjs.csrf-token');
-};
 
 export const proxy = async (req: NextRequest): Promise<NextResponse> => {
 	const { pathname } = req.nextUrl;
@@ -25,41 +16,39 @@ export const proxy = async (req: NextRequest): Promise<NextResponse> => {
 	}
 
 	const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-
 	const isAuthenticated = Boolean(token);
 
-	// VERSION CHECK: redirect if token version mismatch
-	if (isAuthenticated) {
-		const tokenVersion = Number(token?.version ?? 0);
-
-		if (tokenVersion !== LASTVERSION) {
-			const url = new URL('/login', req.url);
-			url.search = 'version_update=1';
-
-			const res = NextResponse.redirect(url);
-			clearAuthCookies(res);
-
-			return res;
-		}
+	// Redirect if token version mismatch
+	const versionCheck = await enforceVersion(req);
+	if (versionCheck) {
+		return versionCheck;
 	}
 
 	const segments = pathname.split('/').filter(Boolean);
 	const topLevelPath = '/' + (segments[0] ?? '');
 
-	// Redirect authenticated users to /home
+	let response: NextResponse;
+
 	if (isAuthenticated && isPublicPath(topLevelPath)) {
-		return NextResponse.redirect(new URL('/home?logged=1', req.url));
+		// Redirect authenticated users to /home
+		response = NextResponse.redirect(new URL('/home?logged=1', req.url));
+	} else if (!isAuthenticated && !isPublicPath(topLevelPath)) {
+		// Redirect unauthenticated users
+		response = NextResponse.redirect(new URL('/login?unauthorized=1', req.url));
+	} else {
+		response = NextResponse.next();
 	}
 
-	// Redirect unauthenticated users
-	if (!isAuthenticated && !isPublicPath(topLevelPath)) {
-		return NextResponse.redirect(new URL('/login?unauthorized=1', req.url));
-	}
+	const newToken = generateCsrfToken();
+	response.cookies.set('csrf-token', newToken, {
+		path: '/',
+		httpOnly: false,
+		sameSite: 'lax',
+		secure: process.env.NODE_ENV === 'production',
+	});
 
-	return NextResponse.next();
+	return response;
 };
 
 // Only match real pages, excluding static assets, APIs, and files with extensions
-export const config = {
-	matcher: ['/((?!_next/static|_next/image|favicon.ico|api).*)'],
-};
+export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico|api).*)'] };

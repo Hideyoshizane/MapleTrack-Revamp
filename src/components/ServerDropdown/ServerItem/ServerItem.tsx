@@ -6,7 +6,7 @@ import CheckIcon from '@assets/svg/check.svg';
 
 import styles from './ServerItem.module.scss';
 
-import type { Server } from '@sharedTypes/server';
+import type { Server } from '@data/servers/servers';
 import type { JSX, KeyboardEvent } from 'react';
 
 type ServerItemProps = {

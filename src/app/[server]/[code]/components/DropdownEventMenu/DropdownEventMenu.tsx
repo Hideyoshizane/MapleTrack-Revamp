@@ -55,7 +55,7 @@ const DropdownEventMenu = (): JSX.Element => {
 									<div className={styles.leftColumn}>{renderBonusItem(value, arcaneBonus, setArcaneBonus)}</div>
 									<div>{renderBonusItem(value, sacredBonus, setSacredBonus)}</div>
 								</React.Fragment>
-							)
+							),
 						)}
 					</div>
 					<DropdownMenu.Arrow className={styles.arrow} width={15} height={10} />

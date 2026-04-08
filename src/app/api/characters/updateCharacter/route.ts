@@ -1,53 +1,51 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { getToken } from 'next-auth/jwt';
 
-import { parseSymbolCategory } from '@/data/symbols/symbolMappings';
+import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
+import { calculateNewLevelFromExp } from '@data/symbols/symbolMappings';
 import { characterToBossList } from '@features/Boss/bossListService';
-import { getUpdateCharacterDataRequestSchema } from '@features/character/characterUpdateSchema';
+import { updateCharacterRequestSchema } from '@features/character/schemas/character.request.schema';
 import { prisma } from '@lib/prisma';
+import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
+import { logZodError } from '@utils/logger';
 
+import type { SymbolCategory } from '@prisma/client';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
+type SymbolCategoryKey = 'arcane' | 'sacred' | 'grand';
+
+const symbolCategoryKeys: SymbolCategoryKey[] = ['arcane', 'sacred', 'grand'];
+
 dayjs.extend(utc);
 
-export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
+const route = 'api/characters/updateCharacter';
+
+const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
 	try {
-		// Extract token from the request cookies
-		const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
-		if (!token || typeof token.id !== 'string') {
-			return createResponse<ApiResponse>({ success: false, message: 'Unauthorized' }, 401);
-		}
-
-		let body: unknown;
-		try {
-			body = await request.json();
-		} catch {
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
-		}
-
 		// Validate request body using Zod
-		const parseResult = getUpdateCharacterDataRequestSchema.safeParse(body);
+		const parseResult = updateCharacterRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
-			console.log(parseResult.error);
+			logZodError(parseResult.error, { route: route });
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
-		const { server, className, data } = parseResult.data;
-		const authenticatedUserId = token.id;
+		const { server, class: className, id } = parseResult.data;
+		const data = parseResult.data;
 		const now = dayjs().utc().toDate();
+
+		const isValidObjectId = (value: string): boolean => {
+			return value.length === 24;
+		};
+
+		const whereClause = isValidObjectId(id)
+			? { id: id }
+			: { userId_server_class: { userId: authenticatedUserId, server, class: className } };
 
 		await prisma.$transaction(async (tx) => {
 			const character = await tx.character.upsert({
-				where: {
-					userId_server_class: {
-						userId: authenticatedUserId,
-						server,
-						class: className,
-					},
-				},
+				where: whereClause,
 				create: {
 					name: data.name,
 					level: data.level,
@@ -76,53 +74,47 @@ export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
 				},
 			});
 
-			for (const symbol of data.symbols) {
-				const category = parseSymbolCategory(symbol.category);
+			for (const categoryKey of symbolCategoryKeys) {
+				const symbolsInCategory = data.symbols[categoryKey];
 
-				if (!category) {
-					return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
-				}
+				for (const symbol of symbolsInCategory) {
+					const isInitialState = symbol.level === 1 && symbol.exp === 0;
+					const matchingSymbol = data.symbols[categoryKey].find((s) => s.name === symbol.name);
+					if (!matchingSymbol) {
+						continue;
+					}
+					const newValues = calculateNewLevelFromExp(
+						symbol.category as SymbolCategory,
+						matchingSymbol.level,
+						matchingSymbol.exp,
+					);
 
-				const symbolRecord = await tx.characterSymbol.upsert({
-					where: {
-						characterId_name: {
-							characterId: character.id,
-							name: symbol.name,
-						},
-					},
-					create: {
-						name: symbol.name,
-						level: symbol.level,
-						exp: symbol.exp,
-						category: category,
-						characterId: character.id,
-					},
-					update: {
-						level: symbol.level,
-						exp: symbol.exp,
-						category: category,
-					},
-				});
-
-				for (const content of symbol.content) {
-					await tx.characterContent.upsert({
-						where: {
-							symbolId_contentType: {
-								symbolId: symbolRecord.id,
-								contentType: content.contentType,
-							},
-						},
+					const symbolRecord = await tx.characterSymbol.upsert({
+						where: { characterId_name: { characterId: character.id, name: symbol.name } },
 						create: {
-							contentType: content.contentType,
-							checked: content.checked,
-							tries: content.tries ?? null,
-							symbolId: symbolRecord.id,
+							name: symbol.name,
+							level: newValues.currentLevel,
+							exp: isInitialState ? 1 : newValues.currentLevel,
+							category: categoryKey,
+							characterId: character.id,
 						},
-						update: {
-							checked: content.checked,
-							tries: content.tries ?? null,
-						},
+						update: { level: newValues.currentLevel, exp: newValues.currentLevel, category: categoryKey },
 					});
+
+					const triesAttributeExclude: ReadonlySet<string> = new Set(['Daily Quest', 'Reverse City', 'Yum Yum Island']);
+
+					for (const content of symbol.contents) {
+						await tx.characterContent.upsert({
+							where: { symbolId_contentType: { symbolId: symbolRecord.id, contentType: content.contentType } },
+							create: {
+								contentType: content.contentType,
+								checked: content.checked,
+								...(!triesAttributeExclude.has(content.contentType) && { tries: DEFAULT_WEEKLY_TRIES }),
+								symbolId: symbolRecord.id,
+							},
+							update: { checked: content.checked },
+						});
+					}
 				}
 			}
 
@@ -135,3 +127,5 @@ export const PATCH = async (request: NextRequest): Promise<NextResponse> => {
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };
+
+export const PATCH = routeGuard(handler);

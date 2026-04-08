@@ -1,12 +1,13 @@
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 import { prisma } from '@lib/prisma';
 import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
-import { type ServerOption } from '@utils/serverCookie';
 import { hasWeeklyResetOccurred, hasDailyResetOccurred } from '@utils/time';
 
 import { fetchCharacterDataFromAPI } from './fetchCharacterDataFromAPI';
 
+import type { CharacterDataFromAPI } from '@features/character/characterApi';
 import type { Prisma } from '@prisma/client';
+import type { ServerOption } from '@utils/serverCookie';
 
 const sanitizeString = (input: unknown): string | null => {
 	if (typeof input !== 'string') {
@@ -98,37 +99,36 @@ export const syncCharacterInfo = async ({
 		return;
 	}
 
+	const character = await prisma.character.findFirst({
+		where: { userId: cleanUserId, server: cleanServer, class: cleanCode },
+		select: { id: true, name: true, level: true, syncing: true },
+	});
+	if (!character) {
+		return;
+	}
+
+	let externalData: CharacterDataFromAPI;
+	if (character.syncing) {
+		externalData = await fetchCharacterDataFromAPI(character.name, cleanServer);
+	}
+
 	await prisma.$transaction(async (tx) => {
-		const character = await tx.character.findFirst({
-			where: { userId: cleanUserId, server: cleanServer, class: className },
-			select: { id: true, name: true, level: true, syncing: true },
-		});
-
-		if (!character || !character.syncing) {
-			return;
-		}
-
-		const externalData = await fetchCharacterDataFromAPI(character.name, server);
-
-		if (externalData.level > character.level) {
+		if (externalData && externalData.level > character.level) {
 			await tx.character.update({ where: { id: character.id }, data: { level: externalData.level } });
 
+			const unlockSymbolContent = async (symbolName: string, contentType: string): Promise<void> => {
+				const symbol = await getArcaneSymbol(tx, character.id, symbolName);
+				await tx.characterContent.update({
+					where: { symbolId_contentType: { symbolId: symbol.id, contentType } },
+					data: { checked: true },
+				});
+			};
+
 			if (externalData.level > 205) {
-				const symbol = await getArcaneSymbol(tx, character.id, 'Vanishing Journey');
-
-				await tx.characterContent.update({
-					where: { symbolId_contentType: { symbolId: symbol.id, contentType: 'Reverse City' } },
-					data: { checked: true },
-				});
+				await unlockSymbolContent('Vanishing Journey', 'Reverse City');
 			}
-
 			if (externalData.level > 215) {
-				const symbol = await getArcaneSymbol(tx, character.id, 'Chu Chu Island');
-
-				await tx.characterContent.update({
-					where: { symbolId_contentType: { symbolId: symbol.id, contentType: 'Yum Yum Island' } },
-					data: { checked: true },
-				});
+				await unlockSymbolContent('Chu Chu Island', 'Yum Yum Island');
 			}
 		}
 

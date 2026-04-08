@@ -1,6 +1,5 @@
-import { getToken } from 'next-auth/jwt';
-
 import { prisma } from '@lib/prisma';
+import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
 import { logError, logApiFailure } from '@utils/logger';
 
@@ -9,17 +8,8 @@ import type { NextRequest, NextResponse } from 'next/server';
 
 const route = '/api/account/delete';
 
-export const DELETE = async (request: NextRequest): Promise<NextResponse> => {
+const handler = async (_request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
 	try {
-		// Extract token from the request cookies
-		const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
-		if (!token || typeof token.id !== 'string') {
-			logApiFailure('Unauthorized error', { route: route });
-			return createResponse<ApiResponse>({ success: false, message: 'Unauthorized' }, 401);
-		}
-
-		const authenticatedUserId = token.id;
-
 		// Find user by id
 		const existingUser = await prisma.user.findUnique({ where: { id: authenticatedUserId }, select: { id: true } });
 		if (!existingUser) {
@@ -38,3 +28,5 @@ export const DELETE = async (request: NextRequest): Promise<NextResponse> => {
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };
+
+export const DELETE = routeGuard(handler);

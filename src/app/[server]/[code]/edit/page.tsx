@@ -10,11 +10,11 @@ import CharacterPage from './CharacterPage';
 import type { JSX } from 'react';
 
 type CharactersPageProps = {
-	params: Promise<{ userOrigin: string; server: string; code: string }>;
+	params: Promise<{ server: string; code: string }>;
 };
 
 const CharactersPage = async ({ params }: CharactersPageProps): Promise<JSX.Element> => {
-	const { userOrigin, server, code } = await params;
+	const { server, code } = await params;
 
 	// Redirect to login if not autenthicated
 	const session = await auth();
@@ -25,7 +25,7 @@ const CharactersPage = async ({ params }: CharactersPageProps): Promise<JSX.Elem
 	return (
 		<main className="container">
 			<Navbar username={session.user.username} />
-			<CharacterPage userOrigin={userOrigin} server={server} code={code} />
+			<CharacterPage server={server} code={code} />
 		</main>
 	);
 };

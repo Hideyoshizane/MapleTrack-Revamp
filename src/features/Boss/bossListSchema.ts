@@ -1,12 +1,13 @@
 import { z } from 'zod';
 
+import { serverSchema } from '@/features/character/schemas/character.request.schema';
 import { isValidBossDifficulty, bossDifficultySet } from '@data/bosses/bosses';
 import { CHARACTER_MAX_LEVEL } from '@data/character/constants';
 import { JOB_CLASSES } from '@data/classes/classes';
-import { characterServerSideSchema } from '@features/character/character.server.schema';
-import { serverSchema } from '@features/character/characterRequestSchema';
 import { normalizeDayjsDate } from '@utils/dateFromDayjs';
 import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
+
+import { characterServerSideSchema } from '@/features/character/schemas/server/character.server.schema';
 
 export const bossNames = Object.keys(bossDifficultySet) as readonly string[];
 export const BossSchema = z

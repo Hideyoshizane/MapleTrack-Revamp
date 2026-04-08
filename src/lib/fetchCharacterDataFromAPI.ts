@@ -1,19 +1,18 @@
 import { isRebootServer, getRegion, getServerByName } from '@data/servers/servers';
 import axiosInstance from '@lib/axios/axios';
 
-import type { CharacterDataFromAPI } from '@features/character/characterApi';
+import type { getCharacterDataFromAPIResponseBody } from '@features/character/schemas/character.response.schema';
 import type { AxiosError } from 'axios';
 
 type NexonRankingResponse = {
-	ranks: CharacterDataFromAPI[];
+	ranks: getCharacterDataFromAPIResponseBody[];
 };
 
 export const fetchCharacterDataFromAPI = async (
 	characterName: string,
 	server: string,
-): Promise<CharacterDataFromAPI> => {
+): Promise<getCharacterDataFromAPIResponseBody> => {
 	const serverObj = getServerByName(server);
-
 	if (!serverObj) {
 		throw new Error('Server not found');
 	}
@@ -34,9 +33,7 @@ export const fetchCharacterDataFromAPI = async (
 					character_name: characterName,
 				},
 
-				headers: {
-					'Cache-Control': 'no-store',
-				},
+				headers: { 'Cache-Control': 'no-store' },
 			},
 		);
 

@@ -6,11 +6,11 @@ import { CHARACTER_MAX_LEVEL } from '@data/character/constants';
 import styles from './CharacterStats.module.scss';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { CharacterDraft as Character } from '@features/character/characterModel';
+import type { getEditCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
 type CharacterStatsProps = {
-	character?: Character;
+	character?: getEditCharacterDataResponseBody;
 	levelInput: string;
 	setLevelInput: (value: string) => void;
 	targetLevelInput: string;

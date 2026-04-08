@@ -9,15 +9,13 @@ import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
 
 import styles from './CharacterHeader.module.scss';
 
-import type { UpdateCharacterPayload } from '@features/character/characterApi';
-import type { CharacterDraft as Character } from '@features/character/characterModel';
+import type { updateCharacterRequestBody } from '@features/character/schemas/character.request.schema';
+import type { getEditCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
 type Props = {
-	character?: Character;
-	userOrigin: string;
+	character?: getEditCharacterDataResponseBody;
 	server: string;
-	className: string;
 	nameError: string | null;
 	submitLoading: boolean;
 	setSubmitLoading: (value: boolean) => void;
@@ -25,9 +23,7 @@ type Props = {
 };
 export const CharacterHeader = ({
 	character,
-	userOrigin,
 	server,
-	className,
 	nameError,
 	submitLoading,
 	setSubmitLoading,
@@ -43,12 +39,7 @@ export const CharacterHeader = ({
 
 		try {
 			setSubmitLoading(true);
-			const payload: UpdateCharacterPayload = {
-				userOrigin: sanitizeInputFrontend(userOrigin),
-				server: sanitizeInputFrontend(server),
-				className: sanitizeInputFrontend(className),
-				data: character,
-			};
+			const payload: updateCharacterRequestBody = { ...character, server: sanitizeInputFrontend(server) };
 			const result = await characterApi.updateCharacterData(payload);
 
 			if (result.success) {

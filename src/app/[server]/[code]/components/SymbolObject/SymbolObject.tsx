@@ -20,13 +20,14 @@ import SymbolButtons from '../SymbolButton/SymbolButtons';
 import styles from './SymbolObject.module.scss';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { SymbolCategory, SymbolName } from '@data/symbols/symbolMappings';
-import type { CharacterSymbol } from '@features/character/characterModel';
+import type { SymbolName } from '@data/symbols/symbolMappings';
+import type { getCharacterDataSymbolsResponseBody } from '@features/character/schemas/character.response.schema';
+import type { SymbolCategory, CharacterContent } from '@prisma/client';
 import type { JSX } from 'react';
 
 export type SymbolObjectProps = {
 	type: SymbolCategory;
-	symbol: CharacterSymbol;
+	symbol: getCharacterDataSymbolsResponseBody;
 	characterLevel: number;
 	characterJobType: string;
 	size?: number;
@@ -48,37 +49,58 @@ const SymbolObject = ({
 	size = SYMBOL_SIZE_DEFAULT,
 	disableAllDaily,
 }: SymbolObjectProps): JSX.Element => {
-	const { name, level, exp, content } = symbol;
+	const { level, exp, contents } = symbol;
+	const name = symbol.name as SymbolName;
 
 	// Bonuses
 	const { arcaneBonus, sacredBonus } = useBonusContext();
 	const bonus = type === 'arcane' ? arcaneBonus : sacredBonus;
 
-	const { dailyValue: baseDaily, weeklyValue } = computeDailyWeeklyValues(symbol, content);
+	const { dailyValue: baseDaily, weeklyValue } = computeDailyWeeklyValues(
+		{ name: symbol.name, level: symbol.level, exp: symbol.exp, category: symbol.category as SymbolCategory },
+		contents as CharacterContent[],
+	);
 	const dailyValue = baseDaily + bonus;
 
 	const [optimisticExp, setOptimisticExp] = useState<number | null>(null);
 	const [optimisticLevel, setOptimisticLevel] = useState<number | null>(null);
 
+	const [optimisticDailyCleared, setOptimisticDailyCleared] = useState<boolean | null>(null);
+	const [optimisticWeeklyTries, setOptimisticWeeklyTries] = useState<number | null>(null);
+
 	const effectiveExp = optimisticExp ?? exp;
 	const effectiveLevel = optimisticLevel ?? level;
+
+	const effectiveDailyCleared = optimisticDailyCleared ?? symbol.contents[0]?.cleared;
+	const effectiveWeeklyTries = optimisticWeeklyTries ?? symbol.contents[1]?.tries;
 
 	const usable = canUseSymbol(characterLevel, name);
 	const maxLevel = getSymbolMaxLevel(type);
 	const isMaxed = effectiveLevel === maxLevel;
 
-	const src = getSymbolImagePath(name as SymbolName);
+	const src = getSymbolImagePath(name);
 	const maxExpForLevel = getExpForLevel(type, effectiveLevel);
 
 	const daysToLevel = calculateDaysToCompleteSymbol(dailyValue, weeklyValue, type, effectiveLevel, effectiveExp);
 
 	const jobType: JobType = isMaxed ? 'complete' : (characterJobType as JobType);
 
-	const handleSymbolChange = (data: { currentExp: number; currentLevel: number }): void => {
+	const handleSymbolChange = (data: {
+		currentExp: number;
+		currentLevel: number;
+		dailyCleared?: boolean;
+		weeklyTries?: number;
+	}): void => {
 		setOptimisticExp(data.currentExp);
 		setOptimisticLevel(data.currentLevel);
-	};
 
+		if (data.dailyCleared !== undefined) {
+			setOptimisticDailyCleared(data.dailyCleared);
+		}
+		if (data.weeklyTries !== undefined) {
+			setOptimisticWeeklyTries(data.weeklyTries);
+		}
+	};
 	return (
 		<div className={styles.symbolContainer}>
 			<div className={styles.imageContainer}>
@@ -121,9 +143,10 @@ const SymbolObject = ({
 								symbol={symbol}
 								dailyValue={dailyValue}
 								bonus={bonus}
-								content={content}
 								onValueChange={handleSymbolChange}
 								disableAllDaily={disableAllDaily}
+								optimisticDailyCleared={effectiveDailyCleared}
+								optimisticWeeklyTries={effectiveWeeklyTries}
 							/>
 						</div>
 					</>

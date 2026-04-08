@@ -30,8 +30,10 @@ $fontTiny: 32px;
 		font-weight: 500;
 		color: var(--default-button-text);
 
-		&:disabled {
+		&[aria-disabled='true'] {
+			border: 1px solid var(--disabled);
 			background-color: var(--disabled);
+			cursor: not-allowed;
 		}
 	}
 }

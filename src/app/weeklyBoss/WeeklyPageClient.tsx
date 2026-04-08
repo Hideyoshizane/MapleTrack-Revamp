@@ -86,7 +86,7 @@ const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): J
 
 	useEffect((): void => {
 		void loadBossList();
-		//eslint-disable-next-line
+		 
 	}, [server, username]);
 
 	const handleBossToggle = async (params: {

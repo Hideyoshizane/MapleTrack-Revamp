@@ -1,12 +1,12 @@
 'use client';
 
+import { codeToClass } from '@features/character/characterAttributes';
 import { clsx } from 'clsx';
 import Image from 'next/image';
 import { useRef, useEffect, useState, Fragment } from 'react';
 
 import ChevronIcon from '@assets/svg/chevron-down.svg';
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
-import { codeToClass } from '@features/character/characterAttributes';
 
 import CharacterBossItem from './BossItem/CharacterBossItem';
 import styles from './CharacterSelectBossDropdown.module.scss';

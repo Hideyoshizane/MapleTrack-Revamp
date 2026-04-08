@@ -1,111 +1,58 @@
-import axiosInstance from '@lib/axios/axios';
+import { requestApi } from '@/lib/axios/apiClient';
 
-import type { CharacterDraft as Character } from './characterModel';
+import type {
+	GetAllCharactersRequestBody,
+	getCharacterDataRequestBody,
+	updateCharacterRequestBody,
+	updateCharacterDailyRequestBody,
+	updateCharacterAllDailyRequestBody,
+	updateCharacterWeeklyRequestBody,
+	getCharacterDataFromAPIRequestBody,
+} from './schemas/character.request.schema';
+import type {
+	getAllCharactersResponseBody,
+	getCharacterDataResponseBody,
+	getEditCharacterDataResponseBody,
+	updateCharacterDailyResponseBody,
+	updateCharacterWeeklyResponseBody,
+	getCharacterDataFromAPIResponseBody,
+} from './schemas/character.response.schema';
 import type { LevelUpResult } from '@data/symbols/symbolMappings';
-import type { ApiRequest, ApiResponse } from '@sharedTypes/api';
-
-export type GetAllCharactersPayload = ApiRequest<{
-	server: string;
-}>;
-
-export type GetCharacterDataPayload = ApiRequest<{
-	server: string;
-	className: string;
-}>;
-
-export type UpdateCharacterPayload = ApiRequest<{
-	userOrigin: string;
-	server: string;
-	className: string;
-	data: Character;
-}>;
-
-export type CharacterDataFromAPI = {
-	level: number;
-	characterImgURL: string;
-};
-
-type UpdateCharacterResponseData = {
-	currentExp: number;
-	currentLevel: number;
-};
+import type { ApiResponse } from '@sharedTypes/api';
 
 export const characterApi = {
-	getAllCharacters: async (payload: GetAllCharactersPayload): Promise<ApiResponse<Character[]>> => {
-		const { data } = await axiosInstance.post<ApiResponse<Character[]>>('/characters/getAllCharacters', payload);
+	getAllCharacters: async (
+		payload: GetAllCharactersRequestBody,
+	): Promise<ApiResponse<getAllCharactersResponseBody[]>> =>
+		requestApi('/characters/getAllCharacters', 'POST', payload),
 
-		return data;
-	},
+	getCharacterData: async (payload: getCharacterDataRequestBody): Promise<ApiResponse<getCharacterDataResponseBody>> =>
+		requestApi('/characters/getCharacterData', 'POST', payload),
 
-	getCharacterData: async (payload: GetCharacterDataPayload): Promise<ApiResponse<Character>> => {
-		const { data } = await axiosInstance.post<ApiResponse<Character>>('/characters/getCharacterData', payload);
-
-		return data;
-	},
+	getEditCharacterData: async (
+		payload: getCharacterDataRequestBody,
+	): Promise<ApiResponse<getEditCharacterDataResponseBody>> =>
+		requestApi('/characters/getEditCharacterData', 'POST', payload),
 
 	getCharacterDataFromAPI: async (
-		characterName: string,
-		server: string,
-	): Promise<ApiResponse<CharacterDataFromAPI>> => {
-		const payload = { characterName, server };
+		payload: getCharacterDataFromAPIRequestBody,
+	): Promise<ApiResponse<getCharacterDataFromAPIResponseBody>> =>
+		requestApi('/characters/getCharacterDataFromAPI', 'POST', payload),
 
-		const { data } = await axiosInstance.post<ApiResponse<CharacterDataFromAPI>>(
-			'/characters/getCharacterDataFromAPI',
-			payload,
-		);
+	updateCharacterData: async (payload: updateCharacterRequestBody): Promise<ApiResponse> =>
+		requestApi('/characters/updateCharacter', 'PATCH', payload),
 
-		return data;
-	},
+	//to be fixed
+	updateAllDaily: async (payload: updateCharacterAllDailyRequestBody): Promise<Record<string, LevelUpResult>> =>
+		requestApi('/characters/updateAllDaily', 'POST', payload),
 
-	updateCharacterData: async (payload: UpdateCharacterPayload): Promise<ApiResponse> => {
-		const { data } = await axiosInstance.patch<ApiResponse>('/characters/updateCharacter', payload);
+	updateCharacterDaily: async (
+		payload: updateCharacterDailyRequestBody,
+	): Promise<ApiResponse<updateCharacterDailyResponseBody>> =>
+		requestApi('/characters/updateCharacterDaily', 'POST', payload),
 
-		return data;
-	},
-
-	updateAllDaily: async (payload: {
-		server: string;
-		code: string;
-		arcaneBonus: number;
-		sacredBonus: number;
-	}): Promise<Record<string, LevelUpResult>> => {
-		const { data } = await axiosInstance.post<{
-			success: boolean;
-			message: string;
-			data: Record<string, LevelUpResult>;
-		}>('/characters/updateAllDaily', payload);
-
-		if (!data.success) {
-			throw new Error(data.message ?? 'Failed to update all daily symbols');
-		}
-
-		return data.data;
-	},
-
-	updateCharacterDaily: async (payload: {
-		symbolName: string;
-		bonus: number;
-		server: string;
-		code: string;
-	}): Promise<ApiResponse<UpdateCharacterResponseData>> => {
-		const { data } = await axiosInstance.post<ApiResponse<UpdateCharacterResponseData>>(
-			'/characters/updateCharacterDaily',
-			payload,
-		);
-
-		return data;
-	},
-
-	updateCharacterWeekly: async (payload: {
-		symbolName: string;
-		server: string;
-		code: string;
-	}): Promise<ApiResponse<UpdateCharacterResponseData>> => {
-		const { data } = await axiosInstance.post<ApiResponse<UpdateCharacterResponseData>>(
-			'/characters/updateCharacterWeekly',
-			payload,
-		);
-
-		return data;
-	},
+	updateCharacterWeekly: async (
+		payload: updateCharacterWeeklyRequestBody,
+	): Promise<ApiResponse<updateCharacterWeeklyResponseBody>> =>
+		requestApi('/characters/updateCharacterWeekly', 'POST', payload),
 };

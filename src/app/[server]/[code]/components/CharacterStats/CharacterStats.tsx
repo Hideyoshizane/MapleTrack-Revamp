@@ -4,15 +4,16 @@ import BossIcon from '@assets/svg/boss_slayer.svg';
 import LegionBlock from '@components/LegionBlock/LegionBlock';
 import LinkSkillBlock from '@components/LinkSkillBlock/LinkSkillBlock';
 import ProgressBar from '@components/ProgressBar/ProgressBar';
+import { generateClassCode } from '@data/classes/classes';
 
 import styles from './CharacterStats.module.scss';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { CharacterDraft as Character } from '@features/character/characterModel';
+import type { getCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
 type CharacterStatsProps = {
-	character: Character;
+	character: getCharacterDataResponseBody;
 	job: string;
 	jobType: JobType;
 };
@@ -21,7 +22,7 @@ const BOSS_ICON_SIZE = 90;
 const ICON_SIZE = 64;
 
 const CharacterStats = ({ character, job, jobType }: CharacterStatsProps): JSX.Element => {
-	const { level, targetLevel, bossing, linkSkill, code, jobType: charJobType, legion, class: charClass } = character;
+	const { level, targetLevel, bossing, linkSkill, jobType: charJobType, legion, class: charClass } = character;
 	return (
 		<>
 			<div className={styles.bigBlock}>
@@ -39,7 +40,7 @@ const CharacterStats = ({ character, job, jobType }: CharacterStatsProps): JSX.E
 
 					<LegionBlock
 						characterLevel={level}
-						characterCode={code ?? ''}
+						characterCode={generateClassCode(charClass ?? '')}
 						characterJobType={charJobType ?? 'default'}
 						characterLegionType={legion ?? 'none'}
 						iconSize={ICON_SIZE}

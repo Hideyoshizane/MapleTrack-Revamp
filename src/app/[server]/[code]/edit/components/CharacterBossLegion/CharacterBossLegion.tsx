@@ -10,14 +10,14 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import styles from './CharacterBossLegion.module.scss';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { CharacterDraft as Character } from '@features/character/characterModel';
+import type { getEditCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
 const BOSS_ICON_SIZE = 90;
 const ICON_SIZE = 64;
 
 type CharacterBossLegionProps = {
-	character: Character;
+	character: getEditCharacterDataResponseBody;
 	toggleBossing: () => void;
 	linkSkill: string;
 	code: string;

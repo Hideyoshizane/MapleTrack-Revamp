@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import ErrorPage from '@components/ErrorPage/ErrorPage';
 import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
 import { getClassNameByCode } from '@data/classes/classes';
-import { getJob } from '@features/character/characterAttributes';
+import { getJob } from '@features/character/characterService';
 
 import CharacterBossLegion from './components/CharacterBossLegion/CharacterBossLegion';
 import { CharacterHeader } from './components/CharacterHeader/CharacterHeader';
@@ -22,12 +22,11 @@ import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { JSX } from 'react';
 
 type CharacterPageProps = {
-	userOrigin: string;
 	server: string;
 	code: string;
 };
 
-const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.Element => {
+const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
 	const router = useRouter();
 	const pathname = usePathname();
 
@@ -41,19 +40,14 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 	const [firstLoad, setFirstLoad] = useState(true);
 
 	const { character, updateCharacter, loading, CharacterDataFromAPI, CharacterDataFromAPIFailed } =
-		useCharacterPageData({
-			server,
-			className,
-			nameOverride: committedName,
-			syncEnabled,
-			setFirstLoad,
-		});
+		useCharacterPageData({ server, className, nameOverride: committedName, syncEnabled, setFirstLoad });
 
 	useEffect(() => {
 		if (character?.syncing && !syncEnabled) {
 			setTimeout(() => setSyncEnabled(true), 0);
 		}
 	}, [character, syncEnabled]);
+
 	const {
 		levelInput,
 		setLevelInput,
@@ -102,9 +96,7 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 				<div className={styles.characterContent}>
 					<CharacterHeader
 						character={character}
-						userOrigin={userOrigin}
 						server={server}
-						className={className}
 						nameError={nameError}
 						submitLoading={false}
 						setSubmitLoading={(): void => {}}

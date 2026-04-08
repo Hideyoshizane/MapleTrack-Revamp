@@ -1,91 +1,114 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import dayjs from 'dayjs';
 
 import Button from '@components/Button/Button';
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
+import { getClassNameByCode } from '@data/classes/classes';
 import { characterQueryKeys } from '@features/character/character.queryKeys';
 import { characterApi } from '@features/character/characterApi';
-import { hasDailyResetOccurred, hasWeeklyResetOccurred } from '@utils/time';
 
 import styles from './SymbolButtons.module.scss';
 
 import type {
-	CharacterDraft as Character,
-	CharacterContent,
-	CharacterSymbol,
-} from '@features/character/characterModel';
+	getCharacterDataResponseBody,
+	getCharacterDataSymbolsResponseBody,
+} from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
 type SymbolButtonsProps = {
-	symbol: CharacterSymbol;
+	symbol: getCharacterDataSymbolsResponseBody;
 	dailyValue: number;
 	bonus: number;
-	content: CharacterContent[];
-	onValueChange?: (data: { currentExp: number; currentLevel: number }) => void;
+	onValueChange?: (data: {
+		currentExp: number;
+		currentLevel: number;
+		dailyCleared?: boolean;
+		weeklyTries?: number;
+	}) => void;
+
 	disableAllDaily: boolean;
+	optimisticDailyCleared?: boolean;
+	optimisticWeeklyTries?: number;
 };
 
 const SymbolButtons = ({
 	symbol,
 	dailyValue,
 	bonus,
-	content,
 	onValueChange,
 	disableAllDaily = false,
+	optimisticDailyCleared,
+	optimisticWeeklyTries,
 }: SymbolButtonsProps): JSX.Element => {
 	const queryClient = useQueryClient();
-
-	const dailyContent = content[0];
-	const weeklyContent = content[1];
-
-	const isDailyResetDone = dailyContent?.date ? hasDailyResetOccurred(dailyContent.date) : true;
-	const isWeeklyResetDone = weeklyContent?.date ? hasWeeklyResetOccurred(dayjs(weeklyContent.date)) : true;
 
 	const handleDailyUpdate = async (): Promise<void> => {
 		try {
 			const [server, code] = window.location.pathname.split('/').filter(Boolean);
-
+			const className = getClassNameByCode(code);
 			const result = await characterApi.updateCharacterDaily({
-				symbolName: symbol.name,
-				bonus: bonus,
 				server: server,
-				code: code,
+				className: className ?? '',
+				id: symbol.id,
+				bonus,
 			});
 
 			if (!result.success || !result.data) {
 				return;
 			}
 
-			onValueChange?.(result.data);
+			// Create updated contents array with first content cleared
+			const updatedContents = symbol.contents.map((c, index) => (index === 0 ? { ...c, cleared: true } : c));
+
+			onValueChange?.({
+				currentExp: result.data.currentExp,
+				currentLevel: result.data.currentLevel,
+				dailyCleared: true,
+			});
 
 			queryClient.setQueryData(
-				characterQueryKeys.detail(server, code),
-				(previousCharacter: Character | undefined): Character | undefined => {
+				characterQueryKeys.detail(server, className ?? ''),
+				(previousCharacter: getCharacterDataResponseBody | undefined): getCharacterDataResponseBody | undefined => {
 					if (!previousCharacter) {
 						return previousCharacter;
 					}
 
-					return {
-						...previousCharacter,
-						symbols: previousCharacter.symbols.map((characterSymbol) =>
-							characterSymbol.name !== symbol.name
-								? characterSymbol
-								: {
-										...characterSymbol,
-										content: characterSymbol.content.map((characterContent, index) =>
-											index === 0
-												? {
-														...characterContent,
-														cleared: true,
-														date: new Date(),
-													}
-												: characterContent,
-										),
-									},
-						),
+					const updateCategory = <T extends getCharacterDataResponseBody['symbols']['arcane']>(
+						symbols: T,
+					): { updated: boolean; symbols: T } => {
+						let updated = false;
+						const nextSymbols = symbols.map((s) => {
+							if (s.id !== result.data?.id) {
+								return s;
+							}
+							updated = true;
+							return {
+								...s,
+								exp: result.data.currentExp,
+								level: result.data.currentLevel,
+								contents: updatedContents,
+							};
+						}) as T;
+						return { updated, symbols: nextSymbols };
 					};
+
+					const arcaneResult = updateCategory(previousCharacter.symbols.arcane);
+					if (arcaneResult.updated) {
+						return { ...previousCharacter, symbols: { ...previousCharacter.symbols, arcane: arcaneResult.symbols } };
+					}
+
+					const sacredResult = updateCategory(previousCharacter.symbols.sacred);
+					if (sacredResult.updated) {
+						return { ...previousCharacter, symbols: { ...previousCharacter.symbols, sacred: sacredResult.symbols } };
+					}
+
+					const grandResult = updateCategory(previousCharacter.symbols.grand);
+					if (grandResult.updated) {
+						return { ...previousCharacter, symbols: { ...previousCharacter.symbols, grand: grandResult.symbols } };
+					}
+
+					return previousCharacter;
 				},
 			);
 		} catch (error) {
@@ -96,55 +119,64 @@ const SymbolButtons = ({
 	const handleWeeklyUpdate = async (): Promise<void> => {
 		try {
 			const [server, code] = window.location.pathname.split('/').filter(Boolean);
+			const className = getClassNameByCode(code);
 
-			const result = await characterApi.updateCharacterWeekly({
-				symbolName: symbol.name,
-				server,
-				code,
-			});
+			const result = await characterApi.updateCharacterWeekly({ id: symbol.id });
 
 			if (!result.success || !result.data) {
 				return;
 			}
 
-			onValueChange?.(result.data);
+			const currentTries: number = optimisticWeeklyTries ?? DEFAULT_WEEKLY_TRIES;
+			const newTries: number = Math.max(currentTries - 1, 0);
+
+			const updatedContents = symbol.contents.map((c, index) =>
+				index !== 1 ? c : { ...c, tries: newTries, cleared: newTries === 0 },
+			);
+
+			onValueChange?.({
+				currentExp: result.data.currentExp,
+				currentLevel: result.data.currentLevel,
+				weeklyTries: newTries,
+			});
 
 			queryClient.setQueryData(
-				characterQueryKeys.detail(server, code),
-				(previousCharacter: Character | undefined): Character | undefined => {
+				characterQueryKeys.detail(server, className ?? ''),
+				(previousCharacter: getCharacterDataResponseBody | undefined): getCharacterDataResponseBody | undefined => {
 					if (!previousCharacter) {
 						return previousCharacter;
 					}
 
-					return {
-						...previousCharacter,
-						symbols: previousCharacter.symbols.map((characterSymbol) =>
-							characterSymbol.name !== symbol.name
-								? characterSymbol
-								: {
-										...characterSymbol,
-										content: characterSymbol.content.map((characterContent, index) => {
-											if (index !== 1) {
-												return characterContent;
-											}
+					const updateArcane = <T extends getCharacterDataResponseBody['symbols']['arcane']>(
+						symbols: T,
+					): {
+						updated: boolean;
+						symbols: T;
+					} => {
+						let updated = false;
+						const nextSymbols = symbols.map((s) => {
+							if (s.id !== symbol.id) {
+								return s;
+							}
 
-											const currentTries =
-												typeof characterContent.tries === 'number' && characterContent.tries > 0
-													? characterContent.tries
-													: DEFAULT_WEEKLY_TRIES;
+							updated = true;
+							return {
+								...s,
+								exp: result.data!.currentExp,
+								level: result.data!.currentLevel,
+								contents: updatedContents,
+							};
+						}) as T;
 
-											const newTries = Math.max(currentTries - 1, 0);
-
-											return {
-												...characterContent,
-												tries: newTries,
-												cleared: newTries === 0,
-												date: newTries === 0 ? new Date() : characterContent.date,
-											};
-										}),
-									},
-						),
+						return { updated, symbols: nextSymbols };
 					};
+
+					const arcaneResult = updateArcane(previousCharacter.symbols.arcane);
+					if (arcaneResult.updated) {
+						return { ...previousCharacter, symbols: { ...previousCharacter.symbols, arcane: arcaneResult.symbols } };
+					}
+
+					return previousCharacter;
 				},
 			);
 		} catch (error) {
@@ -152,26 +184,26 @@ const SymbolButtons = ({
 		}
 	};
 
-	// Determine button state and label for Daily Button
-	const dailyButtonDisabled = disableAllDaily || !dailyContent?.checked || dailyContent?.cleared || !isDailyResetDone;
+	const dailyContent = symbol.contents[0];
+	const weeklyContent = symbol.contents[1];
 
-	const dailyButtonLabel = disableAllDaily
-		? 'Daily done!'
-		: !dailyContent?.checked
-			? 'Disabled'
-			: !isDailyResetDone
-				? 'Daily done!'
-				: `Daily: +${dailyValue}`;
+	const isDailyDisabled = !dailyContent?.checked;
+	const isDailyDone = disableAllDaily || optimisticDailyCleared;
+
+	const isWeeklyDisabled = !weeklyContent?.checked;
+	const isWeeklyDone = optimisticWeeklyTries === 0;
+
+	// Determine button state and label for Daily Button
+	const dailyButtonDisabled = isDailyDisabled || isDailyDone;
+	const dailyButtonLabel = isDailyDisabled ? 'Disabled' : isDailyDone ? 'Daily done!' : `Daily: +${dailyValue}`;
 
 	// Determine button state and label for Weekly Button
-	const weeklyButtonDisabled =
-		!weeklyContent?.checked || weeklyContent?.cleared || (weeklyContent?.tries === 0 && !isWeeklyResetDone);
-
-	const weeklyButtonLabel = !weeklyContent?.checked
+	const weeklyButtonDisabled = isWeeklyDisabled || isWeeklyDone;
+	const weeklyButtonLabel = isWeeklyDisabled
 		? 'Disabled'
-		: !isWeeklyResetDone && weeklyContent?.tries === 0
+		: isWeeklyDone
 			? 'Weekly Done'
-			: `Weekly: ${weeklyContent?.tries}/${DEFAULT_WEEKLY_TRIES}`;
+			: `Weekly: ${optimisticWeeklyTries}/${DEFAULT_WEEKLY_TRIES}`;
 
 	return (
 		<div className={styles.buttonLines}>

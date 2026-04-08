@@ -6,13 +6,13 @@ import ErrorPage from '@components/ErrorPage/ErrorPage';
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 import { JobClasses } from '@data/classes/classes';
 import { characterApi } from '@features/character/characterApi';
-import { generateCharacterObject } from '@features/character/characterService';
+import { generateCharacterObjectHomePage } from '@features/character/characterService';
 
 import ClassCard from './ClassCard/ClassCard';
 import styles from './ClassGrid.module.scss';
 
-import type { GetAllCharactersPayload } from '@features/character/characterApi';
-import type { CharacterDraft as Character } from '@features/character/characterModel';
+import type { GetAllCharactersRequestBody } from '@features/character/schemas/character.request.schema';
+import type { getAllCharactersResponseBody } from '@features/character/schemas/character.response.schema';
 import type { ClassFilterOption } from '@utils/classFilterCookie';
 import type { JSX } from 'react';
 
@@ -24,7 +24,10 @@ type ClassGridProps = {
 	selectedClassesLoading: boolean;
 };
 
-const filterCharacters = (results: Character[], selectedClasses: ClassFilterOption[]): Character[] => {
+const filterCharacters = (
+	results: getAllCharactersResponseBody[],
+	selectedClasses: ClassFilterOption[],
+): getAllCharactersResponseBody[] => {
 	return results.filter((char): boolean => {
 		if (!selectedClasses.length) {
 			return true;
@@ -42,7 +45,7 @@ const filterCharacters = (results: Character[], selectedClasses: ClassFilterOpti
 	});
 };
 
-const sortCharacters = (characters: Character[]): Character[] => {
+const sortCharacters = (characters: getAllCharactersResponseBody[]): getAllCharactersResponseBody[] => {
 	return [...characters].sort((a, b): number => {
 		const aType = a.jobType === 'xenon' ? 'thief' : (a.jobType ?? 'zzz');
 		const bType = b.jobType === 'xenon' ? 'thief' : (b.jobType ?? 'zzz');
@@ -60,7 +63,7 @@ const sortCharacters = (characters: Character[]): Character[] => {
 const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: ClassGridProps): JSX.Element => {
 	const router = useRouter();
 
-	const [allCharacters, setAllCharacters] = useState<Character[]>([]);
+	const [allCharacters, setAllCharacters] = useState<getAllCharactersResponseBody[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -82,25 +85,25 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Cl
 				return;
 			}
 
-			const payload: GetAllCharactersPayload = { server: serverCookie };
+			const payload: GetAllCharactersRequestBody = { server: serverCookie };
 
 			const response = await characterApi.getAllCharacters(payload);
+
 			if (!response.success) {
 				throw new Error(response.message ?? 'Failed to fetch characters');
 			}
 
-			const fetchedCharacters: Character[] = Array.isArray(response.data) ? response.data : [];
+			const fetchedCharacters: getAllCharactersResponseBody[] = Array.isArray(response.data) ? response.data : [];
 
-			const results: Character[] = JobClasses.map((job): Character => {
+			const results: getAllCharactersResponseBody[] = JobClasses.map((job): getAllCharactersResponseBody => {
 				const match = fetchedCharacters.find((char): boolean => char.class === job.className);
 				return (
 					match ??
-					generateCharacterObject({
+					generateCharacterObjectHomePage({
 						jobClassName: job.className,
 						jobType: job.jobType,
 						legion: job.legionType,
 						linkSkill: job.linkSkill,
-						server: serverCookie,
 					})
 				);
 			});
@@ -123,7 +126,7 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Cl
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [serverCookie]);
 
-	const jobResults: Character[] = sortCharacters(filterCharacters(allCharacters, selectedClasses));
+	const jobResults: getAllCharactersResponseBody[] = sortCharacters(filterCharacters(allCharacters, selectedClasses));
 
 	if (error) {
 		return <ErrorPage />;
@@ -133,7 +136,9 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Cl
 		<div className={styles.classGrid}>
 			{loading || selectedClassesLoading
 				? skeletons
-				: jobResults.map((char): JSX.Element => <ClassCard key={char.class} character={char} />)}
+				: jobResults.map(
+						(char): JSX.Element => <ClassCard key={char.class} character={char} serverCookie={serverCookie} />,
+					)}
 		</div>
 	);
 };

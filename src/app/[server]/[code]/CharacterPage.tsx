@@ -10,7 +10,7 @@ import ErrorPage from '@components/ErrorPage/ErrorPage';
 import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
 import { getClassNameByCode } from '@data/classes/classes';
 import { characterQueryKeys } from '@features/character/character.queryKeys';
-import { getJob } from '@features/character/characterAttributes';
+import { getJob } from '@features/character/characterService';
 import { useCharacterExternalQuery } from '@hooks/useCharacterExternalQuery';
 import { useCharacterQuery } from '@hooks/useCharacterQuery';
 
@@ -21,23 +21,15 @@ import { useIncreaseAllSymbols } from './hooks/useIncreaseAllSymbols';
 import styles from './page.module.scss';
 import { useBonusContext } from './useBonusContext';
 
-import type { LevelUpResult } from '@/data/symbols/symbolMappings';
 import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { JSX } from 'react';
 
 type CharacterPageProps = {
-	userOrigin: string;
 	server: string;
 	code: string;
 };
 
-export type UpdateCharacterResponse = {
-	success: boolean;
-	message: string;
-	data: Record<string, LevelUpResult>;
-};
-
-const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.Element => {
+const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const success = searchParams.get('success');
@@ -68,14 +60,21 @@ const CharacterPage = ({ userOrigin, server, code }: CharacterPageProps): JSX.El
 		enabled: Boolean(character?.syncing),
 	});
 
-	const increaseAllMutation = useIncreaseAllSymbols({ userOrigin, server, code, arcaneBonus, sacredBonus });
+	const increaseAllMutation = useIncreaseAllSymbols({
+		server: server,
+		className: className ?? '',
+		id: character?.id ?? '',
+		arcaneBonus,
+		sacredBonus,
+	});
 
 	const handleIncreaseAll = (): void => {
+		if (!character?.id) {
+			return;
+		}
 		increaseAllMutation.mutate(undefined, {
 			onSuccess: (): void => {
-				void queryClient.invalidateQueries({
-					queryKey: characterQueryKeys.detail(server, code),
-				});
+				void queryClient.invalidateQueries({ queryKey: characterQueryKeys.detail(server, className) });
 			},
 		});
 	};

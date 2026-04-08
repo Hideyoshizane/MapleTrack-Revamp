@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { getToken } from 'next-auth/jwt';
 
 import {
 	getContentValue,
@@ -8,11 +7,12 @@ import {
 	canUseSymbol,
 	getSymbolMaxLevel,
 	isSymbolName,
-	toSymbolName,
 } from '@data/symbols/symbolMappings';
-import { updateAllDailySchema } from '@features/character/characterUpdateSchema';
+import { updateCharacterAllDailyRequestSchema } from '@features/character/schemas/character.request.schema';
 import { prisma } from '@lib/prisma';
+import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
+import { logError, logApiFailure, logZodError } from '@utils/logger';
 
 import type { LevelUpResult } from '@data/symbols/symbolMappings';
 import type { ApiResponse } from '@sharedTypes/api';
@@ -22,43 +22,27 @@ dayjs.extend(utc);
 
 const DAILY_CONTENT_TYPE = 'Daily Quest' as const;
 
-export const POST = async (request: NextRequest): Promise<NextResponse> => {
+const route = 'api/characters/updateAllDaily';
+
+const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
 	try {
-		// Extract token from the request cookies
-		const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
-		if (!token || typeof token.id !== 'string') {
-			return createResponse<ApiResponse>({ success: false, message: 'Unauthorized' }, 401);
-		}
-
-		let body: unknown;
-		try {
-			body = await request.json();
-		} catch {
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
-		}
-
 		// Validate request body using Zod
-		const parseResult = updateAllDailySchema.safeParse(body);
+		const parseResult = updateCharacterAllDailyRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
+			logZodError(parseResult.error, { route: route });
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
-		const { server, code, arcaneBonus, sacredBonus } = parseResult.data;
-		const authenticatedUserId = token.id;
+
+		const { server, className, id, arcaneBonus, sacredBonus } = parseResult.data;
 		const now = dayjs().utc().toDate();
 
 		// Search for the character and update
 		const updatedResults = await prisma.$transaction(async (tx) => {
 			const character = await tx.character.findUnique({
-				where: {
-					userId_server_code: {
-						userId: authenticatedUserId,
-						server,
-						code,
-					},
-				},
+				where: { id: id, userId: authenticatedUserId, server: server, class: className },
 				include: {
 					symbols: {
-						include: { content: true },
+						select: { id: true, name: true, level: true, exp: true, category: true, contents: true },
 					},
 				},
 			});
@@ -66,7 +50,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 			if (!character) {
 				return null;
 			}
-
 			const results: Record<string, LevelUpResult> = {};
 			const symbolUpdates: Parameters<typeof tx.characterSymbol.update>[0][] = [];
 			const contentUpdates: Parameters<typeof tx.characterContent.update>[0][] = [];
@@ -88,26 +71,18 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 						continue;
 					}
 
-					const dailyContent = symbol.content.find((content): boolean => content.contentType === DAILY_CONTENT_TYPE);
-					if (!dailyContent) {
-						continue;
-					}
-					if (dailyContent.cleared || dailyContent.checked !== true) {
+					const dailyContent = symbol.contents.find((content): boolean => content.contentType === DAILY_CONTENT_TYPE);
+					if (!dailyContent || dailyContent.cleared || dailyContent.checked !== true) {
 						continue;
 					}
 
 					let dailyValue = getContentValue(symbol.name, DAILY_CONTENT_TYPE);
-
-					const bonusContent = symbol.content.find(
-						(content): boolean =>
-							content.checked === true && content.contentType !== DAILY_CONTENT_TYPE && content.tries === null,
+					const extraArea: ReadonlySet<string> = new Set(['Reverse City', 'Yum Yum Island']);
+					const extraAreaContent = symbol.contents.some(
+						(content): boolean => content.checked === true && extraArea.has(content.contentType),
 					);
-
-					if (bonusContent) {
-						const bonusSymbol = toSymbolName(bonusContent.contentType);
-						if (bonusSymbol) {
-							dailyValue += getContentValue(bonusSymbol, DAILY_CONTENT_TYPE);
-						}
+					if (extraAreaContent) {
+						dailyValue += dailyValue;
 					}
 
 					dailyValue += bonus;
@@ -117,23 +92,12 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
 					symbolUpdates.push({
 						where: { id: symbol.id },
-						data: {
-							level: newValues.currentLevel,
-							exp: newValues.currentExp,
-						},
+						data: { level: newValues.currentLevel, exp: newValues.currentExp },
 					});
 
 					contentUpdates.push({
-						where: {
-							symbolId_contentType: {
-								symbolId: symbol.id,
-								contentType: dailyContent.contentType,
-							},
-						},
-						data: {
-							cleared: true,
-							date: now,
-						},
+						where: { symbolId_contentType: { symbolId: symbol.id, contentType: dailyContent.contentType } },
+						data: { cleared: true, date: now },
 					});
 
 					results[symbol.name] = newValues;
@@ -153,25 +117,18 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		});
 
 		if (!updatedResults) {
-			return createResponse<ApiResponse>(
-				{
-					success: true,
-					message: 'Character not found.',
-				},
-				200,
-			);
+			logApiFailure('Character not found', { route });
+			return createResponse<ApiResponse>({ success: true, message: 'Character not found.' }, 200);
 		}
 
 		return createResponse<ApiResponse<Record<string, LevelUpResult>>>(
-			{
-				success: true,
-				message: 'Character updated successfully.',
-				data: updatedResults,
-			},
+			{ success: true, message: 'Character updated successfully.', data: updatedResults },
 			200,
 		);
 	} catch (error) {
-		console.error('Search error:', error);
+		logError(error, { route: route });
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };
+
+export const POST = routeGuard(handler);

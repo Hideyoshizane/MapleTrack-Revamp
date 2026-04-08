@@ -8,13 +8,15 @@ import Tooltip from '@components/Tooltip/Tooltip';
 
 import styles from './CharacterImageAndSync.module.scss';
 
-import type { CharacterDataFromAPI } from '@features/character/characterApi';
-import type { CharacterDraft as Character } from '@features/character/characterModel';
+import type {
+	getCharacterDataFromAPIResponseBody,
+	getEditCharacterDataResponseBody,
+} from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
 type Props = {
-	character?: Character;
-	CharacterDataFromAPI: CharacterDataFromAPI | null;
+	character?: getEditCharacterDataResponseBody;
+	CharacterDataFromAPI: getCharacterDataFromAPIResponseBody | null;
 	CharacterDataFromAPIFailed: boolean;
 	syncEnabled: boolean;
 	toggleSync: () => void;

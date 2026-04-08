@@ -40,9 +40,9 @@ export const useForgotPassword = (
 					toast.error(result.message || 'Failed to process your request');
 
 					if (result.message) {
-						Object.entries(result.message).forEach(([field, msg]): void => {
+						for (const [field, msg] of Object.entries(result.message)) {
 							setError(field as keyof ForgotPasswordFormData, { message: msg ?? 'Invalid input' });
-						});
+						}
 					}
 				} else {
 					toast.error('Unexpected response format');

@@ -5,18 +5,18 @@ import EditPageSymbolObject from '../EditPageSymbolObject/EditPageSymbolObject';
 import styles from './EditPageSymbolGrid.module.scss';
 
 import type {
-	CharacterSymbolDraft as CharacterSymbol,
-	CharacterDraft as Character,
-} from '@features/character/characterModel';
+	getEditCharacterDataSymbolsResponseBody,
+	getEditCharacterDataResponseBody,
+} from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
 type EditPageSymbolGridProps = {
 	type: 'arcane' | 'sacred' | 'grand';
-	symbols: CharacterSymbol[];
+	symbols: getEditCharacterDataSymbolsResponseBody[];
 	characterLevel: number;
 	characterJobType: string;
 	size?: number;
-	updateCharacter: (recipe: (draft: Character) => void) => void;
+	updateCharacter: (recipe: (draft: getEditCharacterDataResponseBody) => void) => void;
 };
 
 const EditPageSymbolGrid = ({

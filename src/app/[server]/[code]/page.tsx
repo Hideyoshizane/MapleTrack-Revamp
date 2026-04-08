@@ -11,11 +11,11 @@ import CharacterPage from './CharacterPage';
 import type { JSX } from 'react';
 
 type CharactersPageProps = {
-	params: Promise<{ userOrigin: string; server: string; code: string }>;
+	params: Promise<{ server: string; code: string }>;
 };
 
 const CharactersPage = async ({ params }: CharactersPageProps): Promise<JSX.Element> => {
-	const { userOrigin, server, code } = await params;
+	const { server, code } = await params;
 
 	const session = await auth();
 	if (!session) {
@@ -26,7 +26,7 @@ const CharactersPage = async ({ params }: CharactersPageProps): Promise<JSX.Elem
 		<main className="container">
 			<Navbar username={session.user.username} />
 			<BonusProvider>
-				<CharacterPage userOrigin={userOrigin} server={server} code={code} />
+				<CharacterPage server={server} code={code} />
 			</BonusProvider>
 		</main>
 	);

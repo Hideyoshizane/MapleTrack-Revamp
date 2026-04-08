@@ -1,5 +1,6 @@
 'use client';
 
+import { codeToClass } from '@features/character/characterAttributes';
 import NumberFlow from '@number-flow/react';
 import { clsx } from 'clsx';
 import Image from 'next/image';
@@ -9,7 +10,6 @@ import BossCheckedIcon from '@assets/svg/check-boss.svg';
 import ChevronIcon from '@assets/svg/chevron-down.svg';
 import NoBossIcon from '@assets/svg/circle-x.svg';
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
-import { codeToClass } from '@features/character/characterAttributes';
 
 import CharacterBossItem from './BossItem/CharacterBossItem';
 import styles from './WeeklyBossDropdown.module.scss';

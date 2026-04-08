@@ -50,11 +50,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		const html = getForgotPasswordTemplate(resetUrl, user.username);
 
 		try {
-			await sendEmail({
-				to: email,
-				subject: 'Reset Your Password',
-				html,
-			});
+			await sendEmail({ to: email, subject: 'Reset Your Password', html });
 		} catch (emailError) {
 			logApiFailure('Failed to send reset email', {
 				route,

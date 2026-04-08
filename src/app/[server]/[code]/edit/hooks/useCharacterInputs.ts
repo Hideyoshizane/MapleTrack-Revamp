@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 
-import { characterClientSchema } from '@features/character/character.client.schema';
+import { characterNameRawSchema } from '@features/character/schemas/base/character.schema';
 
-import type { CharacterDraft as Character } from '@features/character/characterModel';
+import type { getCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { Dispatch, SetStateAction } from 'react';
 
 type UseCharacterInputsProps = {
-	character: Character | null;
-	updateCharacter: (recipe: (draft: Character) => void) => void;
+	character: getCharacterDataResponseBody | null;
+	updateCharacter: (recipe: (draft: getCharacterDataResponseBody) => void) => void;
 	setSyncEnabled: (value: boolean) => void;
 };
 
@@ -64,7 +64,7 @@ export const useCharacterInputs = ({
 	const nameError: string | null =
 		character.name === 'Character Name' || !character.name.trim() ? 'Please enter a valid name' : null;
 	const handleNameBlur = (value: string): void => {
-		const result = characterClientSchema.shape.characterName.safeParse(value);
+		const result = characterNameRawSchema.safeParse(value);
 		if (!result.success) {
 			return;
 		}

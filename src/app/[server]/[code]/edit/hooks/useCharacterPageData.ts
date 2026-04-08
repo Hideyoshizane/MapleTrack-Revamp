@@ -5,8 +5,10 @@ import { useState, useEffect } from 'react';
 import { useCharacterExternalQuery } from '@hooks/useCharacterExternalQuery';
 import { useCharacterQuery } from '@hooks/useCharacterQuery';
 
-import type { CharacterDataFromAPI } from '@features/character/characterApi';
-import type { CharacterDraft as Character } from '@features/character/characterModel';
+import type {
+	getCharacterDataFromAPIResponseBody,
+	getCharacterDataResponseBody,
+} from '@features/character/schemas/character.response.schema';
 
 type UseCharacterPageDataProps = {
 	server: string;
@@ -17,11 +19,11 @@ type UseCharacterPageDataProps = {
 };
 
 type UseCharacterPageDataReturn = {
-	character: Character | null;
-	updateCharacter: (recipe: (draft: Character) => void) => void;
+	character: getCharacterDataResponseBody | null;
+	updateCharacter: (recipe: (draft: getCharacterDataResponseBody) => void) => void;
 	loading: boolean;
 	error?: string;
-	CharacterDataFromAPI: CharacterDataFromAPI | null;
+	CharacterDataFromAPI: getCharacterDataFromAPIResponseBody | null;
 	CharacterDataFromAPIFailed: boolean;
 };
 
@@ -34,7 +36,9 @@ export const useCharacterPageData = ({
 }: UseCharacterPageDataProps): UseCharacterPageDataReturn => {
 	// Main character data
 	const { data: serverCharacter, isLoading: characterLoading, error } = useCharacterQuery({ server, className });
-	const [editableCharacter, setEditableCharacter] = useState<Character | null>(() => serverCharacter ?? null);
+	const [editableCharacter, setEditableCharacter] = useState<getCharacterDataResponseBody | null>(
+		() => serverCharacter ?? null,
+	);
 
 	useEffect(() => {
 		if (serverCharacter && serverCharacter !== editableCharacter) {
@@ -44,7 +48,7 @@ export const useCharacterPageData = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [serverCharacter]);
 
-	const updateCharacter = (recipe: (draft: Character) => void): void => {
+	const updateCharacter = (recipe: (draft: getCharacterDataResponseBody) => void): void => {
 		setEditableCharacter((prev) => {
 			if (!prev) {
 				return prev;
@@ -61,11 +65,7 @@ export const useCharacterPageData = ({
 		data: extraData,
 		isLoading: extraLoading,
 		isError: CharacterDataFromAPIFailed,
-	} = useCharacterExternalQuery({
-		name: resolvedName,
-		server,
-		enabled: syncEnabled && !!resolvedName,
-	});
+	} = useCharacterExternalQuery({ name: resolvedName, server, enabled: syncEnabled && !!resolvedName });
 
 	return {
 		character: editableCharacter,

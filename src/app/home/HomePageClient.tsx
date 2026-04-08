@@ -4,12 +4,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 
-import { ClassFilter } from '@components/ClassFilter/ClassFilter';
-import ClassGrid from '@components/ClassGrid/ClassGrid';
 import ServerDropdown from '@components/ServerDropdown/ServerDropdown';
-import { useClassFilterCookie } from '@hooks/useClassFilterCookie';
 import { useServerCookie } from '@hooks/useServerCookie';
 
+import { ClassFilter } from './components/ClassFilter/ClassFilter';
+import ClassGrid from './components/ClassGrid/ClassGrid';
+import { useClassFilterCookie } from './hooks/useClassFilterCookie';
 import styles from './page.module.scss';
 
 import type { ServerName } from '@data/servers/servers';

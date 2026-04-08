@@ -1,22 +1,18 @@
-import { characterApiSchema } from '@features/character/character.server.schema';
+import { getCharacterDataFromAPIRequestSchema } from '@features/character/schemas/character.request.schema';
 import { fetchCharacterDataFromAPI } from '@lib/fetchCharacterDataFromAPI';
+import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
+import { logError, logZodError } from '@utils/logger';
 
-import type { CharacterDataFromAPI } from '@features/character/characterApi';
+import type { getCharacterDataFromAPIResponseBody } from '@features/character/schemas/character.response.schema';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
-export const POST = async (request: NextRequest): Promise<NextResponse> => {
-	let body: unknown;
-	try {
-		body = await request.json();
-	} catch {
-		return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
-	}
-
-	// Validate name
-	const parseResult = characterApiSchema.safeParse(body);
+const route = 'api/characters/getCharacterDataFromAPI';
+const handler = async (request: NextRequest): Promise<NextResponse> => {
+	const parseResult = getCharacterDataFromAPIRequestSchema.safeParse(await request.json());
 	if (!parseResult.success) {
+		logZodError(parseResult.error, { route: route });
 		return createResponse<ApiResponse>({ success: false, message: 'Invalid parameters.' }, 400);
 	}
 
@@ -25,13 +21,14 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
 		const data = await fetchCharacterDataFromAPI(characterName, server);
 
-		return createResponse<ApiResponse<CharacterDataFromAPI>>(
+		return createResponse<ApiResponse<getCharacterDataFromAPIResponseBody>>(
 			{ success: true, message: 'Character fetched.', data },
 			200,
 		);
 	} catch (error: unknown) {
-		console.error('Error fetching character:', error);
-
+		logError(error, { route: route });
 		return createResponse<ApiResponse>({ success: false, message: 'Internal server error.' }, 500);
 	}
 };
+
+export const POST = routeGuard(handler);

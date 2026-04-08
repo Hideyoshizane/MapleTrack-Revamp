@@ -20,23 +20,28 @@ import {
 import styles from './EditPageSymbolObject.module.scss';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { SymbolCategory, SymbolName } from '@data/symbols/symbolMappings';
-import type { Character, CharacterSymbol, CharacterContent } from '@features/character/characterModel';
+import type { SymbolName } from '@data/symbols/symbolMappings';
+import type {
+	getEditCharacterDataSymbolsResponseBody,
+	getEditCharacterDataResponseBody,
+	getEditCharacterContentResponseBody,
+} from '@features/character/schemas/character.response.schema';
+import type { CharacterContent, SymbolCategory } from '@prisma/client';
 import type { JSX } from 'react';
 
 export type EditPageSymbolObjectProps = {
 	type: SymbolCategory;
-	symbol: CharacterSymbol;
+	symbol: getEditCharacterDataSymbolsResponseBody;
 	characterLevel: number;
 	characterJobType: string;
 	size?: number;
-	updateCharacter: (recipe: (draft: Character) => void) => void;
+	updateCharacter: (recipe: (draft: getEditCharacterDataResponseBody) => void) => void;
 };
 
 type SymbolUpdatePayload =
-	| { type: 'level'; value: number }
-	| { type: 'exp'; value: number }
-	| { type: 'content'; index: number; checked: boolean };
+	| { type: 'level'; value: number; category: SymbolCategory; name: string }
+	| { type: 'exp'; value: number; category: SymbolCategory; name: string }
+	| { type: 'content'; index: number; checked: boolean; category: SymbolCategory; name: string };
 
 type LevelExpInputProps = {
 	level: number;
@@ -91,7 +96,7 @@ function SymbolImage({ src, size, computedValue, usable }: SymbolImageProps): JS
 }
 
 type ContentCheckboxProps = {
-	content: CharacterContent;
+	content: getEditCharacterContentResponseBody;
 	index: number;
 	characterLevel: number;
 	onToggle: (index: number, checked: boolean) => void;
@@ -103,8 +108,8 @@ function ContentCheckbox({ content, index, characterLevel, onToggle, symbolName 
 		content.contentType === 'Reverse City'
 			? characterLevel < 205
 			: content.contentType === 'Yum Yum Island'
-			? characterLevel < 215
-			: false;
+				? characterLevel < 215
+				: false;
 
 	return (
 		<label className={styles.contentItem}>
@@ -117,7 +122,7 @@ function ContentCheckbox({ content, index, characterLevel, onToggle, symbolName 
 					{isDisabled ? <Cross2Icon /> : <CheckIcon />}
 				</Checkbox.Indicator>
 			</Checkbox.Root>
-			{content.contentType}: +{getContentValue(symbolName, content.contentType)}
+			{content.contentType}: +{getContentValue(symbolName as SymbolName, content.contentType)}
 		</label>
 	);
 }
@@ -130,13 +135,16 @@ export function EditPageSymbolObject({
 	size = 24,
 	updateCharacter,
 }: EditPageSymbolObjectProps): JSX.Element {
-	const isSymbolUsable = canUseSymbol(characterLevel, symbol.name);
+	const isSymbolUsable = canUseSymbol(characterLevel, symbol.name as SymbolName);
 	const maxLevel = getSymbolMaxLevel(type);
 	const src = getSymbolImagePath(symbol.name as SymbolName);
 
 	const expRequired = getExpForLevel(type, symbol.level);
 
-	const { dailyValue, weeklyValue } = computeDailyWeeklyValues(symbol, symbol.content);
+	const { dailyValue, weeklyValue } = computeDailyWeeklyValues(
+		{ name: symbol.name, level: symbol.level, exp: symbol.exp, category: symbol.category as SymbolCategory },
+		symbol.contents as CharacterContent[],
+	);
 
 	const computedValue = calculateDaysToCompleteSymbol(dailyValue, weeklyValue, type, symbol.level, symbol.exp);
 
@@ -144,30 +152,26 @@ export function EditPageSymbolObject({
 
 	const updateSymbol = (payload: SymbolUpdatePayload): void => {
 		updateCharacter((draft) => {
-			const target = draft.symbols.find((s) => s.name === symbol.name);
+			const targetArray = draft.symbols[payload.category];
+			const target = targetArray.find((s) => s.name === payload.name);
 
 			if (!target) {
 				return;
 			}
 
 			switch (payload.type) {
-				case 'level': {
+				case 'level':
 					target.level = payload.value;
-					target.exp = Math.min(target.exp, getExpForLevel(type, payload.value));
-					return;
-				}
-
-				case 'exp': {
+					target.exp = Math.min(target.exp, getExpForLevel(payload.category, payload.value));
+					break;
+				case 'exp':
 					target.exp = payload.value;
-					return;
-				}
-
-				case 'content': {
-					const targetContent = target.content;
-					if (targetContent[payload.index]) {
-						targetContent[payload.index].checked = payload.checked;
+					break;
+				case 'content':
+					if (target.contents[payload.index]) {
+						target.contents[payload.index].checked = payload.checked;
 					}
-				}
+					break;
 			}
 		});
 	};
@@ -178,7 +182,7 @@ export function EditPageSymbolObject({
 				<SymbolImage src={src} size={size} computedValue={computedValue} usable={false} />
 				<div className={styles.symbolOff}>
 					<ProgressBar height={8} width={231} value={0} maxValue={expRequired} jobType={jobType} forceFull={false} />
-					<p className={styles.unlockLevel}>Unlock at Level {getSymbolMinLevel(symbol.name)}</p>
+					<p className={styles.unlockLevel}>Unlock at Level {getSymbolMinLevel(symbol.name as SymbolName)}</p>
 				</div>
 			</div>
 		);
@@ -196,8 +200,8 @@ export function EditPageSymbolObject({
 					exp={symbol.exp}
 					maxLevel={maxLevel}
 					expRequired={expRequired}
-					onLevelBlur={(value) => updateSymbol({ type: 'level', value })}
-					onExpBlur={(value) => updateSymbol({ type: 'exp', value })}
+					onLevelBlur={(value) => updateSymbol({ type: 'level', value, category: type, name: symbol.name })}
+					onExpBlur={(value) => updateSymbol({ type: 'exp', value, category: type, name: symbol.name })}
 				/>
 
 				<div className={styles.progressDiv}>
@@ -212,7 +216,7 @@ export function EditPageSymbolObject({
 				</div>
 
 				<div className={styles.contentList}>
-					{symbol.content.map((content, index) => (
+					{symbol.contents.map((content, index) => (
 						<ContentCheckbox
 							key={`${symbol.name}-${content.contentType}`}
 							content={content}
@@ -220,11 +224,7 @@ export function EditPageSymbolObject({
 							characterLevel={characterLevel}
 							symbolName={symbol.name}
 							onToggle={(i, checked) =>
-								updateSymbol({
-									type: 'content',
-									index: i,
-									checked,
-								})
+								updateSymbol({ type: 'content', index: i, checked, category: type, name: symbol.name })
 							}
 						/>
 					))}

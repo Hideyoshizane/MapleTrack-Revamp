@@ -4,26 +4,27 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { generateClassCode } from '@/data/classes/classes';
 import BossIcon from '@assets/svg/boss_slayer.svg';
 import LegionBlock from '@components/LegionBlock/LegionBlock';
 import LinkSkillBlock from '@components/LinkSkillBlock/LinkSkillBlock';
 import ProgressBar from '@components/ProgressBar/ProgressBar';
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
+import { generateClassCode } from '@data/classes/classes';
 import { getLinkSkillByName } from '@data/linkSkill/linkSkill';
 import { getLastLevel } from '@data/symbols/exp/expTable';
 import { toSymbolName, getSymbolImagePath, canUseSymbol } from '@data/symbols/symbolMappings';
-import { separateSymbolsByCategory, getJob } from '@features/character/characterAttributes';
+import { getJob } from '@features/character/characterService';
 
 import styles from './ClassCard.module.scss';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { SymbolName } from '@data/symbols/symbolMappings';
-import type { CharacterDraft as Character } from '@features/character/characterModel';
+import type { getAllCharactersResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
 type ClassCardProps = {
-	character: Character;
+	character: getAllCharactersResponseBody;
+	serverCookie: string | undefined;
 };
 
 type SymbolProps = {
@@ -92,7 +93,7 @@ const IconSection = ({
 	</div>
 );
 
-const ClassCard = ({ character }: ClassCardProps): JSX.Element | null => {
+const ClassCard = ({ character, serverCookie }: ClassCardProps): JSX.Element | null => {
 	const router = useRouter();
 
 	if (!character.jobType || !character.legion) {
@@ -100,9 +101,7 @@ const ClassCard = ({ character }: ClassCardProps): JSX.Element | null => {
 		return null;
 	}
 
-	const { jobType, legion, linkSkill: ls, level, name, bossing, targetLevel, server, class: className } = character;
-
-	const { arcane: ArcaneSymbol, sacred: SacredSymbol } = separateSymbolsByCategory(character.symbols);
+	const { jobType, legion, linkSkill: ls, level, name, bossing, targetLevel, class: className, symbols } = character;
 
 	const SYMBOL_SIZE = 20;
 	const BOSS_ICON_SIZE = 48;
@@ -117,7 +116,7 @@ const ClassCard = ({ character }: ClassCardProps): JSX.Element | null => {
 	const code: string = generateClassCode(character.class ?? '');
 
 	return (
-		<Link href={`/${server}/${code}`} passHref>
+		<Link href={`/${serverCookie}/${code}`} passHref>
 			<div className={styles.cardBody}>
 				{/* Top section */}
 				<div className={styles.topPart}>
@@ -125,7 +124,7 @@ const ClassCard = ({ character }: ClassCardProps): JSX.Element | null => {
 						<p className={styles.title}>Arcane Symbol</p>
 						<SymbolGrid
 							type="arcane"
-							symbols={ArcaneSymbol}
+							symbols={symbols.arcane}
 							maxLevel={arcaneMaxLevel}
 							size={SYMBOL_SIZE}
 							characterLevel={character.level}
@@ -134,7 +133,7 @@ const ClassCard = ({ character }: ClassCardProps): JSX.Element | null => {
 						<p className={styles.title}>Sacred Symbol</p>
 						<SymbolGrid
 							type="sacred"
-							symbols={SacredSymbol}
+							symbols={symbols.sacred}
 							maxLevel={sacredMaxLevel}
 							size={SYMBOL_SIZE}
 							characterLevel={character.level}

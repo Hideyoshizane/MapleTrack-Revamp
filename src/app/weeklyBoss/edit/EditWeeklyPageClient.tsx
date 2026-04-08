@@ -93,7 +93,7 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 			setSelectedCharacter(freshCharacter);
 		}
 
-		// eslint-disable-next-line
+		 
 	}, [serverData]);
 
 	useEffect(() => {

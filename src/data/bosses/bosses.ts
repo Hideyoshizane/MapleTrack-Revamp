@@ -28,18 +28,18 @@ const bossLookup: Record<BossCompositeKey, BossLookupEntry> = {};
 const bossImageLookup: Record<string, string> = {};
 export const bossDifficultySet: Record<string, Set<string>> = {};
 
-bosses.forEach((boss) => {
+for (const boss of bosses) {
 	bossImageLookup[boss.name] = boss.img;
 	bossDifficultySet[boss.name] = new Set(boss.difficulties.map((d) => d.name));
 
-	boss.difficulties.forEach((diff) => {
+	for (const diff of boss.difficulties) {
 		const key: BossCompositeKey = `${boss.name}|${diff.name}`;
 		bossLookup[key] = {
 			value: diff.value,
 			reset: diff.reset,
 		};
-	});
-});
+	}
+}
 
 export const BOSS_NAMES = bosses.map((boss): string => boss.name) as readonly string[];
 
