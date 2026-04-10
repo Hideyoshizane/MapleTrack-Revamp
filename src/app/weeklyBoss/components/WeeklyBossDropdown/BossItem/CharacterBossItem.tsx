@@ -2,18 +2,18 @@
 
 import Image from 'next/image';
 
-import { getBossImage, getBossDifficultyValue } from '@/data/bosses/bosses';
 import BossCheckedIcon from '@assets/svg/check-boss.svg';
 import CircleBossIcon from '@assets/svg/circle-boss.svg';
-import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
+import ResponsiveText from '@components/ResponsiveText/responsiveText';
+import { getBossImage, getBossDifficultyValue } from '@data/bosses/bosses';
 
-import styles from './CharacterBossItem.module.scss';
+import styles from './characterBossItem.module.scss';
 
-import type { BossDraft as Boss } from '@features/Boss/bossListModel';
+import type { getBossListBossResponseBody } from '@features/Boss/schemas/bossList.response.schema';
 import type { JSX, KeyboardEvent } from 'react';
 
 type CharacterBossItemProps = {
-	boss: Boss;
+	boss: getBossListBossResponseBody;
 	server: string;
 	isSelected: boolean;
 	onClick?: () => void;

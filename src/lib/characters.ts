@@ -3,9 +3,9 @@ import { prisma } from '@lib/prisma';
 import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
 import { hasWeeklyResetOccurred, hasDailyResetOccurred } from '@utils/time';
 
-import { fetchCharacterDataFromAPI } from './fetchCharacterDataFromAPI';
+import { fetchCharacterDataFromApi } from './fetchCharacterDataFromApi';
 
-import type { CharacterDataFromAPI } from '@features/character/characterApi';
+import type { getCharacterDataFromAPIResponseBody } from '@features/character/schemas/character.response.schema';
 import type { Prisma } from '@prisma/client';
 import type { ServerOption } from '@utils/serverCookie';
 
@@ -107,9 +107,9 @@ export const syncCharacterInfo = async ({
 		return;
 	}
 
-	let externalData: CharacterDataFromAPI;
+	let externalData: getCharacterDataFromAPIResponseBody;
 	if (character.syncing) {
-		externalData = await fetchCharacterDataFromAPI(character.name, cleanServer);
+		externalData = await fetchCharacterDataFromApi(character.name, cleanServer);
 	}
 
 	await prisma.$transaction(async (tx) => {

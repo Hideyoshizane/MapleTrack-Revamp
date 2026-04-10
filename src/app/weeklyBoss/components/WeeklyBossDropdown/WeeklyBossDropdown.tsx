@@ -1,6 +1,5 @@
 'use client';
 
-import { codeToClass } from '@features/character/characterAttributes';
 import NumberFlow from '@number-flow/react';
 import { clsx } from 'clsx';
 import Image from 'next/image';
@@ -9,16 +8,17 @@ import { useRef, useEffect, useState, Fragment } from 'react';
 import BossCheckedIcon from '@assets/svg/check-boss.svg';
 import ChevronIcon from '@assets/svg/chevron-down.svg';
 import NoBossIcon from '@assets/svg/circle-x.svg';
-import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
+import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
+import { generateClassCode } from '@data/classes/classes';
 
-import CharacterBossItem from './BossItem/CharacterBossItem';
-import styles from './WeeklyBossDropdown.module.scss';
+import CharacterBossItem from './BossItem/characterBossItem';
+import styles from './weeklyBossDropdown.module.scss';
 
-import type { BossCharacterDraft as BossCharacter } from '@features/Boss/bossListModel';
+import type { getBossListCharacterResponseBody } from '@features/Boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
 type WeeklyBossDropdownProps = {
-	character: BossCharacter | null;
+	character: getBossListCharacterResponseBody;
 	server: string;
 };
 
@@ -53,7 +53,7 @@ const WeeklyBossDropdown = ({ character, server }: WeeklyBossDropdownProps): JSX
 
 	useEffect(() => {
 		if (!isOpen && isAnimating) {
-			const timer = setTimeout(() => setIsAnimating(false), 300); // Match SCSS 0.3s
+			const timer = setTimeout(() => setIsAnimating(false), 300);
 			return (): void => clearTimeout(timer);
 		}
 	}, [isOpen, isAnimating]);
@@ -66,6 +66,7 @@ const WeeklyBossDropdown = ({ character, server }: WeeklyBossDropdownProps): JSX
 	const totalBosses = character.bosses.length;
 	const clearedBosses = character.bosses.filter((boss) => boss.cleared).length;
 	const isCleared = clearedBosses === totalBosses;
+	const code = generateClassCode(character.class);
 
 	return (
 		<div className={styles.outerWrap}>
@@ -92,7 +93,7 @@ const WeeklyBossDropdown = ({ character, server }: WeeklyBossDropdownProps): JSX
 					}}>
 					<div className={styles.nameDiv}>
 						<p className={styles.characterName}>{character.name}</p>
-						<p className={styles.characterClass}>{codeToClass(character.code)}</p>
+						<p className={styles.characterClass}>{character.class}</p>
 					</div>
 					<div className={styles.iconsDiv}>
 						{totalBosses === 0 ? (
@@ -105,15 +106,11 @@ const WeeklyBossDropdown = ({ character, server }: WeeklyBossDropdownProps): JSX
 								{`/${totalBosses}`}
 							</p>
 						)}
-						<ChevronIcon
-							className={clsx(styles.icon, styles.rotated, {
-								[styles.rotatedActive]: isOpen,
-							})}
-						/>
+						<ChevronIcon className={clsx(styles.icon, styles.rotated, { [styles.rotatedActive]: isOpen })} />
 					</div>
 					<Image
 						className={styles.classIcon}
-						src={`/assets/buttom_profile/${character.code}.webp`}
+						src={`/assets/buttom_profile/${code}.webp`}
 						alt={character.name}
 						width={480}
 						height={80}

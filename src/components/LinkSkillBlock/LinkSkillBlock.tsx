@@ -3,10 +3,10 @@
 import { clsx } from 'clsx';
 import Image from 'next/image';
 
-import Tooltip from '@components/Tooltip/Tooltip';
+import Tooltip from '@components/Tooltip/tooltip';
 import { getLinkSkillByName, getLinkSkillDescription } from '@data/linkSkill/linkSkill';
 
-import styles from './LinkSkillBlock.module.scss';
+import styles from './linkSkillBlock.module.scss';
 
 import type { JSX } from 'react';
 

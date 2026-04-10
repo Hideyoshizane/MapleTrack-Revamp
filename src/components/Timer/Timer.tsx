@@ -6,10 +6,10 @@ import duration from 'dayjs/plugin/duration';
 import utc from 'dayjs/plugin/utc';
 import { useEffect, useState } from 'react';
 
-import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
+import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
 import { nowInUtc, getNextResetTime, toUtc, WEEKDAYS } from '@utils/time';
 
-import styles from './Timer.module.scss';
+import styles from './timer.module.scss';
 
 import type { JSX } from 'react';
 

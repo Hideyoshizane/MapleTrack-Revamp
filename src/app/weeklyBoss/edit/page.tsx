@@ -1,14 +1,14 @@
 import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
-import Navbar from '@components/Navbar/Navbar';
+import Navbar from '@components/Navbar/navbar';
 import { resolveServerFromCookies } from '@data/servers/resolveServerFromCookies';
 
-import EditWeeklyPageClient from './EditWeeklyPageClient';
+import EditWeeklyPageClient from './editWeeklyPageClient';
 
 import type { JSX } from 'react';
 
-const HomePage = async (): Promise<JSX.Element> => {
+const editWeeklyBossPage = async (): Promise<JSX.Element> => {
 	const session = await auth();
 
 	// If no session, redirect to login with a query param
@@ -18,15 +18,12 @@ const HomePage = async (): Promise<JSX.Element> => {
 
 	const initialServer = await resolveServerFromCookies();
 
-	// Execute function here to update weekly bosses.
-	// Function here
-
 	return (
 		<main className="container">
 			<Navbar username={session.user.username} />
-			<EditWeeklyPageClient username={session.user.username} initialServer={initialServer} />
+			<EditWeeklyPageClient initialServer={initialServer} />
 		</main>
 	);
 };
 
-export default HomePage;
+export default editWeeklyBossPage;

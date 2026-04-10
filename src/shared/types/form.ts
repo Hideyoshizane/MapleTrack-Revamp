@@ -4,7 +4,7 @@ import type {
 	ResetPasswordRequestBody,
 	ForgotPasswordRequestBody,
 	ChangePasswordRequestBody,
-} from '@/features/user/schemas/user.schema';
+} from '@features/user/schemas/user.schema';
 
 export type LoginFormData = Credentials;
 

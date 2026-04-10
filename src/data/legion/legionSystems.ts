@@ -5,14 +5,14 @@ type LegionBonusRank = {
 	description: string;
 };
 
-export type LegionBonus = {
+type LegionBonus = {
 	name: string;
 	jobType: string;
 	ranking: LegionBonusRank[];
 };
 
-export type LegionRank = 'rank_b' | 'rank_a' | 'rank_s' | 'rank_ss' | 'rank_sss' | 'no_rank';
-export type LegionThresholdSetCode = 'zero' | 'default';
+type LegionRank = 'rank_b' | 'rank_a' | 'rank_s' | 'rank_ss' | 'rank_sss' | 'no_rank';
+type LegionThresholdSetCode = 'zero' | 'default';
 
 type ThresholdTuple = readonly [number, number, number, number, number];
 
@@ -20,7 +20,7 @@ const legionList = legionSystemsJson as readonly LegionBonus[];
 const ZERO_THRESHOLDS = [130, 160, 180, 200, 250] as const;
 const DEFAULT_THRESHOLDS = [60, 100, 140, 200, 250] as const;
 
-export const legionByName: Readonly<Record<string, LegionBonus>> = Object.fromEntries(
+const legionByName: Readonly<Record<string, LegionBonus>> = Object.fromEntries(
 	legionList.map((entry): [string, LegionBonus] => [entry.name, entry]),
 ) as Readonly<Record<string, LegionBonus>>;
 

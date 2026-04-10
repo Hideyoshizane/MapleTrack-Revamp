@@ -3,13 +3,13 @@
 import { clsx } from 'clsx';
 
 import BossIcon from '@assets/svg/boss_slayer.svg';
-import LegionBlock from '@components/LegionBlock/LegionBlock';
-import LinkSkillBlock from '@components/LinkSkillBlock/LinkSkillBlock';
-import Tooltip from '@components/Tooltip/Tooltip';
+import LegionBlock from '@components/LegionBlock/legionBlock';
+import LinkSkillBlock from '@components/LinkSkillBlock/linkSkillBlock';
+import Tooltip from '@components/Tooltip/tooltip';
 
-import styles from './CharacterBossLegion.module.scss';
+import styles from './characterBossLegion.module.scss';
 
-import type { JobType } from '@components/ProgressBar/ProgressBar';
+import type { JobType } from '@components/ProgressBar/progressBar';
 import type { getEditCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 

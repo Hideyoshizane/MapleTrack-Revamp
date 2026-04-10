@@ -7,8 +7,8 @@ export type ValidationResult = {
 	error?: string;
 };
 
-export const extractErrorMessage = (
-	result: { success: false; error: { issues: { message?: string }[] } } | { success: true }
+const extractErrorMessage = (
+	result: { success: false; error: { issues: { message?: string }[] } } | { success: true },
 ): string => {
 	if (result.success) {
 		return '';
@@ -26,7 +26,7 @@ export const validateValue = <T>(schema: z.ZodType<T>, value: unknown): Validati
 export const handleFieldValidation = <T extends string>(
 	field: T,
 	validationResult: ValidationResult,
-	setError: (field: T, error: { message: string }) => void
+	setError: (field: T, error: { message: string }) => void,
 ): boolean => {
 	if (!validationResult.isValid) {
 		const message = validationResult.error ?? `Invalid ${field}`;

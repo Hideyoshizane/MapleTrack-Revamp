@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { serverCookie } from '@utils/serverCookie';
 
@@ -18,9 +18,9 @@ export const useServerCookie = (
 		serverCookie.set([server]);
 	}, [server]);
 
-	const setServerCookieHandler = useCallback((name: ServerName): void => {
+	const setServerCookieHandler = (name: ServerName): void => {
 		setServer(name);
-	}, []);
+	};
 
 	return { server, setServerCookie: setServerCookieHandler };
 };

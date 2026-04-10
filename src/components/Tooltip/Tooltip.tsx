@@ -4,7 +4,7 @@ import * as RadixTooltip from '@radix-ui/react-tooltip';
 
 import { useTheme } from '@context/useTheme';
 
-import styles from './Tooltip.module.scss';
+import styles from './tooltip.module.scss';
 
 import type { ReactElement, ReactNode, JSX } from 'react';
 

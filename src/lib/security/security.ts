@@ -5,7 +5,7 @@ const tokens = new Tokens();
 export const SENSITIVE_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'] as const;
 export type SensitiveMethod = (typeof SENSITIVE_METHODS)[number];
 
-export const CSRF_SECRET = process.env.CSRF_SECRET || 'fallback-secret';
+const CSRF_SECRET = process.env.CSRF_SECRET || 'fallback-secret';
 
 export const generateCsrfToken = (): string => {
 	return tokens.create(CSRF_SECRET);

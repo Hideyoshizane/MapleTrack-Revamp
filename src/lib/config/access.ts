@@ -1,6 +1,4 @@
-export const PUBLIC_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/testpage'] as const;
-
-export type PublicPath = (typeof PUBLIC_PATHS)[number];
+const PUBLIC_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/testpage'] as const;
 
 const PUBLIC_PATHS_SET = new Set(PUBLIC_PATHS);
 

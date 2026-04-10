@@ -25,13 +25,16 @@ export const getServerByName = (name: string | undefined): Server | undefined =>
 	return serversMap.get(name.toLowerCase());
 };
 
-export const getServerImageByName = (serverName: string): string | null => {
-	const server: Server | undefined = serversMap.get(serverName.toLowerCase());
-	return server?.img ?? null;
-};
-
 export const isRebootServer = (serverName: string): boolean => {
 	return serversMap.get(serverName.toLowerCase())?.Reboot ?? false;
+};
+
+export const isValidServerName = (serverName: string | undefined): boolean => {
+	if (!serverName) {
+		return false;
+	}
+
+	return serversMap.has(serverName.toLowerCase());
 };
 
 export const getRegion = (server: Server): 'eu' | 'na' =>

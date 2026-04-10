@@ -2,12 +2,12 @@
 import { useRouter, usePathname } from 'next/navigation';
 import { toast } from 'react-toastify';
 
-import Button from '@components/Button/Button';
-import Tooltip from '@components/Tooltip/Tooltip';
+import Button from '@components/Button/button';
+import Tooltip from '@components/Tooltip/tooltip';
 import { characterApi } from '@features/character/characterApi';
 import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
 
-import styles from './CharacterHeader.module.scss';
+import styles from './characterHeader.module.scss';
 
 import type { updateCharacterRequestBody } from '@features/character/schemas/character.request.schema';
 import type { getEditCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';

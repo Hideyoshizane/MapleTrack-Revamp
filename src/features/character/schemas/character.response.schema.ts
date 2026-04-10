@@ -11,10 +11,10 @@ import {
 	symbolIdRawSchema,
 	symbolCategoriesSchema,
 	symbolNameSchema,
-} from './base/character.schema';
+} from './character.schema';
 
 // Home Page
-export const getAllCharactersSymbolsResponseSchema = z.object({
+const getAllCharactersSymbolsResponseSchema = z.object({
 	name: symbolNameSchema,
 	level: z.number().min(1),
 	category: symbolCategoriesSchema,
@@ -43,7 +43,7 @@ export type getAllCharactersResponseBody = z.infer<typeof getAllCharactersRespon
 
 //Character Page
 
-export const getCharacterContentSchema = z
+const getCharacterContentSchema = z
 	.object({
 		contentType: z.enum(CONTENT_TYPES),
 		checked: z.boolean().optional(),
@@ -106,6 +106,7 @@ export type getEditCharacterContentResponseBody = z.infer<typeof getEditCharacte
 
 export const getEditCharacterDataSymbolsResponseSchema = z
 	.object({
+		id: symbolIdRawSchema,
 		name: symbolNameSchema,
 		level: z.number().min(1),
 		exp: z.number().min(0),
@@ -177,12 +178,14 @@ export type updateCharacterWeeklyResponseBody = z.infer<typeof updateCharacterWe
 
 //Update All Daily
 
-export const levelUpResultSchema = z.object({
+const levelUpResultSchema = z.object({
 	currentLevel: z.number().min(0),
 	currentExp: z.number().min(0),
 });
 
-export const updatedResultsSchema = z.record(levelUpResultSchema).nullable();
+export const updateCharacterAllDailyResponseSchema = z.record(z.string(), levelUpResultSchema).nullable();
+
+export type updateCharacterAllDailyResponseBody = z.infer<typeof updateCharacterAllDailyResponseSchema>;
 
 // export type UpdateCharacterRequestInput = z.infer<typeof getUpdateCharacterDataRequestSchema>;
 

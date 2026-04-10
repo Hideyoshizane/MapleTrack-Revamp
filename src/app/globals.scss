@@ -38,12 +38,21 @@
 }
 
 .Toastify__toast {
+	width: 320px;
 	border-radius: 6px;
 	background-color: var(--default-button-text);
 	font-family: Roboto, sans-serif;
 	font-size: 1rem;
 	font-weight: 500;
 	color: var(--default-white);
+}
+
+.toast--large {
+	width: 500px;
+}
+
+.Toastify__toast-body {
+	white-space: pre-line;
 }
 
 /* Success toast progress bar */

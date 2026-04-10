@@ -6,22 +6,23 @@ import { useRouter, useSearchParams, redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-import ErrorPage from '@components/ErrorPage/ErrorPage';
-import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
+import ErrorPage from '@components/ErrorPage/errorPage';
+import FullPageLoader from '@components/FullPageLoader/fullPageLoader';
 import { getClassNameByCode } from '@data/classes/classes';
+import { isValidServerName } from '@data/servers/servers';
 import { characterQueryKeys } from '@features/character/character.queryKeys';
 import { getJob } from '@features/character/characterService';
 import { useCharacterExternalQuery } from '@hooks/useCharacterExternalQuery';
 import { useCharacterQuery } from '@hooks/useCharacterQuery';
 
-import CharacterHeader from './components/CharacterHeader/CharacterHeader';
-import CharacterStats from './components/CharacterStats/CharacterStats';
-import SymbolsSection from './components/SymbolsSection/SymbolsSection';
+import CharacterHeader from './components/CharacterHeader/characterHeader';
+import CharacterStats from './components/CharacterStats/characterStats';
+import SymbolsSection from './components/SymbolsSection/symbolsSection';
 import { useIncreaseAllSymbols } from './hooks/useIncreaseAllSymbols';
 import styles from './page.module.scss';
 import { useBonusContext } from './useBonusContext';
 
-import type { JobType } from '@components/ProgressBar/ProgressBar';
+import type { JobType } from '@components/ProgressBar/progressBar';
 import type { JSX } from 'react';
 
 type CharacterPageProps = {
@@ -34,8 +35,10 @@ const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
 	const searchParams = useSearchParams();
 	const success = searchParams.get('success');
 
+	const isServerValid = isValidServerName(server);
+
 	const className = getClassNameByCode(code);
-	if (!className) {
+	if (!className || !isServerValid) {
 		redirect('/error');
 	}
 

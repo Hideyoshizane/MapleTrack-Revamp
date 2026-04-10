@@ -3,10 +3,7 @@ import nodemailer from 'nodemailer';
 // Create transporter using Gmail service
 const transporter = nodemailer.createTransport({
 	service: 'gmail',
-	auth: {
-		user: process.env.GMAIL_USER as string,
-		pass: process.env.GMAIL_APP_PASSWORD as string,
-	},
+	auth: { user: process.env.GMAIL_USER as string, pass: process.env.GMAIL_APP_PASSWORD as string },
 });
 
 const FROM_EMAIL = `"MapleTrack" <${process.env.GMAIL_USER}>`;

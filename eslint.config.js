@@ -75,6 +75,7 @@ export default defineConfig([
 			'@typescript-eslint/no-misused-promises': 'error',
 			'@typescript-eslint/no-non-null-assertion': 'warn',
 			'@typescript-eslint/require-await': 'error',
+			'@typescript-eslint/explicit-function-return-type': ['error', { allowExpressions: true }],
 
 			// React
 			'no-console': ['error', { allow: ['warn', 'error'] }],
@@ -84,10 +85,6 @@ export default defineConfig([
 			'react/react-in-jsx-scope': 'off',
 			'react/no-array-index-key': 'error',
 			'react/jsx-pascal-case': 'error',
-			'react/function-component-definition': [
-				'error',
-				{ namedComponents: 'arrow-function', unnamedComponents: 'arrow-function' },
-			],
 
 			// Import order & organization
 			'import/order': [

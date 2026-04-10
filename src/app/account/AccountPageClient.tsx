@@ -2,11 +2,11 @@
 
 import { useForm, useWatch } from 'react-hook-form';
 
-import Button from '@components/Button/Button';
-import FormInput from '@components/FormInput/FormInput';
+import Button from '@components/Button/button';
+import FormInput from '@components/FormInput/formInput';
 import { validatePassword, validatePasswordConfirmation } from '@utils/validators';
 
-import AlertDialogComponent from './Components/AlertDialogComponent/AlertDialogComponent';
+import AlertDialogComponent from './Components/AlertDialogComponent/alertDialogComponent';
 import { useChangePassword } from './hooks/useChangePassword';
 import { useDeleteAccount } from './hooks/useDeleteAccount';
 import styles from './page.module.scss';
@@ -15,12 +15,7 @@ import type { ChangePasswordFormData } from '@sharedTypes/form';
 import type { ValidationResult } from '@utils/validateField';
 import type { JSX } from 'react';
 
-type AccountClientProps = {
-	searchParams?: Record<string, string | undefined>;
-	username: string;
-};
-
-const AccountPageClient = ({ username }: AccountClientProps): JSX.Element => {
+const AccountPageClient = (): JSX.Element => {
 	const {
 		control,
 		handleSubmit,
@@ -32,8 +27,8 @@ const AccountPageClient = ({ username }: AccountClientProps): JSX.Element => {
 		defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
 	});
 
-	const { onSubmit } = useChangePassword({ username, setError });
-	const { isDeleteDialogOpen, openDeleteDialog, closeDeleteDialog, handleDelete } = useDeleteAccount({ username });
+	const { onSubmit } = useChangePassword({ setError });
+	const { isDeleteDialogOpen, openDeleteDialog, closeDeleteDialog, handleDelete } = useDeleteAccount();
 
 	const commonInputProps = { control, isSubmitted, isLightmode: true };
 

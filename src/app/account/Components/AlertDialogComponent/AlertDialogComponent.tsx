@@ -2,7 +2,7 @@
 
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 
-import styles from './AlertDialogComponent.module.scss';
+import styles from './alertDialogComponent.module.scss';
 
 import type { JSX } from 'react';
 

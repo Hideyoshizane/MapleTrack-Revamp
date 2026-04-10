@@ -1,23 +1,22 @@
 'use client';
-
-import { codeToClass } from '@features/character/characterAttributes';
 import { clsx } from 'clsx';
 import Image from 'next/image';
 import { useRef, useEffect, useState, Fragment } from 'react';
 
 import ChevronIcon from '@assets/svg/chevron-down.svg';
-import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
+import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
+import { generateClassCode } from '@data/classes/classes';
 
-import CharacterBossItem from './BossItem/CharacterBossItem';
-import styles from './CharacterSelectBossDropdown.module.scss';
+import CharacterBossItem from './BossItem/characterBossItem';
+import styles from './characterSelectBossDropdown.module.scss';
 
-import type { BossCharacterDraft as BossCharacter } from '@features/Boss/bossListModel';
+import type { getEditBossListCharacterResponseBody } from '@features/Boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
 type CharacterSelectBossDropdownProps = {
-	setSelectedCharacter: (value: BossCharacter) => void;
-	selectedCharacter: BossCharacter | null;
-	characters: BossCharacter[];
+	setSelectedCharacter: (value: getEditBossListCharacterResponseBody) => void;
+	selectedCharacter: getEditBossListCharacterResponseBody | null;
+	characters: getEditBossListCharacterResponseBody[];
 };
 
 const CharacterSelectBossDropdown = ({
@@ -31,7 +30,7 @@ const CharacterSelectBossDropdown = ({
 	// Toggle dropdown open/close state
 	const handleToggle = (): void => setIsOpen((prev) => !prev);
 
-	const handleSelectCharacter = (character: BossCharacter): void => {
+	const handleSelectCharacter = (character: getEditBossListCharacterResponseBody): void => {
 		setSelectedCharacter(character);
 		setIsOpen(false);
 	};
@@ -52,6 +51,8 @@ const CharacterSelectBossDropdown = ({
 		return <SkeletonWrapper width={502} height={368} color="light" variant="rounded" />;
 	}
 
+	const code = generateClassCode(selectedCharacter.class);
+
 	return (
 		<div ref={dropdownRef} className={clsx(styles.characterDropdownWrapper, { [styles.open]: isOpen })}>
 			{/* Selected character button */}
@@ -70,14 +71,14 @@ const CharacterSelectBossDropdown = ({
 				}}>
 				<div className={styles.nameDiv}>
 					<p className={styles.characterName}>{selectedCharacter.name}</p>
-					<p className={styles.characterClass}>{codeToClass(selectedCharacter.code)}</p>
+					<p className={styles.characterClass}>{selectedCharacter.class}</p>
 				</div>
 				<div className={styles.iconsDiv}>
 					<ChevronIcon className={clsx(styles.chevronIcon, styles.rotated, { [styles.rotatedActive]: isOpen })} />
 				</div>
 				<Image
 					className={styles.classIcon}
-					src={`/assets/buttom_profile/${selectedCharacter.code}.webp`}
+					src={`/assets/buttom_profile/${code}.webp`}
 					alt={selectedCharacter.name}
 					width={480}
 					height={80}
@@ -88,10 +89,10 @@ const CharacterSelectBossDropdown = ({
 			{/* Dropdown list */}
 			<div className={styles.characterList}>
 				{characters.map((character, index) => (
-					<Fragment key={character.code}>
+					<Fragment key={character.class}>
 						<CharacterBossItem
 							character={character}
-							isSelected={character.code === selectedCharacter.code}
+							isSelected={character.class === selectedCharacter.class}
 							onClick={() => handleSelectCharacter(character)}
 						/>
 						{index < characters.length - 1 && <hr className={styles.hr} />}

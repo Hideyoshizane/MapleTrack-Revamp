@@ -2,13 +2,12 @@
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { clsx } from 'clsx';
-import { useCallback } from 'react';
 
 import BanIcon from '@assets/svg/ban.svg';
 import CheckIcon from '@assets/svg/check.svg';
-import Tooltip from '@components/Tooltip/Tooltip';
+import Tooltip from '@components/Tooltip/tooltip';
 
-import styles from './BossDropdownButton.module.scss';
+import styles from './bossDropdownButton.module.scss';
 
 import type { JSX } from 'react';
 
@@ -43,18 +42,15 @@ const BossDropdownButton = ({
 	value = 0,
 	onSelectDifficulty,
 }: BossDropdownButtonProps): JSX.Element => {
-	const rows = Array.from({ length: 8 }, (_, i): number => i);
+	const rows = Array.from({ length: 8 }, (_, index): number => index);
 
-	const handleSelect = useCallback(
-		(value: number): void => {
-			try {
-				onSelectDifficulty?.(difficulty, value);
-			} catch (error) {
-				console.error('Failed to set selected value:', error);
-			}
-		},
-		[difficulty, onSelectDifficulty]
-	);
+	const handleSelect = (multiplier: number): void => {
+		try {
+			onSelectDifficulty?.(difficulty, multiplier);
+		} catch (error: unknown) {
+			console.error('Failed to set selected value:', error);
+		}
+	};
 
 	const renderBossValueItem = (multiplier: number): JSX.Element => (
 		<DropdownMenu.Item className={styles.menuItem} key={multiplier} onSelect={(): void => handleSelect(multiplier)}>
@@ -68,7 +64,6 @@ const BossDropdownButton = ({
 
 	const tooltipContent = `Required Level: ${difficulty.minLevel}`;
 
-	// Render locked version
 	if (locked) {
 		return (
 			<Tooltip content={tooltipContent} enabled={true}>
@@ -79,7 +74,6 @@ const BossDropdownButton = ({
 		);
 	}
 
-	// Render Dropdown version
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
@@ -90,7 +84,9 @@ const BossDropdownButton = ({
 
 			<DropdownMenu.Portal>
 				<DropdownMenu.Content forceMount className={styles.dropdownContent} side="bottom" align="center" sideOffset={5}>
-					<div className={styles.gridContainer}>{rows.map((value): JSX.Element => renderBossValueItem(value))}</div>
+					<div className={styles.gridContainer}>
+						{rows.map((multiplier): JSX.Element => renderBossValueItem(multiplier))}
+					</div>
 
 					<DropdownMenu.Arrow className={styles.arrow} width={15} height={10} />
 				</DropdownMenu.Content>

@@ -9,6 +9,7 @@ import {
 	isSymbolName,
 } from '@data/symbols/symbolMappings';
 import { updateCharacterAllDailyRequestSchema } from '@features/character/schemas/character.request.schema';
+import { updateCharacterAllDailyResponseSchema } from '@features/character/schemas/character.response.schema';
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
@@ -41,9 +42,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			const character = await tx.character.findUnique({
 				where: { id: id, userId: authenticatedUserId, server: server, class: className },
 				include: {
-					symbols: {
-						select: { id: true, name: true, level: true, exp: true, category: true, contents: true },
-					},
+					symbols: { select: { id: true, name: true, level: true, exp: true, category: true, contents: true } },
 				},
 			});
 
@@ -119,6 +118,12 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		if (!updatedResults) {
 			logApiFailure('Character not found', { route });
 			return createResponse<ApiResponse>({ success: true, message: 'Character not found.' }, 200);
+		}
+
+		const validation = updateCharacterAllDailyResponseSchema.safeParse(updatedResults);
+		if (!validation.success) {
+			logZodError(validation.error, { route: route });
+			return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 		}
 
 		return createResponse<ApiResponse<Record<string, LevelUpResult>>>(

@@ -11,7 +11,7 @@ import { validateUsernameLogin, validatePasswordLogin } from '@utils/validators'
 
 import type { DefaultSession } from 'next-auth';
 
-export type AppUser = {
+type AppUser = {
 	id: string;
 	username: string;
 	version: number;
@@ -26,14 +26,14 @@ function isAppUser(user: unknown): user is AppUser {
 		typeof (user as AppUser).version === 'number'
 	);
 }
-export type AppJWT = {
+type AppJWT = {
 	id: string;
 	username: string;
 	version: number;
 	[key: string]: unknown;
 };
 
-export type AppSession = DefaultSession & {
+type AppSession = DefaultSession & {
 	user: {
 		id: string;
 		username: string;
@@ -43,7 +43,7 @@ export type AppSession = DefaultSession & {
 
 type LoginCredentials = { username: string; password: string };
 
-export const { auth, handlers, signIn, signOut } = NextAuth({
+export const { auth, handlers } = NextAuth({
 	providers: [
 		CredentialsProvider({
 			name: 'Credentials',

@@ -6,48 +6,34 @@ import { motion, AnimatePresence } from 'motion/react';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
-import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
-import { isRebootServer } from '@data/servers/servers';
+import ResponsiveText from '@components/ResponsiveText/responsiveText';
+import {
+	parseBossName,
+	parseBossDifficultyName,
+	getBossDifficultyValue,
+	isValidBossDifficulty,
+	getBossImage,
+} from '@data/bosses/bosses';
 
-import BossButton from '../BossButton/BossButton';
-import BossDropdownButton from '../BossDropdownButton/BossDropdownButton';
+import BossButton from '../BossButton/bossButton';
+import BossDropdownButton from '../BossDropdownButton/bossDropdownButton';
 
-import styles from './BossItem.module.scss';
+import styles from './bossItem.module.scss';
 
+import type { BossName, BossDifficultyName, BossReset, Boss } from '@data/bosses/bosses';
+import type { getEditBossListBossResponseBody } from '@features/Boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
-
-export type BossDifficulty = {
-	name: string;
-	value: number;
-	reset: string;
-	minLevel: number;
-};
-
-export type Boss = {
-	name: string;
-	img: string;
-	difficulties: BossDifficulty[];
-};
-
-export type BossProgress = {
-	name: string;
-	difficulty: string;
-	reset: 'Daily' | 'Weekly' | 'Monthly';
-	cleared: boolean;
-	dailyTotal?: number;
-	date?: Date | null;
-	locked?: boolean;
-};
 
 type BossItemProps = {
 	serverCookie: string;
 	boss: Boss;
-	selectedBosses: BossProgress[];
+	selectedBosses: getEditBossListBossResponseBody[];
 	selectedCharacterLevel: number;
 	onBossUpdate: (
-		bossName: string,
-		difficulty: string,
-		reset: 'Daily' | 'Weekly' | 'Monthly',
+		bossName: BossName,
+		difficulty: BossDifficultyName,
+		server: string,
+		reset: BossReset,
 		dailyTotal?: number,
 	) => void;
 };
@@ -62,30 +48,60 @@ const BossItem = ({
 	const isSmallButtons = boss.difficulties.length > 3;
 	const gapClass = isSmallButtons ? styles.smallGap : styles.largeGap;
 
-	const getSelection = (diffName: string, reset: string): BossProgress | undefined => {
-		return selectedBosses.find((b) => b.difficulty === diffName && b.reset === reset);
+	const selectionMap = new Map<string, getEditBossListBossResponseBody>();
+	for (const b of selectedBosses) {
+		selectionMap.set(`${b.difficulty}|${b.reset}`, b);
+	}
+
+	const getSelection = (diffName: string, reset: string): getEditBossListBossResponseBody | undefined => {
+		return selectionMap.get(`${diffName}|${reset}`);
 	};
 
-	const totalGold: number = selectedBosses.reduce((total, progress) => {
-		const difficulty = boss.difficulties.find((d) => d.name === progress.difficulty && d.reset === progress.reset);
+	const totalGold: number = (() => {
+		const bossNameParsed = parseBossName(boss.name);
 
-		if (!difficulty) {
-			return total;
+		if (!bossNameParsed) {
+			return 0;
 		}
 
-		const baseValue: number = difficulty.value ?? 0;
-		const goldValue: number = isRebootServer(serverCookie) ? baseValue * 5 : baseValue;
+		let total = 0;
 
-		return progress.reset === 'Daily' ? total + goldValue * (progress.dailyTotal ?? 0) : total + goldValue;
-	}, 0);
+		for (const progress of selectedBosses) {
+			const difficultyParsed = parseBossDifficultyName(progress.difficulty);
+			if (!difficultyParsed) {
+				continue;
+			}
+
+			if (!isValidBossDifficulty(bossNameParsed, difficultyParsed)) {
+				continue;
+			}
+
+			const value = getBossDifficultyValue(bossNameParsed, difficultyParsed, serverCookie);
+			if (!value) {
+				continue;
+			}
+
+			total += progress.reset === 'Daily' ? value * (progress.dailyTotal ?? 0) : value;
+		}
+
+		return total;
+	})();
 
 	const handleBossUpdate = (
-		bossName: string,
-		difficulty: string,
-		reset: 'Daily' | 'Weekly' | 'Monthly',
+		serverCookie: string,
+		bossName: BossName,
+		difficulty: BossDifficultyName,
+		reset: BossReset,
 		dailyTotal?: number,
 	): void => {
-		onBossUpdate(bossName, difficulty, reset, dailyTotal);
+		const parsedBoss = parseBossName(bossName);
+		const parsedDifficulty = parseBossDifficultyName(difficulty);
+
+		if (!parsedBoss || !parsedDifficulty) {
+			return;
+		}
+
+		onBossUpdate(parsedBoss, parsedDifficulty, serverCookie, reset, dailyTotal);
 	};
 
 	const anySelected = boss.difficulties.some((d) => !!getSelection(d.name, d.reset));
@@ -130,7 +146,7 @@ const BossItem = ({
 			<div className={styles.bossSlotContent}>
 				<Image
 					className={styles.bossIcon}
-					src={boss.img}
+					src={getBossImage(boss.name as BossName)}
 					alt={`${boss.name} portrait`}
 					width={64}
 					height={64}
@@ -156,7 +172,7 @@ const BossItem = ({
 									difficulty={difficulty}
 									isSmallButtons={isSmallButtons}
 									onSelectDifficulty={(diff, multiplier) => {
-										handleBossUpdate(boss.name, diff.name, 'Daily', multiplier);
+										handleBossUpdate(serverCookie, boss.name, diff.name, 'Daily', multiplier);
 									}}
 								/>
 							);
@@ -170,7 +186,7 @@ const BossItem = ({
 								isSmallButtons={isSmallButtons}
 								characterLevel={selectedCharacterLevel}
 								onSelect={() => {
-									handleBossUpdate(boss.name, difficulty.name, difficulty.reset as 'Weekly' | 'Monthly');
+									handleBossUpdate(serverCookie, boss.name, difficulty.name, difficulty.reset);
 								}}
 							/>
 						);

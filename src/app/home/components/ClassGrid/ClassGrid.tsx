@@ -2,14 +2,14 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import ErrorPage from '@components/ErrorPage/ErrorPage';
-import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
+import ErrorPage from '@components/ErrorPage/errorPage';
+import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
 import { JobClasses } from '@data/classes/classes';
 import { characterApi } from '@features/character/characterApi';
 import { generateCharacterObjectHomePage } from '@features/character/characterService';
 
-import ClassCard from './ClassCard/ClassCard';
-import styles from './ClassGrid.module.scss';
+import ClassCard from './ClassCard/classCard';
+import styles from './classGrid.module.scss';
 
 import type { GetAllCharactersRequestBody } from '@features/character/schemas/character.request.schema';
 import type { getAllCharactersResponseBody } from '@features/character/schemas/character.response.schema';
@@ -123,7 +123,6 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Cl
 		}
 
 		void fetchCharacters();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [serverCookie]);
 
 	const jobResults: getAllCharactersResponseBody[] = sortCharacters(filterCharacters(allCharacters, selectedClasses));

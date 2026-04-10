@@ -2,21 +2,14 @@ import { getRemainingExp, getExpForLevel, getLastLevel } from '@data/symbols/exp
 
 import { allSymbols } from './dailyExp';
 
-import type { CharacterSymbol as PrismaCharacterSymbol, SymbolCategory } from '@prisma/client';
+import type { SymbolCategory } from '@prisma/client';
 
-export type CharacterSymbol = {
+type CharacterSymbol = {
 	name: string;
 	level: number;
 	exp: number;
 	category: SymbolCategory;
 };
-
-export const mapCharacterSymbol = (input: PrismaCharacterSymbol): CharacterSymbol => ({
-	name: input.name,
-	level: input.level,
-	exp: input.exp,
-	category: input.category,
-});
 
 export const SYMBOL_CONFIG = {
 	arcane: {
@@ -69,7 +62,7 @@ const SYMBOL_MAP: Record<SymbolName, SymbolInfo> = Object.fromEntries(
 const contentValueMap = new Map<string, number>(allSymbols.map((s) => [s.name, Number(s.value) || 0]));
 const SYMBOL_CATEGORY_SET: ReadonlySet<SymbolCategory> = new Set(Object.keys(SYMBOL_CONFIG) as SymbolCategory[]);
 
-export const isSymbolCategory = (value: unknown): value is SymbolCategory =>
+const isSymbolCategory = (value: unknown): value is SymbolCategory =>
 	typeof value === 'string' && SYMBOL_CATEGORY_SET.has(value as SymbolCategory);
 
 export const isSymbolName = (value: string): value is SymbolName => value in SYMBOL_MAP;
@@ -105,7 +98,7 @@ export const getContentValue = (symbolName: SymbolName | null, contentType: stri
 	return contentValueMap.get(contentType) ?? contentValueMap.get('Weekly') ?? 0;
 };
 
-export type CharacterContent = { contentType: string; checked: boolean; cleared: boolean };
+type CharacterContent = { contentType: string; checked: boolean; cleared: boolean };
 
 export const computeDailyWeeklyValues = (
 	symbol: CharacterSymbol,

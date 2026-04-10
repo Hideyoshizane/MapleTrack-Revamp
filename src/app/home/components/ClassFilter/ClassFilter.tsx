@@ -1,9 +1,9 @@
 'use client';
 
-import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
+import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
 import { classFilterOptions } from '@utils/classFilterCookie';
 
-import styles from './ClassFilter.module.scss';
+import styles from './classFilter.module.scss';
 
 import type { ClassFilterOption } from '@utils/classFilterCookie';
 import type { JSX } from 'react';

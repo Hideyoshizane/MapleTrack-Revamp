@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import { Roboto } from 'next/font/google';
 
-import ClientToaster from '@components/CustomToaster/CustomToaster';
+import ClientToaster from '@components/CustomToaster/customToaster';
 
 import Providers from './providers';
 

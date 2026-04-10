@@ -4,8 +4,8 @@ import { clsx } from 'clsx';
 import { useState } from 'react';
 import { Controller, type Control, type Path, type FieldValues } from 'react-hook-form';
 
-import styles from './FormInput.module.scss';
-import ValidationIcon from './ValidationIcon/ValidationIcon';
+import styles from './formInput.module.scss';
+import ValidationIcon from './ValidationIcon/validationIcon';
 
 import type { ValidationResult } from '@utils/validateField';
 import type { HTMLInputTypeAttribute, JSX } from 'react';
@@ -31,9 +31,7 @@ const FormInput = <TFieldValues extends FieldValues>({
 }: FormInputProps<TFieldValues>): JSX.Element => {
 	const [touched, setTouched] = useState(false);
 
-	const containerClass: string = clsx(styles.inputContainer, {
-		[styles.marginSignUp]: !isLogin,
-	});
+	const containerClass: string = clsx(styles.inputContainer, { [styles.marginSignUp]: !isLogin });
 
 	return (
 		<Controller
@@ -41,7 +39,9 @@ const FormInput = <TFieldValues extends FieldValues>({
 			control={control}
 			rules={{
 				validate: (value: string): boolean | string => {
-					if (!validation) return true;
+					if (!validation) {
+						return true;
+					}
 					const result = validation(value);
 					return result.isValid || result.error || 'Invalid input';
 				},
@@ -50,7 +50,7 @@ const FormInput = <TFieldValues extends FieldValues>({
 				const showError = Boolean(fieldState.error);
 				const showValid = touched && !fieldState.error;
 				const showInvalid = touched && showError;
-				const tooltipMessage = showError ? fieldState.error?.message ?? 'Invalid input' : 'Enter a value';
+				const tooltipMessage = showError ? (fieldState.error?.message ?? 'Invalid input') : 'Enter a value';
 
 				const inputClass = clsx(styles.input, {
 					[styles.valid]: !isLogin && showValid,

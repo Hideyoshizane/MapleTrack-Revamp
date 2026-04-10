@@ -2,10 +2,10 @@ import { clsx } from 'clsx';
 
 import BanIcon from '@assets/svg/ban.svg';
 import CheckedIcon from '@assets/svg/check-boss.svg';
-import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
-import Tooltip from '@components/Tooltip/Tooltip';
+import ResponsiveText from '@components/ResponsiveText/responsiveText';
+import Tooltip from '@components/Tooltip/tooltip';
 
-import styles from './BossButton.module.scss';
+import styles from './bossButton.module.scss';
 
 import type { JSX } from 'react';
 

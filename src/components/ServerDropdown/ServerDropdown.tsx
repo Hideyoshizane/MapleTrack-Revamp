@@ -5,11 +5,11 @@ import Image from 'next/image';
 import { useRef, useEffect, useState } from 'react';
 
 import ChevronIcon from '@assets/svg/chevron-down.svg';
-import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
+import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
 import { servers } from '@data/servers/servers';
 
-import styles from './ServerDropdown.module.scss';
-import ServerItem from './ServerItem/ServerItem';
+import styles from './serverDropdown.module.scss';
+import ServerItem from './ServerItem/serverItem';
 
 import type { Server, ServerName } from '@data/servers/servers';
 import type { JSX } from 'react';

@@ -1,7 +1,7 @@
 import { COOKIE_EXPIRES_DAYS } from '@constants/cookiesConstants';
 import { SERVER_NAMES, type ServerName } from '@data/servers/servers';
 
-import { createCookieManager } from './CookieManager';
+import { createCookieManager } from './cookieManager';
 
 export type ServerOption = ServerName;
 

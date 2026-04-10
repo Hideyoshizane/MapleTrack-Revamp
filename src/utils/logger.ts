@@ -1,6 +1,6 @@
 type LogLevel = 'error' | 'warn' | 'info';
 
-export type LogContext = {
+type LogContext = {
 	level?: LogLevel;
 	route?: string;
 	userId?: string;

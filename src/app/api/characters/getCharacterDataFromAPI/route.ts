@@ -1,5 +1,5 @@
 import { getCharacterDataFromAPIRequestSchema } from '@features/character/schemas/character.request.schema';
-import { fetchCharacterDataFromAPI } from '@lib/fetchCharacterDataFromAPI';
+import { fetchCharacterDataFromApi } from '@lib/fetchCharacterDataFromApi';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
 import { logError, logZodError } from '@utils/logger';
@@ -19,7 +19,7 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
 	const { characterName, server } = parseResult.data;
 
 	try {
-		const data = await fetchCharacterDataFromAPI(characterName, server);
+		const data = await fetchCharacterDataFromApi(characterName, server);
 
 		return createResponse<ApiResponse<getCharacterDataFromAPIResponseBody>>(
 			{ success: true, message: 'Character fetched.', data },

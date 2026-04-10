@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-import { characterNameRawSchema } from '@features/character/schemas/base/character.schema';
+import { characterNameRawSchema } from '@features/character/schemas/character.schema';
 
 import type { getCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { Dispatch, SetStateAction } from 'react';
@@ -13,7 +13,7 @@ type UseCharacterInputsProps = {
 	setSyncEnabled: (value: boolean) => void;
 };
 
-export type UseCharacterInputsReturn = {
+type UseCharacterInputsReturn = {
 	levelInput: string;
 	setLevelInput: Dispatch<SetStateAction<string>>;
 	targetLevelInput: string;

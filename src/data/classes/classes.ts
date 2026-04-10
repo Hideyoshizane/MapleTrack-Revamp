@@ -1,6 +1,6 @@
 import classesJson from './classes.json';
 
-export type Classes = {
+type Classes = {
 	linkSkill: string;
 	legionType: string;
 	className: string;
@@ -14,27 +14,12 @@ export const LEGION_TYPE = JobClasses.map((classes): string => classes.legionTyp
 export const JOB_CLASSES = JobClasses.map((classes): string => classes.className) as readonly string[];
 export const JOB_TYPE = JobClasses.map((classes): string => classes.jobType) as readonly string[];
 
-export const jobClassesByName: ReadonlyMap<string, Classes> = new Map(
+const jobClassesByName: ReadonlyMap<string, Classes> = new Map(
 	JobClasses.map((jobClass): [string, Classes] => [jobClass.className, jobClass]),
 );
 
 export const getClassByName = (className: string): Classes | null => {
 	return jobClassesByName.get(className) ?? null;
-};
-
-export const getLinkSkillByClassName = (className: string): string | null => {
-	const jobClass = jobClassesByName.get(className);
-	return jobClass ? jobClass.linkSkill : null;
-};
-
-export const getLegionTypeByClassName = (className: string): string | null => {
-	const jobClass = jobClassesByName.get(className);
-	return jobClass ? jobClass.legionType : null;
-};
-
-export const getJobTypeByClassName = (className: string): string | null => {
-	const jobClass = jobClassesByName.get(className);
-	return jobClass ? jobClass.jobType : null;
 };
 
 export const generateClassCode = (className: string): string => {
@@ -46,7 +31,7 @@ export const generateClassCode = (className: string): string => {
 		.replace(/_+/g, '_');
 };
 
-export const classCodeToNameMap: ReadonlyMap<string, string> = new Map(
+const classCodeToNameMap: ReadonlyMap<string, string> = new Map(
 	JobClasses.map((jobClass): [string, string] => [generateClassCode(jobClass.className), jobClass.className]),
 );
 

@@ -2,13 +2,15 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 
-import Button from '@components/Button/Button';
+import Button from '@components/Button/button';
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 import { getClassNameByCode } from '@data/classes/classes';
 import { characterQueryKeys } from '@features/character/character.queryKeys';
-import { characterApi } from '@features/character/characterApi';
 
-import styles from './SymbolButtons.module.scss';
+import { useUpdateSymbolDaily } from '../../hooks/useUpdateSymbolDaily';
+import { useUpdateSymbolWeekly } from '../../hooks/useUpdateSymbolWeekly';
+
+import styles from './symbolButtons.module.scss';
 
 import type {
 	getCharacterDataResponseBody,
@@ -43,12 +45,15 @@ const SymbolButtons = ({
 }: SymbolButtonsProps): JSX.Element => {
 	const queryClient = useQueryClient();
 
+	const { mutateAsync: updateDaily } = useUpdateSymbolDaily();
+	const { mutateAsync: updateWeekly } = useUpdateSymbolWeekly();
+
 	const handleDailyUpdate = async (): Promise<void> => {
 		try {
 			const [server, code] = window.location.pathname.split('/').filter(Boolean);
 			const className = getClassNameByCode(code);
-			const result = await characterApi.updateCharacterDaily({
-				server: server,
+			const result = await updateDaily({
+				server,
 				className: className ?? '',
 				id: symbol.id,
 				bonus,
@@ -83,12 +88,7 @@ const SymbolButtons = ({
 								return s;
 							}
 							updated = true;
-							return {
-								...s,
-								exp: result.data.currentExp,
-								level: result.data.currentLevel,
-								contents: updatedContents,
-							};
+							return { ...s, exp: result.data.currentExp, level: result.data.currentLevel, contents: updatedContents };
 						}) as T;
 						return { updated, symbols: nextSymbols };
 					};
@@ -121,7 +121,7 @@ const SymbolButtons = ({
 			const [server, code] = window.location.pathname.split('/').filter(Boolean);
 			const className = getClassNameByCode(code);
 
-			const result = await characterApi.updateCharacterWeekly({ id: symbol.id });
+			const result = await updateWeekly({ server, className: className ?? '', id: symbol.id });
 
 			if (!result.success || !result.data) {
 				return;
@@ -155,17 +155,12 @@ const SymbolButtons = ({
 					} => {
 						let updated = false;
 						const nextSymbols = symbols.map((s) => {
-							if (s.id !== symbol.id) {
+							if (s.id !== result.data?.id) {
 								return s;
 							}
 
 							updated = true;
-							return {
-								...s,
-								exp: result.data!.currentExp,
-								level: result.data!.currentLevel,
-								contents: updatedContents,
-							};
+							return { ...s, exp: result.data.currentExp, level: result.data.currentLevel, contents: updatedContents };
 						}) as T;
 
 						return { updated, symbols: nextSymbols };

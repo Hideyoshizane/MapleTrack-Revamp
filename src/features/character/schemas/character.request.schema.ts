@@ -4,14 +4,14 @@ import { MIN_VALUE_BONUS_COOKIE, MAX_VALUE_BONUS_COOKIE } from '@constants/cooki
 import { CHARACTER_MAX_LEVEL } from '@data/character/constants';
 import { JOB_CLASSES, LINK_SKILL, JOB_TYPE, LEGION_TYPE } from '@data/classes/classes';
 
+import { getCharacterDataSymbolsResponseSchema } from './character.response.schema';
 import {
 	characterNameRawSchema,
 	characterIdRawSchema,
 	symbolIdRawSchema,
 	serverSchema,
 	jobClassSchema,
-} from './base/character.schema';
-import { getCharacterDataSymbolsResponseSchema } from './character.response.schema';
+} from './character.schema';
 
 // Home Page
 export const getAllCharactersRequestSchema = z
@@ -85,6 +85,8 @@ export type updateCharacterDailyRequestBody = z.infer<typeof updateCharacterDail
 
 export const updateCharacterWeeklyRequestSchema = z
 	.object({
+		server: serverSchema,
+		className: z.enum(JOB_CLASSES),
 		id: symbolIdRawSchema,
 	})
 	.strict();

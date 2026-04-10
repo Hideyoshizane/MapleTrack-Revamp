@@ -2,17 +2,24 @@ import { produce } from 'immer';
 
 import { getBossDifficultyValue } from '@data/bosses/bosses';
 
-import type { BossServerDraft as BossServer, BossCharacterDraft as BossCharacter } from '@features/Boss/bossListModel';
+import type {
+	getEditBossListResponseBody,
+	getEditBossListCharacterResponseBody,
+} from './schemas/bossList.response.schema';
 
 type UpdateBossParams = {
 	characterName: string;
 	bossName: string;
 	difficulty: string;
+	server: string;
 	reset: 'Daily' | 'Weekly' | 'Monthly';
 	dailyTotal?: number;
 };
 
-export const updateCharacterBoss = (serverData: BossServer, params: UpdateBossParams): BossServer => {
+export const updateCharacterBoss = (
+	serverData: getEditBossListResponseBody,
+	params: UpdateBossParams,
+): getEditBossListResponseBody => {
 	return produce(serverData, (draft) => {
 		const character = draft.characters.find((c) => c.name === params.characterName);
 		if (!character) {
@@ -21,7 +28,7 @@ export const updateCharacterBoss = (serverData: BossServer, params: UpdateBossPa
 
 		const bossIndex = character.bosses.findIndex((b) => b.name === params.bossName && b.reset === params.reset);
 
-		const newValue = getBossDifficultyValue(params.bossName, params.difficulty, draft.name);
+		const newValue = getBossDifficultyValue(params.bossName, params.difficulty, params.server);
 		if (newValue === null) {
 			return;
 		}
@@ -35,10 +42,7 @@ export const updateCharacterBoss = (serverData: BossServer, params: UpdateBossPa
 				name: params.bossName,
 				difficulty: params.difficulty,
 				reset: params.reset,
-				cleared: false,
-				date: null,
 				dailyTotal: isDaily ? (params.dailyTotal ?? 0) : 0,
-				locked: false,
 			});
 
 			draft.totalGains += newValue * multiplier;
@@ -49,7 +53,7 @@ export const updateCharacterBoss = (serverData: BossServer, params: UpdateBossPa
 
 		const existingBoss = character.bosses[bossIndex];
 
-		const oldValue = getBossDifficultyValue(params.bossName, existingBoss.difficulty, draft.name);
+		const oldValue = getBossDifficultyValue(params.bossName, existingBoss.difficulty, params.server);
 		if (oldValue === null) {
 			return;
 		}
@@ -90,7 +94,7 @@ export const updateCharacterBoss = (serverData: BossServer, params: UpdateBossPa
 	});
 };
 
-export const countCharacterBosses = (character: BossCharacter): number => {
+export const countCharacterBosses = (character: getEditBossListCharacterResponseBody): number => {
 	let totalBosses = 0;
 
 	for (const boss of character.bosses) {
@@ -105,13 +109,13 @@ export const countCharacterBosses = (character: BossCharacter): number => {
 	return totalBosses;
 };
 
-export const countMonthlyBosses = (character: BossCharacter): number => {
+export const countMonthlyBosses = (character: getEditBossListCharacterResponseBody): number => {
 	return character.bosses.reduce<number>((total, boss) => {
 		return boss.reset === 'Monthly' ? total + 1 : total;
 	}, 0);
 };
 
-export const countServerBosses = (serverData: BossServer): number => {
+export const countServerBosses = (serverData: getEditBossListResponseBody): number => {
 	return serverData.characters.reduce<number>((total, character) => {
 		return total + countCharacterBosses(character);
 	}, 0);

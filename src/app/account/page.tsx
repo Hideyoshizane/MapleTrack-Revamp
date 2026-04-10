@@ -1,17 +1,13 @@
 import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
-import Navbar from '@components/Navbar/Navbar';
+import Navbar from '@components/Navbar/navbar';
 
-import AccountPageClient from './AccountPageClient';
+import AccountPageClient from './accountPageClient';
 
 import type { JSX } from 'react';
 
-type AccountPageProps = {
-	searchParams?: Record<string, string | undefined>;
-};
-
-const AccountPage = async ({ searchParams }: AccountPageProps): Promise<JSX.Element> => {
+const AccountPage = async (): Promise<JSX.Element> => {
 	const session = await auth();
 
 	// If no session, redirect to login with a query param
@@ -22,7 +18,7 @@ const AccountPage = async ({ searchParams }: AccountPageProps): Promise<JSX.Elem
 	return (
 		<main className="container">
 			<Navbar username={session.user.username} />
-			<AccountPageClient searchParams={searchParams} username={session.user.username} />
+			<AccountPageClient />
 		</main>
 	);
 };

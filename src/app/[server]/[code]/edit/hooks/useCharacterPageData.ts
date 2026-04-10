@@ -45,7 +45,6 @@ export const useCharacterPageData = ({
 			setEditableCharacter(serverCharacter);
 		}
 		setFirstLoad(false);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [serverCharacter]);
 
 	const updateCharacter = (recipe: (draft: getCharacterDataResponseBody) => void): void => {

@@ -3,12 +3,12 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import Timer from '@components/Timer/Timer';
+import Timer from '@components/Timer/timer';
 import { APP_VERSION } from '@lib/config/version';
 
-import CustomDropdownMenu from './DropdownMenu/CustomDropdownMenu';
-import styles from './Navbar.module.scss';
-import SearchBar from './SearchBar/SearchBar';
+import CustomDropdownMenu from './DropdownMenu/customDropdownMenu';
+import styles from './navbar.module.scss';
+import SearchBar from './SearchBar/searchBar';
 
 import type { JSX } from 'react';
 

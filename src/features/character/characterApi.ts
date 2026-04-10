@@ -1,4 +1,4 @@
-import { requestApi } from '@/lib/axios/apiClient';
+import { requestApi } from '@lib/axios/apiClient';
 
 import type {
 	GetAllCharactersRequestBody,
@@ -42,7 +42,6 @@ export const characterApi = {
 	updateCharacterData: async (payload: updateCharacterRequestBody): Promise<ApiResponse> =>
 		requestApi('/characters/updateCharacter', 'PATCH', payload),
 
-	//to be fixed
 	updateAllDaily: async (payload: updateCharacterAllDailyRequestBody): Promise<Record<string, LevelUpResult>> =>
 		requestApi('/characters/updateAllDaily', 'POST', payload),
 

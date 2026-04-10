@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
-import Navbar from '@components/Navbar/Navbar';
+import Navbar from '@components/Navbar/navbar';
 import { resolveServerFromCookies } from '@data/servers/resolveServerFromCookies';
 
-import HomePageClient from './HomePageClient';
+import HomePageClient from './homePageClient';
 
 import type { JSX } from 'react';
 

@@ -1,9 +1,9 @@
 // src/features/character/components/SymbolsSection/SymbolsSection.tsx
 'use client';
 
-import SymbolObject from '../SymbolObject/SymbolObject';
+import SymbolObject from '../SymbolObject/symbolObject';
 
-import styles from './SymbolsSection.module.scss';
+import styles from './symbolsSection.module.scss';
 
 import type { getCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';

@@ -4,9 +4,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-import Button from '@components/Button/Button';
-import FooterOutside from '@components/FooterOutside/FooterOutside';
-import FormInput from '@components/FormInput/FormInput';
+import Button from '@components/Button/button';
+import FooterOutside from '@components/FooterOutside/footerOutside';
+import FormInput from '@components/FormInput/formInput';
 import { validatePassword, validatePasswordConfirmation } from '@utils/validators';
 
 import { useResetPassword } from './hooks/useResetPassword';

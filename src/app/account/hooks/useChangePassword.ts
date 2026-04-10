@@ -1,6 +1,4 @@
-// hooks/useChangePassword.ts
 import { signOut } from 'next-auth/react';
-import { useCallback } from 'react';
 import { toast } from 'react-toastify';
 
 import { handleFieldValidation } from '@/utils/validateField';
@@ -23,56 +21,53 @@ type UseChangePasswordReturn = {
 };
 
 export const useChangePassword = ({ setError }: UseChangePasswordProps): UseChangePasswordReturn => {
-	const onSubmit = useCallback(
-		async (data: ChangePasswordFormData): Promise<void> => {
-			try {
-				const [currentPassword, newPassword, confirmPassword] = [
-					data.currentPassword,
-					data.newPassword,
-					data.confirmPassword,
-				].map(sanitizeInputFrontend);
+	const onSubmit = async (data: ChangePasswordFormData): Promise<void> => {
+		try {
+			const [currentPassword, newPassword, confirmPassword] = [
+				data.currentPassword,
+				data.newPassword,
+				data.confirmPassword,
+			].map(sanitizeInputFrontend);
 
-				const validations = {
-					currentPassword: validatePassword(currentPassword),
-					newPassword: validatePassword(newPassword),
-					confirmPassword: validatePasswordConfirmation(newPassword, confirmPassword),
-				};
+			const validations = {
+				currentPassword: validatePassword(currentPassword),
+				newPassword: validatePassword(newPassword),
+				confirmPassword: validatePasswordConfirmation(newPassword, confirmPassword),
+			};
 
-				const hasErrors = (Object.entries(validations) as [keyof ChangePasswordFormData, ValidationResult][]).some(
-					([field, result]): boolean => handleFieldValidation(field, result, setError),
-				);
-				if (hasErrors) return;
+			const hasErrors = (Object.entries(validations) as [keyof ChangePasswordFormData, ValidationResult][]).some(
+				([field, result]): boolean => handleFieldValidation(field, result, setError),
+			);
 
-				const payload = { currentPassword, newPassword };
+			if (hasErrors) return;
 
-				const result: ApiResponse = await userApi.changePassword(payload);
+			const payload = { currentPassword, newPassword };
 
-				// Handle successful password change
-				if (result.success) {
-					toast.success('Password changed successfully.');
-					await signOut({ callbackUrl: '/login' });
-					return;
-				}
+			const result: ApiResponse = await userApi.changePassword(payload);
 
-				toast.error(result.message || 'Failed to change password');
-
-				setError('currentPassword', {
-					message: result.message,
-				});
-			} catch (error: unknown) {
-				const axiosError = error as AxiosError<ApiResponse>;
-
-				const isTimeout = axiosError.code === 'ECONNABORTED';
-
-				toast.error(isTimeout ? 'Request timed out. Please try again.' : 'Unexpected error occurred');
-
-				if (!isTimeout) {
-					console.error('Change password error:', axiosError);
-				}
+			if (result.success) {
+				toast.success('Password changed successfully.');
+				await signOut({ callbackUrl: '/login' });
+				return;
 			}
-		},
-		[setError],
-	);
+
+			toast.error(result.message || 'Failed to change password');
+
+			setError('currentPassword', {
+				message: result.message,
+			});
+		} catch (error: unknown) {
+			const axiosError = error as AxiosError<ApiResponse>;
+
+			const isTimeout = axiosError.code === 'ECONNABORTED';
+
+			toast.error(isTimeout ? 'Request timed out. Please try again.' : 'Unexpected error occurred');
+
+			if (!isTimeout) {
+				console.error('Change password error:', axiosError);
+			}
+		}
+	};
 
 	return { onSubmit };
 };

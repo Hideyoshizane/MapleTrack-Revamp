@@ -44,6 +44,14 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			: { userId_server_class: { userId: authenticatedUserId, server, class: className } };
 
 		await prisma.$transaction(async (tx) => {
+			const existingCharacter = await tx.character.findUnique({
+				where: whereClause,
+				select: {
+					id: true,
+					bossing: true,
+				},
+			});
+
 			const character = await tx.character.upsert({
 				where: whereClause,
 				create: {
@@ -74,6 +82,8 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				},
 			});
 
+			const shouldSyncBossList = existingCharacter === null || existingCharacter.bossing !== data.bossing;
+
 			for (const categoryKey of symbolCategoryKeys) {
 				const symbolsInCategory = data.symbols[categoryKey];
 
@@ -94,11 +104,11 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 						create: {
 							name: symbol.name,
 							level: newValues.currentLevel,
-							exp: isInitialState ? 1 : newValues.currentLevel,
+							exp: isInitialState ? 1 : newValues.currentExp,
 							category: categoryKey,
 							characterId: character.id,
 						},
-						update: { level: newValues.currentLevel, exp: newValues.currentLevel, category: categoryKey },
+						update: { level: newValues.currentLevel, exp: newValues.currentExp, category: categoryKey },
 					});
 
 					const triesAttributeExclude: ReadonlySet<string> = new Set(['Daily Quest', 'Reverse City', 'Yum Yum Island']);
@@ -117,8 +127,9 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					}
 				}
 			}
-
-			await characterToBossList(authenticatedUserId, server, character.id, data.bossing);
+			if (shouldSyncBossList) {
+				await characterToBossList(tx, authenticatedUserId, server, character.id, data.bossing);
+			}
 		});
 
 		return createResponse<ApiResponse>({ success: true, message: 'Character updated successfully.' }, 200);

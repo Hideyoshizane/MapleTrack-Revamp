@@ -72,7 +72,7 @@ const mapToTemplate = (template: SymbolTemplate): SymbolTemplate => ({
 	contents: template.contents.map((c) => ({ ...c })),
 });
 
-export function createSymbolTemplates(includeGrand: boolean): ReturnSymbolTemplate {
+function createSymbolTemplates(includeGrand: boolean): ReturnSymbolTemplate {
 	return {
 		arcane: SYMBOL_TEMPLATES.arcane.map(mapToTemplate),
 		sacred: SYMBOL_TEMPLATES.sacred.map(mapToTemplate),
@@ -80,7 +80,7 @@ export function createSymbolTemplates(includeGrand: boolean): ReturnSymbolTempla
 	};
 }
 
-export function createSymbolsWithIds(includeGrand: boolean): ReturnSymbolWithId {
+function createSymbolsWithIds(includeGrand: boolean): ReturnSymbolWithId {
 	const addId = (template: SymbolTemplate): getCharacterDataSymbolsResponseBody =>
 		({ id: '', ...mapToTemplate(template) }) as getCharacterDataSymbolsResponseBody;
 
@@ -148,7 +148,7 @@ export function generateCharacterObjectEditCharacterPage(
 		linkSkill: options.linkSkill,
 		bossing: false,
 		syncing: false,
-		symbols: createSymbolTemplates(true),
+		symbols: createSymbolsWithIds(true),
 	};
 }
 

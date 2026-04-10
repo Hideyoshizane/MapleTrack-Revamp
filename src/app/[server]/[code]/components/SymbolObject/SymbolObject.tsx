@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 
-import ProgressBar from '@components/ProgressBar/ProgressBar';
+import ProgressBar from '@components/ProgressBar/progressBar';
 import { getExpForLevel } from '@data/symbols/exp/expTable';
 import {
 	getSymbolImagePath,
@@ -15,17 +15,17 @@ import {
 } from '@data/symbols/symbolMappings';
 
 import { useBonusContext } from '../../useBonusContext';
-import SymbolButtons from '../SymbolButton/SymbolButtons';
+import SymbolButtons from '../SymbolButton/symbolButtons';
 
-import styles from './SymbolObject.module.scss';
+import styles from './symbolObject.module.scss';
 
-import type { JobType } from '@components/ProgressBar/ProgressBar';
+import type { JobType } from '@components/ProgressBar/progressBar';
 import type { SymbolName } from '@data/symbols/symbolMappings';
 import type { getCharacterDataSymbolsResponseBody } from '@features/character/schemas/character.response.schema';
 import type { SymbolCategory, CharacterContent } from '@prisma/client';
 import type { JSX } from 'react';
 
-export type SymbolObjectProps = {
+type SymbolObjectProps = {
 	type: SymbolCategory;
 	symbol: getCharacterDataSymbolsResponseBody;
 	characterLevel: number;

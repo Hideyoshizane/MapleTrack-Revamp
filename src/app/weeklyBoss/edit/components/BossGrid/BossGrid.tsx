@@ -2,27 +2,28 @@
 
 import { bosses } from '@data/bosses/bosses';
 
-import BossItem from '../BossItem/BossItem';
+import BossItem from '../BossItem/bossItem';
 
-import styles from './BossGrid.module.scss';
+import styles from './bossGrid.module.scss';
 
-import type { BossCharacterDraft as BossCharacter } from '@features/Boss/bossListModel';
+import type { getEditBossListCharacterResponseBody } from '@/features/Boss/schemas/bossList.response.schema';
+import type { BossName, BossDifficultyName, BossReset } from '@data/bosses/bosses';
 import type { JSX } from 'react';
 
 type BossGridProps = {
 	serverCookie: string;
-	selectedCharacter: BossCharacter | null;
+	selectedCharacter: getEditBossListCharacterResponseBody | null;
 	onBossUpdate: (
-		bossName: string,
-		difficulty: string,
-		reset: 'Daily' | 'Weekly' | 'Monthly',
+		bossName: BossName,
+		difficulty: BossDifficultyName,
+		server: string,
+		reset: BossReset,
 		dailyTotal?: number,
 	) => void;
 };
 
 const BossGrid = ({ serverCookie, selectedCharacter, onBossUpdate }: BossGridProps): JSX.Element => {
 	const selectedBosses = selectedCharacter?.bosses ?? [];
-
 	return (
 		<div className={styles.classGrid}>
 			{bosses.map((boss): JSX.Element => {

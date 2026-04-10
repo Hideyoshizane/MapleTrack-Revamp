@@ -8,27 +8,27 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import BossIcon from '@assets/svg/boss_slayer.svg';
-import Button from '@components/Button/Button';
-import ProgressBar from '@components/ProgressBar/ProgressBar';
-import ServerDropdown from '@components/ServerDropdown/ServerDropdown';
+import ErrorIcon from '@assets/svg/octagon-x.svg';
+import Button from '@components/Button/button';
+import FullPageLoader from '@components/FullPageLoader/fullPageLoader';
+import ProgressBar from '@components/ProgressBar/progressBar';
+import ServerDropdown from '@components/ServerDropdown/serverDropdown';
 import { WEEKLY_BOSSES_TOTAL } from '@constants/bossConstants';
 import { bossListApi } from '@features/Boss/bossListApi';
 import { useServerCookie } from '@hooks/useServerCookie';
 
-import CharactersBossGrid from './components/CharactersBossGrid/CharactersBossGrid';
+import CharactersBossGrid from './components/CharactersBossGrid/charactersBossGrid';
 import styles from './page.module.scss';
 
 import type { ServerName } from '@data/servers/servers';
-import type { BossServerDraft as BossServer } from '@features/Boss/bossListModel';
+import type { getBossListResponseBody } from '@features/Boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
 type WeeklyPageClientProps = {
-	searchParams?: Record<string, string | undefined>;
-	username: string;
 	initialServer: ServerName;
 };
 
-const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): JSX.Element => {
+const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element => {
 	const pathname = usePathname();
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -36,12 +36,12 @@ const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): J
 
 	const { server, setServerCookie } = useServerCookie(initialServer);
 
-	const [serverData, setServerData] = useState<BossServer | null>(null);
+	const [bossList, setbossList] = useState<getBossListResponseBody | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 
-	const weeklyBosses = serverData?.weeklyBosses ?? 0;
-	const totalGains = serverData?.totalGains ?? 0;
-	const characters = serverData?.characters ?? [];
+	const weeklyBosses = bossList?.weeklyBosses ?? 0;
+	const totalGains = bossList?.totalGains ?? 0;
+	const characters = bossList?.characters ?? [];
 
 	useEffect((): void => {
 		if (success === '1') {
@@ -54,17 +54,13 @@ const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): J
 	const BOSS_ICON_SIZE = 96;
 
 	const loadBossList = async (): Promise<void> => {
-		if (!server || !username) {
-			return;
-		}
-
 		setLoading(true);
 		try {
-			const payload = { userOrigin: username, server };
+			const payload = { server };
 			const response = await bossListApi.getBossList(payload);
 
 			if (!response.success || !response.data) {
-				setServerData(null);
+				setbossList(null);
 				return;
 			}
 
@@ -74,7 +70,7 @@ const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): J
 				draft.characters ??= [];
 			});
 
-			setServerData(nextServerData);
+			setbossList(nextServerData);
 		} catch (error) {
 			if (!(error instanceof DOMException && error.name === 'AbortError')) {
 				console.error(error);
@@ -86,18 +82,13 @@ const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): J
 
 	useEffect((): void => {
 		void loadBossList();
-		 
-	}, [server, username]);
+	}, [server]);
 
 	const handleBossToggle = async (params: {
 		characterCode: string;
 		bossName: string;
 		difficulty: string;
 	}): Promise<void> => {
-		if (!server) {
-			return;
-		}
-
 		try {
 			const payload = { server, ...params };
 			const response = await bossListApi.toggleBoss(payload);
@@ -109,7 +100,7 @@ const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): J
 
 			const { weeklyBosses, totalGains, clearedUpdate } = response.data;
 
-			setServerData(
+			setbossList(
 				produce((draft) => {
 					if (!draft) {
 						return;
@@ -118,7 +109,7 @@ const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): J
 					draft.weeklyBosses = weeklyBosses;
 					draft.totalGains = totalGains;
 
-					const character = draft.characters.find((character) => character.code === params.characterCode);
+					const character = draft.characters.find((character) => character.characterId === params.characterCode);
 					if (character) {
 						const boss = character.bosses.find(
 							(boss) => boss.name === params.bossName && boss.difficulty === params.difficulty,
@@ -134,6 +125,25 @@ const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): J
 			toast.error('Unexpected error');
 		}
 	};
+
+	if (loading) {
+		return <FullPageLoader />;
+	}
+
+	if (!loading && bossList?.characters.length == 0) {
+		return (
+			<section className="mainContent">
+				<div className={styles.wrapper}>
+					<div className={styles.notFoundList}>
+						<ErrorIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.errorIcon} />
+						<p className={styles.title}>No character found!</p>
+						<p className={styles.text}>You haven&apos;t marked any characters as Boss Slayer yet.</p>
+						<p className={styles.text}>Go to your desired character and set it as a Boss Slayer to see them here.</p>
+					</div>
+				</div>
+			</section>
+		);
+	}
 
 	return (
 		<section className="mainContent">
@@ -206,15 +216,5 @@ const WeeklyPageClient = ({ username, initialServer }: WeeklyPageClientProps): J
 
 export default WeeklyPageClient;
 
-// {
-// 	!loading && serverData ? (
-// 		<pre className={styles.bossListPreview}>{JSON.stringify(serverData, null, 2)}</pre>
-// 	) : (
-// 		<div className={styles.notFoundList}>
-// 			<ErrorIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.errorIcon} />
-// 			<p className={styles.title}>No character found!</p>
-// 			<p className={styles.text}>You haven&apos;t marked any characters as Boss Slayer yet.</p>
-// 			<p className={styles.text}>Go to your desired character and set it as a Boss Slayer to see them here.</p>
-// 		</div>
-// 	);
-// }
+{
+}

@@ -1,18 +1,14 @@
 import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
-import Navbar from '@components/Navbar/Navbar';
+import Navbar from '@components/Navbar/navbar';
 import { resolveServerFromCookies } from '@data/servers/resolveServerFromCookies';
 
-import WeeklyPageClient from './WeeklyPageClient';
+import WeeklyPageClient from './weeklyPageClient';
 
 import type { JSX } from 'react';
 
-type HomePageProps = {
-	searchParams?: Record<string, string | undefined>;
-};
-
-const HomePage = async ({ searchParams }: HomePageProps): Promise<JSX.Element> => {
+const WeeklyBossPage = async (): Promise<JSX.Element> => {
 	const session = await auth();
 
 	const initialServer = await resolveServerFromCookies();
@@ -22,15 +18,12 @@ const HomePage = async ({ searchParams }: HomePageProps): Promise<JSX.Element> =
 		redirect('/login?unauthorized=1');
 	}
 
-	// Execute function here to updat weekly bosses.
-	// Function here
-
 	return (
 		<main className="container">
 			<Navbar username={session.user.username} />
-			<WeeklyPageClient searchParams={searchParams} username={session.user.username} initialServer={initialServer} />
+			<WeeklyPageClient initialServer={initialServer} />
 		</main>
 	);
 };
 
-export default HomePage;
+export default WeeklyBossPage;

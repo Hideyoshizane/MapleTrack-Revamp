@@ -1,10 +1,10 @@
 'use client';
 
-import WeeklyBossDropdown from '../WeeklyBossDropdown/WeeklyBossDropdown';
+import WeeklyBossDropdown from '../WeeklyBossDropdown/weeklyBossDropdown';
 
-import styles from './CharactersBossGrid.module.scss';
+import styles from './charactersBossGrid.module.scss';
 
-import type { BossCharacterDraft as BossCharacter } from '@features/Boss/bossListModel';
+import type { getBossListCharacterResponseBody } from '@features/Boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
 type HandleBossToggle = (params: {
@@ -15,7 +15,7 @@ type HandleBossToggle = (params: {
 
 type CharacterBossGridProps = {
 	server: string;
-	characterList: BossCharacter[];
+	characterList: getBossListCharacterResponseBody[];
 	handleBossToggle: HandleBossToggle;
 };
 

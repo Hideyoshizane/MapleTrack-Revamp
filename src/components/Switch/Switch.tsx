@@ -2,9 +2,9 @@
 
 import * as SwitchPrimitive from '@radix-ui/react-switch';
 
-import Tooltip from '@components/Tooltip/Tooltip';
+import Tooltip from '@components/Tooltip/tooltip';
 
-import styles from './Switch.module.scss';
+import styles from './switch.module.scss';
 
 import type { JSX } from 'react';
 

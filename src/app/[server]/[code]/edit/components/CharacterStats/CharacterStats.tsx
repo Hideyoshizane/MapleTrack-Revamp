@@ -1,11 +1,11 @@
 'use client';
 
-import ProgressBar from '@components/ProgressBar/ProgressBar';
+import ProgressBar from '@components/ProgressBar/progressBar';
 import { CHARACTER_MAX_LEVEL } from '@data/character/constants';
 
-import styles from './CharacterStats.module.scss';
+import styles from './characterStats.module.scss';
 
-import type { JobType } from '@components/ProgressBar/ProgressBar';
+import type { JobType } from '@components/ProgressBar/progressBar';
 import type { getEditCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 

@@ -1,4 +1,4 @@
-import styles from './SearchBar.module.scss';
+import styles from './searchBar.module.scss';
 
 import type { JSX } from 'react';
 

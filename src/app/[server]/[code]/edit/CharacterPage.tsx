@@ -3,22 +3,23 @@ import Image from 'next/image';
 import { useRouter, usePathname, redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
-import ErrorPage from '@components/ErrorPage/ErrorPage';
-import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
+import ErrorPage from '@components/ErrorPage/errorPage';
+import FullPageLoader from '@components/FullPageLoader/fullPageLoader';
 import { getClassNameByCode } from '@data/classes/classes';
+import { isValidServerName } from '@data/servers/servers';
 import { getJob } from '@features/character/characterService';
 
-import CharacterBossLegion from './components/CharacterBossLegion/CharacterBossLegion';
-import { CharacterHeader } from './components/CharacterHeader/CharacterHeader';
-import { CharacterImageAndSync } from './components/CharacterImageAndSync/CharacterImageAndSync';
-import CharacterStats from './components/CharacterStats/CharacterStats';
-import CharacterSymbol from './components/CharacterSymbol/CharacterSymbol';
-import ValidatedInput from './components/ValidadeInput/ValidatedInput';
+import CharacterBossLegion from './components/CharacterBossLegion/characterBossLegion';
+import { CharacterHeader } from './components/CharacterHeader/characterHeader';
+import { CharacterImageAndSync } from './components/CharacterImageAndSync/characterImageAndSync';
+import CharacterStats from './components/CharacterStats/characterStats';
+import CharacterSymbol from './components/CharacterSymbol/characterSymbol';
+import ValidatedInput from './components/ValidadeInput/validatedInput';
 import { useCharacterInputs } from './hooks/useCharacterInputs';
 import { useCharacterPageData } from './hooks/useCharacterPageData';
 import styles from './page.module.scss';
 
-import type { JobType } from '@components/ProgressBar/ProgressBar';
+import type { JobType } from '@components/ProgressBar/progressBar';
 import type { JSX } from 'react';
 
 type CharacterPageProps = {
@@ -30,8 +31,10 @@ const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
 	const router = useRouter();
 	const pathname = usePathname();
 
+	const isServerValid = isValidServerName(server);
+
 	const className = getClassNameByCode(code);
-	if (!className) {
+	if (!className || !isServerValid) {
 		redirect('/error');
 	}
 

@@ -1,7 +1,4 @@
-import { createNumericCookieManager } from './CookieManager';
-
-export const BONUS_OPTIONS = ['None', 'Active', 'Inactive'] as const;
-export type BonusOption = (typeof BONUS_OPTIONS)[number];
+import { createNumericCookieManager } from './cookieManager';
 
 export const arcaneBonusCookie = createNumericCookieManager('ArcaneBonusEvent');
 export const sacredBonusCookie = createNumericCookieManager('SacredBonusEvent');

@@ -4,8 +4,8 @@ import * as Checkbox from '@radix-ui/react-checkbox';
 import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
 import Image from 'next/image';
 
-import ProgressBar from '@components/ProgressBar/ProgressBar';
-import Tooltip from '@components/Tooltip/Tooltip';
+import ProgressBar from '@components/ProgressBar/progressBar';
+import Tooltip from '@components/Tooltip/tooltip';
 import { getExpForLevel } from '@data/symbols/exp/expTable';
 import {
 	getSymbolImagePath,
@@ -17,9 +17,9 @@ import {
 	calculateDaysToCompleteSymbol,
 } from '@data/symbols/symbolMappings';
 
-import styles from './EditPageSymbolObject.module.scss';
+import styles from './editPageSymbolObject.module.scss';
 
-import type { JobType } from '@components/ProgressBar/ProgressBar';
+import type { JobType } from '@components/ProgressBar/progressBar';
 import type { SymbolName } from '@data/symbols/symbolMappings';
 import type {
 	getEditCharacterDataSymbolsResponseBody,
@@ -29,7 +29,7 @@ import type {
 import type { CharacterContent, SymbolCategory } from '@prisma/client';
 import type { JSX } from 'react';
 
-export type EditPageSymbolObjectProps = {
+type EditPageSymbolObjectProps = {
 	type: SymbolCategory;
 	symbol: getEditCharacterDataSymbolsResponseBody;
 	characterLevel: number;
@@ -127,7 +127,7 @@ function ContentCheckbox({ content, index, characterLevel, onToggle, symbolName 
 	);
 }
 
-export function EditPageSymbolObject({
+function EditPageSymbolObject({
 	type,
 	symbol,
 	characterLevel,

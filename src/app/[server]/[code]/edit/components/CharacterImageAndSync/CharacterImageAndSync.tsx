@@ -2,11 +2,11 @@
 import Image from 'next/image';
 
 import ErrorIcon from '@assets/svg/circle-x.svg';
-import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
-import Switch from '@components/Switch/Switch';
-import Tooltip from '@components/Tooltip/Tooltip';
+import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
+import Switch from '@components/Switch/switch';
+import Tooltip from '@components/Tooltip/tooltip';
 
-import styles from './CharacterImageAndSync.module.scss';
+import styles from './characterImageAndSync.module.scss';
 
 import type {
 	getCharacterDataFromAPIResponseBody,

@@ -3,7 +3,7 @@
 import { clsx } from 'clsx';
 import { useRef, useState, useEffect } from 'react';
 
-import styles from './ResponsiveText.module.scss';
+import styles from './responsiveText.module.scss';
 
 import type { JSX, ReactNode } from 'react';
 

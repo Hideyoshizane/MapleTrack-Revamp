@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useState, useEffect } from 'react';
 
 import type { Theme } from '@sharedTypes/theme';
 import type { JSX, ReactNode } from 'react';
@@ -30,16 +30,12 @@ const getInitialTheme = (): Theme => {
 };
 
 export const ThemeProvider = ({ children }: { children: ReactNode }): JSX.Element => {
-	const [theme, setThemeState] = useState<Theme>(getInitialTheme);
+	const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
 	useEffect(() => {
 		document.documentElement.dataset.theme = theme;
 		localStorage.setItem('theme', theme);
 	}, [theme]);
-
-	const setTheme = useCallback((value: Theme): void => {
-		setThemeState(value);
-	}, []);
 
 	return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 };

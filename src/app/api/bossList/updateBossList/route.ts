@@ -1,93 +1,60 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { getToken } from 'next-auth/jwt';
 
-import { UpdateBossListRequestSchema } from '@features/Boss/bossListSchema';
+import { updateBossListRequestSchema } from '@/features/Boss/schemas/bossList.request.schema';
 import { prisma } from '@lib/prisma';
+import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
+import { logZodError, logApiFailure, logError } from '@utils/logger';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
 dayjs.extend(utc);
 
-export const POST = async (request: NextRequest): Promise<NextResponse> => {
+const route = 'api/bossList/updateBossList';
+
+const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
 	try {
-		// Extract token from the request cookies
-		const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
-
-		if (!token || typeof token.id !== 'string') {
-			return createResponse<ApiResponse>({ success: false, message: 'Unauthorized' }, 401);
-		}
-
-		const authenticatedUserId = token.id;
-
-		let body: unknown;
-		try {
-			body = await request.json();
-		} catch {
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
-		}
-
 		// Validate request body using Zod
-		const parseResult = UpdateBossListRequestSchema.safeParse(body);
+		const parseResult = updateBossListRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
+			logZodError(parseResult.error, { route: route });
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
-		const data = parseResult.data.data;
+		const data = parseResult.data;
 
 		const existingBossList = await prisma.bossList.findUnique({
 			where: { userId: authenticatedUserId },
-			include: {
-				servers: {
-					include: {
-						characters: true,
-					},
-				},
+			select: {
+				id: true,
+				servers: { select: { id: true, serverName: true, characters: { select: { id: true, characterId: true } } } },
 			},
 		});
 		if (!existingBossList) {
+			logApiFailure('Boss List not found', { route });
 			return createResponse<ApiResponse>({ success: false, message: 'Boss list not found' }, 404);
 		}
 
-		const targetServer = existingBossList.servers.find((server): boolean => server.name === data.name);
+		const targetServer = existingBossList.servers.find((server): boolean => server.id === data.id);
 		if (!targetServer) {
+			logApiFailure('Server not found', { route });
 			return createResponse<ApiResponse>({ success: false, message: 'Server not found' }, 404);
-		}
-		const existingCharactersMap = new Map(targetServer.characters.map((character) => [character.name, character]));
-		for (const incomingCharacter of data.characters) {
-			const existingCharacter = existingCharactersMap.get(incomingCharacter.name);
-
-			if (!existingCharacter) {
-				continue;
-			}
-
-			const hasInvalidChange =
-				existingCharacter.code !== incomingCharacter.code ||
-				existingCharacter.class !== incomingCharacter.class ||
-				existingCharacter.level !== incomingCharacter.level;
-
-			if (hasInvalidChange) {
-				return createResponse<ApiResponse>({ success: false, message: `Invalid update Request` }, 400);
-			}
 		}
 
 		await prisma.$transaction(async (tx) => {
 			for (const incomingCharacter of data.characters) {
 				const existingCharacter = targetServer.characters.find(
-					(character) => character.name === incomingCharacter.name,
+					(character) => character.characterId === incomingCharacter.characterId,
 				);
-
 				if (!existingCharacter) {
 					continue;
 				}
 
 				await tx.bossCharacter.update({
 					where: { id: existingCharacter.id },
-					data: {
-						totalIncome: incomingCharacter.totalIncome,
-					},
+					data: { totalIncome: incomingCharacter.totalIncome },
 				});
 
 				await tx.boss.deleteMany({
@@ -100,10 +67,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 							name: boss.name,
 							difficulty: boss.difficulty,
 							reset: boss.reset,
-							cleared: boss.cleared,
-							date: boss.date,
 							dailyTotal: boss.dailyTotal,
-							locked: boss.locked,
 							characterId: existingCharacter.id,
 						})),
 					});
@@ -112,25 +76,21 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
 			await tx.bossServer.update({
 				where: { id: targetServer.id },
-				data: {
-					weeklyBosses: data.weeklyBosses,
-					totalGains: data.totalGains,
-				},
+				data: { weeklyBosses: data.weeklyBosses, totalGains: data.totalGains },
 			});
 
 			await tx.bossList.update({
 				where: { id: existingBossList.id },
-				data: {
-					lastUpdate: dayjs().utc().toDate(),
-				},
+				data: { lastUpdate: dayjs().utc().toDate() },
 			});
 		});
 
 		// Success response
 		return createResponse<ApiResponse>({ success: true, message: 'Boss list updated successfully' }, 200);
 	} catch (error) {
-		console.error('boss_list_fetch_failed', { error: error instanceof Error ? error.message : 'unknown' });
-
+		logError(error, { route: route });
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };
+
+export const POST = routeGuard(handler);

@@ -3,5 +3,3 @@ export type ApiResponse<T = undefined> = {
 	message: string;
 	data?: T;
 };
-
-export type ApiRequest<T> = T;

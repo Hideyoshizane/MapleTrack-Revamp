@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { BonusContext, type BonusContextType } from './BonusContext';
+import { BonusContext, type BonusContextType } from './bonusContext';
 
 export const useBonusContext = (): BonusContextType => {
 	const context = useContext(BonusContext);

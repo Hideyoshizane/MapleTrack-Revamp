@@ -5,19 +5,19 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import BossIcon from '@assets/svg/boss_slayer.svg';
-import LegionBlock from '@components/LegionBlock/LegionBlock';
-import LinkSkillBlock from '@components/LinkSkillBlock/LinkSkillBlock';
-import ProgressBar from '@components/ProgressBar/ProgressBar';
-import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
+import LegionBlock from '@components/LegionBlock/legionBlock';
+import LinkSkillBlock from '@components/LinkSkillBlock/linkSkillBlock';
+import ProgressBar from '@components/ProgressBar/progressBar';
+import ResponsiveText from '@components/ResponsiveText/responsiveText';
 import { generateClassCode } from '@data/classes/classes';
 import { getLinkSkillByName } from '@data/linkSkill/linkSkill';
 import { getLastLevel } from '@data/symbols/exp/expTable';
 import { toSymbolName, getSymbolImagePath, canUseSymbol } from '@data/symbols/symbolMappings';
 import { getJob } from '@features/character/characterService';
 
-import styles from './ClassCard.module.scss';
+import styles from './classCard.module.scss';
 
-import type { JobType } from '@components/ProgressBar/ProgressBar';
+import type { JobType } from '@components/ProgressBar/progressBar';
 import type { SymbolName } from '@data/symbols/symbolMappings';
 import type { getAllCharactersResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
@@ -50,14 +50,14 @@ const jobLevelClassMap: Record<JobType, string> = {
 // Subcomponent: renders Arcane/Sacred symbols in a grid
 const SymbolGrid = ({ symbols, maxLevel, size = 16, characterLevel }: SymbolProps): JSX.Element => (
 	<div className={styles.symbolGrid}>
-		{symbols.map((symbol, index): JSX.Element => {
+		{symbols.map((symbol): JSX.Element => {
 			const symbolName = toSymbolName(symbol.name);
 
 			const usable = symbolName !== null && canUseSymbol(characterLevel, symbolName);
 			const displayLevel = usable ? (symbol.level < maxLevel ? `Lv. ${symbol.level}` : 'MAX') : 'Lv. 0';
 
 			return (
-				<div key={index} className={styles.symbolsLine}>
+				<div key={symbol.name} className={styles.symbolsLine}>
 					<Image
 						src={getSymbolImagePath(symbol.name as SymbolName)}
 						width={size}

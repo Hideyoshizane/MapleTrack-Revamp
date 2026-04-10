@@ -2,10 +2,10 @@
 
 import Image from 'next/image';
 
-import Tooltip from '@components/Tooltip/Tooltip';
+import Tooltip from '@components/Tooltip/tooltip';
 import { getLegionData, getRank, codeToLegionThresholdSet } from '@data/legion/legionSystems';
 
-import styles from './LegionBlock.module.scss';
+import styles from './legionBlock.module.scss';
 
 import type { JSX } from 'react';
 

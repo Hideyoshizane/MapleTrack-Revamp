@@ -5,9 +5,9 @@ import { clsx } from 'clsx';
 import OkIcon from '@assets/svg/circle-check.svg';
 import ErrorIcon from '@assets/svg/circle-x.svg';
 import InfoIcon from '@assets/svg/info.svg';
-import Tooltip from '@components/Tooltip/Tooltip';
+import Tooltip from '@components/Tooltip/tooltip';
 
-import styles from './ValidationIcon.module.scss';
+import styles from './validationIcon.module.scss';
 
 import type { FC, SVGProps, JSX } from 'react';
 
@@ -45,7 +45,7 @@ const ValidationIcon = ({
 	const iconClass = clsx(
 		showInvalid ? styles.invalidIcon : styles.defaultIcon,
 		!showInvalid && isLightmode && styles.lightModeDefaultIcon,
-		className
+		className,
 	);
 
 	return (

@@ -7,8 +7,8 @@ import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 import BossIcon from '@assets/svg/boss_slayer.svg';
-import Button from '@components/Button/Button';
-import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
+import Button from '@components/Button/button';
+import FullPageLoader from '@components/FullPageLoader/fullPageLoader';
 import {
 	WEEKLY_BOSSES_TOTAL,
 	WEEKLY_BOSSES_PER_CHARACTER,
@@ -23,28 +23,31 @@ import {
 } from '@features/Boss/bossListUtils';
 import { useServerCookie } from '@hooks/useServerCookie';
 
-import BossGrid from './components/BossGrid/BossGrid';
-import WeeklyBossDropdown from './components/CharacterSelectBossDropdown/CharacterSelectBossDropdown';
+import BossGrid from './components/BossGrid/bossGrid';
+import WeeklyBossDropdown from './components/CharacterSelectBossDropdown/characterSelectBossDropdown';
 import styles from './page.module.scss';
 
+import type { BossName, BossDifficultyName, BossReset } from '@data/bosses/bosses';
 import type { ServerName } from '@data/servers/servers';
-import type { BossServerDraft as BossServer, BossCharacterDraft as BossCharacter } from '@features/Boss/bossListModel';
+import type {
+	getEditBossListResponseBody,
+	getEditBossListCharacterResponseBody,
+} from '@features/Boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
 type EditWeeklyPageClientProps = {
-	username: string;
 	initialServer: ServerName;
 };
 
-const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientProps): JSX.Element => {
+const EditWeeklyPageClient = ({ initialServer }: EditWeeklyPageClientProps): JSX.Element => {
 	const pathname = usePathname();
 	const router = useRouter();
 	const { server } = useServerCookie(initialServer);
 
 	const [loading, setLoading] = useState<boolean>(true);
 
-	const [serverData, setServerData] = useState<BossServer | null>(null);
-	const [selectedCharacter, setSelectedCharacter] = useState<BossCharacter | null>(null);
+	const [serverData, setServerData] = useState<getEditBossListResponseBody | null>(null);
+	const [selectedCharacter, setSelectedCharacter] = useState<getEditBossListCharacterResponseBody | null>(null);
 	const [totalBosses, setTotalBosses] = useState<number>(0);
 	const [totalGains, setTotalGains] = useState<number>(0);
 	const [characterWeeklyIncome, setCharacterWeeklyIncome] = useState<number>(0);
@@ -54,15 +57,11 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 	const BOSS_ICON_SIZE = 96;
 
 	useEffect(() => {
-		if (!server || !username) {
-			return;
-		}
-
 		const fetchBossList = async (): Promise<void> => {
 			setLoading(true);
 			try {
-				const payload = { userOrigin: username, server };
-				const response = await bossListApi.getBossList(payload);
+				const payload = { server };
+				const response = await bossListApi.getEditBossList(payload);
 
 				if (response.success && response.data) {
 					setServerData(response.data);
@@ -81,10 +80,11 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 		};
 
 		void fetchBossList();
-	}, [server, username]);
+	}, [server]);
 
 	useEffect(() => {
 		if (!serverData || !selectedCharacter) {
+			setLoading(false);
 			return;
 		}
 
@@ -92,8 +92,6 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 		if (freshCharacter && freshCharacter !== selectedCharacter) {
 			setSelectedCharacter(freshCharacter);
 		}
-
-		 
 	}, [serverData]);
 
 	useEffect(() => {
@@ -106,14 +104,19 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 		setCharacterMonthlyBossAmount(countMonthlyBosses(selectedCharacter));
 	}, [selectedCharacter]);
 
+	useEffect(() => {
+		if (!loading && !serverData) {
+			router.replace('/home?missingBossList=1');
+		}
+	}, [loading, serverData, router]);
+
 	if (loading || !serverData || !selectedCharacter) {
 		return <FullPageLoader />;
 	}
 
 	const handleSaveChanges = async (): Promise<void> => {
 		try {
-			const payload = { data: serverData };
-			const result = await bossListApi.updateBossList(payload);
+			const result = await bossListApi.updateBossList(serverData);
 			if (result.success) {
 				const basePath = pathname.replace(/\/edit$/, '');
 				router.push(`${basePath}?success=1`);
@@ -126,9 +129,10 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 	};
 
 	const handleBossUpdate = (
-		bossName: string,
-		difficulty: string,
-		reset: 'Daily' | 'Weekly' | 'Monthly',
+		bossName: BossName,
+		difficulty: BossDifficultyName,
+		server: string,
+		reset: BossReset,
 		dailyTotal?: number,
 	): void => {
 		const updatedData = updateCharacterBoss(serverData, {
@@ -137,6 +141,7 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 			difficulty,
 			reset,
 			dailyTotal,
+			server,
 		});
 		setServerData(updatedData);
 		setTotalBosses(countServerBosses(updatedData));
@@ -144,6 +149,7 @@ const EditWeeklyPageClient = ({ username, initialServer }: EditWeeklyPageClientP
 	};
 
 	const characters = serverData.characters;
+
 	return (
 		<section className="mainContent">
 			<div className={styles.topBar}>

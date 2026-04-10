@@ -3,7 +3,7 @@
 import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { clsx } from 'clsx';
 
-import styles from './ProgressBar.module.scss';
+import styles from './progressBar.module.scss';
 
 import type { JSX } from 'react';
 
@@ -59,7 +59,7 @@ const ProgressBar = ({
 			<ProgressPrimitive.Indicator
 				className={clsx(
 					styles.progressIndicator,
-					jobTypeClassMap[forceFull || value >= maxValue ? 'complete' : jobType]
+					jobTypeClassMap[forceFull || value >= maxValue ? 'complete' : jobType],
 				)}
 				style={indicatorStyle}
 			/>

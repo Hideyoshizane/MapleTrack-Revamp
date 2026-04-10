@@ -3,9 +3,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import Button from '@components/Button/Button';
-import FooterOutside from '@components/FooterOutside/FooterOutside';
-import FormInput from '@components/FormInput/FormInput';
+import Button from '@components/Button/button';
+import FooterOutside from '@components/FooterOutside/footerOutside';
+import FormInput from '@components/FormInput/formInput';
 import { validateUsername, validateEmail, validatePassword, validatePasswordConfirmation } from '@utils/validators';
 
 import { useSignup } from './hooks/useSignup';

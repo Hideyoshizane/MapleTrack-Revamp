@@ -8,7 +8,7 @@ type NexonRankingResponse = {
 	ranks: getCharacterDataFromAPIResponseBody[];
 };
 
-export const fetchCharacterDataFromAPI = async (
+export const fetchCharacterDataFromApi = async (
 	characterName: string,
 	server: string,
 ): Promise<getCharacterDataFromAPIResponseBody> => {

@@ -3,9 +3,9 @@ import { useRouter } from 'next/navigation';
 import { useForm, type Control, type UseFormHandleSubmit, type UseFormGetValues } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import { handleFieldValidation } from '@/utils/validateField';
 import { userApi } from '@features/user/userApi';
 import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
+import { handleFieldValidation } from '@utils/validateField';
 import { validatePassword, validatePasswordConfirmation } from '@utils/validators';
 
 import type { ApiResponse } from '@sharedTypes/api';
