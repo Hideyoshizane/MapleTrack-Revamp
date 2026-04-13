@@ -52,11 +52,13 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				},
 			});
 
+			const isNullLevel = data.level == 0;
+
 			const character = await tx.character.upsert({
 				where: whereClause,
 				create: {
 					name: data.name,
-					level: data.level,
+					level: isNullLevel ? 10 : data.level,
 					targetLevel: data.targetLevel,
 					class: data.class,
 					jobType: data.jobType,
@@ -70,7 +72,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				},
 				update: {
 					name: data.name,
-					level: data.level,
+					level: isNullLevel ? 10 : data.level,
 					targetLevel: data.targetLevel,
 					class: data.class,
 					jobType: data.jobType,

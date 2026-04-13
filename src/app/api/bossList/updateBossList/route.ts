@@ -73,16 +73,6 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					});
 				}
 			}
-
-			await tx.bossServer.update({
-				where: { id: targetServer.id },
-				data: { weeklyBosses: data.weeklyBosses, totalGains: data.totalGains },
-			});
-
-			await tx.bossList.update({
-				where: { id: existingBossList.id },
-				data: { lastUpdate: dayjs().utc().toDate() },
-			});
 		});
 
 		// Success response

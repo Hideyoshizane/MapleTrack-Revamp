@@ -54,6 +54,7 @@ const BossButton = ({
 	const sizeClass = isSmallButtons ? styles.smallButton : styles.bigButton;
 	const minTextSize = isSmallButtons ? 12 : 16;
 	const widthSize = isSmallButtons ? 45 : 60;
+	const iconSize = isSmallButtons ? 16 : 24;
 
 	const locked = characterLevel < difficulty.minLevel;
 	const content = `Required Level: ${difficulty.minLevel}`;
@@ -75,8 +76,8 @@ const BossButton = ({
 						</ResponsiveText>
 					)}
 					<CheckedIcon
-						width={24}
-						height={24}
+						width={iconSize}
+						height={iconSize}
 						className={clsx(styles.icon, iconColor, selected && !locked && styles.iconVisible)}
 					/>
 				</div>

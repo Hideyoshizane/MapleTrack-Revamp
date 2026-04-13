@@ -89,11 +89,11 @@ export const getBossDifficultyValue = (
 	bossName: BossName,
 	difficultyName: BossDifficultyName,
 	serverName: string,
-): number | null => {
+): number => {
 	const entry = bossLookup[`${bossName}|${difficultyName}`];
 
 	if (!entry) {
-		return null;
+		return 0;
 	}
 
 	return isRebootServer(serverName) ? entry.value * 5 : entry.value;

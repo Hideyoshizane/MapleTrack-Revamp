@@ -1,14 +1,14 @@
 'use client';
 
-import NumberFlow from '@number-flow/react';
-import { clsx } from 'clsx';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import * as ScrollArea from '@radix-ui/react-scroll-area';
 import Image from 'next/image';
-import { useRef, useEffect, useState, Fragment } from 'react';
+import { Fragment } from 'react';
+import { toast } from 'react-toastify';
 
 import BossCheckedIcon from '@assets/svg/check-boss.svg';
 import ChevronIcon from '@assets/svg/chevron-down.svg';
 import NoBossIcon from '@assets/svg/circle-x.svg';
-import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
 import { generateClassCode } from '@data/classes/classes';
 
 import CharacterBossItem from './BossItem/characterBossItem';
@@ -17,97 +17,49 @@ import styles from './weeklyBossDropdown.module.scss';
 import type { getBossListCharacterResponseBody } from '@features/Boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
+type HandleBossToggle = (bossMosterId: string) => void | Promise<void>;
+
 type WeeklyBossDropdownProps = {
 	character: getBossListCharacterResponseBody;
 	server: string;
+	handleBossToggle: HandleBossToggle;
 };
 
-const WeeklyBossDropdown = ({ character, server }: WeeklyBossDropdownProps): JSX.Element => {
-	const [isOpen, setIsOpen] = useState(false);
-
-	const [isAnimating, setIsAnimating] = useState(false);
-	const dropdownRef = useRef<HTMLDivElement>(null);
-
-	// Toggle dropdown open/close state
-	const handleToggle = (): void => {
-		if ((character && !character.bosses) || (character && character.bosses.length === 0)) {
-			return;
-		}
-
-		if (!isOpen) {
-			setIsAnimating(true);
-		}
-		setIsOpen((prev) => !prev);
-	};
-
-	// Close dropdown when clicking outside
-	useEffect((): (() => void) => {
-		const handleClickOutside = (event: MouseEvent): void => {
-			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-				setIsOpen(false);
-			}
-		};
-		document.addEventListener('mousedown', handleClickOutside);
-		return (): void => document.removeEventListener('mousedown', handleClickOutside);
-	}, []);
-
-	useEffect(() => {
-		if (!isOpen && isAnimating) {
-			const timer = setTimeout(() => setIsAnimating(false), 300);
-			return (): void => clearTimeout(timer);
-		}
-	}, [isOpen, isAnimating]);
-
-	// Skeleton placeholder while selectedServer is not ready
-	if (!character) {
-		return <SkeletonWrapper width={502} height={368} color="light" variant="rounded" />;
-	}
-
-	const totalBosses = character.bosses.length;
+const WeeklyBossDropdown = ({ character, server, handleBossToggle }: WeeklyBossDropdownProps): JSX.Element => {
+	const totalBosses = character.bosses.filter((boss) => !boss.locked).length;
+	const isDisabled = totalBosses === 0;
 	const clearedBosses = character.bosses.filter((boss) => boss.cleared).length;
 	const isCleared = clearedBosses === totalBosses;
 	const code = generateClassCode(character.class);
 
 	return (
-		<div className={styles.outerWrap}>
-			<div
-				ref={dropdownRef}
-				className={clsx(styles.characterDropdownWrapper, {
-					[styles.open]: isOpen,
-					[styles.stayOnTop]: isAnimating,
-					[styles.cleared]: isCleared,
-					[styles.disabled]: totalBosses === 0,
-				})}>
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger asChild disabled={isDisabled}>
 				<div
 					className={styles.selectedCharacterWrapper}
-					onClick={handleToggle}
-					tabIndex={0}
+					data-disabled={isDisabled}
+					data-cleared={isCleared && !isDisabled}
 					role="button"
-					aria-expanded={isOpen}
-					aria-label={`Selected character: ${character.name}`}
-					onKeyDown={(e): void => {
-						if (e.key === 'Enter' || e.key === ' ') {
-							e.preventDefault();
-							handleToggle();
-						}
-					}}>
+					aria-label={`Selected character: ${character.name}`}>
 					<div className={styles.nameDiv}>
 						<p className={styles.characterName}>{character.name}</p>
 						<p className={styles.characterClass}>{character.class}</p>
 					</div>
+
 					<div className={styles.iconsDiv}>
-						{totalBosses === 0 ? (
+						{isDisabled ? (
 							<NoBossIcon className={styles.iconClear} />
 						) : isCleared ? (
 							<BossCheckedIcon className={styles.iconClear} />
 						) : (
 							<p className={styles.bossNumber}>
-								<NumberFlow value={clearedBosses} />
-								{`/${totalBosses}`}
+								{clearedBosses}/{totalBosses}
 							</p>
 						)}
-						<ChevronIcon className={clsx(styles.icon, styles.rotated, { [styles.rotatedActive]: isOpen })} />
+
+						<ChevronIcon className={styles.icon} />
 					</div>
+
 					<Image
 						className={styles.classIcon}
 						src={`/assets/buttom_profile/${code}.webp`}
@@ -117,24 +69,47 @@ const WeeklyBossDropdown = ({ character, server }: WeeklyBossDropdownProps): JSX
 						priority
 					/>
 				</div>
-				<hr className={styles.hr} />
-				<div className={styles.characterList}>
-					{character.bosses.map((boss, index) => (
-						<Fragment key={`${boss.name}-${boss.difficulty}`}>
-							<CharacterBossItem
-								boss={boss}
-								server={server}
-								isSelected={false}
-								onClick={(): void => {
-									// define behavior if selecting a boss is needed
-								}}
-							/>
-							{index < character.bosses.length - 1 && <hr className={styles.hr} />}
-						</Fragment>
-					))}
-				</div>
-			</div>
-		</div>
+			</DropdownMenu.Trigger>
+
+			<DropdownMenu.Portal>
+				<DropdownMenu.Content className={styles.characterList} sideOffset={4} align="start" side="bottom">
+					<ScrollArea.Root className={styles.scrollAreaRoot}>
+						<ScrollArea.Viewport className={styles.scrollAreaViewport}>
+							{character.bosses.map((boss) => (
+								<Fragment key={`${boss.name}-${boss.difficulty}`}>
+									<DropdownMenu.CheckboxItem
+										checked={boss.cleared}
+										data-checked={boss.cleared}
+										data-locked={boss.locked}
+										onSelect={(event): void => {
+											event.preventDefault();
+										}}
+										className={styles.characterItem}>
+										<CharacterBossItem
+											boss={boss}
+											server={server}
+											isSelected={boss.locked || boss.cleared}
+											onClick={() => {
+												if (boss.locked) {
+													toast.info('This boss has already been cleared this month.');
+													return;
+												}
+												const bossMonsterId = boss.id;
+												void handleBossToggle(bossMonsterId);
+											}}
+										/>
+									</DropdownMenu.CheckboxItem>
+								</Fragment>
+							))}
+						</ScrollArea.Viewport>
+
+						<ScrollArea.Scrollbar className={styles.scrollAreaScrollbar} orientation="vertical">
+							<ScrollArea.Thumb className={styles.scrollAreaThumb} />
+						</ScrollArea.Scrollbar>
+					</ScrollArea.Root>
+				</DropdownMenu.Content>
+			</DropdownMenu.Portal>
+		</DropdownMenu.Root>
 	);
 };
 

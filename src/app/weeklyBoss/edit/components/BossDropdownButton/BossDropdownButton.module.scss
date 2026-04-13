@@ -1,3 +1,5 @@
+$fontSize: 16px;
+
 .menuOpener {
 	display: flex;
 	align-items: center;
@@ -100,22 +102,19 @@
 
 .easy {
 	background-color: var(--boss-easy);
-	font-size: 18px;
-	font-weight: 500;
+	font-size: $fontSize;
 	color: var(--default-white);
 }
 
 .normal {
 	background-color: var(--boss-normal);
-	font-size: 18px;
-	font-weight: 500;
+	font-size: $fontSize;
 	color: var(--default-button-text);
 }
 
 .hard {
 	background-color: var(--boss-hard);
-	font-size: 18px;
-	font-weight: 500;
+	font-size: $fontSize;
 	color: var(--default-button-text);
 }
 
@@ -123,8 +122,7 @@
 	box-sizing: border-box;
 	border: solid 2px var(--boss-chaos-secondary);
 	background-color: var(--boss-chaos);
-	font-size: 18px;
-	font-weight: 500;
+	font-size: $fontSize;
 	color: var(--boss-chaos-secondary);
 }
 
@@ -132,8 +130,7 @@
 	box-sizing: border-box;
 	border: solid 2px var(--boss-extreme-secondary);
 	background-color: var(--boss-extreme);
-	font-size: 18px;
-	font-weight: 500;
+	font-size: $fontSize;
 	color: var(--boss-extreme-secondary);
 }
 

@@ -32,6 +32,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				level: true,
 				targetLevel: true,
 				linkSkill: true,
+				bossing: true,
 				symbols: { select: { category: true, name: true, level: true } },
 			},
 		});

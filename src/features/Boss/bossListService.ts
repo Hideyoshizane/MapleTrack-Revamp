@@ -1,6 +1,9 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
+import { prisma } from '@lib/prisma';
+import { hasDailyResetOccurred, hasWeeklyResetOccurred, hasMonthlyResetOccurred } from '@utils/time';
+
 import type { PrismaClient } from '@prisma/client';
 
 dayjs.extend(utc);
@@ -79,5 +82,101 @@ export const characterToBossList = async (
 		where: { serverId_characterId: { serverId, characterId } },
 		update: {},
 		create: { characterId, serverId, totalIncome: 0 },
+	});
+};
+
+type resetBossListRequestBody = {
+	serverName: string;
+	authenticatedUserId: string;
+};
+
+export const resetBossList = async (serverData: resetBossListRequestBody): Promise<void> => {
+	// Query BossList and return only the requested server
+	const bossList = await prisma.bossList.findUnique({
+		where: { userId: serverData.authenticatedUserId },
+		select: {
+			id: true,
+			lastUpdate: true,
+			servers: {
+				where: { serverName: serverData.serverName },
+				select: {
+					id: true,
+					weeklyBosses: true,
+					totalGains: true,
+					characters: {
+						select: { characterId: true, bosses: { select: { id: true, reset: true, cleared: true, locked: true } } },
+					},
+				},
+			},
+		},
+	});
+
+	if (!bossList) {
+		return;
+	}
+
+	const isDailyReset = hasDailyResetOccurred(bossList.lastUpdate);
+	const isWeeklyReset = hasWeeklyResetOccurred(bossList.lastUpdate);
+	const isMonthlyReset = hasMonthlyResetOccurred(bossList.lastUpdate);
+
+	if (!isDailyReset && !isWeeklyReset && !isMonthlyReset) {
+		return;
+	}
+
+	const server = bossList.servers[0];
+	if (!server) {
+		return;
+	}
+
+	const serverUpdate: { weeklyBosses?: number; totalGains?: number } = {};
+
+	if (isWeeklyReset) {
+		serverUpdate.weeklyBosses = 0;
+		serverUpdate.totalGains = 0;
+	}
+	await prisma.$transaction(async (tx) => {
+		for (const character of server.characters) {
+			const updatedBosses = character.bosses.map((boss) => {
+				const nextState = { id: boss.id, cleared: boss.cleared, locked: boss.locked };
+
+				if (isDailyReset && boss.reset === 'Daily') {
+					nextState.cleared = false;
+				}
+
+				if (isWeeklyReset && boss.reset === 'Weekly') {
+					nextState.cleared = false;
+				}
+
+				if (boss.reset === 'Monthly') {
+					if (isWeeklyReset) {
+						nextState.cleared = false;
+						nextState.locked = true;
+					}
+
+					if (isMonthlyReset) {
+						nextState.locked = false;
+					}
+				}
+
+				return nextState;
+			});
+
+			for (const boss of updatedBosses) {
+				await tx.boss.updateMany({
+					where: { id: boss.id },
+					data: { cleared: boss.cleared, locked: boss.locked },
+				});
+			}
+		}
+
+		await tx.bossServer.update({
+			where: { id: server.id },
+			data: serverUpdate,
+		});
+	});
+
+	await prisma.bossList.update({
+		where: { userId: serverData.authenticatedUserId },
+		data: { lastUpdate: new Date() },
 	});
 };

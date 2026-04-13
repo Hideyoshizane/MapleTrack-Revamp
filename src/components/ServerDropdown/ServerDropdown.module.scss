@@ -1,30 +1,19 @@
 $dropdownHeight: 56px;
-$dropdownRadius: 15px;
+$borderRadius: 15px;
 $iconSize: 32px;
 $spacingSmall: 4px;
 $spacingMedium: 8px;
 
-.serverDropdownWrapper {
-	position: absolute;
-	width: 256px;
-	max-height: $dropdownHeight;
-	overflow: hidden;
-	border-radius: 15px;
-	background-color: var(--server-color-button);
-	transition: max-height 0.3s ease;
-
-	&.open {
-		position: absolute;
-		max-height: 394px;
-	}
-}
-
 .selectedServerWrapper {
 	display: flex;
 	align-items: center;
-	width: 100%;
+	width: 256px;
 	height: $dropdownHeight;
+	border: none;
+	border-radius: $borderRadius;
+	background-color: var(--server-color-button);
 	cursor: pointer;
+	outline: none;
 
 	.iconWrapper {
 		margin-left: $spacingSmall;
@@ -34,6 +23,7 @@ $spacingMedium: 8px;
 	.serverName {
 		width: 140px;
 		font-size: 32px;
+		text-align: start;
 		color: var(--default-white);
 	}
 
@@ -43,24 +33,21 @@ $spacingMedium: 8px;
 		color: var(--default-white);
 		margin-left: $spacingMedium;
 		margin-right: $spacingSmall;
-
-		&.rotated {
-			transition: transform 0.3s ease;
-			transform: rotate(0deg);
-		}
-
-		&.rotatedActive {
-			transform: rotate(180deg);
-		}
 	}
 }
 
-.hr {
-	border: none;
-	border-bottom: 2px solid #294766;
-}
-
 .serversList {
+	z-index: 10;
 	display: flex;
 	flex-direction: column;
+	width: 256px;
+	overflow: hidden;
+	border-radius: $borderRadius;
+	background-color: var(--server-color-button);
+	filter: drop-shadow(0 0 3px #121212);
+	margin-top: 8px;
+}
+
+.serverItem:focus-visible {
+	outline: none;
 }

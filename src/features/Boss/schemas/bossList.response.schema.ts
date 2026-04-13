@@ -14,6 +14,7 @@ export const IdRawSchema = z
 
 const getBossListBossesSchema = z
 	.object({
+		id: IdRawSchema,
 		name: z.enum(BOSS_NAMES_ENUM),
 		difficulty: z.enum(BOSS_DIFFICULTY_ENUM),
 		reset: z.enum(BOSS_RESET_ENUM),
@@ -45,6 +46,7 @@ export type getBossListCharacterResponseBody = z.infer<typeof getBossListCharact
 
 export const getBossListResponseSchema = z
 	.object({
+		id: IdRawSchema,
 		weeklyBosses: z.number().min(0),
 		totalGains: z.number().min(0),
 		characters: z.array(getBossListCharactersSchema),
@@ -93,3 +95,12 @@ export const getEditBossListResponseSchema = z
 export type getEditBossListResponseBody = z.infer<typeof getEditBossListResponseSchema>;
 
 // Toggle boss
+
+export const toggleBossListResponseSchema = z
+	.object({
+		weeklyBossesUpdate: z.number(),
+		totalGainUpdate: z.number(),
+	})
+	.strict();
+
+export type toggleBossListResponseBody = z.infer<typeof toggleBossListResponseSchema>;

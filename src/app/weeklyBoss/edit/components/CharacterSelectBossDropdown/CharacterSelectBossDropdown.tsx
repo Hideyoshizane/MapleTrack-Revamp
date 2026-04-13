@@ -1,10 +1,10 @@
 'use client';
-import { clsx } from 'clsx';
+
+import * as ScrollArea from '@radix-ui/react-scroll-area';
+import * as Select from '@radix-ui/react-select';
 import Image from 'next/image';
-import { useRef, useEffect, useState, Fragment } from 'react';
 
 import ChevronIcon from '@assets/svg/chevron-down.svg';
-import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
 import { generateClassCode } from '@data/classes/classes';
 
 import CharacterBossItem from './BossItem/characterBossItem';
@@ -13,69 +13,37 @@ import styles from './characterSelectBossDropdown.module.scss';
 import type { getEditBossListCharacterResponseBody } from '@features/Boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
-type CharacterSelectBossDropdownProps = {
+type Props = {
 	setSelectedCharacter: (value: getEditBossListCharacterResponseBody) => void;
 	selectedCharacter: getEditBossListCharacterResponseBody | null;
 	characters: getEditBossListCharacterResponseBody[];
 };
 
-const CharacterSelectBossDropdown = ({
-	setSelectedCharacter,
-	selectedCharacter,
-	characters,
-}: CharacterSelectBossDropdownProps): JSX.Element => {
-	const [isOpen, setIsOpen] = useState(false);
-	const dropdownRef = useRef<HTMLDivElement>(null);
-
-	// Toggle dropdown open/close state
-	const handleToggle = (): void => setIsOpen((prev) => !prev);
-
-	const handleSelectCharacter = (character: getEditBossListCharacterResponseBody): void => {
-		setSelectedCharacter(character);
-		setIsOpen(false);
-	};
-
-	// Close dropdown when clicking outside
-	useEffect((): (() => void) => {
-		const handleClickOutside = (event: MouseEvent): void => {
-			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-				setIsOpen(false);
-			}
-		};
-		document.addEventListener('mousedown', handleClickOutside);
-		return (): void => document.removeEventListener('mousedown', handleClickOutside);
-	}, []);
-
-	// Skeleton placeholder while selectedServer is not ready
+const CharacterSelectBossDropdown = ({ setSelectedCharacter, selectedCharacter, characters }: Props): JSX.Element => {
 	if (!selectedCharacter) {
-		return <SkeletonWrapper width={502} height={368} color="light" variant="rounded" />;
+		return <div />;
 	}
 
 	const code = generateClassCode(selectedCharacter.class);
 
 	return (
-		<div ref={dropdownRef} className={clsx(styles.characterDropdownWrapper, { [styles.open]: isOpen })}>
-			{/* Selected character button */}
-			<div
-				className={styles.selectedCharacterWrapper}
-				onClick={handleToggle}
-				tabIndex={0}
-				role="button"
-				aria-expanded={isOpen}
-				aria-label={`Selected character: ${selectedCharacter.name}`}
-				onKeyDown={(e): void => {
-					if (e.key === 'Enter' || e.key === ' ') {
-						e.preventDefault();
-						handleToggle();
-					}
-				}}>
+		<Select.Root
+			value={selectedCharacter.class}
+			onValueChange={(value): void => {
+				const found = characters.find((c) => c.class === value);
+				if (found) {
+					setSelectedCharacter(found);
+				}
+			}}>
+			<Select.Trigger className={styles.selectedCharacterWrapper}>
 				<div className={styles.nameDiv}>
 					<p className={styles.characterName}>{selectedCharacter.name}</p>
 					<p className={styles.characterClass}>{selectedCharacter.class}</p>
 				</div>
 				<div className={styles.iconsDiv}>
-					<ChevronIcon className={clsx(styles.chevronIcon, styles.rotated, { [styles.rotatedActive]: isOpen })} />
+					<ChevronIcon className={styles.chevronIcon} />
 				</div>
+
 				<Image
 					className={styles.classIcon}
 					src={`/assets/buttom_profile/${code}.webp`}
@@ -84,23 +52,32 @@ const CharacterSelectBossDropdown = ({
 					height={80}
 					priority
 				/>
-			</div>
-			<hr className={styles.hr} />
-			{/* Dropdown list */}
-			<div className={styles.characterList}>
-				{characters.map((character, index) => (
-					<Fragment key={character.class}>
-						<CharacterBossItem
-							character={character}
-							isSelected={character.class === selectedCharacter.class}
-							onClick={() => handleSelectCharacter(character)}
-						/>
-						{index < characters.length - 1 && <hr className={styles.hr} />}
-					</Fragment>
-				))}
-			</div>
-		</div>
+			</Select.Trigger>
+
+			<Select.Portal>
+				<Select.Content className={styles.characterList} position="popper">
+					<ScrollArea.Root className={styles.scrollAreaRoot} type="auto">
+						<ScrollArea.Viewport className={styles.scrollAreaViewport}>
+							<Select.Viewport>
+								{characters.map((character) => (
+									<Select.Item key={character.class} value={character.class} className={styles.characterItem}>
+										<CharacterBossItem
+											character={character}
+											isSelected={character.class === selectedCharacter.class}
+											onClick={() => setSelectedCharacter(character)}
+										/>
+									</Select.Item>
+								))}
+							</Select.Viewport>
+						</ScrollArea.Viewport>
+
+						<ScrollArea.Scrollbar className={styles.scrollAreaScrollbar} orientation="vertical">
+							<ScrollArea.Thumb className={styles.scrollAreaThumb} />
+						</ScrollArea.Scrollbar>
+					</ScrollArea.Root>
+				</Select.Content>
+			</Select.Portal>
+		</Select.Root>
 	);
 };
-
 export default CharacterSelectBossDropdown;

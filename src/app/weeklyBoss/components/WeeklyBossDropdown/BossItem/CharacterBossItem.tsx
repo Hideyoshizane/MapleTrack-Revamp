@@ -54,7 +54,7 @@ export default function CharacterBossItem({ boss, server, isSelected, onClick }:
 			</div>
 
 			<div className={styles.iconsDiv}>
-				{boss.cleared ? <BossCheckedIcon className={styles.icon} /> : <CircleBossIcon className={styles.icon} />}
+				{isSelected ? <BossCheckedIcon className={styles.icon} /> : <CircleBossIcon className={styles.icon} />}
 			</div>
 		</div>
 	);

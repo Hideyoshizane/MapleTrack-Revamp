@@ -17,32 +17,19 @@ const sanitizeString = (input: unknown): string | null => {
 	return sanitizeInputBackEnd(input) || null;
 };
 
-const getArcaneSymbol = async (
-	tx: Prisma.TransactionClient,
-	characterId: string,
-	name: string,
-): Promise<{ id: string }> => {
-	const symbol = await tx.characterSymbol.findFirst({
-		where: { characterId, name, category: 'arcane' },
+const getSymbolIds = async (tx: Prisma.TransactionClient, characterId: string): Promise<string[]> => {
+	const symbols = await tx.characterSymbol.findMany({
+		where: { characterId },
 		select: { id: true },
 	});
 
-	if (!symbol) {
-		throw new Error(`${name} symbol not found`);
-	}
-
-	return symbol;
+	return symbols.map((s) => s.id);
 };
 
-const resetDailyQuests = async (tx: Prisma.TransactionClient, characterId: string): Promise<void> => {
-	const symbols = await tx.characterSymbol.findMany({ where: { characterId }, select: { id: true } });
-
-	if (!symbols.length) {
+const resetDailyQuests = async (tx: Prisma.TransactionClient, symbolIds: string[]): Promise<void> => {
+	if (!symbolIds.length) {
 		return;
 	}
-
-	const symbolIds = symbols.map((symbol) => symbol.id);
-
 	const quests = await tx.characterContent.findMany({
 		where: { symbolId: { in: symbolIds }, contentType: 'Daily Quest' },
 		select: { id: true, date: true },
@@ -56,21 +43,17 @@ const resetDailyQuests = async (tx: Prisma.TransactionClient, characterId: strin
 	await tx.characterContent.updateMany({ where: { id: { in: questsToReset } }, data: { cleared: false } });
 };
 
-const resetWeeklyQuests = async (tx: Prisma.TransactionClient, characterId: string): Promise<void> => {
-	const symbols = await tx.characterSymbol.findMany({ where: { characterId }, select: { id: true } });
-
-	if (!symbols.length) {
+const resetWeeklyQuests = async (tx: Prisma.TransactionClient, symbolIds: string[]): Promise<void> => {
+	if (!symbolIds.length) {
 		return;
 	}
-
-	const symbolIds = symbols.map((symbol) => symbol.id);
-
 	const quests = await tx.characterContent.findMany({
 		where: { symbolId: { in: symbolIds }, tries: { not: null } },
 		select: { id: true, date: true },
 	});
 
 	const questsToReset = quests.filter((quest) => hasWeeklyResetOccurred(quest.date)).map((quest) => quest.id);
+
 	if (!questsToReset.length) {
 		return;
 	}
@@ -112,12 +95,22 @@ export const syncCharacterInfo = async ({
 		externalData = await fetchCharacterDataFromApi(character.name, cleanServer);
 	}
 
-	await prisma.$transaction(async (tx) => {
+	await prisma.$transaction(async (tx): Promise<void> => {
+		const symbolIds = await getSymbolIds(tx, character.id);
+
 		if (externalData && externalData.level > character.level) {
 			await tx.character.update({ where: { id: character.id }, data: { level: externalData.level } });
 
 			const unlockSymbolContent = async (symbolName: string, contentType: string): Promise<void> => {
-				const symbol = await getArcaneSymbol(tx, character.id, symbolName);
+				const symbol = await tx.characterSymbol.findFirst({
+					where: { characterId: character.id, name: symbolName, category: 'arcane' },
+					select: { id: true },
+				});
+
+				if (!symbol) {
+					return;
+				}
+
 				await tx.characterContent.update({
 					where: { symbolId_contentType: { symbolId: symbol.id, contentType } },
 					data: { checked: true },
@@ -132,7 +125,7 @@ export const syncCharacterInfo = async ({
 			}
 		}
 
-		await resetDailyQuests(tx, character.id);
-		await resetWeeklyQuests(tx, character.id);
+		await resetDailyQuests(tx, symbolIds);
+		await resetWeeklyQuests(tx, symbolIds);
 	});
 };

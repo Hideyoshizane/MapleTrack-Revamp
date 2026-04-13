@@ -84,21 +84,20 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 		void loadBossList();
 	}, [server]);
 
-	const handleBossToggle = async (params: {
-		characterCode: string;
-		bossName: string;
-		difficulty: string;
-	}): Promise<void> => {
+	const handleBossToggle = async (bossMonsterId: string): Promise<void> => {
 		try {
-			const payload = { server, ...params };
+			const bossListId = bossList?.id;
+			if (!bossListId) {
+				return;
+			}
+			const payload = { bossListId: bossListId, bossMonsterId: bossMonsterId };
 			const response = await bossListApi.toggleBoss(payload);
-
 			if (!response.success || !response.data) {
 				toast.error('Failed to update boss');
 				return;
 			}
 
-			const { weeklyBosses, totalGains, clearedUpdate } = response.data;
+			const { weeklyBossesUpdate, totalGainUpdate } = response.data;
 
 			setbossList(
 				produce((draft) => {
@@ -106,16 +105,15 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 						return;
 					}
 
-					draft.weeklyBosses = weeklyBosses;
-					draft.totalGains = totalGains;
+					draft.weeklyBosses += weeklyBossesUpdate;
+					draft.totalGains += totalGainUpdate;
 
-					const character = draft.characters.find((character) => character.characterId === params.characterCode);
-					if (character) {
-						const boss = character.bosses.find(
-							(boss) => boss.name === params.bossName && boss.difficulty === params.difficulty,
-						);
+					for (const character of draft.characters) {
+						const boss = character.bosses.find((boss) => boss.id === bossMonsterId);
+
 						if (boss) {
-							boss.cleared = clearedUpdate;
+							boss.cleared = !boss.cleared;
+							break;
 						}
 					}
 				}),
@@ -130,20 +128,7 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 		return <FullPageLoader />;
 	}
 
-	if (!loading && bossList?.characters.length == 0) {
-		return (
-			<section className="mainContent">
-				<div className={styles.wrapper}>
-					<div className={styles.notFoundList}>
-						<ErrorIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.errorIcon} />
-						<p className={styles.title}>No character found!</p>
-						<p className={styles.text}>You haven&apos;t marked any characters as Boss Slayer yet.</p>
-						<p className={styles.text}>Go to your desired character and set it as a Boss Slayer to see them here.</p>
-					</div>
-				</div>
-			</section>
-		);
-	}
+	const hasCharacters: boolean = characters.length > 0;
 
 	return (
 		<section className="mainContent">
@@ -197,24 +182,35 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 					<ServerDropdown server={server} setServerCookie={setServerCookie} />
 				</div>
 
-				<Button className={styles.editCharacterButton} onClick={(): void => router.push(`${pathname}/edit`)}>
+				<Button
+					className={styles.editCharacterButton}
+					disabled={!hasCharacters}
+					onClick={(): void => router.push(`${pathname}/edit`)}>
 					Edit Bosses
 				</Button>
 			</div>
-			<div className={styles.contentWrapper}>
-				<CharactersBossGrid
-					characterList={characters}
-					server={server}
-					handleBossToggle={(params): void => {
-						void handleBossToggle(params);
-					}}
-				/>
-			</div>
+			{hasCharacters ? (
+				<div className={styles.contentWrapper}>
+					<CharactersBossGrid
+						characterList={characters}
+						server={server}
+						handleBossToggle={(bossMonsterId: string): void => {
+							void handleBossToggle(bossMonsterId);
+						}}
+					/>
+				</div>
+			) : (
+				<div className={styles.wrapper}>
+					<div className={styles.notFoundList}>
+						<ErrorIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.errorIcon} />
+						<p className={styles.title}>No character found!</p>
+						<p className={styles.text}>You haven&apos;t marked any characters as Boss Slayer yet.</p>
+						<p className={styles.text}>Go to your desired character and set it as a Boss Slayer to see them here.</p>
+					</div>
+				</div>
+			)}
 		</section>
 	);
 };
 
 export default WeeklyPageClient;
-
-{
-}

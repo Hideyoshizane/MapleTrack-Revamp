@@ -84,7 +84,6 @@ const EditWeeklyPageClient = ({ initialServer }: EditWeeklyPageClientProps): JSX
 
 	useEffect(() => {
 		if (!serverData || !selectedCharacter) {
-			setLoading(false);
 			return;
 		}
 

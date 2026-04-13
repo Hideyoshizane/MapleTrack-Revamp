@@ -1,136 +1,137 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { getToken } from 'next-auth/jwt';
 
-import { UpdateBossListRequestSchema } from '@features/Boss/bossListSchema';
+import { getBossDifficultyValue } from '@data/bosses/bosses';
+import { toggleBossListRequestSchema } from '@features/Boss/schemas/bossList.request.schema';
+import { toggleBossListResponseSchema } from '@features/Boss/schemas/bossList.response.schema';
 import { prisma } from '@lib/prisma';
+import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
+import { logZodError, logApiFailure, logError } from '@utils/logger';
 
+import type { toggleBossListResponseBody } from '@features/Boss/schemas/bossList.response.schema';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
 dayjs.extend(utc);
 
-export const POST = async (request: NextRequest): Promise<NextResponse> => {
+const route = 'api/bossList/toggleBossList';
+
+const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
 	try {
-		// Extract token from the request cookies
-		const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+		const parseResult = toggleBossListRequestSchema.safeParse(await request.json());
 
-		if (!token || typeof token.id !== 'string') {
-			return createResponse<ApiResponse>({ success: false, message: 'Unauthorized' }, 401);
-		}
-
-		const authenticatedUserId = token.id;
-
-		let body: unknown;
-		try {
-			body = await request.json();
-		} catch {
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
-		}
-
-		// Validate request body using Zod
-		const parseResult = UpdateBossListRequestSchema.safeParse(body);
 		if (!parseResult.success) {
+			logZodError(parseResult.error, { route });
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
-		const data = parseResult.data.data;
+		const data = parseResult.data;
 
-		const existingBossList = await prisma.bossList.findUnique({
-			where: { userId: authenticatedUserId },
-			include: {
-				servers: {
-					include: {
-						characters: true,
+		const bossData = await prisma.boss.findFirst({
+			where: {
+				id: data.bossMonsterId,
+				character: { server: { bossList: { userId: authenticatedUserId } } },
+			},
+			select: {
+				id: true,
+				name: true,
+				difficulty: true,
+				cleared: true,
+				locked: true,
+				character: {
+					select: {
+						server: {
+							select: {
+								id: true,
+								serverName: true,
+								bossList: { select: { id: true } },
+							},
+						},
 					},
 				},
 			},
 		});
-		if (!existingBossList) {
+
+		if (!bossData) {
+			logApiFailure('Boss Data not found', { route });
+			return createResponse<ApiResponse>({ success: false, message: 'Boss data not found' }, 404);
+		}
+
+		const server = bossData.character.server;
+
+		if (!server) {
+			logApiFailure('Server Data not found', { route });
+			return createResponse<ApiResponse>({ success: false, message: 'server data not found' }, 404);
+		}
+
+		const bossList = server.bossList;
+
+		if (!bossList) {
+			logApiFailure('Boss List not found', { route });
 			return createResponse<ApiResponse>({ success: false, message: 'Boss list not found' }, 404);
 		}
 
-		const targetServer = existingBossList.servers.find((server): boolean => server.name === data.name);
-		if (!targetServer) {
-			return createResponse<ApiResponse>({ success: false, message: 'Server not found' }, 404);
-		}
-		const existingCharactersMap = new Map(targetServer.characters.map((character) => [character.name, character]));
-		for (const incomingCharacter of data.characters) {
-			const existingCharacter = existingCharactersMap.get(incomingCharacter.name);
+		const now = dayjs().utc().toDate();
 
-			if (!existingCharacter) {
-				continue;
+		const responseData = await prisma.$transaction(async (tx) => {
+			const currentBoss = await tx.boss.findUnique({
+				where: { id: data.bossMonsterId },
+				select: { id: true, cleared: true, locked: true },
+			});
+
+			if (!currentBoss) {
+				throw new Error('Boss not found during transaction');
 			}
 
-			const hasInvalidChange =
-				existingCharacter.code !== incomingCharacter.code ||
-				existingCharacter.class !== incomingCharacter.class ||
-				existingCharacter.level !== incomingCharacter.level;
-
-			if (hasInvalidChange) {
-				return createResponse<ApiResponse>({ success: false, message: `Invalid update Request` }, 400);
+			if (currentBoss.locked) {
+				throw new Error('BOSS_LOCKED');
 			}
-		}
 
-		await prisma.$transaction(async (tx) => {
-			for (const incomingCharacter of data.characters) {
-				const existingCharacter = targetServer.characters.find(
-					(character) => character.name === incomingCharacter.name,
-				);
+			const willBeCleared = !currentBoss.cleared;
+			const sign = willBeCleared ? 1 : -1;
 
-				if (!existingCharacter) {
-					continue;
-				}
+			const bossValue = getBossDifficultyValue(bossData.name, bossData.difficulty, server.serverName);
 
-				await tx.bossCharacter.update({
-					where: { id: existingCharacter.id },
-					data: {
-						totalIncome: incomingCharacter.totalIncome,
-					},
-				});
+			const bossValueWithSign = bossValue * sign;
 
-				await tx.boss.deleteMany({
-					where: { characterId: existingCharacter.id },
-				});
-
-				if (incomingCharacter.bosses.length > 0) {
-					await tx.boss.createMany({
-						data: incomingCharacter.bosses.map((boss) => ({
-							name: boss.name,
-							difficulty: boss.difficulty,
-							reset: boss.reset,
-							cleared: boss.cleared,
-							date: boss.date,
-							dailyTotal: boss.dailyTotal,
-							locked: boss.locked,
-							characterId: existingCharacter.id,
-						})),
-					});
-				}
-			}
+			await tx.boss.update({
+				where: { id: data.bossMonsterId },
+				data: { cleared: willBeCleared },
+			});
 
 			await tx.bossServer.update({
-				where: { id: targetServer.id },
-				data: {
-					weeklyBosses: data.weeklyBosses,
-					totalGains: data.totalGains,
-				},
+				where: { id: server.id },
+				data: { weeklyBosses: { increment: sign }, totalGains: { increment: bossValueWithSign } },
 			});
 
-			await tx.bossList.update({
-				where: { id: existingBossList.id },
-				data: {
-					lastUpdate: dayjs().utc().toDate(),
-				},
-			});
+			await tx.bossList.update({ where: { id: bossList.id }, data: { lastUpdate: now } });
+
+			return {
+				weeklyBossesUpdate: sign,
+				totalGainUpdate: bossValueWithSign,
+			};
 		});
 
-		// Success response
-		return createResponse<ApiResponse>({ success: true, message: 'Boss list updated successfully' }, 200);
-	} catch (error) {
-		console.error('boss_list_fetch_failed', { error: error instanceof Error ? error.message : 'unknown' });
+		const validation = toggleBossListResponseSchema.safeParse(responseData);
 
+		if (!validation.success) {
+			logZodError(validation.error, { route });
+			throw new Error('Invalid Boss List data');
+		}
+
+		return createResponse<ApiResponse<toggleBossListResponseBody>>(
+			{ success: true, message: 'Boss list updated successfully', data: responseData },
+			200,
+		);
+	} catch (error) {
+		if (error instanceof Error && error.message === 'BOSS_LOCKED') {
+			return createResponse<ApiResponse>({ success: false, message: 'Boss is locked' }, 403);
+		}
+
+		logError(error, { route });
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };
+
+export const POST = routeGuard(handler);

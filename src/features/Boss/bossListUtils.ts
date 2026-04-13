@@ -99,7 +99,6 @@ export const countCharacterBosses = (character: getEditBossListCharacterResponse
 
 	for (const boss of character.bosses) {
 		if (boss.reset === 'Daily') {
-			totalBosses += boss.dailyTotal ?? 0;
 			continue;
 		}
 

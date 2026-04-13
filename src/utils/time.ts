@@ -51,3 +51,11 @@ export const hasWeeklyResetOccurred = (date: string | Date | Dayjs | null | unde
 	}
 	return hasResetOccurred(getNextResetTime(date, WEEKDAYS.THURSDAY));
 };
+
+export const hasMonthlyResetOccurred = (date: string | Date | Dayjs | null | undefined): boolean => {
+	if (!date) {
+		return true;
+	}
+
+	return hasResetOccurred(toUtc(date).add(1, 'month').startOf('month'));
+};

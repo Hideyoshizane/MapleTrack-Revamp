@@ -1,31 +1,21 @@
 $dropdownHeight: 80px;
-$dropdownRadius: 15px;
-$iconSize: 48px;
-$spacingSmall: 4px;
-$spacingMedium: 8px;
-
-.characterDropdownWrapper {
-	position: absolute;
-	z-index: 100;
-	width: 480px;
-	max-height: $dropdownHeight;
-	overflow: hidden;
-	border-radius: 15px;
-	background-color: var(--default-color-button);
-	transition: max-height 0.3s ease;
-
-	&.open {
-		position: absolute;
-		max-height: 394px;
-	}
-}
+$borderRadius: 15px;
+$dropdownOpenHeight: 404px;
+$scrollbarLimit: 16px;
+$iconSize: 40px;
 
 .selectedCharacterWrapper {
+	position: relative;
 	display: flex;
 	align-items: center;
 	width: 100%;
 	height: $dropdownHeight;
+	overflow: hidden;
+	border: none;
+	border-radius: $borderRadius;
+	background-color: var(--boss-dropdown-color);
 	cursor: pointer;
+	outline: none;
 
 	.classIcon {
 		position: absolute;
@@ -35,17 +25,17 @@ $spacingMedium: 8px;
 	.nameDiv {
 		display: flex;
 		flex-direction: column;
+		align-items: start;
+		color: var(--default-button-text);
 		margin-left: 112px;
 
 		.characterName {
 			font-size: 28px;
 			font-weight: 500;
-			color: var(--default-button-text);
 		}
 
 		.characterClass {
 			font-size: 24px;
-			color: var(--default-button-text);
 		}
 	}
 
@@ -62,25 +52,54 @@ $spacingMedium: 8px;
 			width: $iconSize;
 			height: $iconSize;
 			color: var(--default-button-text);
-
-			&.rotated {
-				transition: transform 0.3s ease;
-				transform: rotate(0deg);
-			}
-
-			&.rotatedActive {
-				transform: rotate(180deg);
-			}
 		}
 	}
 }
 
-.hr {
-	border: none;
-	border-bottom: 2px solid #707070;
+.scrollAreaRoot {
+	max-height: $dropdownOpenHeight;
+}
+
+.scrollAreaViewport {
+	max-height: inherit;
+	overflow: auto;
+	overscroll-behavior: contain;
+}
+
+.scrollAreaScrollbar {
+	display: flex;
+	width: 6px;
+	padding: 2px;
+	user-select: none;
+	padding-bottom: $scrollbarLimit;
+	padding-top: $scrollbarLimit;
+	touch-action: none;
+
+	&[data-orientation='vertical'] {
+		width: 6px;
+	}
+}
+
+.scrollAreaThumb {
+	position: relative;
+	flex: 1;
+	border-radius: 999px;
+	background: var(--default-black);
 }
 
 .characterList {
-	display: flex;
-	flex-direction: column;
+	max-height: $dropdownOpenHeight;
+	overflow: hidden;
+	border-radius: $borderRadius;
+	background-color: var(--boss-dropdown-color);
+	filter: drop-shadow(0 0 3px #121212);
+	margin-top: 16px;
+}
+
+.characterItem:focus-visible {
+	outline: none;
+}
+
+.characterItem:not(:last-child) {
+	border-bottom: 1px solid #143952;
 }

@@ -1,6 +1,6 @@
 $spacingSmall: 4px;
 $spacingMedium: 8px;
-$iconSize: 48px;
+$iconSize: 40px;
 
 .wrapper {
 	display: flex;
@@ -9,10 +9,6 @@ $iconSize: 48px;
 	height: 80px;
 	transition: background-color 0.2s;
 	cursor: pointer;
-
-	&:hover {
-		background-color: #b8b8b8;
-	}
 
 	.bossIcon {
 		margin-left: 24px;

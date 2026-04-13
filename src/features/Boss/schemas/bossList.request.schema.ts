@@ -67,3 +67,12 @@ export const updateBossListRequestSchema = z
 export type updateBossListRequestBody = z.infer<typeof updateBossListRequestSchema>;
 
 // Toggle boss
+
+export const toggleBossListRequestSchema = z
+	.object({
+		bossListId: IdRawSchema,
+		bossMonsterId: IdRawSchema,
+	})
+	.strict();
+
+export type toggleBossListRequestBody = z.infer<typeof toggleBossListRequestSchema>;

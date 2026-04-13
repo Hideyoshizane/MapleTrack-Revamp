@@ -1,8 +1,8 @@
 'use client';
 
-import { clsx } from 'clsx';
+import * as ScrollArea from '@radix-ui/react-scroll-area';
+import * as Select from '@radix-ui/react-select';
 import Image from 'next/image';
-import { useRef, useEffect, useState } from 'react';
 
 import ChevronIcon from '@assets/svg/chevron-down.svg';
 import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
@@ -20,77 +20,56 @@ type ServerDropdownProps = {
 };
 
 const ServerDropdown = ({ server, setServerCookie }: ServerDropdownProps): JSX.Element => {
-	const [isOpen, setIsOpen] = useState(false);
-	const dropdownRef = useRef<HTMLDivElement>(null);
-
 	const selectedServer: Server | undefined = servers.find((s: Server): boolean => s.name === server);
-
-	// Toggle dropdown open/close state
-	const handleToggle = (): void => {
-		setIsOpen((prev): boolean => !prev);
-	};
-
-	const handleSelectServer = (server: Server): void => {
-		setServerCookie?.(server.name);
-		setIsOpen(false);
-	};
-
-	// Close dropdown when clicking outside
-	useEffect((): (() => void) => {
-		const handleClickOutside = (event: MouseEvent): void => {
-			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-				setIsOpen(false);
-			}
-		};
-		document.addEventListener('mousedown', handleClickOutside);
-		return (): void => document.removeEventListener('mousedown', handleClickOutside);
-	}, []);
 
 	if (!selectedServer) {
 		return <SkeletonWrapper width={502} height={368} color="light" variant="rounded" />;
 	}
 
 	return (
-		<div ref={dropdownRef} className={clsx(styles.serverDropdownWrapper, { [styles.open]: isOpen })}>
-			{/* Selected server button */}
-			<div
-				className={styles.selectedServerWrapper}
-				onClick={handleToggle}
-				tabIndex={0}
-				role="button"
-				aria-expanded={isOpen}
-				aria-label={`Selected server: ${selectedServer.name}`}
-				onKeyDown={(e): void => {
-					if (e.key === 'Enter' || e.key === ' ') {
-						e.preventDefault();
-						handleToggle();
-					}
-				}}>
+		<Select.Root
+			value={selectedServer.name}
+			onValueChange={(value: string): void => {
+				setServerCookie?.(value as ServerName);
+			}}>
+			<Select.Trigger className={styles.selectedServerWrapper} aria-label={`Selected server: ${selectedServer.name}`}>
 				<div className={styles.iconWrapper}>
 					<Image src={selectedServer.img} alt={selectedServer.name} width={48} height={48} priority />
 				</div>
+
 				<p className={styles.serverName}>{selectedServer.name}</p>
-				<ChevronIcon
-					className={clsx(styles.icon, styles.rotated, {
-						[styles.rotatedActive]: isOpen,
-					})}
-				/>
-			</div>
-			<hr className={styles.hr} />
-			{/* Dropdown list */}
-			<div className={styles.serversList}>
-				{servers.map(
-					(server: Server): JSX.Element => (
-						<ServerItem
-							key={server.name}
-							server={server}
-							isSelected={server.name === selectedServer.name}
-							onSelect={handleSelectServer}
-						/>
-					),
-				)}
-			</div>
-		</div>
+
+				<ChevronIcon className={styles.icon} />
+			</Select.Trigger>
+
+			<Select.Portal>
+				<Select.Content className={styles.serversList} position="popper">
+					<ScrollArea.Root className={styles.scrollAreaRoot} type="auto">
+						<ScrollArea.Viewport className={styles.scrollAreaViewport}>
+							<Select.Viewport>
+								{servers.map(
+									(serverItem: Server): JSX.Element => (
+										<Select.Item key={serverItem.name} value={serverItem.name} className={styles.serverItem}>
+											<ServerItem
+												server={serverItem}
+												isSelected={serverItem.name === selectedServer.name}
+												onSelect={() => {
+													setServerCookie?.(serverItem.name);
+												}}
+											/>
+										</Select.Item>
+									),
+								)}
+							</Select.Viewport>
+						</ScrollArea.Viewport>
+
+						<ScrollArea.Scrollbar className={styles.scrollAreaScrollbar} orientation="vertical">
+							<ScrollArea.Thumb className={styles.scrollAreaThumb} />
+						</ScrollArea.Scrollbar>
+					</ScrollArea.Root>
+				</Select.Content>
+			</Select.Portal>
+		</Select.Root>
 	);
 };
 
