@@ -4,9 +4,9 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import React from 'react';
 
 import CheckIcon from '@assets/svg/check.svg';
+import ArcaneIcon from '@assets/svg/circle-star.svg';
 import SacredIcon from '@assets/svg/hexagon.svg';
 import MenuIcon from '@assets/svg/menu.svg';
-import ArcaneIcon from '@assets/svg/star.svg';
 import { MAX_VALUE_BONUS_COOKIE } from '@constants/cookiesConstants';
 
 import { useBonusContext } from '../../useBonusContext';
@@ -16,6 +16,7 @@ import styles from './dropdownEventMenu.module.scss';
 import type { JSX } from 'react';
 
 const ICON_SIZE = 40;
+const SYMBOL_SIZE = 20;
 
 const DropdownEventMenu = (): JSX.Element => {
 	const { arcaneBonus, sacredBonus, setArcaneBonus, setSacredBonus } = useBonusContext();
@@ -41,11 +42,11 @@ const DropdownEventMenu = (): JSX.Element => {
 				<DropdownMenu.Content forceMount className={styles.dropdownContent} side="bottom" align="center" sideOffset={5}>
 					<div className={styles.gridContainer}>
 						<div className={`${styles.header} ${styles.leftColumn}`}>
-							<ArcaneIcon width={16} height={16} />
+							<ArcaneIcon width={SYMBOL_SIZE} height={SYMBOL_SIZE} />
 							Arcane
 						</div>
 						<div className={styles.header}>
-							<SacredIcon width={16} height={16} />
+							<SacredIcon width={SYMBOL_SIZE} height={SYMBOL_SIZE} />
 							Sacred
 						</div>
 

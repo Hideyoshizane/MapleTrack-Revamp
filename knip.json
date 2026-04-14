@@ -1,0 +1,11 @@
+{
+	"entry": ["src/**/*", "next.config.*", "eslint.config.*"],
+	"ignoreDependencies": ["eslint-config-next", "eslint-config-prettier", "@svgr/webpack", "baseline-browser-mapping"],
+	"eslint": {
+		"config": ["eslint.config.js"],
+		"entry": ["eslint.config.js"]
+	},
+	"next": {
+		"entry": ["next.config.js", "next.config.mjs", "next.config.ts"]
+	}
+}

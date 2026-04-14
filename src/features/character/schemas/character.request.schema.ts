@@ -106,3 +106,16 @@ export const updateCharacterAllDailyRequestSchema = z
 	.strict();
 
 export type updateCharacterAllDailyRequestBody = z.infer<typeof updateCharacterAllDailyRequestSchema>;
+
+export const searchCharacterRequestSchema = z
+	.object({
+		parameters: z
+			.string()
+			.trim()
+			.min(3, 'Search must have at least 3 characters')
+			.max(25, 'Search too long')
+			.regex(/^[a-zA-Z0-9\s-]+$/, 'Invalid characters in search'),
+	})
+	.strict();
+
+export type searchCharacterRequestBody = z.infer<typeof searchCharacterRequestSchema>;

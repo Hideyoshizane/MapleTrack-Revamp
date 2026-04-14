@@ -7,8 +7,8 @@ import { Fragment } from 'react';
 import { toast } from 'react-toastify';
 
 import BossCheckedIcon from '@assets/svg/check-boss.svg';
-import ChevronIcon from '@assets/svg/chevron-down.svg';
 import NoBossIcon from '@assets/svg/circle-x.svg';
+import MenuIcon from '@assets/svg/menu.svg';
 import { generateClassCode } from '@data/classes/classes';
 
 import CharacterBossItem from './BossItem/characterBossItem';
@@ -48,7 +48,7 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: WeeklyBossD
 
 					<div className={styles.iconsDiv}>
 						{isDisabled ? (
-							<NoBossIcon className={styles.iconClear} />
+							<div />
 						) : isCleared ? (
 							<BossCheckedIcon className={styles.iconClear} />
 						) : (
@@ -56,8 +56,7 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: WeeklyBossD
 								{clearedBosses}/{totalBosses}
 							</p>
 						)}
-
-						<ChevronIcon className={styles.icon} />
+						{isDisabled ? <NoBossIcon className={styles.iconClear} /> : <MenuIcon className={styles.icon} />}
 					</div>
 
 					<Image

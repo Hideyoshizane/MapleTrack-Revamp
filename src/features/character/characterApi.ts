@@ -8,6 +8,7 @@ import type {
 	updateCharacterAllDailyRequestBody,
 	updateCharacterWeeklyRequestBody,
 	getCharacterDataFromAPIRequestBody,
+	searchCharacterRequestBody,
 } from './schemas/character.request.schema';
 import type {
 	getAllCharactersResponseBody,
@@ -16,6 +17,7 @@ import type {
 	updateCharacterDailyResponseBody,
 	updateCharacterWeeklyResponseBody,
 	getCharacterDataFromAPIResponseBody,
+	searchCharacterResponseBody,
 } from './schemas/character.response.schema';
 import type { LevelUpResult } from '@data/symbols/symbolMappings';
 import type { ApiResponse } from '@sharedTypes/api';
@@ -54,4 +56,11 @@ export const characterApi = {
 		payload: updateCharacterWeeklyRequestBody,
 	): Promise<ApiResponse<updateCharacterWeeklyResponseBody>> =>
 		requestApi('/characters/updateCharacterWeekly', 'POST', payload),
+
+	searchCharacter: async (params: searchCharacterRequestBody): Promise<ApiResponse<searchCharacterResponseBody>> =>
+		requestApi<ApiResponse<searchCharacterResponseBody>, searchCharacterRequestBody>(
+			'/characters/searchCharacter',
+			'GET',
+			params,
+		),
 };

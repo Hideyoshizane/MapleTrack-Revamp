@@ -25,6 +25,14 @@ export const getServerByName = (name: string | undefined): Server | undefined =>
 	return serversMap.get(name.toLowerCase());
 };
 
+export const getServerImageByName = (serverName: string | undefined): string => {
+	if (!serverName) {
+		return '';
+	}
+
+	return serversMap.get(serverName.toLowerCase())?.img ?? '';
+};
+
 export const isRebootServer = (serverName: string): boolean => {
 	return serversMap.get(serverName.toLowerCase())?.Reboot ?? false;
 };
@@ -39,3 +47,27 @@ export const isValidServerName = (serverName: string | undefined): boolean => {
 
 export const getRegion = (server: Server): 'eu' | 'na' =>
 	server.name === 'Luna' || server.name === 'Solis' ? 'eu' : 'na';
+
+export const getServersExcept = (quantity: number, excludedServers: string[]): string[] => {
+	if (quantity <= 0) {
+		return [];
+	}
+
+	const excludedSet: Set<string> = new Set(excludedServers.map((server): string => server.toLowerCase()));
+
+	const result: string[] = [];
+
+	for (const server of servers) {
+		if (excludedSet.has(server.name.toLowerCase())) {
+			continue;
+		}
+
+		result.push(server.name);
+
+		if (result.length === quantity) {
+			break;
+		}
+	}
+
+	return result;
+};

@@ -34,11 +34,7 @@ const nextConfig: NextConfig = {
 							dimensions: false,
 
 							// Normalize SVGs so they scale infinitely with CSS
-							svgProps: {
-								width: '100%',
-								height: '100%',
-								preserveAspectRatio: 'xMidYMid meet',
-							},
+							svgProps: { width: '100%', height: '100%', preserveAspectRatio: 'xMidYMid meet' },
 						},
 					},
 				],
@@ -47,10 +43,7 @@ const nextConfig: NextConfig = {
 		},
 	},
 
-	images: {
-		remotePatterns: patterns,
-		qualities: [75, 100],
-	},
+	images: { remotePatterns: patterns, qualities: [75, 100] },
 };
 
 export default withBundleAnalyzer({

@@ -39,8 +39,6 @@ const updateBossListBossesSchema = z
 	})
 	.strict();
 
-export type updateBossListBossRequestBody = z.infer<typeof updateBossListBossesSchema>;
-
 const updateBossListCharactersSchema = z
 	.object({
 		characterId: characterIdRawSchema,
@@ -52,8 +50,6 @@ const updateBossListCharactersSchema = z
 		bosses: z.array(updateBossListBossesSchema).default([]),
 	})
 	.strict();
-
-export type updateBossListCharacterRequestBody = z.infer<typeof updateBossListCharactersSchema>;
 
 export const updateBossListRequestSchema = z
 	.object({

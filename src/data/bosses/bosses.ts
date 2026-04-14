@@ -47,10 +47,7 @@ type BossLookupEntry = {
 
 const bossLookup: Record<BossCompositeKey, BossLookupEntry> = {};
 const bossImageLookup: Record<BossName, string> = {} as Record<BossName, string>;
-export const bossDifficultySet: Record<BossName, Set<BossDifficultyName>> = {} as Record<
-	BossName,
-	Set<BossDifficultyName>
->;
+const bossDifficultySet: Record<BossName, Set<BossDifficultyName>> = {} as Record<BossName, Set<BossDifficultyName>>;
 
 for (const boss of bosses) {
 	bossImageLookup[boss.name as BossName] = boss.img;
@@ -69,11 +66,11 @@ for (const boss of bosses) {
 const bossNameRuntimeSet: Set<string> = new Set(BOSS_NAMES_ENUM);
 const difficultyRuntimeSet: Set<string> = new Set(BOSS_DIFFICULTY_ENUM);
 
-export const isBossName = (value: string): value is BossName => {
+const isBossName = (value: string): value is BossName => {
 	return bossNameRuntimeSet.has(value);
 };
 
-export const isBossDifficultyName = (value: string): value is BossDifficultyName => {
+const isBossDifficultyName = (value: string): value is BossDifficultyName => {
 	return difficultyRuntimeSet.has(value);
 };
 
@@ -97,10 +94,6 @@ export const getBossDifficultyValue = (
 	}
 
 	return isRebootServer(serverName) ? entry.value * 5 : entry.value;
-};
-
-export const getBossReset = (bossName: BossName, difficultyName: BossDifficultyName): BossReset | null => {
-	return bossLookup[`${bossName}|${difficultyName}`]?.reset ?? null;
 };
 
 export const isValidBossDifficulty = (bossName: BossName, difficultyName: BossDifficultyName): boolean => {

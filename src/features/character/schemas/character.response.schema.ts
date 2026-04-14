@@ -4,11 +4,12 @@ import { CHARACTER_MAX_LEVEL, DEFAULT_WEEKLY_TRIES } from '@data/character/const
 import { JOB_CLASSES, LINK_SKILL, JOB_TYPE, LEGION_TYPE } from '@data/classes/classes';
 
 import {
-	CONTENT_TYPES,
-	symbolNames,
 	characterNameRawSchema,
 	characterIdRawSchema,
 	symbolIdRawSchema,
+	serverSchema,
+	CONTENT_TYPES,
+	symbolNames,
 	symbolCategoriesSchema,
 	symbolNameSchema,
 } from './character.schema';
@@ -51,8 +52,6 @@ const getCharacterContentSchema = z
 		tries: z.number().min(0).max(DEFAULT_WEEKLY_TRIES).optional(),
 	})
 	.strict();
-
-export type getCharacterContentResponseBody = z.infer<typeof getCharacterContentSchema>;
 
 export const getCharacterDataSymbolsResponseSchema = z
 	.object({
@@ -187,30 +186,16 @@ export const updateCharacterAllDailyResponseSchema = z.record(z.string(), levelU
 
 export type updateCharacterAllDailyResponseBody = z.infer<typeof updateCharacterAllDailyResponseSchema>;
 
-// export type UpdateCharacterRequestInput = z.infer<typeof getUpdateCharacterDataRequestSchema>;
+//Search Component
 
-// export const updateCharacterDailySchema = z.object({
-// 	symbolName: z.enum(ALL_SYMBOL_NAMES),
-// 	bonus: z.number().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
-// 	server: serverSchema,
-// 	class: z.enum(JOB_CLASSES),
-// });
+const searchCharacterDataResponseSchema = z.object({
+	name: characterNameRawSchema,
+	server: serverSchema,
+	class: z.enum(JOB_CLASSES),
+});
 
-// export type UpdateCharacterDailyRequestInput = z.infer<typeof updateCharacterDailySchema>;
+export const searchCharacterResponseSchema = z.object({
+	characters: z.array(searchCharacterDataResponseSchema).max(6),
+});
 
-// export const updateCharacterWeeklySchema = z.object({
-// 	symbolName: z.enum(ALL_SYMBOL_NAMES),
-// 	server: serverSchema,
-// 	class: z.enum(JOB_CLASSES),
-// });
-
-// export type UpdateCharacterWeeklyRequestInput = z.infer<typeof updateCharacterWeeklySchema>;
-
-// export const updateAllDailySchema = z.object({
-// 	server: serverSchema,
-// 	class: z.enum(JOB_CLASSES),
-// 	arcaneBonus: z.number().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
-// 	sacredBonus: z.number().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
-// });
-
-// export type UpdateAllDailySchema = z.infer<typeof updateAllDailySchema>;
+export type searchCharacterResponseBody = z.infer<typeof searchCharacterResponseSchema>;

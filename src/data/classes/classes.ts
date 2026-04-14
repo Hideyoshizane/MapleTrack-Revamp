@@ -1,3 +1,5 @@
+import Fuse from 'fuse.js';
+
 import classesJson from './classes.json';
 
 type Classes = {
@@ -37,4 +39,18 @@ const classCodeToNameMap: ReadonlyMap<string, string> = new Map(
 
 export const getClassNameByCode = (code: string): string | null => {
 	return classCodeToNameMap.get(code) ?? null;
+};
+
+const options = {
+	keys: ['className'],
+	threshold: 0.4,
+	includeScore: true,
+};
+
+const fuse = new Fuse(JobClasses, options);
+
+export const findBestClassMatch = (input: string): string => {
+	const results = fuse.search(input);
+
+	return results.length > 0 ? results[0].item.className : '';
 };

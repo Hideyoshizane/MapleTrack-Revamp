@@ -4,7 +4,7 @@ import * as ScrollArea from '@radix-ui/react-scroll-area';
 import * as Select from '@radix-ui/react-select';
 import Image from 'next/image';
 
-import ChevronIcon from '@assets/svg/chevron-down.svg';
+import MenuIcon from '@assets/svg/menu.svg';
 import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
 import { servers } from '@data/servers/servers';
 
@@ -39,7 +39,7 @@ const ServerDropdown = ({ server, setServerCookie }: ServerDropdownProps): JSX.E
 
 				<p className={styles.serverName}>{selectedServer.name}</p>
 
-				<ChevronIcon className={styles.icon} />
+				<MenuIcon className={styles.icon} />
 			</Select.Trigger>
 
 			<Select.Portal>

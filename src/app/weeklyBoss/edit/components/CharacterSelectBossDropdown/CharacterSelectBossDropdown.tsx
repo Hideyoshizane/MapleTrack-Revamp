@@ -4,7 +4,7 @@ import * as ScrollArea from '@radix-ui/react-scroll-area';
 import * as Select from '@radix-ui/react-select';
 import Image from 'next/image';
 
-import ChevronIcon from '@assets/svg/chevron-down.svg';
+import MenuIcon from '@assets/svg/menu.svg';
 import { generateClassCode } from '@data/classes/classes';
 
 import CharacterBossItem from './BossItem/characterBossItem';
@@ -41,7 +41,7 @@ const CharacterSelectBossDropdown = ({ setSelectedCharacter, selectedCharacter, 
 					<p className={styles.characterClass}>{selectedCharacter.class}</p>
 				</div>
 				<div className={styles.iconsDiv}>
-					<ChevronIcon className={styles.chevronIcon} />
+					<MenuIcon className={styles.chevronIcon} />
 				</div>
 
 				<Image

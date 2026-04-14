@@ -4,7 +4,6 @@ import { fileURLToPath } from 'url';
 import { fixupPluginRules } from '@eslint/compat';
 import { FlatCompat } from '@eslint/eslintrc';
 import nextPlugin from '@next/eslint-plugin-next';
-import tsParser from '@typescript-eslint/parser';
 import { defineConfig } from 'eslint/config';
 import importPlugin from 'eslint-plugin-import';
 import reactPlugin from 'eslint-plugin-react';
@@ -33,7 +32,7 @@ export default defineConfig([
 	{
 		files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
 		languageOptions: {
-			parser: tsParser,
+			parser: tseslint.parser,
 			parserOptions: {
 				project: './tsconfig.json',
 				tsconfigRootDir: __dirname,
