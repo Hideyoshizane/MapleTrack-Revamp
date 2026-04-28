@@ -1,0 +1,31 @@
+$borderRadius: 15px;
+$smallMargin: 8px;
+
+.inputDiv {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 320px;
+	height: 80px;
+	border: solid 2px var(--default-black);
+	border-radius: $borderRadius;
+	outline: none;
+	padding-left: 16px;
+	padding-right: 16px;
+
+	.input {
+		width: 200px;
+		border: none;
+		background-color: transparent;
+		font-size: 32px;
+		color: var(--default-button-text);
+
+		&:focus {
+			outline: none;
+		}
+	}
+
+	.icon {
+		color: var(--default-button-text);
+	}
+}

@@ -65,34 +65,34 @@ const SearchBar = (): JSX.Element => {
 	const isLoading = isPending;
 
 	return (
-		<Popover.Root open={open} onOpenChange={setOpen}>
+		<Popover.Root onOpenChange={setOpen} open={open}>
 			<Popover.Anchor asChild>
 				<div className={styles.searchBar}>
 					<div className={styles.searchDiv}>
-						<SearchIcon width={32} height={32} className={styles.icon} />
+						<SearchIcon className={styles.icon} height={32} width={32} />
 						<input
-							ref={inputRef}
 							className={styles.search}
-							value={query}
-							onFocus={(): void => setOpen(true)}
-							onChange={(event): void => setQuery(event.target.value)}
-							placeholder="Search by character name or class"
-							role="combobox"
-							aria-expanded={open}
 							aria-controls="async-select-list"
+							aria-expanded={open}
+							onChange={(event): void => setQuery(event.target.value)}
+							onFocus={(): void => setOpen(true)}
+							placeholder="Search by character name or class"
+							ref={inputRef}
+							role="combobox"
+							value={query}
 						/>
 					</div>
 				</div>
 			</Popover.Anchor>
 
 			<Popover.Content
-				sideOffset={4}
+				onCloseAutoFocus={(event): void => event.preventDefault()}
 				onOpenAutoFocus={(event): void => event.preventDefault()}
-				onCloseAutoFocus={(event): void => event.preventDefault()}>
+				sideOffset={4}>
 				<div id="async-select-list" role="listbox">
 					{isLoading && (
 						<div className={styles.searching}>
-							<Loader width={24} height={24} color={'#121212'} borderWidth={3} />
+							<Loader borderWidth={3} color={'#121212'} height={24} width={24} />
 						</div>
 					)}
 
@@ -107,14 +107,14 @@ const SearchBar = (): JSX.Element => {
 
 								return (
 									<Link
-										key={`${character.server}-${character.name}`}
 										href={`/${character.server}/${generateClassCode(character.class)}`}
+										key={`${character.server}-${character.name}`}
 										prefetch={false}>
 										<div
 											className={styles.resultItem}
-											role="option"
-											onMouseDown={(event): void => event.preventDefault()}>
-											<Image src={imageSrc} width={48} height={48} alt={`${character.server} Icon`} />
+											onMouseDown={(event): void => event.preventDefault()}
+											role="option">
+											<Image alt={`${character.server} Icon`} height={48} src={imageSrc} width={48} />
 											<span>
 												{character.server}: {character.name} - {character.class}
 											</span>

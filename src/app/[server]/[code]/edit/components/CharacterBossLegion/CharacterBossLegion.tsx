@@ -37,8 +37,6 @@ const CharacterBossLegion = ({
 		<div className={styles.bossSlot}>
 			<Tooltip content="Click to toggle Boss Slayer status" placement="bottom">
 				<div
-					role="button"
-					tabIndex={0}
 					onClick={toggleBossing}
 					onKeyDown={(e) => {
 						if (e.key === 'Enter' || e.key === ' ') {
@@ -46,24 +44,26 @@ const CharacterBossLegion = ({
 							toggleBossing();
 						}
 					}}
-					style={{ cursor: 'pointer' }}>
+					role="button"
+					style={{ cursor: 'pointer' }}
+					tabIndex={0}>
 					<BossIcon
-						width={BOSS_ICON_SIZE}
-						height={BOSS_ICON_SIZE}
 						className={clsx(styles.bossIcon, {
 							[styles.on]: character.bossing,
 							[styles.off]: !character.bossing,
 						})}
+						height={BOSS_ICON_SIZE}
+						width={BOSS_ICON_SIZE}
 					/>
 				</div>
 			</Tooltip>
 		</div>
 		<LinkSkillBlock characterLevel={character.level} characterLinkSkill={linkSkill} iconSize={ICON_SIZE} showTooltip />
 		<LegionBlock
-			characterLevel={character.level}
 			characterCode={code}
 			characterJobType={jobType}
 			characterLegionType={legion}
+			characterLevel={character.level}
 			iconSize={ICON_SIZE}
 			showTooltip
 		/>

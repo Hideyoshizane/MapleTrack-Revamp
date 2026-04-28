@@ -44,14 +44,14 @@ const ValidatedInputInner = ({
 	};
 
 	return (
-		<Tooltip content={error} placement="left" enabled={!!error}>
+		<Tooltip content={error} enabled={!!error} placement="left">
 			<input
 				className={clsx(styles.characterName, { [styles.invalid]: !!error })}
-				value={inputValue}
-				placeholder={placeholder}
+				onBlur={handleBlur}
 				onChange={(e) => handleChange(e.target.value)}
 				onFocus={handleFocus}
-				onBlur={handleBlur}
+				placeholder={placeholder}
+				value={inputValue}
 			/>
 		</Tooltip>
 	);

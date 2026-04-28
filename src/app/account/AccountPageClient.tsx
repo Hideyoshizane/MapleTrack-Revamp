@@ -49,10 +49,10 @@ const AccountPageClient = (): JSX.Element => {
 			<p className={styles.subTitle}>Change Password</p>
 
 			<form
+				noValidate
 				onSubmit={(e): void => {
 					void handleFormSubmit(e);
-				}}
-				noValidate>
+				}}>
 				<div className={styles.firstInput}>
 					<FormInput<ChangePasswordFormData>
 						id="currentPassword"
@@ -82,25 +82,25 @@ const AccountPageClient = (): JSX.Element => {
 				/>
 
 				<Button
-					type="submit"
 					className={styles.submitButton}
-					isLoading={isSubmitting}
-					loadingText="Submitting..."
-					loaderSize={16}
-					loaderColor="#121212"
-					loaderBorderWidth={3}
 					aria-label="Submit form"
-					disabled={isSubmitDisabled}>
+					disabled={isSubmitDisabled}
+					isLoading={isSubmitting}
+					loaderBorderWidth={3}
+					loaderColor="#121212"
+					loaderSize={16}
+					loadingText="Submitting..."
+					type="submit">
 					Change Password
 				</Button>
 			</form>
 
 			<p className={styles.dangerText}>Danger Zone</p>
 
-			<Button onClick={openDeleteDialog} className={styles.dangerButton}>
+			<Button className={styles.dangerButton} onClick={openDeleteDialog}>
 				Delete Account
 			</Button>
-			<AlertDialogComponent open={isDeleteDialogOpen} onOpenChange={closeDeleteDialog} onConfirm={handleDelete} />
+			<AlertDialogComponent onConfirm={handleDelete} onOpenChange={closeDeleteDialog} open={isDeleteDialogOpen} />
 		</section>
 	);
 };

@@ -1,0 +1,105 @@
+$dropdownHeight: 80px;
+$borderRadius: 15px;
+$dropdownOpenHeight: 404px;
+$scrollbarLimit: 16px;
+$iconSize: 40px;
+
+.selectedCharacterWrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+	width: 480px;
+	height: $dropdownHeight;
+	overflow: hidden;
+	border: none;
+	border-radius: $borderRadius;
+	background-color: var(--boss-dropdown-color);
+	cursor: pointer;
+	outline: none;
+
+	.classIcon {
+		position: absolute;
+		opacity: 0.25;
+	}
+
+	.nameDiv {
+		display: flex;
+		flex-direction: column;
+		align-items: start;
+		color: var(--default-button-text);
+		margin-left: 112px;
+
+		.characterName {
+			font-size: 28px;
+			font-weight: 500;
+		}
+
+		.characterClass {
+			font-size: 24px;
+		}
+	}
+
+	.iconsDiv {
+		right: 0;
+		display: flex;
+		gap: 16px;
+		margin-left: auto;
+		margin-right: 16px;
+
+		.chevronIcon {
+			right: 0;
+			display: flex;
+			width: $iconSize;
+			height: $iconSize;
+			color: var(--default-button-text);
+		}
+	}
+}
+
+.scrollAreaRoot {
+	max-height: $dropdownOpenHeight;
+}
+
+.scrollAreaViewport {
+	max-height: inherit;
+	overflow: auto;
+	overscroll-behavior: contain;
+}
+
+.scrollAreaScrollbar {
+	display: flex;
+	width: 6px;
+	padding: 2px;
+	user-select: none;
+	padding-bottom: $scrollbarLimit;
+	padding-top: $scrollbarLimit;
+	touch-action: none;
+
+	&[data-orientation='vertical'] {
+		width: 6px;
+	}
+}
+
+.scrollAreaThumb {
+	position: relative;
+	flex: 1;
+	border-radius: 999px;
+	background: var(--default-black);
+}
+
+.characterList {
+	max-height: $dropdownOpenHeight;
+	overflow: hidden;
+	border-radius: $borderRadius;
+	background-color: var(--boss-dropdown-color);
+	filter: drop-shadow(0 0 3px #121212);
+	margin-top: 16px;
+}
+
+.characterItem:focus-visible {
+	outline: none;
+}
+
+.characterItem:not(:last-child) {
+	border-bottom: 1px solid #143952;
+}

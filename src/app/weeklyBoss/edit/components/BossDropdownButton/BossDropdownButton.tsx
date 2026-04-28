@@ -55,7 +55,7 @@ const BossDropdownButton = ({
 	const renderBossValueItem = (multiplier: number): JSX.Element => (
 		<DropdownMenu.Item className={styles.menuItem} key={multiplier} onSelect={(): void => handleSelect(multiplier)}>
 			<span className={styles.menuText}>{`${multiplier}x times`}</span>
-			{value === multiplier && <CheckIcon className={styles.checkIcon} width={16} height={16} />}
+			{value === multiplier && <CheckIcon className={styles.checkIcon} height={16} width={16} />}
 		</DropdownMenu.Item>
 	);
 
@@ -68,7 +68,7 @@ const BossDropdownButton = ({
 		return (
 			<Tooltip content={tooltipContent} enabled={true}>
 				<button className={clsx(styles.menuOpener, difficultyClass, sizeClass)} disabled>
-					<BanIcon width={24} height={24} className={styles.banIcon} />
+					<BanIcon className={styles.banIcon} height={24} width={24} />
 				</button>
 			</Tooltip>
 		);
@@ -83,12 +83,12 @@ const BossDropdownButton = ({
 			</DropdownMenu.Trigger>
 
 			<DropdownMenu.Portal>
-				<DropdownMenu.Content forceMount className={styles.dropdownContent} side="bottom" align="center" sideOffset={5}>
+				<DropdownMenu.Content className={styles.dropdownContent} align="center" forceMount side="bottom" sideOffset={5}>
 					<div className={styles.gridContainer}>
 						{rows.map((multiplier): JSX.Element => renderBossValueItem(multiplier))}
 					</div>
 
-					<DropdownMenu.Arrow className={styles.arrow} width={15} height={10} />
+					<DropdownMenu.Arrow className={styles.arrow} height={10} width={15} />
 				</DropdownMenu.Content>
 			</DropdownMenu.Portal>
 		</DropdownMenu.Root>

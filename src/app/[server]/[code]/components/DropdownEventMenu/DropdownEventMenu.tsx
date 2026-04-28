@@ -23,9 +23,9 @@ const DropdownEventMenu = (): JSX.Element => {
 	const rows = Array.from({ length: MAX_VALUE_BONUS_COOKIE + 1 }, (_, i): number => i);
 
 	const renderBonusItem = (value: number, currentBonus: number, onSelect: (val: number) => void): JSX.Element => (
-		<DropdownMenu.Item className={styles.menuItem} onSelect={(): void => onSelect(value)} key={value}>
+		<DropdownMenu.Item className={styles.menuItem} key={value} onSelect={(): void => onSelect(value)}>
 			<span className={styles.menuText}>{value === 0 ? 'No Bonus' : `Bonus +${value}`}</span>
-			{currentBonus === value && <CheckIcon className={styles.checkIcon} width={16} height={16} />}
+			{currentBonus === value && <CheckIcon className={styles.checkIcon} height={16} width={16} />}
 		</DropdownMenu.Item>
 	);
 
@@ -34,19 +34,19 @@ const DropdownEventMenu = (): JSX.Element => {
 			<DropdownMenu.Trigger asChild>
 				<button className={styles.menuOpener}>
 					Event Bonus
-					<MenuIcon width={ICON_SIZE} height={ICON_SIZE} className={styles.icon} />
+					<MenuIcon className={styles.icon} height={ICON_SIZE} width={ICON_SIZE} />
 				</button>
 			</DropdownMenu.Trigger>
 
 			<DropdownMenu.Portal>
-				<DropdownMenu.Content forceMount className={styles.dropdownContent} side="bottom" align="center" sideOffset={5}>
+				<DropdownMenu.Content className={styles.dropdownContent} align="center" forceMount side="bottom" sideOffset={5}>
 					<div className={styles.gridContainer}>
 						<div className={`${styles.header} ${styles.leftColumn}`}>
-							<ArcaneIcon width={SYMBOL_SIZE} height={SYMBOL_SIZE} />
+							<ArcaneIcon height={SYMBOL_SIZE} width={SYMBOL_SIZE} />
 							Arcane
 						</div>
 						<div className={styles.header}>
-							<SacredIcon width={SYMBOL_SIZE} height={SYMBOL_SIZE} />
+							<SacredIcon height={SYMBOL_SIZE} width={SYMBOL_SIZE} />
 							Sacred
 						</div>
 
@@ -59,7 +59,7 @@ const DropdownEventMenu = (): JSX.Element => {
 							),
 						)}
 					</div>
-					<DropdownMenu.Arrow className={styles.arrow} width={15} height={10} />
+					<DropdownMenu.Arrow className={styles.arrow} height={10} width={15} />
 				</DropdownMenu.Content>
 			</DropdownMenu.Portal>
 		</DropdownMenu.Root>

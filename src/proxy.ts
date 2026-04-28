@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-import { generateCsrfToken } from '@/lib/security/security';
 import { isPublicPath } from '@lib/config/access';
 import { enforceVersion } from '@lib/config/tokenChange';
+import { generateCsrfToken } from '@lib/security/security';
 
 import type { NextRequest } from 'next/server';
 

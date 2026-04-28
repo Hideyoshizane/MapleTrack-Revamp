@@ -57,14 +57,14 @@ const SymbolGrid = ({ symbols, maxLevel, size = 16, characterLevel }: SymbolProp
 			const displayLevel = usable ? (symbol.level < maxLevel ? `Lv. ${symbol.level}` : 'MAX') : 'Lv. 0';
 
 			return (
-				<div key={symbol.name} className={styles.symbolsLine}>
+				<div className={styles.symbolsLine} key={symbol.name}>
 					<Image
+						className={!usable ? styles.off : ''}
+						alt={`${symbol.name} Icon`}
+						height={size}
+						loading="lazy"
 						src={getSymbolImagePath(symbol.name as SymbolName)}
 						width={size}
-						height={size}
-						alt={`${symbol.name} Icon`}
-						className={!usable ? styles.off : ''}
-						loading="lazy"
 					/>
 					<p className={styles.symbolLevel}>{displayLevel}</p>
 				</div>
@@ -84,10 +84,10 @@ const IconSection = ({
 	<div className={styles.bottomHalfIcon}>
 		<LinkSkillBlock characterLevel={character.level} characterLinkSkill={character.linkSkill} iconSize={iconSize} />
 		<LegionBlock
-			characterLevel={character.level}
 			characterCode={character.code === 'zero' ? 'zero' : 'default'}
 			characterJobType={character.jobType}
 			characterLegionType={character.legion}
+			characterLevel={character.level}
 			iconSize={iconSize}
 		/>
 	</div>
@@ -123,46 +123,46 @@ const ClassCard = ({ character, serverCookie }: ClassCardProps): JSX.Element | n
 					<div className={styles.symbolsDiv}>
 						<p className={styles.title}>Arcane Symbol</p>
 						<SymbolGrid
-							type="arcane"
-							symbols={symbols.arcane}
+							characterLevel={character.level}
 							maxLevel={arcaneMaxLevel}
 							size={SYMBOL_SIZE}
-							characterLevel={character.level}
+							symbols={symbols.arcane}
+							type="arcane"
 						/>
 
 						<p className={styles.title}>Sacred Symbol</p>
 						<SymbolGrid
-							type="sacred"
-							symbols={symbols.sacred}
+							characterLevel={character.level}
 							maxLevel={sacredMaxLevel}
 							size={SYMBOL_SIZE}
-							characterLevel={character.level}
+							symbols={symbols.sacred}
+							type="sacred"
 						/>
 					</div>
 
 					<Image
-						src={`/assets/cards/${code}.webp`}
-						width={355}
+						className={clsx(styles.classImg, level === 0 && styles.cardOff)}
+						alt={`${className} class Icon`}
 						height={213}
 						priority
-						alt={`${className} class Icon`}
-						className={clsx(styles.classImg, level === 0 && styles.cardOff)}
+						src={`/assets/cards/${code}.webp`}
+						width={355}
 					/>
 				</div>
 
 				{/* Bottom section: Link Skill, Legion, Boss, Name */}
 				<div className={styles.bottomPart}>
-					<IconSection linkSkill={linkSkill} character={{ linkSkill: ls ?? '', level, code, jobType, legion }} />
+					<IconSection character={{ linkSkill: ls ?? '', level, code, jobType, legion }} linkSkill={linkSkill} />
 
 					<div className={styles.bottomHalf}>
-						{bossing && <BossIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.bossIcon} />}
+						{bossing && <BossIcon className={styles.bossIcon} height={BOSS_ICON_SIZE} width={BOSS_ICON_SIZE} />}
 						<div className={styles.characterNameJobDiv}>
 							<ResponsiveText
 								className={styles.characterName}
-								width={180}
 								height={36}
 								maxFontSize={28}
-								minFontSize={12}>
+								minFontSize={12}
+								width={180}>
 								{name}
 							</ResponsiveText>
 							<p className={styles.characterJob}>{job}</p>
@@ -175,7 +175,7 @@ const ClassCard = ({ character, serverCookie }: ClassCardProps): JSX.Element | n
 					<p className={clsx(styles.levelText, jobLevelClassMap[jobKey], { [styles.complete]: level >= targetLevel })}>
 						{level}/{targetLevel}
 					</p>
-					<ProgressBar height={24} width={486} value={level} maxValue={targetLevel} jobType={jobKey} />
+					<ProgressBar height={24} jobType={jobKey} maxValue={targetLevel} value={level} width={486} />
 				</div>
 			</div>
 		</Link>

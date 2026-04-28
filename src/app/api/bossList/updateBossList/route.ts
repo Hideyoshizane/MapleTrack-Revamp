@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-import { updateBossListRequestSchema } from '@/features/Boss/schemas/bossList.request.schema';
+import { updateBossListRequestSchema } from '@features/boss/schemas/bossList.request.schema';
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';

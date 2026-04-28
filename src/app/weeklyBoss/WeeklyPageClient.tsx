@@ -14,14 +14,14 @@ import FullPageLoader from '@components/FullPageLoader/fullPageLoader';
 import ProgressBar from '@components/ProgressBar/progressBar';
 import ServerDropdown from '@components/ServerDropdown/serverDropdown';
 import { WEEKLY_BOSSES_TOTAL } from '@constants/bossConstants';
-import { bossListApi } from '@features/Boss/bossListApi';
+import { bossListApi } from '@features/boss/bossListApi';
 import { useServerCookie } from '@hooks/useServerCookie';
 
 import CharactersBossGrid from './components/CharactersBossGrid/charactersBossGrid';
 import styles from './page.module.scss';
 
 import type { ServerName } from '@data/servers/servers';
-import type { getBossListResponseBody } from '@features/Boss/schemas/bossList.response.schema';
+import type { getBossListResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
 type WeeklyPageClientProps = {
@@ -125,7 +125,11 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 	};
 
 	if (loading) {
-		return <FullPageLoader />;
+		return (
+			<section className="mainContent">
+				<FullPageLoader />
+			</section>
+		);
 	}
 
 	const hasCharacters: boolean = characters.length > 0;
@@ -134,19 +138,19 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 		<section className="mainContent">
 			<div className={styles.topBar}>
 				<div className={styles.bossHunt}>
-					<BossIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.bossIcon} />
+					<BossIcon className={styles.bossIcon} height={BOSS_ICON_SIZE} width={BOSS_ICON_SIZE} />
 					<p className={styles.bossTitle}>Boss Hunting</p>
 				</div>
 
 				<div className={styles.weekProgress}>
 					<Image
-						src="/assets/icons/menu/crystal.webp"
-						alt="Boss Crystal Icon"
-						width={64}
-						height={72}
-						quality={100}
-						priority
 						className={styles.icon}
+						alt="Boss Crystal Icon"
+						height={72}
+						priority
+						quality={100}
+						src="/assets/icons/menu/crystal.webp"
+						width={64}
 					/>
 					<div className={styles.content}>
 						<p className={styles.weekTitle}>Week Progress</p>
@@ -155,23 +159,23 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 						</p>
 						<ProgressBar
 							height={16}
-							width={240}
-							value={weeklyBosses}
-							maxValue={WEEKLY_BOSSES_TOTAL}
 							jobType={'default'}
+							maxValue={WEEKLY_BOSSES_TOTAL}
+							value={weeklyBosses}
+							width={240}
 						/>
 					</div>
 				</div>
 
 				<div className={styles.totalGain}>
 					<Image
-						src="/assets/icons/menu/stash.webp"
-						alt="Gold Stash Icon"
-						width={80}
-						height={80}
-						quality={100}
-						priority
 						className={styles.icon}
+						alt="Gold Stash Icon"
+						height={80}
+						priority
+						quality={100}
+						src="/assets/icons/menu/stash.webp"
+						width={80}
 					/>
 					<div className={styles.content}>
 						<p className={styles.totalGainTitle}>Total Gain</p>
@@ -193,16 +197,16 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 				<div className={styles.contentWrapper}>
 					<CharactersBossGrid
 						characterList={characters}
-						server={server}
 						handleBossToggle={(bossMonsterId: string): void => {
 							void handleBossToggle(bossMonsterId);
 						}}
+						server={server}
 					/>
 				</div>
 			) : (
 				<div className={styles.wrapper}>
 					<div className={styles.notFoundList}>
-						<ErrorIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.errorIcon} />
+						<ErrorIcon className={styles.errorIcon} height={BOSS_ICON_SIZE} width={BOSS_ICON_SIZE} />
 						<p className={styles.title}>No character found!</p>
 						<p className={styles.text}>You haven&apos;t marked any characters as Boss Slayer yet.</p>
 						<p className={styles.text}>Go to your desired character and set it as a Boss Slayer to see them here.</p>

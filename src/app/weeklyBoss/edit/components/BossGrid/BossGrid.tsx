@@ -6,8 +6,8 @@ import BossItem from '../BossItem/bossItem';
 
 import styles from './bossGrid.module.scss';
 
-import type { getEditBossListCharacterResponseBody } from '@/features/Boss/schemas/bossList.response.schema';
 import type { BossName, BossDifficultyName, BossReset } from '@data/bosses/bosses';
+import type { getEditBossListCharacterResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
 type BossGridProps = {
@@ -30,12 +30,12 @@ const BossGrid = ({ serverCookie, selectedCharacter, onBossUpdate }: BossGridPro
 				const selections = selectedBosses.filter((b) => b.name === boss.name);
 				return (
 					<BossItem
-						key={boss.name}
-						serverCookie={serverCookie}
-						selectedCharacterLevel={selectedCharacter?.level ?? 0}
 						boss={boss}
-						selectedBosses={selections}
+						key={boss.name}
 						onBossUpdate={onBossUpdate}
+						selectedBosses={selections}
+						selectedCharacterLevel={selectedCharacter?.level ?? 0}
+						serverCookie={serverCookie}
 					/>
 				);
 			})}

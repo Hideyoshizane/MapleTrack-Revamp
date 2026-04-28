@@ -57,22 +57,22 @@ function LevelExpInput({ level, exp, maxLevel, expRequired, onLevelBlur, onExpBl
 		<div className={styles.levelExpInfo}>
 			<p className={styles.symbolLevelText}>Level:</p>
 			<input
-				type="number"
 				className={styles.symbolLevel}
 				defaultValue={level}
-				min={0}
 				max={maxLevel}
+				min={0}
 				onBlur={(e) => onLevelBlur(Number(e.target.value || 0))}
+				type="number"
 			/>
 
 			<p className={styles.symbolLevelText}>EXP:</p>
 			<input
-				type="number"
 				className={styles.symbolExp}
 				defaultValue={exp}
-				min={0}
 				max={expRequired}
+				min={0}
 				onBlur={(e) => onExpBlur(Number(e.target.value || 0))}
+				type="number"
 			/>
 		</div>
 	);
@@ -89,8 +89,8 @@ function SymbolImage({ src, size, computedValue, usable }: SymbolImageProps): JS
 	const tooltipMessage = computedValue === 0 ? 'Symbol at Max level.' : `Days to max Level: ${computedValue}`;
 
 	return (
-		<Tooltip content={tooltipMessage} placement="top" enabled={usable}>
-			<Image src={src} width={size} height={size} alt="Symbol Icon" className={!usable ? styles.off : ''} />
+		<Tooltip content={tooltipMessage} enabled={usable} placement="top">
+			<Image className={!usable ? styles.off : ''} alt="Symbol Icon" height={size} src={src} width={size} />
 		</Tooltip>
 	);
 }
@@ -179,9 +179,9 @@ function EditPageSymbolObject({
 	if (!isSymbolUsable) {
 		return (
 			<div className={styles.symbolContainer}>
-				<SymbolImage src={src} size={size} computedValue={computedValue} usable={false} />
+				<SymbolImage computedValue={computedValue} size={size} src={src} usable={false} />
 				<div className={styles.symbolOff}>
-					<ProgressBar height={8} width={231} value={0} maxValue={expRequired} jobType={jobType} forceFull={false} />
+					<ProgressBar forceFull={false} height={8} jobType={jobType} maxValue={expRequired} value={0} width={231} />
 					<p className={styles.unlockLevel}>Unlock at Level {getSymbolMinLevel(symbol.name as SymbolName)}</p>
 				</div>
 			</div>
@@ -191,41 +191,41 @@ function EditPageSymbolObject({
 	return (
 		<div className={styles.symbolContainer}>
 			<div className={styles.imageContainer}>
-				<SymbolImage src={src} size={size} computedValue={computedValue} usable />
+				<SymbolImage computedValue={computedValue} size={size} src={src} usable />
 			</div>
 
 			<div className={styles.symbolInfo}>
 				<LevelExpInput
-					level={symbol.level}
 					exp={symbol.exp}
-					maxLevel={maxLevel}
 					expRequired={expRequired}
-					onLevelBlur={(value) => updateSymbol({ type: 'level', value, category: type, name: symbol.name })}
+					level={symbol.level}
+					maxLevel={maxLevel}
 					onExpBlur={(value) => updateSymbol({ type: 'exp', value, category: type, name: symbol.name })}
+					onLevelBlur={(value) => updateSymbol({ type: 'level', value, category: type, name: symbol.name })}
 				/>
 
 				<div className={styles.progressDiv}>
 					<ProgressBar
-						height={8}
-						width={231}
-						value={symbol.exp}
-						maxValue={expRequired}
-						jobType={jobType}
 						forceFull={symbol.level >= maxLevel}
+						height={8}
+						jobType={jobType}
+						maxValue={expRequired}
+						value={symbol.exp}
+						width={231}
 					/>
 				</div>
 
 				<div className={styles.contentList}>
 					{symbol.contents.map((content, index) => (
 						<ContentCheckbox
-							key={`${symbol.name}-${content.contentType}`}
+							characterLevel={characterLevel}
 							content={content}
 							index={index}
-							characterLevel={characterLevel}
-							symbolName={symbol.name}
+							key={`${symbol.name}-${content.contentType}`}
 							onToggle={(i, checked) =>
 								updateSymbol({ type: 'content', index: i, checked, category: type, name: symbol.name })
 							}
+							symbolName={symbol.name}
 						/>
 					))}
 				</div>

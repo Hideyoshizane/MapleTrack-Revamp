@@ -50,9 +50,7 @@ const HomePageClient = ({ initialServer }: HomePageClientProps): JSX.Element => 
 					<br />
 					Please select a character and enable Boss Slayer in the character settings.
 				</div>,
-				{
-					className: 'toast--large',
-				},
+				{ className: 'toast--large' },
 			);
 			hasShownToast.current = true;
 			router.replace('/home');
@@ -65,9 +63,9 @@ const HomePageClient = ({ initialServer }: HomePageClientProps): JSX.Element => 
 				<ServerDropdown server={server} setServerCookie={setServerCookie} />
 			</div>
 			<div className={styles.classFilter}>
-				<ClassFilter selectedClasses={selectedClasses} setSelectedClasses={setClasses} loading={loading} />
+				<ClassFilter loading={loading} selectedClasses={selectedClasses} setSelectedClasses={setClasses} />
 			</div>
-			<ClassGrid serverCookie={server} selectedClasses={selectedClasses} selectedClassesLoading={loading} />
+			<ClassGrid selectedClasses={selectedClasses} selectedClassesLoading={loading} serverCookie={server} />
 		</section>
 	);
 };

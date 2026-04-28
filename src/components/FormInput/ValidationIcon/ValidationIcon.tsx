@@ -37,7 +37,7 @@ const ValidationIcon = ({
 }: ValidationIconProps): JSX.Element => {
 	// Show green check without tooltip
 	if (showValid) {
-		return <OkIcon width={iconSize} height={iconSize} className={clsx(styles.validIcon, className)} />;
+		return <OkIcon className={clsx(styles.validIcon, className)} height={iconSize} width={iconSize} />;
 	}
 
 	// Determine which icon to render
@@ -49,8 +49,8 @@ const ValidationIcon = ({
 	);
 
 	return (
-		<Tooltip content={tooltipMessage} placement="right" enabled={showTooltip}>
-			<IconComponent width={iconSize} height={iconSize} className={iconClass} />
+		<Tooltip content={tooltipMessage} enabled={showTooltip} placement="right">
+			<IconComponent className={iconClass} height={iconSize} width={iconSize} />
 		</Tooltip>
 	);
 };

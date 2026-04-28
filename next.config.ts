@@ -42,7 +42,6 @@ const nextConfig: NextConfig = {
 			},
 		},
 	},
-
 	images: { remotePatterns: patterns, qualities: [75, 100] },
 };
 

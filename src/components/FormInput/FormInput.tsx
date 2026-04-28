@@ -35,17 +35,8 @@ const FormInput = <TFieldValues extends FieldValues>({
 
 	return (
 		<Controller
-			name={id}
 			control={control}
-			rules={{
-				validate: (value: string): boolean | string => {
-					if (!validation) {
-						return true;
-					}
-					const result = validation(value);
-					return result.isValid || result.error || 'Invalid input';
-				},
-			}}
+			name={id}
 			render={({ field, fieldState }): JSX.Element => {
 				const showError = Boolean(fieldState.error);
 				const showValid = touched && !fieldState.error;
@@ -62,34 +53,43 @@ const FormInput = <TFieldValues extends FieldValues>({
 					<div className={containerClass}>
 						<div className={styles.inputRow}>
 							<input
-								id={id}
-								type={type}
-								aria-invalid={!isLogin && showError}
-								aria-describedby={!isLogin && showError ? `${String(id)}-error` : undefined}
 								className={inputClass}
+								aria-describedby={!isLogin && showError ? `${String(id)}-error` : undefined}
+								aria-invalid={!isLogin && showError}
+								id={id}
 								placeholder={label}
+								type={type}
 								{...field}
-								value={field.value ?? ''}
 								onBlur={(): void => {
 									setTouched(true);
 									field.onBlur();
 								}}
+								value={field.value ?? ''}
 							/>
 
 							{!isLogin && (
 								<div className={styles.icon}>
 									<ValidationIcon
-										showValid={showValid}
-										showInvalid={showInvalid}
-										tooltipMessage={tooltipMessage}
 										isLightmode={isLightmode}
+										showInvalid={showInvalid}
 										showTooltip
+										showValid={showValid}
+										tooltipMessage={tooltipMessage}
 									/>
 								</div>
 							)}
 						</div>
 					</div>
 				);
+			}}
+			rules={{
+				validate: (value: string): boolean | string => {
+					if (!validation) {
+						return true;
+					}
+					const result = validation(value);
+					return result.isValid || result.error || 'Invalid input';
+				},
 			}}
 		/>
 	);

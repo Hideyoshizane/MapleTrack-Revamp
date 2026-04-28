@@ -18,14 +18,14 @@ type SwitchProps = {
 
 const Switch = ({ title, checked, tooltipMessage, onCheckedChange, disabled }: SwitchProps): JSX.Element => {
 	return (
-		<Tooltip content={tooltipMessage} placement="bottom" enabled={!!tooltipMessage}>
+		<Tooltip content={tooltipMessage} enabled={!!tooltipMessage} placement="bottom">
 			<div className={styles.wrapper}>
 				{title && <div className={styles.title}>{title}</div>}
 				<SwitchPrimitive.Root
 					className={styles.root}
 					checked={checked}
-					onCheckedChange={onCheckedChange}
-					disabled={disabled}>
+					disabled={disabled}
+					onCheckedChange={onCheckedChange}>
 					<SwitchPrimitive.Thumb className={styles.thumb} />
 				</SwitchPrimitive.Root>
 			</div>

@@ -36,14 +36,14 @@ const CharacterHeader = ({
 	const characterImage = character.syncing ? (
 		extraData ? (
 			<Image
-				src={extraData.characterImgURL}
-				alt="Fetched from API"
-				width={80}
-				height={80}
 				className={styles.loadedImage}
+				alt="Fetched from API"
+				height={80}
+				src={extraData.characterImgURL}
+				width={80}
 			/>
 		) : (
-			<SkeletonWrapper width={80} height={80} color="light" variant="rectangular" />
+			<SkeletonWrapper color="light" height={80} variant="rectangular" width={80} />
 		)
 	) : null;
 

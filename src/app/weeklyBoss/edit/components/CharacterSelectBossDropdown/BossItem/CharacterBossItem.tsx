@@ -7,7 +7,7 @@ import { generateClassCode } from '@data/classes/classes';
 
 import styles from './characterBossItem.module.scss';
 
-import type { getEditBossListCharacterResponseBody } from '@features/Boss/schemas/bossList.response.schema';
+import type { getEditBossListCharacterResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX, KeyboardEvent } from 'react';
 
 type CharacterBossItemProps = {
@@ -16,7 +16,7 @@ type CharacterBossItemProps = {
 	onClick?: () => void;
 };
 
-export default function CharacterBossItem({ character, isSelected, onClick }: CharacterBossItemProps): JSX.Element {
+const CharacterBossItem = ({ character, isSelected, onClick }: CharacterBossItemProps): JSX.Element => {
 	const handleKey = (event: KeyboardEvent<HTMLDivElement>): void => {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();
@@ -29,18 +29,18 @@ export default function CharacterBossItem({ character, isSelected, onClick }: Ch
 	return (
 		<div
 			className={styles.wrapper}
-			tabIndex={0}
-			role="option"
 			aria-selected={isSelected}
+			onClick={onClick}
 			onKeyDown={handleKey}
-			onClick={onClick}>
+			role="option"
+			tabIndex={0}>
 			<Image
 				className={styles.classIcon}
-				src={`/assets/buttom_profile/${code}.webp`}
 				alt={character.name}
-				width={480}
 				height={80}
 				priority
+				src={`/assets/buttom_profile/${code}.webp`}
+				width={480}
 			/>
 			<div className={styles.nameDiv}>
 				<p className={styles.characterName}>{character.name}</p>
@@ -53,4 +53,6 @@ export default function CharacterBossItem({ character, isSelected, onClick }: Ch
 			)}
 		</div>
 	);
-}
+};
+
+export default CharacterBossItem;

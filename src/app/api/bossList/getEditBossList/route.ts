@@ -1,11 +1,11 @@
-import { getEditBossListRequestSchema } from '@features/Boss/schemas/bossList.request.schema';
-import { getEditBossListResponseSchema } from '@features/Boss/schemas/bossList.response.schema';
+import { getEditBossListRequestSchema } from '@features/boss/schemas/bossList.request.schema';
+import { getEditBossListResponseSchema } from '@features/boss/schemas/bossList.response.schema';
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
 import { logZodError, logError } from '@utils/logger';
 
-import type { getEditBossListResponseBody } from '@features/Boss/schemas/bossList.response.schema';
+import type { getEditBossListResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 

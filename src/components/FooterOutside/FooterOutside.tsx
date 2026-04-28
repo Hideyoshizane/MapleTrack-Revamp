@@ -9,7 +9,7 @@ const FooterOutside = (): JSX.Element => {
 			<p>All assets and trademarks are © their respective owners.</p>
 			<p>
 				Made by Hideyoshi. Check the{' '}
-				<a href="https://github.com/Hideyoshizane/MapleTrack-Revamp" target="_blank" rel="noopener noreferrer">
+				<a href="https://github.com/Hideyoshizane/MapleTrack-Revamp" rel="noopener noreferrer" target="_blank">
 					GitHub
 				</a>{' '}
 				for more info.

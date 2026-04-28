@@ -64,21 +64,21 @@ const BossButton = ({
 			<button className={clsx(styles.button, difficultyClass, sizeClass)} disabled={locked} onClick={onSelect}>
 				<div className={styles.content}>
 					{locked ? (
-						<BanIcon width={24} height={24} className={styles.banIcon} />
+						<BanIcon className={styles.banIcon} height={24} width={24} />
 					) : (
 						<ResponsiveText
 							className={clsx(styles.buttonText, selected && styles.textShift)}
-							width={widthSize}
 							height={40}
 							maxFontSize={minTextSize}
-							minFontSize={minTextSize}>
+							minFontSize={minTextSize}
+							width={widthSize}>
 							{difficulty.name}
 						</ResponsiveText>
 					)}
 					<CheckedIcon
-						width={iconSize}
-						height={iconSize}
 						className={clsx(styles.icon, iconColor, selected && !locked && styles.iconVisible)}
+						height={iconSize}
+						width={iconSize}
 					/>
 				</div>
 			</button>

@@ -1,0 +1,62 @@
+.bossesDiv {
+	width: 100%;
+	height: auto;
+	padding: 24px;
+	border-radius: 25px;
+	background-color: var(--background-white);
+	color: var(--default-button-text);
+
+	.title {
+		font-size: 24px;
+		font-weight: 500;
+	}
+
+	.subTitle {
+		font-size: 16px;
+		margin-top: 8px;
+	}
+
+	.titleDiv {
+		display: flex;
+		font-size: 20px;
+		margin-bottom: 8px;
+		margin-top: 8px;
+
+		.menuBoss {
+			width: 180px;
+		}
+
+		.menuDifficulty {
+			width: 336px;
+			text-align: center;
+			margin-right: 8px;
+		}
+
+		.menuParty {
+			width: 88px;
+			text-align: center;
+			margin-right: 8px;
+		}
+
+		.menuCleared {
+			width: 75px;
+			text-align: center;
+		}
+	}
+}
+
+.bossList {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+
+	.bossCard {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+
+		.bossName {
+			width: 108px;
+		}
+	}
+}

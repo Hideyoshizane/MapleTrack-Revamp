@@ -20,13 +20,11 @@ const FullPageLoader = ({
 	borderWidth = 12,
 }: FullPageLoaderProps): JSX.Element => {
 	return (
-		<section className="mainContent">
-			<div className={styles.mainDiv}>
-				<div className={styles.loaderDiv}>
-					<Loader width={width} height={height} color={color} borderWidth={borderWidth} />
-				</div>
+		<div className={styles.mainDiv}>
+			<div className={styles.loaderDiv}>
+				<Loader borderWidth={borderWidth} color={color} height={height} width={width} />
 			</div>
-		</section>
+		</div>
 	);
 };
 

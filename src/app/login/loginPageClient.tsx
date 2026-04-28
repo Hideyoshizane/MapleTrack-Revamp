@@ -35,10 +35,10 @@ const LoginPageClient = (): JSX.Element => {
 	return (
 		<div className={styles.container}>
 			<div className={styles.logoDiv}>
-				<Image src="/assets/logo/logo.webp" priority fill sizes="750px" alt="MapleTrack Logo" />
+				<Image alt="MapleTrack Logo" fill priority sizes="750px" src="/assets/logo/logo.webp" />
 			</div>
 
-			<form onSubmit={(e): undefined => void handleSubmit(submitLogin)(e)} noValidate>
+			<form noValidate onSubmit={(e): undefined => void handleSubmit(submitLogin)(e)}>
 				<FormInput<LoginFormData>
 					id="username"
 					label="Username"
@@ -57,26 +57,26 @@ const LoginPageClient = (): JSX.Element => {
 					isLogin={true}
 				/>
 				<div>
-					<Link href="/forgot-password" className={styles.forgotPassword}>
+					<Link className={styles.forgotPassword} href="/forgot-password">
 						Forgot password?
 					</Link>
 				</div>
 
 				<Button
-					type="submit"
 					className={styles.submitButton}
+					aria-label="Submit form"
 					isLoading={isSubmitting}
-					loadingText="Loading..."
-					loaderSize={16}
-					loaderColor="#121212"
 					loaderBorderWidth={3}
-					aria-label="Submit form">
+					loaderColor="#121212"
+					loaderSize={16}
+					loadingText="Loading..."
+					type="submit">
 					Login
 				</Button>
 
 				<p className={styles.signupText}>
 					Don&apos;t have an account?{' '}
-					<Link href="/signup" className={styles.signupLink}>
+					<Link className={styles.signupLink} href="/signup">
 						Sign up
 					</Link>
 				</p>

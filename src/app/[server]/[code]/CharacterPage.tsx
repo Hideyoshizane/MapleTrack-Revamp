@@ -83,7 +83,11 @@ const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
 	};
 
 	if (isLoading && !character) {
-		return <FullPageLoader />;
+		return (
+			<section className="mainContent">
+				<FullPageLoader />
+			</section>
+		);
 	}
 	if (!character) {
 		return (
@@ -100,18 +104,18 @@ const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
 		<section className="mainContent">
 			<div className={styles.mainDiv}>
 				<Image
-					src={`/assets/profile/${code}.webp`}
-					width={650}
+					alt={`${character.class} class profile Icon`}
 					height={827}
 					priority
-					alt={`${character.class} class profile Icon`}
+					src={`/assets/profile/${code}.webp`}
+					width={650}
 				/>
 				<div className={styles.characterContent}>
 					<CharacterHeader
 						character={character}
 						extraData={characterDataApi ?? null}
-						router={router}
 						onIncreaseAll={handleIncreaseAll}
+						router={router}
 						setDisableAllDaily={setDisableAllDaily}
 					/>
 

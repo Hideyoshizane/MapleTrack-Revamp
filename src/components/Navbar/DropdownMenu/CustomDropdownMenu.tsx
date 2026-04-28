@@ -24,15 +24,15 @@ const CustomDropdownMenu = ({ username }: CustomDropdownMenuProps): JSX.Element 
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
 				<button className={styles.menuOpener} aria-label={`Open menu for ${username}`}>
-					<ResponsiveText className={styles.usernameText} width={200} height={40} maxFontSize={32} minFontSize={12}>
+					<ResponsiveText className={styles.usernameText} height={40} maxFontSize={32} minFontSize={12} width={200}>
 						{username}
 					</ResponsiveText>
-					<MenuIcon width={ICON_SIZE} height={ICON_SIZE} className={styles.icon} />
+					<MenuIcon className={styles.icon} height={ICON_SIZE} width={ICON_SIZE} />
 				</button>
 			</DropdownMenu.Trigger>
 
 			<DropdownMenu.Portal>
-				<DropdownMenu.Content className={styles.dropdownContent} side="bottom" align="end" sideOffset={5}>
+				<DropdownMenu.Content className={styles.dropdownContent} align="end" side="bottom" sideOffset={5}>
 					{MENU_ITEMS.map(
 						(item): JSX.Element => (
 							<Fragment key={item.text}>

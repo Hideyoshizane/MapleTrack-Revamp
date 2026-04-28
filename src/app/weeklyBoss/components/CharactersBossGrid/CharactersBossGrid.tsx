@@ -4,7 +4,7 @@ import WeeklyBossDropdown from '../WeeklyBossDropdown/weeklyBossDropdown';
 
 import styles from './charactersBossGrid.module.scss';
 
-import type { getBossListCharacterResponseBody } from '@features/Boss/schemas/bossList.response.schema';
+import type { getBossListCharacterResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
 type HandleBossToggle = (bossMosterId: string) => void | Promise<void>;
@@ -21,10 +21,10 @@ const CharactersBossGrid = ({ server, characterList, handleBossToggle }: Charact
 			{characterList.map((character): JSX.Element => {
 				return (
 					<WeeklyBossDropdown
-						key={character.name}
 						character={character}
-						server={server}
 						handleBossToggle={handleBossToggle}
+						key={character.name}
+						server={server}
 					/>
 				);
 			})}

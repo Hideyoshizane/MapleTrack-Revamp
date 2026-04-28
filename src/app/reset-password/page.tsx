@@ -25,16 +25,16 @@ const ResetPasswordPage = (): JSX.Element => {
 
 	return (
 		<div className={styles.container}>
-			<Link href="/login" aria-label="Go to login page">
+			<Link aria-label="Go to login page" href="/login">
 				<div className={styles.logoDiv}>
-					<Image src="/assets/logo/logo.webp" priority fill sizes="750px" alt="MapleTrack Logo" />
+					<Image alt="MapleTrack Logo" fill priority sizes="750px" src="/assets/logo/logo.webp" />
 				</div>
 			</Link>
 
 			<h1 className={styles.title}>Create a new password</h1>
 			<h1 className={styles.text}>Your new password must be different from previous used password.</h1>
 
-			<form onSubmit={(e): undefined => void handleSubmit(onSubmit)(e)} noValidate>
+			<form noValidate onSubmit={(e): undefined => void handleSubmit(onSubmit)(e)}>
 				<FormInput<ResetPasswordFormData>
 					id="password"
 					label="Password"
@@ -54,14 +54,14 @@ const ResetPasswordPage = (): JSX.Element => {
 				/>
 
 				<Button
-					type="submit"
 					className={styles.submitButton}
+					aria-label="Submit form"
 					isLoading={isSubmitting}
-					loadingText="Submitting..."
-					loaderSize={16}
-					loaderColor="#121212"
 					loaderBorderWidth={3}
-					aria-label="Submit form">
+					loaderColor="#121212"
+					loaderSize={16}
+					loadingText="Submitting..."
+					type="submit">
 					Reset Password
 				</Button>
 			</form>

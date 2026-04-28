@@ -23,18 +23,18 @@ const ServerDropdown = ({ server, setServerCookie }: ServerDropdownProps): JSX.E
 	const selectedServer: Server | undefined = servers.find((s: Server): boolean => s.name === server);
 
 	if (!selectedServer) {
-		return <SkeletonWrapper width={502} height={368} color="light" variant="rounded" />;
+		return <SkeletonWrapper color="light" height={368} variant="rounded" width={502} />;
 	}
 
 	return (
 		<Select.Root
-			value={selectedServer.name}
 			onValueChange={(value: string): void => {
 				setServerCookie?.(value as ServerName);
-			}}>
+			}}
+			value={selectedServer.name}>
 			<Select.Trigger className={styles.selectedServerWrapper} aria-label={`Selected server: ${selectedServer.name}`}>
 				<div className={styles.iconWrapper}>
-					<Image src={selectedServer.img} alt={selectedServer.name} width={48} height={48} priority />
+					<Image alt={selectedServer.name} height={48} priority src={selectedServer.img} width={48} />
 				</div>
 
 				<p className={styles.serverName}>{selectedServer.name}</p>
@@ -49,13 +49,13 @@ const ServerDropdown = ({ server, setServerCookie }: ServerDropdownProps): JSX.E
 							<Select.Viewport>
 								{servers.map(
 									(serverItem: Server): JSX.Element => (
-										<Select.Item key={serverItem.name} value={serverItem.name} className={styles.serverItem}>
+										<Select.Item className={styles.serverItem} key={serverItem.name} value={serverItem.name}>
 											<ServerItem
-												server={serverItem}
 												isSelected={serverItem.name === selectedServer.name}
 												onSelect={() => {
 													setServerCookie?.(serverItem.name);
 												}}
+												server={serverItem}
 											/>
 										</Select.Item>
 									),

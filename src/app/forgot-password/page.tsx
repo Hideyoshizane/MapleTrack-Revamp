@@ -29,26 +29,26 @@ const ForgotPasswordPage = (): JSX.Element => {
 
 	return (
 		<div className={styles.container}>
-			<Link href="/login" aria-label="Go to login page">
+			<Link aria-label="Go to login page" href="/login">
 				<div className={styles.logoDiv}>
 					<Image
-						src="/assets/logo/logo.webp"
-						priority
-						fill
-						sizes="(max-width: 1024px) 100vw, 880px"
 						alt="MapleTrack Logo"
+						fill
+						priority
+						sizes="(max-width: 1024px) 100vw, 880px"
+						src="/assets/logo/logo.webp"
 					/>
 				</div>
 			</Link>
 
 			<div className={styles.titleDiv}>
-				<LockIcon width={32} height={32} className={styles.icon} />
+				<LockIcon className={styles.icon} height={32} width={32} />
 				<p className={styles.title}>Trouble logging in?</p>
 			</div>
 
 			<p className={styles.text}>Enter your email and we&apos;ll send you a link to reset your password.</p>
 
-			<form onSubmit={(e): undefined => void handleSubmit(submitForgotPassword)(e)} noValidate>
+			<form noValidate onSubmit={(e): undefined => void handleSubmit(submitForgotPassword)(e)}>
 				<FormInput<ForgotPasswordFormData>
 					id="email"
 					label="Email"
@@ -59,14 +59,14 @@ const ForgotPasswordPage = (): JSX.Element => {
 				/>
 
 				<Button
-					type="submit"
 					className={styles.submitButton}
+					aria-label="Submit form"
 					isLoading={isSubmitting}
-					loadingText="Submitting..."
-					loaderSize={16}
-					loaderColor="#121212"
 					loaderBorderWidth={3}
-					aria-label="Submit form">
+					loaderColor="#121212"
+					loaderSize={16}
+					loadingText="Submitting..."
+					type="submit">
 					Send Reset Link
 				</Button>
 
@@ -76,7 +76,7 @@ const ForgotPasswordPage = (): JSX.Element => {
 					<div className={styles.bar} />
 				</div>
 
-				<Link href="/signup" passHref className={styles.newAccount}>
+				<Link className={styles.newAccount} href="/signup" passHref>
 					Create new account
 				</Link>
 			</form>

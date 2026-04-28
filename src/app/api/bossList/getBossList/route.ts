@@ -1,12 +1,12 @@
-import { resetBossList } from '@features/Boss/bossListService';
-import { getBossListRequestSchema } from '@features/Boss/schemas/bossList.request.schema';
-import { getBossListResponseSchema } from '@features/Boss/schemas/bossList.response.schema';
+import { resetBossList } from '@features/boss/bossListService';
+import { getBossListRequestSchema } from '@features/boss/schemas/bossList.request.schema';
+import { getBossListResponseSchema } from '@features/boss/schemas/bossList.response.schema';
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
 import { logZodError, logError, logApiFailure } from '@utils/logger';
 
-import type { getBossListResponseBody } from '@features/Boss/schemas/bossList.response.schema';
+import type { getBossListResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 

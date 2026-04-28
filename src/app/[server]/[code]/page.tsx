@@ -26,7 +26,7 @@ const CharactersPage = async ({ params }: CharactersPageProps): Promise<JSX.Elem
 		<main className="container">
 			<Navbar username={session.user.username} />
 			<BonusProvider>
-				<CharacterPage server={server} code={code} />
+				<CharacterPage code={code} server={server} />
 			</BonusProvider>
 		</main>
 	);

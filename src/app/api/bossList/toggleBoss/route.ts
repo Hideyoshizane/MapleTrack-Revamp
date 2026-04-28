@@ -2,14 +2,14 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
 import { getBossDifficultyValue } from '@data/bosses/bosses';
-import { toggleBossListRequestSchema } from '@features/Boss/schemas/bossList.request.schema';
-import { toggleBossListResponseSchema } from '@features/Boss/schemas/bossList.response.schema';
+import { toggleBossListRequestSchema } from '@features/boss/schemas/bossList.request.schema';
+import { toggleBossListResponseSchema } from '@features/boss/schemas/bossList.response.schema';
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
 import { logZodError, logApiFailure, logError } from '@utils/logger';
 
-import type { toggleBossListResponseBody } from '@features/Boss/schemas/bossList.response.schema';
+import type { toggleBossListResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
@@ -40,15 +40,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				cleared: true,
 				locked: true,
 				character: {
-					select: {
-						server: {
-							select: {
-								id: true,
-								serverName: true,
-								bossList: { select: { id: true } },
-							},
-						},
-					},
+					select: { server: { select: { id: true, serverName: true, bossList: { select: { id: true } } } } },
 				},
 			},
 		});

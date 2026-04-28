@@ -12,12 +12,12 @@ const ClientToaster = (props: ToastContainerProps): JSX.Element => {
 		<ToastContainer
 			{...props}
 			autoClose={4000}
+			closeOnClick
+			draggable
 			hideProgressBar={false}
 			newestOnTop={false}
-			closeOnClick
-			pauseOnHover
-			draggable
 			pauseOnFocusLoss={false}
+			pauseOnHover
 			transition={Bounce}
 		/>
 	);

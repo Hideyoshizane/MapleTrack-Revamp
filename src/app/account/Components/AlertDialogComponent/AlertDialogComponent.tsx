@@ -23,7 +23,7 @@ const AlertDialogComponent = ({ open, onOpenChange, onConfirm }: AlertDialogComp
 	};
 
 	return (
-		<AlertDialog.Root open={open} onOpenChange={onOpenChange}>
+		<AlertDialog.Root onOpenChange={onOpenChange} open={open}>
 			<AlertDialog.Portal>
 				<AlertDialog.Overlay className={styles.overlay} />
 				<AlertDialog.Content className={styles.content}>

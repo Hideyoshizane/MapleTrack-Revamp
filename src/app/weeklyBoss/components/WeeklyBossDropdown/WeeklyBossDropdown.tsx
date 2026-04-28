@@ -14,7 +14,7 @@ import { generateClassCode } from '@data/classes/classes';
 import CharacterBossItem from './BossItem/characterBossItem';
 import styles from './weeklyBossDropdown.module.scss';
 
-import type { getBossListCharacterResponseBody } from '@features/Boss/schemas/bossList.response.schema';
+import type { getBossListCharacterResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
 type HandleBossToggle = (bossMosterId: string) => void | Promise<void>;
@@ -37,10 +37,10 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: WeeklyBossD
 			<DropdownMenu.Trigger asChild disabled={isDisabled}>
 				<div
 					className={styles.selectedCharacterWrapper}
-					data-disabled={isDisabled}
+					aria-label={`Selected character: ${character.name}`}
 					data-cleared={isCleared && !isDisabled}
-					role="button"
-					aria-label={`Selected character: ${character.name}`}>
+					data-disabled={isDisabled}
+					role="button">
 					<div className={styles.nameDiv}>
 						<p className={styles.characterName}>{character.name}</p>
 						<p className={styles.characterClass}>{character.class}</p>
@@ -61,32 +61,31 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: WeeklyBossD
 
 					<Image
 						className={styles.classIcon}
-						src={`/assets/buttom_profile/${code}.webp`}
 						alt={character.name}
-						width={480}
 						height={80}
 						priority
+						src={`/assets/buttom_profile/${code}.webp`}
+						width={480}
 					/>
 				</div>
 			</DropdownMenu.Trigger>
 
 			<DropdownMenu.Portal>
-				<DropdownMenu.Content className={styles.characterList} sideOffset={4} align="start" side="bottom">
+				<DropdownMenu.Content className={styles.characterList} align="start" side="bottom" sideOffset={4}>
 					<ScrollArea.Root className={styles.scrollAreaRoot}>
 						<ScrollArea.Viewport className={styles.scrollAreaViewport}>
 							{character.bosses.map((boss) => (
 								<Fragment key={`${boss.name}-${boss.difficulty}`}>
 									<DropdownMenu.CheckboxItem
+										className={styles.characterItem}
 										checked={boss.cleared}
 										data-checked={boss.cleared}
 										data-locked={boss.locked}
 										onSelect={(event): void => {
 											event.preventDefault();
-										}}
-										className={styles.characterItem}>
+										}}>
 										<CharacterBossItem
 											boss={boss}
-											server={server}
 											isSelected={boss.locked || boss.cleared}
 											onClick={() => {
 												if (boss.locked) {
@@ -96,6 +95,7 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: WeeklyBossD
 												const bossMonsterId = boss.id;
 												void handleBossToggle(bossMonsterId);
 											}}
+											server={server}
 										/>
 									</DropdownMenu.CheckboxItem>
 								</Fragment>

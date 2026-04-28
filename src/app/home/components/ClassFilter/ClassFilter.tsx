@@ -34,7 +34,7 @@ export const ClassFilter = ({
 	if (loading) {
 		return (
 			<div className={styles.classFilter}>
-				<SkeletonWrapper width={1243} height={56} color="light" variant="rounded" />
+				<SkeletonWrapper color="light" height={56} variant="rounded" width={1243} />
 			</div>
 		);
 	}
@@ -46,11 +46,11 @@ export const ClassFilter = ({
 				{classFilterOptions.map((className, index, arr): JSX.Element => {
 					const lowerName = className.toLowerCase() as ClassFilterOption;
 					return (
-						<span key={lowerName} className={styles.optionWrapper}>
+						<span className={styles.optionWrapper} key={lowerName}>
 							<button
-								type="button"
 								className={`${styles.option} ${selectedClasses.includes(lowerName) ? styles.active : ''}`}
-								onClick={(): void => toggleClass(lowerName)}>
+								onClick={(): void => toggleClass(lowerName)}
+								type="button">
 								{toCapitalCase(lowerName)}
 							</button>
 							{index < arr.length - 1 && <span className={styles.separator} />}

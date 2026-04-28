@@ -41,11 +41,11 @@ const SymbolGrids = ({
 				<div key={type}>
 					<p className={styles.title}>{title}</p>
 					<EditPageSymbolGrid
-						type={type}
-						symbols={character.symbols[type]}
-						characterLevel={characterLevel}
 						characterJobType={characterJobType}
+						characterLevel={characterLevel}
 						size={56}
+						symbols={character.symbols[type]}
+						type={type}
 						updateCharacter={updateCharacter}
 					/>
 				</div>

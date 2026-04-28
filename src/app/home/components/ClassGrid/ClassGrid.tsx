@@ -69,8 +69,8 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Cl
 
 	const skeletons: JSX.Element[] = JobClasses.map(
 		(job): JSX.Element => (
-			<div key={job.className} className={styles.skeletonWrapper}>
-				<SkeletonWrapper width={502} height={368} color="light" variant="rounded" />
+			<div className={styles.skeletonWrapper} key={job.className}>
+				<SkeletonWrapper color="light" height={368} variant="rounded" width={502} />
 			</div>
 		),
 	);
@@ -136,7 +136,7 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Cl
 			{loading || selectedClassesLoading
 				? skeletons
 				: jobResults.map(
-						(char): JSX.Element => <ClassCard key={char.class} character={char} serverCookie={serverCookie} />,
+						(char): JSX.Element => <ClassCard character={char} key={char.class} serverCookie={serverCookie} />,
 					)}
 		</div>
 	);

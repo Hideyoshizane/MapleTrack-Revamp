@@ -25,8 +25,8 @@ const Navbar = ({ username }: NavbarProps): JSX.Element => {
 
 	return (
 		<nav className={styles.navBody}>
-			<button type="button" onClick={handleLogoClick} className={styles.logoDiv} aria-label="Go to home">
-				<Image src="/assets/logo/logo-nav.webp" priority fill sizes="312px" alt="MapleTrack Logo" />
+			<button className={styles.logoDiv} aria-label="Go to home" onClick={handleLogoClick} type="button">
+				<Image alt="MapleTrack Logo" fill priority sizes="312px" src="/assets/logo/logo-nav.webp" />
 				<p className={styles.version}>{APP_VERSION}</p>
 			</button>
 			<Timer target="daily" />

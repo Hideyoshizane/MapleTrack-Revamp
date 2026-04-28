@@ -12,16 +12,18 @@ model HealthCheck {
 }
 
 model User {
-  id                   String      @id @default(auto()) @map("_id") @db.ObjectId
-  username             String      @unique
-  email                String      @unique
+  id                   String       @id @default(auto()) @map("_id") @db.ObjectId
+  username             String       @unique
+  email                String       @unique
   password             String
   version              Int
-  lastLogin            DateTime    @default(now())
+  lastLogin            DateTime     @default(now())
   characters           Character[]
   bossList             BossList?
   resetPasswordToken   String?
   resetPasswordExpires DateTime?
+  liberations          Liberation[]
+  liberationLastUpdate DateTime
 
   @@index([resetPasswordToken, resetPasswordExpires])
 }
@@ -43,6 +45,7 @@ model Character {
   user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   symbols        CharacterSymbol[]
   bossCharacters BossCharacter[]
+  liberations    Liberation[]
 
   @@unique([userId, server, class])
   @@index([userId, name])
@@ -127,4 +130,28 @@ model Boss {
   locked      Boolean?      @default(false)
   characterId String        @db.ObjectId
   character   BossCharacter @relation(fields: [characterId], references: [id], onDelete: Cascade)
+}
+
+enum LiberationType {
+  Genesis
+  Destiny
+}
+
+model Liberation {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String    @db.ObjectId
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  characterId String    @db.ObjectId
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  type          LiberationType
+  currentQuest  String
+  server        String
+  currentPoints Int            @default(0)
+  genesisPass   Boolean?       @default(false)
+  liberated     Boolean?       @default(false)
+
+  @@unique([userId, characterId])
+  @@index([userId])
+  @@index([characterId])
 }

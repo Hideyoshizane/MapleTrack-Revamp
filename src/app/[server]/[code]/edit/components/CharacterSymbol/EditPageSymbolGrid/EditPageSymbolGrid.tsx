@@ -32,12 +32,12 @@ const EditPageSymbolGrid = ({
 			{symbols.map(
 				(symbol): JSX.Element => (
 					<EditPageSymbolObject
-						key={symbol.name}
-						type={type}
-						symbol={symbol}
-						characterLevel={characterLevel}
 						characterJobType={characterJobType}
+						characterLevel={characterLevel}
+						key={symbol.name}
 						size={size}
+						symbol={symbol}
+						type={type}
 						updateCharacter={updateCharacter}
 					/>
 				),

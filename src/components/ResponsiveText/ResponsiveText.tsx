@@ -50,8 +50,8 @@ const ResponsiveText = ({
 	return (
 		<div className={clsx(styles.wrapper, className)} style={{ width: `${width}px`, height: `${height}px` }}>
 			<p
-				ref={ref}
 				className={styles.text}
+				ref={ref}
 				style={{
 					fontSize,
 					display: '-webkit-box',

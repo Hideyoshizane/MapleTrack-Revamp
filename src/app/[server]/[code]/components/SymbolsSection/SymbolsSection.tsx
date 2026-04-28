@@ -37,13 +37,13 @@ const SymbolsSection = ({ character, disableAllDaily }: SymbolsSectionProps): JS
 						<div className={styles.symbolGrid}>
 							{categorySymbols.map((symbol) => (
 								<SymbolObject
-									key={symbol.name}
-									type={category}
-									symbol={symbol}
-									characterLevel={level}
 									characterJobType={jobType ?? 'default'}
-									size={SYMBOL_SIZE}
+									characterLevel={level}
 									disableAllDaily={disableAllDaily}
+									key={symbol.name}
+									size={SYMBOL_SIZE}
+									symbol={symbol}
+									type={category}
 								/>
 							))}
 						</div>

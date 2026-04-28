@@ -1,12 +1,6 @@
-import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
-import utc from 'dayjs/plugin/utc';
+import dayjs from './dayjs';
 
 import type { Dayjs } from 'dayjs';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs.tz.setDefault('UTC');
 
 // Returns current UTC time as a Dayjs instance
 export const nowInUtc = (): dayjs.Dayjs => dayjs.utc();

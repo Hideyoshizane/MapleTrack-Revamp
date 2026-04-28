@@ -41,7 +41,7 @@ const getTooltipContent = (legionRank: string, legionData: ReturnType<typeof get
 				const isActive = entry.rank === normalizedRank;
 
 				return (
-					<p key={entry.rank} className={isActive ? styles.activeEntry : styles.entry}>
+					<p className={isActive ? styles.activeEntry : styles.entry} key={entry.rank}>
 						{entry.description}
 					</p>
 				);
@@ -72,17 +72,17 @@ const LegionBlock = ({
 		<div className={styles.iconDiv}>
 			<p className={showTooltip ? styles.iconDivText : styles.iconDivTextWhite}>Legion:</p>
 			<Image
-				src={imageSrc}
-				width={iconSize}
+				alt={`${characterJobType} legion ${legionRank} Icon`}
 				height={iconSize}
 				quality={100}
-				alt={`${characterJobType} legion ${legionRank} Icon`}
+				src={imageSrc}
+				width={iconSize}
 			/>
 		</div>
 	);
 
 	return (
-		<Tooltip content={tooltipContent} placement="bottom" enabled={showTooltip}>
+		<Tooltip content={tooltipContent} enabled={showTooltip} placement="bottom">
 			{content}
 		</Tooltip>
 	);

@@ -15,7 +15,7 @@ type ServerItemProps = {
 	onSelect: (server: Server) => void;
 };
 
-export default function ServerItem({ server, isSelected, onSelect }: ServerItemProps): JSX.Element {
+const ServerItem = ({ server, isSelected, onSelect }: ServerItemProps): JSX.Element => {
 	const handleKey = (event: KeyboardEvent<HTMLDivElement>): void => {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();
@@ -26,16 +26,18 @@ export default function ServerItem({ server, isSelected, onSelect }: ServerItemP
 	return (
 		<div
 			className={styles.wrapper}
-			onClick={(): void => onSelect(server)}
-			tabIndex={0}
-			role="option"
 			aria-selected={isSelected}
-			onKeyDown={handleKey}>
+			onClick={(): void => onSelect(server)}
+			onKeyDown={handleKey}
+			role="option"
+			tabIndex={0}>
 			<div className={styles.iconWrapper}>
-				<Image src={server.img} priority width={48} height={48} alt={`${server.name} server icon`} />
+				<Image alt={`${server.name} server icon`} height={48} priority src={server.img} width={48} />
 			</div>
 			<p className={styles.serverName}>{server.name}</p>
 			{isSelected && <CheckIcon className={styles.icon} />}
 		</div>
 	);
-}
+};
+
+export default ServerItem;

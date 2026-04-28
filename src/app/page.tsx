@@ -10,7 +10,7 @@ const Home = (): JSX.Element => {
 	return (
 		<div className={styles.page}>
 			<main className={styles.main}>
-				<Image src="/assets/logo/logo.webp" alt="Next.js logo" width={355} height={216} priority />
+				<Image alt="Next.js logo" height={216} priority src="/assets/logo/logo.webp" width={355} />
 				<ol>
 					<li>
 						Get started by editing <code>src/app/page.tsx</code>.
@@ -22,16 +22,16 @@ const Home = (): JSX.Element => {
 					<a
 						className={styles.primary}
 						href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-						target="_blank"
-						rel="noopener noreferrer">
-						<Image className={styles.logo} src="/vercel.svg" alt="Vercel logomark" width={20} height={20} />
+						rel="noopener noreferrer"
+						target="_blank">
+						<Image className={styles.logo} alt="Vercel logomark" height={20} src="/vercel.svg" width={20} />
 						Deploy now
 					</a>
 					<a
+						className={styles.secondary}
 						href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-						target="_blank"
 						rel="noopener noreferrer"
-						className={styles.secondary}>
+						target="_blank">
 						Read our docs
 					</a>
 				</div>
@@ -39,23 +39,23 @@ const Home = (): JSX.Element => {
 			<footer className={styles.footer}>
 				<a
 					href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer">
-					<Image aria-hidden src="/file.svg" alt="File icon" width={16} height={16} />
+					rel="noopener noreferrer"
+					target="_blank">
+					<Image alt="File icon" aria-hidden height={16} src="/file.svg" width={16} />
 					Learn
 				</a>
 				<a
 					href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer">
-					<Image aria-hidden src="/window.svg" alt="Window icon" width={16} height={16} />
+					rel="noopener noreferrer"
+					target="_blank">
+					<Image alt="Window icon" aria-hidden height={16} src="/window.svg" width={16} />
 					Examples
 				</a>
 				<a
 					href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer">
-					<Image aria-hidden src="/globe.svg" alt="Globe icon" width={16} height={16} />
+					rel="noopener noreferrer"
+					target="_blank">
+					<Image alt="Globe icon" aria-hidden height={16} src="/globe.svg" width={16} />
 					Go to nextjs.org → {version}
 				</a>
 			</footer>

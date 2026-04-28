@@ -21,15 +21,15 @@ const SignupPage = (): JSX.Element => {
 
 	return (
 		<div className={styles.container}>
-			<Link href="/login" aria-label="Go to login page">
+			<Link aria-label="Go to login page" href="/login">
 				<div className={styles.logoDiv}>
-					<Image src="/assets/logo/logo.webp" priority fill sizes="750px" alt="MapleTrack Logo" />
+					<Image alt="MapleTrack Logo" fill priority sizes="750px" src="/assets/logo/logo.webp" />
 				</div>
 			</Link>
 
 			<h1 className={styles.title}>Create a new account</h1>
 
-			<form onSubmit={(e): undefined => void handleSubmit(onSubmit)(e)} noValidate>
+			<form noValidate onSubmit={(e): undefined => void handleSubmit(onSubmit)(e)}>
 				<FormInput<SignupFormData>
 					id="username"
 					label="Username"
@@ -63,15 +63,15 @@ const SignupPage = (): JSX.Element => {
 				/>
 
 				<Button
-					type="submit"
 					className={styles.submitButton}
-					isLoading={isSubmitting}
+					aria-label="Submit form"
 					disabled={!isValid || isSubmitting}
-					loadingText="Submitting..."
-					loaderSize={16}
-					loaderColor="#121212"
+					isLoading={isSubmitting}
 					loaderBorderWidth={3}
-					aria-label="Submit form">
+					loaderColor="#121212"
+					loaderSize={16}
+					loadingText="Submitting..."
+					type="submit">
 					Sign Up
 				</Button>
 			</form>

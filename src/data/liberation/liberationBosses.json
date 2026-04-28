@@ -1,0 +1,270 @@
+[
+	{
+		"name": "Lotus",
+		"type": "genesis",
+		"img": "/assets/boss/lotus.webp",
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 10
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 50
+			},
+			{
+				"name": "Extreme",
+				"reset": "Weekly",
+				"points": 50
+			}
+		]
+	},
+	{
+		"name": "Damien",
+		"type": "genesis",
+		"img": "/assets/boss/damien.webp",
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 10
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 50
+			}
+		]
+	},
+	{
+		"name": "Lucid",
+		"type": "genesis",
+		"img": "/assets/boss/lucid.webp",
+		"difficulties": [
+			{
+				"name": "Easy",
+				"reset": "Weekly",
+				"points": 15
+			},
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 20
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 65
+			}
+		]
+	},
+	{
+		"name": "Will",
+		"type": "genesis",
+		"img": "/assets/boss/will.webp",
+		"difficulties": [
+			{
+				"name": "Easy",
+				"reset": "Weekly",
+				"points": 15
+			},
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 25
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 75
+			}
+		]
+	},
+	{
+		"name": "Gloom",
+		"type": "genesis",
+		"img": "/assets/boss/gloom.webp",
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 20
+			},
+			{
+				"name": "Chaos",
+				"reset": "Weekly",
+				"points": 65
+			}
+		]
+	},
+	{
+		"name": "Verus Hilla",
+		"type": "genesis",
+		"img": "/assets/boss/verus_hilla.webp",
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 45
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 90
+			}
+		]
+	},
+	{
+		"name": "Darknell",
+		"type": "genesis",
+		"img": "/assets/boss/darknell.webp",
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 25
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 75
+			}
+		]
+	},
+	{
+		"name": "Black Mage",
+		"type": "genesis",
+		"img": "/assets/boss/black_mage.webp",
+		"difficulties": [
+			{
+				"name": "Hard",
+				"reset": "Monthly",
+				"points": 600
+			},
+			{
+				"name": "Extreme",
+				"reset": "Monthly",
+				"points": 600
+			}
+		]
+	},
+	{
+		"name": "Seren",
+		"type": "destiny",
+		"img": "/assets/boss/seren.webp",
+		"difficulties": [
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 6
+			},
+			{
+				"name": "Extreme",
+				"reset": "Weekly",
+				"points": 80
+			}
+		]
+	},
+	{
+		"name": "Kalos",
+		"type": "destiny",
+		"img": "/assets/boss/kalos.webp",
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 10
+			},
+			{
+				"name": "Chaos",
+				"reset": "Weekly",
+				"points": 70
+			},
+			{
+				"name": "Extreme",
+				"reset": "Weekly",
+				"points": 400
+			}
+		]
+	},
+	{
+		"name": "First Adversary",
+		"type": "destiny",
+		"img": "/assets/boss/first_adversary.webp",
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 20
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 120
+			},
+			{
+				"name": "Extreme",
+				"reset": "Weekly",
+				"points": 500
+			}
+		]
+	},
+	{
+		"name": "Kaling",
+		"type": "destiny",
+		"img": "/assets/boss/kaling.webp",
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 20
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 160
+			},
+			{
+				"name": "Extreme",
+				"reset": "Weekly",
+				"points": 1200
+			}
+		]
+	},
+	{
+		"name": "Limbo",
+		"type": "destiny",
+		"img": "/assets/boss/limbo.webp",
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 120
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 360
+			}
+		]
+	},
+	{
+		"name": "Baldrix",
+		"type": "destiny",
+		"img": "/assets/boss/baldrix.webp",
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 150
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 450
+			}
+		]
+	}
+]

@@ -65,7 +65,11 @@ const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
 	} = useCharacterInputs({ character, updateCharacter, setSyncEnabled });
 
 	if (loading && firstLoad) {
-		return <FullPageLoader />;
+		return (
+			<section className="mainContent">
+				<FullPageLoader />
+			</section>
+		);
 	}
 
 	if (!character) {
@@ -88,22 +92,22 @@ const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
 		<section className="mainContent">
 			<div className={styles.mainDiv}>
 				<Image
+					alt={`${character.class} class profile Icon`}
+					height={827}
+					priority
+					quality={100}
 					src={`/assets/profile/${code}.webp`}
 					width={650}
-					height={827}
-					quality={100}
-					priority
-					alt={`${character.class} class profile Icon`}
 				/>
 
 				<div className={styles.characterContent}>
 					<CharacterHeader
 						character={character}
-						server={server}
 						nameError={nameError}
-						submitLoading={false}
-						setSubmitLoading={(): void => {}}
 						onDiscard={(): void => router.push(pathname.replace(/\/edit$/, ''))}
+						server={server}
+						setSubmitLoading={(): void => {}}
+						submitLoading={false}
 					/>
 
 					<div className={styles.usernameLine}>
@@ -115,8 +119,6 @@ const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
 							toggleSync={toggleSync}
 						/>
 						<ValidatedInput
-							value={committedName ?? ''}
-							placeholder={character.name ?? 'Character Name'}
 							error={nameError}
 							onBlur={(value) => {
 								handleNameBlur(value);
@@ -126,17 +128,19 @@ const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
 								handleNameBlur(value);
 								setCommittedName(value);
 							}}
+							placeholder={character.name ?? 'Character Name'}
+							value={committedName ?? ''}
 						/>
 					</div>
 
 					<div className={styles.bigBlock}>
 						<CharacterBossLegion
 							character={character}
-							toggleBossing={toggleBossing}
-							linkSkill={linkSkill ?? ''}
 							code={code ?? ''}
 							jobType={jobType}
 							legion={legion ?? ''}
+							linkSkill={linkSkill ?? ''}
+							toggleBossing={toggleBossing}
 						/>
 
 						<div className={styles.characterClassJob}>
@@ -146,21 +150,21 @@ const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
 					</div>
 
 					<CharacterStats
-						levelInput={levelInput}
-						setLevelInput={setLevelInput}
-						targetLevelInput={targetLevelInput}
-						setTargetLevelInput={setTargetLevelInput}
 						character={character}
 						handleLevelBlur={handleLevelBlur}
 						handleTargetLevelBlur={handleTargetLevelBlur}
-						level={level}
-						targetLevel={targetLevel}
 						jobType={jobType}
+						level={level}
+						levelInput={levelInput}
+						setLevelInput={setLevelInput}
+						setTargetLevelInput={setTargetLevelInput}
+						targetLevel={targetLevel}
+						targetLevelInput={targetLevelInput}
 					/>
 					<CharacterSymbol
-						characterLevel={level}
-						characterJobType={jobType}
 						character={character}
+						characterJobType={jobType}
+						characterLevel={level}
 						updateCharacter={updateCharacter}
 					/>
 				</div>

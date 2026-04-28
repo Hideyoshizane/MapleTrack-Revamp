@@ -28,7 +28,7 @@ const CharacterStats = ({ character, job, jobType }: CharacterStatsProps): JSX.E
 			<div className={styles.bigBlock}>
 				<div className={styles.characterBossLinkLegion}>
 					<div className={styles.bossSlot}>
-						{bossing && <BossIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.bossIcon} />}
+						{bossing && <BossIcon className={styles.bossIcon} height={BOSS_ICON_SIZE} width={BOSS_ICON_SIZE} />}
 					</div>
 
 					<LinkSkillBlock
@@ -39,10 +39,10 @@ const CharacterStats = ({ character, job, jobType }: CharacterStatsProps): JSX.E
 					/>
 
 					<LegionBlock
-						characterLevel={level}
 						characterCode={generateClassCode(charClass ?? '')}
 						characterJobType={charJobType ?? 'default'}
 						characterLegionType={legion ?? 'none'}
+						characterLevel={level}
 						iconSize={ICON_SIZE}
 						showTooltip={true}
 					/>
@@ -62,7 +62,7 @@ const CharacterStats = ({ character, job, jobType }: CharacterStatsProps): JSX.E
 					</p>
 				</div>
 
-				<ProgressBar height={32} width={900} value={level} maxValue={targetLevel} jobType={jobType} />
+				<ProgressBar height={32} jobType={jobType} maxValue={targetLevel} value={level} width={900} />
 			</div>
 		</>
 	);

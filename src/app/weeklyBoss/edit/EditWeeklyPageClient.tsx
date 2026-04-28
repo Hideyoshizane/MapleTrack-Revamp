@@ -14,13 +14,13 @@ import {
 	WEEKLY_BOSSES_PER_CHARACTER,
 	MONTHLY_BOSSES_PER_CHARACTER,
 } from '@constants/bossConstants';
-import { bossListApi } from '@features/Boss/bossListApi';
+import { bossListApi } from '@features/boss/bossListApi';
 import {
 	updateCharacterBoss,
 	countCharacterBosses,
 	countMonthlyBosses,
 	countServerBosses,
-} from '@features/Boss/bossListUtils';
+} from '@features/boss/bossListUtils';
 import { useServerCookie } from '@hooks/useServerCookie';
 
 import BossGrid from './components/BossGrid/bossGrid';
@@ -32,7 +32,7 @@ import type { ServerName } from '@data/servers/servers';
 import type {
 	getEditBossListResponseBody,
 	getEditBossListCharacterResponseBody,
-} from '@features/Boss/schemas/bossList.response.schema';
+} from '@features/boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
 type EditWeeklyPageClientProps = {
@@ -110,7 +110,11 @@ const EditWeeklyPageClient = ({ initialServer }: EditWeeklyPageClientProps): JSX
 	}, [loading, serverData, router]);
 
 	if (loading || !serverData || !selectedCharacter) {
-		return <FullPageLoader />;
+		return (
+			<section className="mainContent">
+				<FullPageLoader />
+			</section>
+		);
 	}
 
 	const handleSaveChanges = async (): Promise<void> => {
@@ -153,18 +157,18 @@ const EditWeeklyPageClient = ({ initialServer }: EditWeeklyPageClientProps): JSX
 		<section className="mainContent">
 			<div className={styles.topBar}>
 				<div className={styles.bossHunt}>
-					<BossIcon width={BOSS_ICON_SIZE} height={BOSS_ICON_SIZE} className={styles.bossIcon} />
+					<BossIcon className={styles.bossIcon} height={BOSS_ICON_SIZE} width={BOSS_ICON_SIZE} />
 					<p className={styles.bossTitle}>Boss Hunting</p>
 				</div>
 				<div className={styles.weekProgress}>
 					<Image
-						src="/assets/icons/menu/crystal.webp"
-						alt="Boss Crystal Icon"
-						width={64}
-						height={72}
-						quality={100}
-						priority
 						className={styles.icon}
+						alt="Boss Crystal Icon"
+						height={72}
+						priority
+						quality={100}
+						src="/assets/icons/menu/crystal.webp"
+						width={64}
 					/>
 					<div className={styles.content}>
 						<p className={styles.bossOverview}>Boss Overview</p>
@@ -176,21 +180,21 @@ const EditWeeklyPageClient = ({ initialServer }: EditWeeklyPageClientProps): JSX
 				</div>
 				<div className={styles.totalGain}>
 					<Image
-						src="/assets/icons/menu/stash.webp"
-						alt="Gold Stash Icon"
-						width={80}
-						height={80}
-						quality={100}
-						priority
 						className={styles.icon}
+						alt="Gold Stash Icon"
+						height={80}
+						priority
+						quality={100}
+						src="/assets/icons/menu/stash.webp"
+						width={80}
 					/>
 					<div className={styles.content}>
 						<p className={styles.charactersIncome}>Total Earnings Overview</p>
 						<NumberFlow
 							className={styles.totalIncome}
-							value={totalGains}
 							format={{ maximumFractionDigits: 0 }}
 							transformTiming={{ duration: 300 }}
+							value={totalGains}
 						/>
 					</div>
 				</div>
@@ -210,42 +214,42 @@ const EditWeeklyPageClient = ({ initialServer }: EditWeeklyPageClientProps): JSX
 			<div className={styles.charPart}>
 				<div className={styles.serverDropdown}>
 					<WeeklyBossDropdown
-						selectedCharacter={selectedCharacter}
 						characters={characters}
+						selectedCharacter={selectedCharacter}
 						setSelectedCharacter={setSelectedCharacter}
 					/>
 				</div>
 
 				<div className={styles.characterInfo}>
 					<Image
-						src="/assets/icons/menu/gold.webp"
-						alt="Gold coin Icon"
-						width={66}
-						height={64}
-						quality={100}
-						priority
 						className={styles.icon}
+						alt="Gold coin Icon"
+						height={64}
+						priority
+						quality={100}
+						src="/assets/icons/menu/gold.webp"
+						width={66}
 					/>
 					<div className={styles.content}>
 						<p className={styles.goldTitle}>Character Income</p>
 						<NumberFlow
 							className={styles.goldTotal}
-							value={characterWeeklyIncome}
-							transformTiming={{ duration: 300 }}
 							format={{ maximumFractionDigits: 0 }}
+							transformTiming={{ duration: 300 }}
+							value={characterWeeklyIncome}
 						/>
 					</div>
 				</div>
 
 				<div className={styles.characterInfo}>
 					<Image
-						src="/assets/icons/menu/weekly.webp"
-						alt="Weekly Crystal Icon"
-						width={64}
-						height={72}
-						quality={100}
-						priority
 						className={styles.icon}
+						alt="Weekly Crystal Icon"
+						height={72}
+						priority
+						quality={100}
+						src="/assets/icons/menu/weekly.webp"
+						width={64}
 					/>
 					<div className={styles.content}>
 						<p className={styles.weeklyBoss}>Weekly Boss Count</p>
@@ -257,13 +261,13 @@ const EditWeeklyPageClient = ({ initialServer }: EditWeeklyPageClientProps): JSX
 				</div>
 				<div className={styles.characterInfo}>
 					<Image
-						src="/assets/icons/menu/monthly.webp"
-						alt="Monthly Crystal Icon"
-						width={64}
-						height={72}
-						quality={100}
-						priority
 						className={styles.icon}
+						alt="Monthly Crystal Icon"
+						height={72}
+						priority
+						quality={100}
+						src="/assets/icons/menu/monthly.webp"
+						width={64}
 					/>
 					<div className={styles.content}>
 						<p className={styles.monthlyBoss}>Monthly Boss Count</p>
@@ -274,7 +278,7 @@ const EditWeeklyPageClient = ({ initialServer }: EditWeeklyPageClientProps): JSX
 					</div>
 				</div>
 			</div>
-			<BossGrid serverCookie={server} selectedCharacter={selectedCharacter} onBossUpdate={handleBossUpdate} />
+			<BossGrid onBossUpdate={handleBossUpdate} selectedCharacter={selectedCharacter} serverCookie={server} />
 		</section>
 	);
 };

@@ -9,7 +9,7 @@ import { getBossImage, getBossDifficultyValue } from '@data/bosses/bosses';
 
 import styles from './characterBossItem.module.scss';
 
-import type { getBossListBossResponseBody } from '@features/Boss/schemas/bossList.response.schema';
+import type { getBossListBossResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX, KeyboardEvent } from 'react';
 
 type CharacterBossItemProps = {
@@ -19,7 +19,7 @@ type CharacterBossItemProps = {
 	onClick?: () => void;
 };
 
-export default function CharacterBossItem({ boss, server, isSelected, onClick }: CharacterBossItemProps): JSX.Element {
+const CharacterBossItem = ({ boss, server, isSelected, onClick }: CharacterBossItemProps): JSX.Element => {
 	const handleKey = (event: KeyboardEvent<HTMLDivElement>): void => {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();
@@ -33,21 +33,21 @@ export default function CharacterBossItem({ boss, server, isSelected, onClick }:
 	return (
 		<div
 			className={styles.wrapper}
-			tabIndex={0}
-			role="option"
 			aria-selected={isSelected}
+			onClick={onClick}
 			onKeyDown={handleKey}
-			onClick={onClick}>
+			role="option"
+			tabIndex={0}>
 			<Image
 				className={styles.bossIcon}
-				src={bossImg}
 				alt={`${boss.difficulty} ${boss.name}`}
-				width={64}
 				height={64}
 				priority
+				src={bossImg}
+				width={64}
 			/>
 			<div className={styles.nameDiv}>
-				<ResponsiveText className={styles.bossName} width={284} height={34} maxFontSize={28} minFontSize={20}>
+				<ResponsiveText className={styles.bossName} height={34} maxFontSize={28} minFontSize={20} width={284}>
 					{boss.difficulty} {boss.name}
 				</ResponsiveText>
 				<p className={styles.bossValue}>{bossValue}</p>
@@ -58,4 +58,5 @@ export default function CharacterBossItem({ boss, server, isSelected, onClick }:
 			</div>
 		</div>
 	);
-}
+};
+export default CharacterBossItem;

@@ -105,12 +105,12 @@ const SymbolObject = ({
 		<div className={styles.symbolContainer}>
 			<div className={styles.imageContainer}>
 				<Image
+					className={!usable ? styles.off : ''}
+					alt={`${name} Icon`}
+					height={size}
+					loading="lazy"
 					src={src}
 					width={size}
-					height={size}
-					alt={`${name} Icon`}
-					className={!usable ? styles.off : ''}
-					loading="lazy"
 				/>
 			</div>
 
@@ -122,12 +122,12 @@ const SymbolObject = ({
 				</div>
 
 				<ProgressBar
-					height={8}
-					width={231}
-					value={usable ? effectiveExp : 0}
-					maxValue={maxExpForLevel}
-					jobType={jobType}
 					forceFull={isMaxed}
+					height={8}
+					jobType={jobType}
+					maxValue={maxExpForLevel}
+					value={usable ? effectiveExp : 0}
+					width={231}
 				/>
 
 				{!usable && <p className={styles.unlockLevel}>Unlock at Level {getSymbolMinLevel(name)}</p>}
@@ -140,13 +140,13 @@ const SymbolObject = ({
 
 						<div className={styles.buttonLines}>
 							<SymbolButtons
-								symbol={symbol}
-								dailyValue={dailyValue}
 								bonus={bonus}
-								onValueChange={handleSymbolChange}
+								dailyValue={dailyValue}
 								disableAllDaily={disableAllDaily}
+								onValueChange={handleSymbolChange}
 								optimisticDailyCleared={effectiveDailyCleared}
 								optimisticWeeklyTries={effectiveWeeklyTries}
+								symbol={symbol}
 							/>
 						</div>
 					</>

@@ -34,7 +34,7 @@ const Tooltip = ({ content, children, placement = 'top', enabled = true }: Custo
 				<RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
 
 				<RadixTooltip.Portal>
-					<RadixTooltip.Content side={placement} sideOffset={5} className={tooltipClass}>
+					<RadixTooltip.Content className={tooltipClass} side={placement} sideOffset={5}>
 						{content}
 						<RadixTooltip.Arrow className={arrowClass} />
 					</RadixTooltip.Content>

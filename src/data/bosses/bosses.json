@@ -294,6 +294,30 @@
 		]
 	},
 	{
+		"name": "Princess No",
+		"img": "/assets/boss/princess_no.webp",
+		"difficulties": [
+			{
+				"name": "Normal",
+				"value": 16200000,
+				"reset": "Weekly",
+				"minLevel": 180
+			}
+		]
+	},
+	{
+		"name": "Akechi",
+		"img": "/assets/boss/akechi.webp",
+		"difficulties": [
+			{
+				"name": "Normal",
+				"value": 28800000,
+				"reset": "Weekly",
+				"minLevel": 200
+			}
+		]
+	},
+	{
 		"name": "Lotus",
 		"img": "/assets/boss/lotus.webp",
 		"difficulties": [
@@ -528,6 +552,36 @@
 		]
 	},
 	{
+		"name": "First Adversary",
+		"img": "/assets/boss/first_adversary.webp",
+		"difficulties": [
+			{
+				"name": "Easy",
+				"value": 197000000,
+				"reset": "Weekly",
+				"minLevel": 270
+			},
+			{
+				"name": "Normal",
+				"value": 273000000,
+				"reset": "Weekly",
+				"minLevel": 270
+			},
+			{
+				"name": "Hard",
+				"value": 588000000,
+				"reset": "Weekly",
+				"minLevel": 270
+			},
+			{
+				"name": "Extreme",
+				"value": 1176000000,
+				"reset": "Weekly",
+				"minLevel": 270
+			}
+		]
+	},
+	{
 		"name": "Kaling",
 		"img": "/assets/boss/kaling.webp",
 		"difficulties": [
@@ -590,30 +644,6 @@
 				"value": 840000000,
 				"reset": "Weekly",
 				"minLevel": 290
-			}
-		]
-	},
-	{
-		"name": "Princess No",
-		"img": "/assets/boss/princess_no.webp",
-		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 16200000,
-				"reset": "Weekly",
-				"minLevel": 180
-			}
-		]
-	},
-	{
-		"name": "Akechi",
-		"img": "/assets/boss/akechi.webp",
-		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 28800000,
-				"reset": "Weekly",
-				"minLevel": 200
 			}
 		]
 	}

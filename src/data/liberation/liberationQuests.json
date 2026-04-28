@@ -1,0 +1,64 @@
+{
+	"Genesis": {
+		"total": 6500,
+		"Von Leon": {
+			"img": "/assets/boss/von_leon.webp",
+			"points": 500
+		},
+		"Arkarium": {
+			"img": "/assets/boss/arkarium.webp",
+			"points": 500
+		},
+		"Magnus": {
+			"img": "/assets/boss/magnus.webp",
+			"points": 500
+		},
+		"Lotus": {
+			"img": "/assets/boss/lotus.webp",
+			"points": 1000
+		},
+		"Damien": {
+			"img": "/assets/boss/damien.webp",
+			"points": 1000
+		},
+		"Will": {
+			"img": "/assets/boss/will.webp",
+			"points": 1000
+		},
+		"Lucid": {
+			"img": "/assets/boss/lucid.webp",
+			"points": 1000
+		},
+		"Verus Hilla": {
+			"img": "/assets/boss/verus_hilla.webp",
+			"points": 1000
+		}
+	},
+	"Destiny": {
+		"total": 6500,
+		"Seren": {
+			"img": "/assets/boss/seren.webp",
+			"points": 2000
+		},
+		"Kalos": {
+			"img": "/assets/boss/kalos.webp",
+			"points": 2500
+		},
+		"Kaling": {
+			"img": "/assets/boss/kaling.webp",
+			"points": 3000
+		},
+		"First Adversary": {
+			"img": "/assets/boss/first_adversary.webp",
+			"points": 10000
+		},
+		"Limbo": {
+			"img": "/assets/boss/limbo.webp",
+			"points": 12500
+		},
+		"Baldrix": {
+			"img": "/assets/boss/baldrix.webp",
+			"points": 15000
+		}
+	}
+}

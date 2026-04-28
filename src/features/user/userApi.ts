@@ -1,4 +1,4 @@
-import { requestApi } from '@/lib/axios/apiClient';
+import { requestApi } from '@lib/axios/apiClient';
 
 import type {
 	SignupRequestBody,

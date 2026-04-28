@@ -61,14 +61,14 @@ export const CharacterHeader = ({
 			<Button className={styles.discardButton} onClick={onDiscard}>
 				Discard Changes
 			</Button>
-			<Tooltip content="Please input a valid character name." placement="bottom" enabled={Boolean(nameError)}>
+			<Tooltip content="Please input a valid character name." enabled={Boolean(nameError)} placement="bottom">
 				<Button
 					className={styles.saveChangesButton}
 					disabled={Boolean(nameError)}
 					isLoading={submitLoading}
-					loaderSize={16}
-					loaderColor="#121212"
 					loaderBorderWidth={3}
+					loaderColor="#121212"
+					loaderSize={16}
 					onClick={(): void => {
 						void onSubmit();
 					}}>

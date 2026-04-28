@@ -3,7 +3,7 @@ import utc from 'dayjs/plugin/utc';
 
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 import { calculateNewLevelFromExp } from '@data/symbols/symbolMappings';
-import { characterToBossList } from '@features/Boss/bossListService';
+import { characterToBossList } from '@features/boss/bossListService';
 import { updateCharacterRequestSchema } from '@features/character/schemas/character.request.schema';
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';

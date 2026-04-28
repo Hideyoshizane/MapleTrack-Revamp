@@ -6,6 +6,7 @@ import { FlatCompat } from '@eslint/eslintrc';
 import nextPlugin from '@next/eslint-plugin-next';
 import { defineConfig } from 'eslint/config';
 import importPlugin from 'eslint-plugin-import';
+import perfectionist from 'eslint-plugin-perfectionist';
 import reactPlugin from 'eslint-plugin-react';
 import reactRefreshPlugin from 'eslint-plugin-react-refresh';
 import unicornPlugin from 'eslint-plugin-unicorn';
@@ -52,6 +53,7 @@ export default defineConfig([
 			unicorn: unicornPlugin,
 			import: fixupPluginRules(importPlugin),
 			react: reactPlugin,
+			perfectionist: perfectionist,
 		},
 		rules: {
 			// Spreading recommended rules from plugins
@@ -78,7 +80,10 @@ export default defineConfig([
 
 			// React
 			'no-console': ['error', { allow: ['warn', 'error'] }],
-			'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+			'react-refresh/only-export-components': [
+				'warn',
+				{ allowConstantExport: true, allowExportNames: ['layout', 'metadata'] },
+			],
 			'react/self-closing-comp': 'error',
 			'react/jsx-no-useless-fragment': 'error',
 			'react/react-in-jsx-scope': 'off',
@@ -100,7 +105,7 @@ export default defineConfig([
 			'import/no-cycle': 'error',
 
 			// Unicorn
-			'unicorn/filename-case': ['error', { case: 'camelCase' }],
+			'unicorn/filename-case': ['error', { case: 'camelCase', ignore: ['not-found.tsx'] }],
 			'unicorn/no-useless-undefined': 'error',
 			'unicorn/prefer-ternary': 'warn',
 			'unicorn/no-array-for-each': 'warn',
@@ -111,6 +116,16 @@ export default defineConfig([
 			// Next.js specific
 			'@next/next/no-img-element': 'error',
 			'@next/next/no-sync-scripts': 'warn',
+
+			'perfectionist/sort-jsx-props': [
+				'error',
+				{
+					type: 'alphabetical',
+					order: 'asc',
+					groups: ['className', 'unknown'],
+					customGroups: [{ groupName: 'className', elementNamePattern: '^className$' }],
+				},
+			],
 		},
 	},
 	{

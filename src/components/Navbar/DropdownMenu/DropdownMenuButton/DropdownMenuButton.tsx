@@ -49,9 +49,9 @@ const DropdownMenuButton = ({ text }: DropdownMenuButtonProps): JSX.Element => {
 	const { href, label, Icon } = MENU_CONFIG[text];
 
 	return (
-		<DropdownMenu.Item asChild className={commonStyles.dropdownItem}>
-			<Link href={href} className={buttonStyles.dropdownLink}>
-				<Icon width={DROPDOWN_ICON_SIZE} height={DROPDOWN_ICON_SIZE} className={commonStyles.icon} />
+		<DropdownMenu.Item className={commonStyles.dropdownItem} asChild>
+			<Link className={buttonStyles.dropdownLink} href={href}>
+				<Icon className={commonStyles.icon} height={DROPDOWN_ICON_SIZE} width={DROPDOWN_ICON_SIZE} />
 				<span className={commonStyles.text}>{label}</span>
 			</Link>
 		</DropdownMenu.Item>

@@ -55,12 +55,12 @@ const Button = ({
 				[styles.disabled]: isActuallyDisabled,
 			})}
 			aria-disabled={isActuallyDisabled}
-			tabIndex={0}
 			onClick={handleClick}
 			onKeyDown={handleKeyDown}
+			tabIndex={0}
 			{...props}>
 			{isLoading && (
-				<Loader width={loaderSize} height={loaderSize} color={loaderColor} borderWidth={loaderBorderWidth} />
+				<Loader borderWidth={loaderBorderWidth} color={loaderColor} height={loaderSize} width={loaderSize} />
 			)}
 			<span className={styles.buttonText}>{isLoading ? loadingText : children}</span>
 		</button>

@@ -28,7 +28,7 @@ type TimerProps = {
 	target: 'daily' | 'weekly';
 };
 
-export default function Timer({ target }: TimerProps): JSX.Element {
+const Timer = ({ target }: TimerProps): JSX.Element => {
 	const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
 	const computeTimeLeft = (resetType: 'daily' | 'weekly'): TimeLeft => {
@@ -64,7 +64,7 @@ export default function Timer({ target }: TimerProps): JSX.Element {
 	}, [target]);
 
 	if (!timeLeft) {
-		return <SkeletonWrapper width={200} height={58} color="dark" variant="rounded" />;
+		return <SkeletonWrapper color="dark" height={58} variant="rounded" width={200} />;
 	}
 
 	const { days, hours, minutes, seconds } = timeLeft;
@@ -77,17 +77,19 @@ export default function Timer({ target }: TimerProps): JSX.Element {
 				<NumberFlowGroup>
 					{days !== undefined && (
 						<>
-							<NumberFlow value={days} trend={-1} format={{ minimumIntegerDigits: 2 }} />
+							<NumberFlow format={{ minimumIntegerDigits: 2 }} trend={-1} value={days} />
 							<span>:</span>
 						</>
 					)}
-					<NumberFlow value={hours} trend={-1} format={{ minimumIntegerDigits: 2 }} />
+					<NumberFlow format={{ minimumIntegerDigits: 2 }} trend={-1} value={hours} />
 					<span>:</span>
-					<NumberFlow value={minutes} trend={-1} format={{ minimumIntegerDigits: 2 }} />
+					<NumberFlow format={{ minimumIntegerDigits: 2 }} trend={-1} value={minutes} />
 					<span>:</span>
-					<NumberFlow value={seconds} trend={-1} format={{ minimumIntegerDigits: 2 }} />
+					<NumberFlow format={{ minimumIntegerDigits: 2 }} trend={-1} value={seconds} />
 				</NumberFlowGroup>
 			</div>
 		</div>
 	);
-}
+};
+
+export default Timer;

@@ -1,7 +1,9 @@
 import argon2 from 'argon2';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 
 import { LASTVERSION } from '@data/user/constants';
-import { createBossList } from '@features/Boss/bossListService';
+import { createBossList } from '@features/boss/bossListService';
 import { signupRequestSchema } from '@features/user/schemas/user.schema';
 import { prisma } from '@lib/prisma';
 import { createResponse } from '@utils/createResponse';
@@ -11,6 +13,8 @@ import type { ApiResponse } from '@sharedTypes/api';
 import type { NextRequest, NextResponse } from 'next/server';
 
 const route = '/api/account/signup';
+
+dayjs.extend(utc);
 
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
@@ -28,14 +32,11 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 			parallelism: 1,
 		});
 
+		const now = dayjs().utc().toDate();
+
 		await prisma.$transaction(async (tx) => {
 			const newUser = await tx.user.create({
-				data: {
-					username,
-					email,
-					password: hashedPassword,
-					version: LASTVERSION,
-				},
+				data: { username, email, password: hashedPassword, version: LASTVERSION, liberationLastUpdate: now },
 				select: { id: true },
 			});
 

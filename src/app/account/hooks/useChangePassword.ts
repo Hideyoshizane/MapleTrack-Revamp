@@ -1,9 +1,9 @@
 import { signOut } from 'next-auth/react';
 import { toast } from 'react-toastify';
 
-import { handleFieldValidation } from '@/utils/validateField';
 import { userApi } from '@features/user/userApi';
 import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
+import { handleFieldValidation } from '@utils/validateField';
 import { validatePassword, validatePasswordConfirmation } from '@utils/validators';
 
 import type { ApiResponse } from '@sharedTypes/api';

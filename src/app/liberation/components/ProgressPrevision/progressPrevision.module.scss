@@ -1,0 +1,43 @@
+.progressPrevision {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: auto;
+	padding: 16px;
+	border-radius: 25px;
+	background-color: var(--background-white);
+
+	.textDiv {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+
+		.title {
+			font-size: 32px;
+			font-weight: 500;
+		}
+
+		.subTitle {
+			font-size: 16px;
+		}
+	}
+
+	.date {
+		width: 320px;
+		height: 80px;
+		box-sizing: border-box;
+		border: solid 2px var(--default-black);
+		border-radius: 15px;
+		background-color: transparent;
+		font-family: Roboto, sans-serif;
+		font-size: 24px;
+		color: var(--default-button-text);
+		margin-top: 8px;
+		outline: none;
+		padding-left: 16px;
+		padding-right: 16px;
+	}
+}

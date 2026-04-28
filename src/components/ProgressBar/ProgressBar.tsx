@@ -55,7 +55,7 @@ const ProgressBar = ({
 	};
 
 	return (
-		<ProgressPrimitive.Root className={styles.progressRoot} value={percentage} max={100} style={{ width, height }}>
+		<ProgressPrimitive.Root className={styles.progressRoot} max={100} style={{ width, height }} value={percentage}>
 			<ProgressPrimitive.Indicator
 				className={clsx(
 					styles.progressIndicator,

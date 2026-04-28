@@ -75,13 +75,39 @@ export const characterToBossList = async (
 		await tx.bossCharacter.deleteMany({
 			where: { characterId, serverId },
 		});
+
+		await tx.liberation.deleteMany({
+			where: { characterId, userId: authenticatedUserId },
+		});
 		return;
 	}
+
+	const now = dayjs().utc().toDate();
 
 	await tx.bossCharacter.upsert({
 		where: { serverId_characterId: { serverId, characterId } },
 		update: {},
 		create: { characterId, serverId, totalIncome: 0 },
+	});
+
+	await tx.liberation.upsert({
+		where: { userId_characterId: { userId: authenticatedUserId, characterId } },
+		update: {},
+		create: {
+			userId: authenticatedUserId,
+			characterId: characterId,
+			server: serverName,
+			type: 'Genesis',
+			currentQuest: 'Von Leon',
+			currentPoints: 0,
+			genesisPass: false,
+			liberated: false,
+		},
+	});
+
+	await tx.user.update({
+		where: { id: authenticatedUserId },
+		data: { liberationLastUpdate: now },
 	});
 };
 

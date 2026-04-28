@@ -34,12 +34,12 @@ const LinkSkillBlock = ({
 	const content = (
 		<div className={styles.iconDiv}>
 			<p className={clsx(showTooltip ? styles.iconDivText : styles.iconDivTextWhite)}>Link Skill:</p>
-			<Image src={linkSkill.image} width={iconSize} height={iconSize} quality={100} alt={linkSkill.name} />
+			<Image alt={linkSkill.name} height={iconSize} quality={100} src={linkSkill.image} width={iconSize} />
 		</div>
 	);
 
 	return (
-		<Tooltip content={tooltipContent} placement="bottom" enabled={showTooltip}>
+		<Tooltip content={tooltipContent} enabled={showTooltip} placement="bottom">
 			{content}
 		</Tooltip>
 	);

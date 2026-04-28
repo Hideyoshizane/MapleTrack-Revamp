@@ -40,28 +40,28 @@ const CharacterStats = ({
 				<p className={styles.levelText}>Level:</p>
 				<input
 					className={styles.levelInput}
-					type="number"
-					min={0}
 					max={CHARACTER_MAX_LEVEL}
-					value={levelInput}
-					placeholder={character?.level?.toString()}
-					onChange={(e): void => setLevelInput(e.target.value)}
+					min={0}
 					onBlur={handleLevelBlur}
+					onChange={(e): void => setLevelInput(e.target.value)}
+					placeholder={character?.level?.toString()}
+					type="number"
+					value={levelInput}
 				/>
 				<span className={styles.levelSpan}>/</span>
 				<input
 					className={styles.levelInput}
-					type="number"
-					min={0}
 					max={CHARACTER_MAX_LEVEL}
-					value={targetLevelInput}
-					placeholder={character?.targetLevel?.toString()}
-					onChange={(e): void => setTargetLevelInput(e.target.value)}
+					min={0}
 					onBlur={handleTargetLevelBlur}
+					onChange={(e): void => setTargetLevelInput(e.target.value)}
+					placeholder={character?.targetLevel?.toString()}
+					type="number"
+					value={targetLevelInput}
 				/>
 			</div>
 			{/* Progress bar showing current vs target level */}
-			<ProgressBar height={32} width={900} value={level} maxValue={targetLevel} jobType={jobType} />
+			<ProgressBar height={32} jobType={jobType} maxValue={targetLevel} value={level} width={900} />
 		</div>
 	);
 };

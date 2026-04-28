@@ -10,7 +10,7 @@ import { generateClassCode } from '@data/classes/classes';
 import CharacterBossItem from './BossItem/characterBossItem';
 import styles from './characterSelectBossDropdown.module.scss';
 
-import type { getEditBossListCharacterResponseBody } from '@features/Boss/schemas/bossList.response.schema';
+import type { getEditBossListCharacterResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
 type Props = {
@@ -28,13 +28,13 @@ const CharacterSelectBossDropdown = ({ setSelectedCharacter, selectedCharacter, 
 
 	return (
 		<Select.Root
-			value={selectedCharacter.class}
 			onValueChange={(value): void => {
 				const found = characters.find((c) => c.class === value);
 				if (found) {
 					setSelectedCharacter(found);
 				}
-			}}>
+			}}
+			value={selectedCharacter.class}>
 			<Select.Trigger className={styles.selectedCharacterWrapper}>
 				<div className={styles.nameDiv}>
 					<p className={styles.characterName}>{selectedCharacter.name}</p>
@@ -46,11 +46,11 @@ const CharacterSelectBossDropdown = ({ setSelectedCharacter, selectedCharacter, 
 
 				<Image
 					className={styles.classIcon}
-					src={`/assets/buttom_profile/${code}.webp`}
 					alt={selectedCharacter.name}
-					width={480}
 					height={80}
 					priority
+					src={`/assets/buttom_profile/${code}.webp`}
+					width={480}
 				/>
 			</Select.Trigger>
 
@@ -60,7 +60,7 @@ const CharacterSelectBossDropdown = ({ setSelectedCharacter, selectedCharacter, 
 						<ScrollArea.Viewport className={styles.scrollAreaViewport}>
 							<Select.Viewport>
 								{characters.map((character) => (
-									<Select.Item key={character.class} value={character.class} className={styles.characterItem}>
+									<Select.Item className={styles.characterItem} key={character.class} value={character.class}>
 										<CharacterBossItem
 											character={character}
 											isSelected={character.class === selectedCharacter.class}

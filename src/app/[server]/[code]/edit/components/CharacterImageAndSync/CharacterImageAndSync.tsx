@@ -47,24 +47,24 @@ export const CharacterImageAndSync = ({
 		if (CharacterDataFromAPI?.characterImgURL) {
 			return (
 				<Image
+					className={styles.loadedImage}
+					alt="Fetched from API"
+					height={CHARACTER_IMG_SIZE}
+					quality={100}
 					src={CharacterDataFromAPI.characterImgURL}
 					width={CHARACTER_IMG_SIZE}
-					height={CHARACTER_IMG_SIZE}
-					alt="Fetched from API"
-					className={styles.loadedImage}
-					quality={100}
 				/>
 			);
 		}
 		if (CharacterDataFromAPIFailed) {
 			return (
 				<Tooltip content="Character not found." placement="top">
-					<ErrorIcon width={CHARACTER_IMG_SIZE} height={CHARACTER_IMG_SIZE} className={styles.errorIcon} />
+					<ErrorIcon className={styles.errorIcon} height={CHARACTER_IMG_SIZE} width={CHARACTER_IMG_SIZE} />
 				</Tooltip>
 			);
 		}
 		return (
-			<SkeletonWrapper width={CHARACTER_IMG_SIZE} height={CHARACTER_IMG_SIZE} color="light" variant="rectangular" />
+			<SkeletonWrapper color="light" height={CHARACTER_IMG_SIZE} variant="rectangular" width={CHARACTER_IMG_SIZE} />
 		);
 	};
 
@@ -72,10 +72,10 @@ export const CharacterImageAndSync = ({
 		<div className={styles.characterImgSwitch}>
 			<div className={styles.characterImgDiv}>{characterImage()}</div>
 			<Switch
-				title="Sync Character"
 				checked={syncing}
-				tooltipMessage="Automatically update level from MapleStory API."
 				onCheckedChange={handleToggle}
+				title="Sync Character"
+				tooltipMessage="Automatically update level from MapleStory API."
 			/>
 		</div>
 	);

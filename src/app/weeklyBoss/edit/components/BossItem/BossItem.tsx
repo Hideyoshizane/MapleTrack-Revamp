@@ -21,7 +21,7 @@ import BossDropdownButton from '../BossDropdownButton/bossDropdownButton';
 import styles from './bossItem.module.scss';
 
 import type { BossName, BossDifficultyName, BossReset, Boss } from '@data/bosses/bosses';
-import type { getEditBossListBossResponseBody } from '@features/Boss/schemas/bossList.response.schema';
+import type { getEditBossListBossResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
 type BossItemProps = {
@@ -139,21 +139,21 @@ const BossItem = ({
 
 	return (
 		<motion.div
-			layout
 			className={styles.bossSlotBody}
 			animate={{ width: parentWidthExpanded ? 720 : 576 }}
+			layout
 			transition={{ duration: 0.2, ease: 'easeInOut' }}>
 			<div className={styles.bossSlotContent}>
 				<Image
 					className={styles.bossIcon}
-					src={getBossImage(boss.name as BossName)}
 					alt={`${boss.name} portrait`}
-					width={64}
 					height={64}
 					priority
+					src={getBossImage(boss.name as BossName)}
+					width={64}
 				/>
 
-				<ResponsiveText className={styles.bossName} width={120} height={52} maxFontSize={28} minFontSize={20}>
+				<ResponsiveText className={styles.bossName} height={52} maxFontSize={28} minFontSize={20} width={120}>
 					{boss.name}
 				</ResponsiveText>
 
@@ -165,29 +165,29 @@ const BossItem = ({
 						if (difficulty.reset === 'Daily') {
 							return (
 								<BossDropdownButton
-									key={difficulty.name}
-									selected={isSelected}
-									value={selection?.dailyTotal ?? 0}
-									locked={selectedCharacterLevel < difficulty.minLevel}
 									difficulty={difficulty}
 									isSmallButtons={isSmallButtons}
+									key={difficulty.name}
+									locked={selectedCharacterLevel < difficulty.minLevel}
 									onSelectDifficulty={(diff, multiplier) => {
 										handleBossUpdate(serverCookie, boss.name, diff.name, 'Daily', multiplier);
 									}}
+									selected={isSelected}
+									value={selection?.dailyTotal ?? 0}
 								/>
 							);
 						}
 
 						return (
 							<BossButton
-								key={difficulty.name}
-								selected={isSelected}
+								characterLevel={selectedCharacterLevel}
 								difficulty={difficulty}
 								isSmallButtons={isSmallButtons}
-								characterLevel={selectedCharacterLevel}
+								key={difficulty.name}
 								onSelect={() => {
 									handleBossUpdate(serverCookie, boss.name, difficulty.name, difficulty.reset);
 								}}
+								selected={isSelected}
 							/>
 						);
 					})}
@@ -196,27 +196,27 @@ const BossItem = ({
 				<AnimatePresence>
 					{showGoldContainer && (
 						<motion.div
-							initial={{ opacity: 0 }}
+							className={styles.goldValue}
 							animate={{ opacity: goldOpacity }}
 							exit={{ opacity: 0 }}
-							transition={{ duration: 0.2 }}
-							className={styles.goldValue}
+							initial={{ opacity: 0 }}
 							onAnimationComplete={() => {
 								if (closing && goldOpacity === 0) {
 									setParentWidthExpanded(false);
 									setShowGoldContainer(false);
 									setClosing(false);
 								}
-							}}>
+							}}
+							transition={{ duration: 0.2 }}>
 							<NumberFlow
 								className={styles.goldText}
-								value={numberFlowValue}
-								transformTiming={{ duration: 200 }}
 								onAnimationsFinish={() => {
 									if (closing) {
 										setGoldOpacity(0);
 									}
 								}}
+								transformTiming={{ duration: 200 }}
+								value={numberFlowValue}
 							/>
 						</motion.div>
 					)}
