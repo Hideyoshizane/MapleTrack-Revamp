@@ -1,19 +1,16 @@
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
 import { getBossDifficultyValue } from '@data/bosses/bosses';
 import { toggleBossListRequestSchema } from '@features/boss/schemas/bossList.request.schema';
 import { toggleBossListResponseSchema } from '@features/boss/schemas/bossList.response.schema';
+import { addPointsToLiberation } from '@features/liberation/liberationService';
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
+import dayjs from '@utils/dayjs';
 import { logZodError, logApiFailure, logError } from '@utils/logger';
 
 import type { toggleBossListResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
-
-dayjs.extend(utc);
 
 const route = 'api/bossList/toggleBossList';
 
@@ -40,7 +37,10 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				cleared: true,
 				locked: true,
 				character: {
-					select: { server: { select: { id: true, serverName: true, bossList: { select: { id: true } } } } },
+					select: {
+						characterId: true,
+						server: { select: { id: true, serverName: true, bossList: { select: { id: true } } } },
+					},
 				},
 			},
 		});
@@ -87,10 +87,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 			const bossValueWithSign = bossValue * sign;
 
-			await tx.boss.update({
-				where: { id: data.bossMonsterId },
-				data: { cleared: willBeCleared },
-			});
+			await tx.boss.update({ where: { id: data.bossMonsterId }, data: { cleared: willBeCleared } });
 
 			await tx.bossServer.update({
 				where: { id: server.id },
@@ -99,14 +96,25 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 			await tx.bossList.update({ where: { id: bossList.id }, data: { lastUpdate: now } });
 
+			const liberationPoints = await addPointsToLiberation(
+				tx,
+				bossData.name,
+				bossData.difficulty,
+				sign,
+				authenticatedUserId,
+				bossData.character.characterId,
+				server.serverName,
+			);
+
 			return {
 				weeklyBossesUpdate: sign,
 				totalGainUpdate: bossValueWithSign,
+				bossType: liberationPoints.bossType,
+				liberationPoints: liberationPoints.points,
 			};
 		});
 
 		const validation = toggleBossListResponseSchema.safeParse(responseData);
-
 		if (!validation.success) {
 			logZodError(validation.error, { route });
 			throw new Error('Invalid Boss List data');

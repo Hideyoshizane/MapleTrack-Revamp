@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import styles from './genesisTracesBreakdown.module.scss';
+import styles from './weeklyBreakdown.module.scss';
 
 import type { Boss, WeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
 import type { JSX } from 'react';
@@ -10,12 +10,15 @@ import type { JSX } from 'react';
 type Props = {
 	bosses: Boss[];
 	weeklyMonthlyPoints: WeeklyMonthlyPoints;
+	type: string;
 };
 
-const GenesisTracesBreakdown = ({ bosses, weeklyMonthlyPoints }: Props): JSX.Element => {
+const WeeklyBreakdown = ({ bosses, weeklyMonthlyPoints, type }: Props): JSX.Element => {
+	const text = type == 'Genesis' ? 'Traces' : 'Determination';
+
 	return (
 		<div className={styles.mainDiv}>
-			<p className={styles.title}>Weekly Traces Breakdown</p>
+			<p className={styles.title}>Weekly {text} Breakdown</p>
 
 			{bosses.map((boss) => {
 				const bossStats = weeklyMonthlyPoints.bosses[boss.name];
@@ -38,4 +41,4 @@ const GenesisTracesBreakdown = ({ bosses, weeklyMonthlyPoints }: Props): JSX.Ele
 	);
 };
 
-export default GenesisTracesBreakdown;
+export default WeeklyBreakdown;

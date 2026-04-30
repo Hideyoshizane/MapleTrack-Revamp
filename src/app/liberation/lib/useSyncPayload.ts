@@ -1,82 +1,184 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { liberationApi } from '@features/liberation/liberationApi';
 
-import type { updateLiberationCharacterRequestBody } from '@features/liberation/schemas/liberation.request.schema';
+import type {
+	getLiberationListResponseBody,
+	updateLiberationCharacterResponseBody,
+} from '@features/liberation/schemas/liberation.response.schema';
 
-export const useGenesisSyncPayload = (params: updateLiberationCharacterRequestBody): void => {
+type SerializedCharacter = string;
+
+type useLiberationSyncPayloadParams = {
+	liberationList: getLiberationListResponseBody | null;
+	onServerSync: (updatedCharacter: updateLiberationCharacterResponseBody) => void;
+};
+
+type useLiberationSyncPayloadReturn = {
+	isSyncing: boolean;
+	scheduleSync: (characterId: string) => void;
+};
+
+export const useLiberationSyncPayload = ({
+	liberationList,
+	onServerSync,
+}: useLiberationSyncPayloadParams): useLiberationSyncPayloadReturn => {
 	const debounceMs = 1500;
 
-	const debounceRef = useRef<NodeJS.Timeout | null>(null);
-	const lastSentPayloadRef = useRef<string | null>(null);
-	const lastCharacterIdRef = useRef<string | null>(null);
-	const isHydratingRef = useRef<boolean>(true);
-	const activeRequestRef = useRef<string | null>(null);
+	const [isSyncing, setIsSyncing] = useState<boolean>(false);
+
+	const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const currentCacheRef = useRef<Map<string, SerializedCharacter>>(new Map());
+	const hasInitializedRef = useRef<boolean>(false);
+	const pendingCharacterIdRef = useRef<string | null>(null);
+
+	const liberationListRef = useRef(liberationList);
+	const onServerSyncRef = useRef(onServerSync);
 
 	useEffect(() => {
-		const payloadString = JSON.stringify(params);
+		liberationListRef.current = liberationList;
+	}, [liberationList]);
 
-		const isCharacterChanged = lastCharacterIdRef.current !== params.characterId;
+	useEffect(() => {
+		onServerSyncRef.current = onServerSync;
+	}, [onServerSync]);
 
-		if (isCharacterChanged) {
-			lastCharacterIdRef.current = params.characterId;
-			isHydratingRef.current = true;
-			lastSentPayloadRef.current = payloadString;
+	const serializeCharacter = (character: getLiberationListResponseBody['characters'][number]): SerializedCharacter => {
+		return JSON.stringify({
+			currentGenesisQuest: character.currentGenesisQuest,
+			currentGenesisPoints: character.currentGenesisPoints,
+			genesisPass: character.genesisPass,
+			liberated: character.liberated,
+			currentDestinyQuest: character.currentDestinyQuest,
+			currentDestinyPoints: character.currentDestinyPoints,
+		});
+	};
+
+	const isValidDestinyState = (character: getLiberationListResponseBody['characters'][number]): boolean => {
+		if (!character) {
+			return false;
+		}
+
+		if (!character.currentDestinyQuest) {
+			return false;
+		}
+
+		if (character.currentDestinyPoints < 0) {
+			return false;
+		}
+
+		return true;
+	};
+
+	// Initialize cache on mount
+	useEffect(() => {
+		if (!liberationList?.characters || hasInitializedRef.current) {
 			return;
 		}
 
-		if (isHydratingRef.current) {
-			isHydratingRef.current = false;
-			lastSentPayloadRef.current = payloadString;
+		for (const character of liberationList.characters) {
+			currentCacheRef.current.set(character.characterId, serializeCharacter(character));
+		}
+		hasInitializedRef.current = true;
+	}, [liberationList]);
+
+	useEffect(() => {
+		if (!liberationListRef.current?.characters || hasInitializedRef.current) {
 			return;
 		}
 
-		if (lastSentPayloadRef.current === payloadString) {
+		for (const character of liberationListRef.current.characters) {
+			currentCacheRef.current.set(character.characterId, serializeCharacter(character));
+		}
+		hasInitializedRef.current = true;
+	}, []);
+
+	const scheduleSync = (characterId: string): void => {
+		if (!liberationList?.characters) {
 			return;
 		}
 
-		if (debounceRef.current) {
-			clearTimeout(debounceRef.current);
+		const character = liberationList.characters.find((c) => c.characterId === characterId);
+		if (!character) {
+			return;
 		}
 
-		const requestKey = `${params.characterId}-${Date.now()}`;
-		activeRequestRef.current = requestKey;
+		// Clear any existing timeout to reset debounce
+		if (debounceTimeoutRef.current) {
+			clearTimeout(debounceTimeoutRef.current);
+			debounceTimeoutRef.current = null;
+		}
 
-		debounceRef.current = setTimeout(() => {
-			const run = async (): Promise<void> => {
+		// Track which character we're waiting to sync
+		pendingCharacterIdRef.current = characterId;
+
+		debounceTimeoutRef.current = setTimeout(() => {
+			const syncCharacter = async (): Promise<void> => {
+				const currentLiberationList = liberationListRef.current;
+				const currentOnServerSync = onServerSyncRef.current;
+
+				if (!currentLiberationList?.characters) {
+					pendingCharacterIdRef.current = null;
+					return;
+				}
+				const latestCharacter = currentLiberationList.characters.find(
+					(c) => c.characterId === pendingCharacterIdRef.current,
+				);
+				if (!latestCharacter) {
+					pendingCharacterIdRef.current = null;
+					return;
+				}
+
+				const cachedSerialized = currentCacheRef.current.get(latestCharacter.characterId);
+				const currentSerialized = serializeCharacter(latestCharacter);
+
+				if (cachedSerialized === currentSerialized) {
+					pendingCharacterIdRef.current = null;
+					return;
+				}
+
+				setIsSyncing(true);
+
 				try {
-					if (activeRequestRef.current !== requestKey) {
+					if (!isValidDestinyState(latestCharacter)) {
+						toast.error('Invalid Destiny state blocked from sync');
 						return;
 					}
-					const request = await liberationApi.updateListProgression({
-						characterId: params.characterId,
-						currentQuest: params.currentQuest,
-						type: params.type,
-						currentPoints: params.currentPoints,
-						genesisPass: params.genesisPass,
-						liberated: params.liberated,
+
+					const response = await liberationApi.updateListProgression({
+						characterId: latestCharacter.characterId,
+						currentGenesisQuest: latestCharacter.currentGenesisQuest,
+						currentGenesisPoints: latestCharacter.currentGenesisPoints,
+						genesisPass: latestCharacter.genesisPass,
+						liberated: latestCharacter.liberated,
+						currentDestinyQuest: latestCharacter.currentDestinyQuest,
+						currentDestinyPoints: latestCharacter.currentDestinyPoints,
 					});
 
-					if (request.success) {
-						toast.success(request.message);
-					}
+					if (response.success && response.data) {
+						const mergedCharacter = { ...latestCharacter, ...response.data };
+						currentCacheRef.current.set(latestCharacter.characterId, serializeCharacter(mergedCharacter));
 
-					lastSentPayloadRef.current = payloadString;
+						currentOnServerSync(response.data);
+						toast.success(response.message);
+					} else {
+						toast.error(response.message || 'Update error');
+					}
 				} catch (error) {
-					console.error(error);
+					console.error('Sync failed:', error);
+					toast.error('Failed to sync character data');
+				} finally {
+					setIsSyncing(false);
+					pendingCharacterIdRef.current = null;
 				}
 			};
 
-			void run();
+			void syncCharacter();
 		}, debounceMs);
+	};
 
-		return () => {
-			if (debounceRef.current) {
-				clearTimeout(debounceRef.current);
-			}
-		};
-	}, [params.characterId, params.currentQuest, params.currentPoints, params.genesisPass, params.liberated, debounceMs]);
+	return { isSyncing, scheduleSync };
 };

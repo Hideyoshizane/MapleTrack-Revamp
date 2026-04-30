@@ -100,6 +100,8 @@ export const toggleBossListResponseSchema = z
 	.object({
 		weeklyBossesUpdate: z.number(),
 		totalGainUpdate: z.number(),
+		bossType: z.string().nullable(),
+		liberationPoints: z.number().nullable(),
 	})
 	.strict();
 

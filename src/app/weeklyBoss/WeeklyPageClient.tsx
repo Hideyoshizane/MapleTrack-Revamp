@@ -96,6 +96,18 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 				toast.error('Failed to update boss');
 				return;
 			}
+			if (response.data.bossType) {
+				const questType = response.data.bossType == 'genesis' ? 'Genesis' : 'Destiny';
+				if (response.data.liberationPoints !== null) {
+					const absolutePoints = Math.abs(response.data.liberationPoints);
+
+					if (response.data.liberationPoints > 0) {
+						toast.success(`${absolutePoints} points added to ${questType} Liberation.`);
+					} else if (response.data.liberationPoints < 0) {
+						toast.success(`${absolutePoints} points removed from ${questType} Liberation.`);
+					}
+				}
+			}
 
 			const { weeklyBossesUpdate, totalGainUpdate } = response.data;
 

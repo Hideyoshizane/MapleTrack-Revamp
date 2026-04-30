@@ -132,24 +132,19 @@ model Boss {
   character   BossCharacter @relation(fields: [characterId], references: [id], onDelete: Cascade)
 }
 
-enum LiberationType {
-  Genesis
-  Destiny
-}
-
 model Liberation {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String    @db.ObjectId
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  characterId String    @db.ObjectId
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
-
-  type          LiberationType
-  currentQuest  String
-  server        String
-  currentPoints Int            @default(0)
-  genesisPass   Boolean?       @default(false)
-  liberated     Boolean?       @default(false)
+  id                   String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId               String    @db.ObjectId
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  characterId          String    @db.ObjectId
+  character            Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  server               String
+  currentGenesisQuest  String
+  currentGenesisPoints Int       @default(0)
+  genesisPass          Boolean   @default(false)
+  liberated            Boolean   @default(false)
+  currentDestinyQuest  String
+  currentDestinyPoints Int       @default(0)
 
   @@unique([userId, characterId])
   @@index([userId])

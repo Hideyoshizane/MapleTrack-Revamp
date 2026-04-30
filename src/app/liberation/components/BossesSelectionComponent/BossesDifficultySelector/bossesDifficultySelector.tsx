@@ -21,10 +21,18 @@ const SKIP_DIFFICULTY: BossDifficulty = {
 type Props = {
 	difficulties: BossDifficulty[];
 	selectedDifficultyName: string | null;
+	type: string;
 	onChangeDifficulty: (difficulty: BossDifficulty) => void;
 };
 
-const BossesDifficultySelector = ({ difficulties, selectedDifficultyName, onChangeDifficulty }: Props): JSX.Element => {
+const BossesDifficultySelector = ({
+	difficulties,
+	selectedDifficultyName,
+	type,
+	onChangeDifficulty,
+}: Props): JSX.Element => {
+	const text = type == 'Genesis' ? 'Traces' : 'Determination';
+
 	const normalizedDifficulties: BossDifficulty[] = difficulties.some(
 		(difficulty) => difficulty.name === SKIP_DIFFICULTY.name,
 	)
@@ -46,7 +54,11 @@ const BossesDifficultySelector = ({ difficulties, selectedDifficultyName, onChan
 			<Select.Trigger className={styles.selectedBossWrapper}>
 				<div className={styles.bossDiv}>
 					<p className={clsx(styles.button, styles[selectedEntry.name.toLowerCase()])}>{selectedEntry.name}</p>
-					{selectedEntry.name !== 'Skip' && <p className={styles.points}>{selectedEntry.points} Traces</p>}
+					{selectedEntry.name !== 'Skip' && (
+						<p className={styles.points}>
+							{selectedEntry.points} {text}
+						</p>
+					)}
 				</div>
 
 				<div className={styles.iconsDiv}>
@@ -64,7 +76,11 @@ const BossesDifficultySelector = ({ difficulties, selectedDifficultyName, onChan
 										<Select.Item className={styles.bossItem} key={difficulty.name} value={difficulty.name}>
 											<div className={styles.itemContent}>
 												<p className={clsx(styles.button, styles[difficulty.name.toLowerCase()])}>{difficulty.name}</p>
-												{difficulty.name !== 'Skip' && <p className={styles.points}>{difficulty.points} Traces</p>}
+												{difficulty.name !== 'Skip' && (
+													<p className={styles.points}>
+														{difficulty.points} {text}
+													</p>
+												)}
 
 												{selectedEntry.name === difficulty.name && (
 													<div className={styles.iconsDiv}>

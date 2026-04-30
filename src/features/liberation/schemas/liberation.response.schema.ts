@@ -7,7 +7,7 @@ import {
 	bossDifficultyWithSkip,
 	isValidBossDifficultyOrSkip,
 } from '@data/liberation/liberationBosses';
-import { questTypes, bossNames } from '@data/liberation/liberationQuests';
+import { questTypes, genesisBosses, destinyBosses } from '@data/liberation/liberationQuests';
 import { characterIdRawSchema, characterNameRawSchema } from '@features/character/schemas/character.schema';
 
 const IdRawSchema = z
@@ -16,7 +16,8 @@ const IdRawSchema = z
 	.or(z.literal(''));
 
 export const questTypeSchema = z.enum(questTypes);
-export const bossNameSchema = z.enum(bossNames);
+export const genesisBossNameSchema = z.enum(genesisBosses);
+export const destinyBossNameSchema = z.enum(destinyBosses);
 
 const getLiberationListCharacterResponseSchema = z
 	.object({
@@ -26,11 +27,12 @@ const getLiberationListCharacterResponseSchema = z
 		class: z.enum(JOB_CLASSES),
 		level: z.number().min(0).max(CHARACTER_MAX_LEVEL),
 
-		type: questTypeSchema,
-		currentQuest: bossNameSchema,
-		currentPoints: z.number().min(0),
-		genesisPass: z.boolean().optional(),
-		liberated: z.boolean().optional(),
+		currentGenesisQuest: genesisBossNameSchema,
+		currentGenesisPoints: z.number().min(0),
+		currentDestinyQuest: destinyBossNameSchema,
+		currentDestinyPoints: z.number().min(0),
+		genesisPass: z.boolean(),
+		liberated: z.boolean(),
 	})
 	.strict();
 
@@ -62,3 +64,18 @@ export type checkedBossResponseBody = z.infer<typeof checkedBossSchema>;
 export const getCheckedBossesListResponseSchema = z.array(checkedBossSchema);
 
 export type getCheckedBossesListResponseBody = z.infer<typeof getCheckedBossesListResponseSchema>;
+
+export const updateLiberationCharacterResponseSchema = z
+	.object({
+		characterId: characterIdRawSchema,
+
+		currentGenesisQuest: genesisBossNameSchema,
+		currentGenesisPoints: z.number().min(0),
+		currentDestinyQuest: destinyBossNameSchema,
+		currentDestinyPoints: z.number().min(0),
+		genesisPass: z.boolean(),
+		liberated: z.boolean(),
+	})
+	.strict();
+
+export type updateLiberationCharacterResponseBody = z.infer<typeof updateLiberationCharacterResponseSchema>;

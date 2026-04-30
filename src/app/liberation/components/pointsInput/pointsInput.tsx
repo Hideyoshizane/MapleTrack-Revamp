@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import InfoIcon from '@assets/svg/info.svg';
 import Tooltip from '@components/Tooltip/tooltip';
@@ -15,6 +15,10 @@ type Props = {
 };
 const PointsInput = ({ points, onChangePoints }: Props): JSX.Element => {
 	const [inputValue, setInputValue] = useState<string>(String(points));
+
+	useEffect((): void => {
+		setInputValue(String(points));
+	}, [points]);
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
 		const rawValue = event.target.value;

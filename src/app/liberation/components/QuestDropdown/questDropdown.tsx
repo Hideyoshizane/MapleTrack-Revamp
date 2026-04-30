@@ -16,13 +16,18 @@ type Props = {
 	quest: LiberationQuest;
 	selectedQuest: string | null;
 	onSelectBoss: (bossName: string) => void;
+	type: string;
 };
 
-const QuestDropdown = ({ quest, selectedQuest, onSelectBoss }: Props): JSX.Element => {
+const QuestDropdown = ({ type, quest, selectedQuest, onSelectBoss }: Props): JSX.Element => {
 	const bosses = Object.entries(quest.bosses);
 
-	const fallbackBossName = bosses[0]?.[0] ?? null;
-	const safeSelectedQuest = selectedQuest ?? fallbackBossName;
+	const defaultBossByType = type === 'Genesis' ? 'Von Leon' : 'Seren';
+	const bossExists = (bossName: string | null): bossName is string => {
+		return bossName !== null && bossName in quest.bosses;
+	};
+
+	const safeSelectedQuest = bossExists(selectedQuest) ? selectedQuest : defaultBossByType;
 	const selectedEntry = safeSelectedQuest ? quest.bosses[safeSelectedQuest] : null;
 
 	const IMAGE_SIZE = 56;

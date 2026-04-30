@@ -15,6 +15,7 @@ import type { checkedBossResponseBody } from '@features/liberation/schemas/liber
 import type { JSX } from 'react';
 
 type Props = {
+	type: string;
 	bosses: Boss[];
 	checkedBosses: checkedBossResponseBody[];
 	onChangeWeeklyTotals: (data: WeeklyMonthlyPoints) => void;
@@ -33,7 +34,7 @@ const buildCheckedMap = (checkedBosses: checkedBossResponseBody[]): Record<strin
 	return map;
 };
 
-const BossesSelectionComponent = ({ bosses, checkedBosses, onChangeWeeklyTotals }: Props): JSX.Element => {
+const BossesSelectionComponent = ({ type, bosses, checkedBosses, onChangeWeeklyTotals }: Props): JSX.Element => {
 	const [state, setState] = useState<BossSelectionState>({});
 	const checkedMap = buildCheckedMap(checkedBosses);
 
@@ -195,6 +196,7 @@ const BossesSelectionComponent = ({ bosses, checkedBosses, onChangeWeeklyTotals 
 								difficulties={boss.difficulties}
 								onChangeDifficulty={(difficulty): void => handleSelectDifficulty(boss.name, difficulty)}
 								selectedDifficultyName={selectedDifficulty?.name ?? null}
+								type={type}
 							/>
 
 							<PartySizeSelector

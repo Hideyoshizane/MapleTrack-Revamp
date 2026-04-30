@@ -8,6 +8,7 @@ import type {
 import type {
 	getLiberationListResponseBody,
 	getCheckedBossesListResponseBody,
+	updateLiberationCharacterResponseBody,
 } from './schemas/liberation.response.schema';
 import type { ApiResponse } from '@sharedTypes/api';
 
@@ -21,6 +22,8 @@ export const liberationApi = {
 		payload: getCheckedBossesListRequesBody,
 	): Promise<ApiResponse<getCheckedBossesListResponseBody>> =>
 		requestApi('/liberation/getCheckedBossesList', 'POST', payload),
-	updateListProgression: async (payload: updateLiberationCharacterRequestBody): Promise<ApiResponse> =>
+	updateListProgression: async (
+		payload: updateLiberationCharacterRequestBody,
+	): Promise<ApiResponse<updateLiberationCharacterResponseBody>> =>
 		requestApi('/liberation/updateListProgression', 'POST', payload),
 };

@@ -85,6 +85,22 @@ export const getBossReset = (bossName: string, difficultyName: string): string |
 	return bossResetMap.get(bossName)?.get(difficultyName) ?? null;
 };
 
+export const getBossType = (bossName: string): BossType | null => {
+	const genesisBosses = bossesByTypeMap.get('genesis') ?? [];
+	const isGenesis = genesisBosses.some((boss) => boss.name === bossName);
+	if (isGenesis) {
+		return 'genesis';
+	}
+	const destinyBosses = bossesByTypeMap.get('destiny') ?? [];
+	const isDestiny = destinyBosses.some((boss) => boss.name === bossName);
+
+	if (isDestiny) {
+		return 'destiny';
+	}
+
+	return null;
+};
+
 export const isBossType = (value: string): value is BossType => {
 	return value === 'genesis' || value === 'destiny';
 };

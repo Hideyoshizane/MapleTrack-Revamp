@@ -65,24 +65,33 @@ export const questTypes = questTypesArray as unknown as readonly [
 
 export type QuestType = (typeof questTypes)[number];
 
-const extractBossNames = (): string[] => {
-	const result: string[] = [];
+const extractBossNamesByQuest = (): { genesisBossNames: string[]; destinyBossNames: string[] } => {
+	const genesisBosses: string[] = [];
+	const destinyBosses: string[] = [];
 
-	for (const quest of Object.values(liberationQuestsJson)) {
+	for (const [questType, quest] of Object.entries(liberationQuestsJson)) {
 		for (const key of Object.keys(quest)) {
-			if (key === 'total') continue;
-			result.push(key);
+			if (key === 'total') {
+				continue;
+			}
+
+			if (questType === 'Genesis') {
+				genesisBosses.push(key);
+			} else if (questType === 'Destiny') {
+				destinyBosses.push(key);
+			}
 		}
 	}
 
-	return result;
+	return { genesisBossNames: genesisBosses, destinyBossNames: destinyBosses };
 };
+const { genesisBossNames, destinyBossNames } = extractBossNamesByQuest();
 
-const bossNamesArray = extractBossNames();
+export const genesisBosses = genesisBossNames as unknown as readonly [string, ...string[]];
+export const destinyBosses = destinyBossNames as unknown as readonly [string, ...string[]];
 
-export const bossNames = bossNamesArray as unknown as readonly [string, ...string[]];
-
-export type BossName = (typeof bossNames)[number];
+export type GenesisBossName = (typeof genesisBosses)[number];
+export type DestinyBossName = (typeof destinyBosses)[number];
 
 // Aux functions
 
@@ -90,34 +99,107 @@ export const getQuestsByType = (questType: string): LiberationQuest | null => {
 	return liberationMilestones[questType] ?? null;
 };
 
-export const getLiberationBossImage = (questName: string, bossName: string): string => {
-	return liberationMap.get(questName)?.get(bossName)?.img ?? '';
+export const getLiberationBossImage = (questType: string, bossName: string): string => {
+	return liberationMap.get(questType)?.get(bossName)?.img ?? '';
 };
 
-export const getLiberationPoints = (questName: string, bossName: string): number => {
-	return liberationMap.get(questName)?.get(bossName)?.points ?? 0;
+export const getLiberationPoints = (questType: string, bossName: string): number => {
+	return liberationMap.get(questType)?.get(bossName)?.points ?? 0;
 };
 
-export const getCumulativeLiberationPoints = (questName: string, bossName: string): number => {
-	const quest = liberationMilestones[questName];
+export const getCumulativeLiberationPoints = (
+	questType: string,
+	bossName: string,
+	includeTargetBoss: boolean = false,
+): number => {
+	const quest = liberationMilestones[questType];
 
 	if (!quest) {
 		return 0;
 	}
 
-	let totalPointsBeforeBoss = 0;
+	let totalPoints = 0;
 
 	for (const [currentBossName, entry] of Object.entries(quest.bosses)) {
+		totalPoints += entry.points;
+
 		if (currentBossName === bossName) {
+			if (!includeTargetBoss) {
+				totalPoints -= entry.points;
+			}
 			break;
 		}
-
-		totalPointsBeforeBoss += entry.points;
 	}
 
-	return totalPointsBeforeBoss;
+	return totalPoints;
 };
 
 export const getLiberationTotal = (questName: string): number => {
 	return liberationMilestones[questName]?.total ?? 0;
+};
+
+type ResolveNextLiberationStateResult = {
+	questName: string;
+	points: number;
+	liberated: boolean;
+};
+
+export const resolveNextLiberationState = (
+	questType: string,
+	questName: string,
+	points: number,
+): ResolveNextLiberationStateResult => {
+	const resolveFinalState = (bossName: string, rawPoints: number): ResolveNextLiberationStateResult => {
+		const isGenesisHilla = questType === 'Genesis' && bossName === 'Verus Hilla';
+
+		const normalizedPoints = isGenesisHilla ? Math.min(rawPoints, HillaThreshold) : rawPoints;
+
+		const liberated = questType === 'Destiny' || (isGenesisHilla && normalizedPoints === HillaThreshold);
+
+		return { questName: bossName, points: normalizedPoints, liberated };
+	};
+
+	const HillaThreshold = getLiberationPoints('Genesis', 'Verus Hilla');
+
+	const quest = getQuestsByType(questType);
+	if (!quest) {
+		return resolveFinalState(questName, points);
+	}
+
+	const bossEntries = Object.entries(quest.bosses);
+	if (bossEntries.length === 0) {
+		return resolveFinalState(questName, points);
+	}
+
+	const startIndex = bossEntries.findIndex(([name]) => name === questName);
+	if (startIndex === -1) {
+		return resolveFinalState(questName, points);
+	}
+	const lastIndex = bossEntries.length - 1;
+	if (startIndex === lastIndex) {
+		return resolveFinalState(questName, points);
+	}
+
+	let remainingPoints = points;
+	let currentIndex = startIndex;
+
+	while (currentIndex < bossEntries.length) {
+		const [currentBossName, currentBoss] = bossEntries[currentIndex];
+
+		if (remainingPoints < currentBoss.points) {
+			return resolveFinalState(currentBossName, remainingPoints);
+		}
+
+		remainingPoints -= currentBoss.points;
+		currentIndex += 1;
+
+		if (currentIndex >= bossEntries.length) {
+			const [lastBossName] = bossEntries[bossEntries.length - 1];
+			return resolveFinalState(lastBossName, remainingPoints);
+		}
+	}
+
+	const [fallbackBossName] = bossEntries[bossEntries.length - 1];
+
+	return resolveFinalState(fallbackBossName, remainingPoints);
 };

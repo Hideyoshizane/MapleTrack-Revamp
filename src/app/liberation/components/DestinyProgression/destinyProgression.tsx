@@ -1,15 +1,11 @@
 'use client';
 
 import { clsx } from 'clsx';
-import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-import CheckedIcon from '@assets/svg/check-boss.svg';
-import CircleIcon from '@assets/svg/circle-boss.svg';
 import LockIcon from '@assets/svg/lock.svg';
-import Tooltip from '@components/Tooltip/tooltip';
-import { GENESIS_MIN_LEVEL } from '@data/liberation/constant';
+import { DESTINY_MIN_LEVEL } from '@data/liberation/constant';
 import { createNormalizedEmptyBossList, getBossesByType } from '@data/liberation/liberationBosses';
 import { getQuestsByType, getLiberationTotal } from '@data/liberation/liberationQuests';
 import { liberationApi } from '@features/liberation/liberationApi';
@@ -23,8 +19,8 @@ import ProgressPrevision from '../ProgressPrevision/progressPrevision';
 import QuestDropdown from '../QuestDropdown/questDropdown';
 import WeeklyBreakdown from '../WeeklyBreakdown/weeklyBreakdown';
 
-import styles from './genesisProgression.module.scss';
-import GenesisSchedule from './genesisSchedule/genesisSchedule';
+import styles from './destinyProgression.module.scss';
+import DestinySchedule from './destinySchedule/destinySchedule';
 
 import type { WeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
 import type {
@@ -51,27 +47,21 @@ type ProgressSnapshot = {
 	tracesPoints: number;
 };
 
-const firstQuest = 'Von Leon';
-const lastQuest = 'Verus Hilla';
-const QUEST_TYPE = 'Genesis';
+const QUEST_TYPE = 'Destiny';
 
 const bosses = getBossesByType(QUEST_TYPE);
 const totalPoints = getLiberationTotal(QUEST_TYPE);
 
-const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacterUpdate }: Props): JSX.Element => {
-	const genesisQuests = getQuestsByType(QUEST_TYPE);
-	if (!genesisQuests || !selectedCharacter) {
+const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacterUpdate }: Props): JSX.Element => {
+	const destinyQuests = getQuestsByType(QUEST_TYPE);
+	if (!destinyQuests || !selectedCharacter) {
 		redirect('/error');
 	}
 
 	const currentDay = dayjs(currentDate).utc();
 
-	const [selectedQuest, setSelectedQuest] = useState<string | null>(selectedCharacter.currentGenesisQuest);
-	const [tracesPoints, setTracesPoints] = useState<number>(selectedCharacter.currentGenesisPoints);
-
-	const [genesisPass, setGenesisPass] = useState<boolean>(Boolean(selectedCharacter.genesisPass));
-
-	const [liberated, setLiberated] = useState<boolean>(Boolean(selectedCharacter.liberated));
+	const [selectedQuest, setSelectedQuest] = useState<string | null>(selectedCharacter.currentDestinyQuest);
+	const [determinationPoints, setDeterminationPoints] = useState<number>(selectedCharacter.currentDestinyPoints);
 
 	const [selectedDate, setSelectedDate] = useState<Dayjs>(currentDay);
 	const [checkedBosses, setCheckedBosses] = useState<checkedBossResponseBody[]>([]);
@@ -88,62 +78,61 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 	const currentDayCacheRef = useRef<CachedEntry | null>(null);
 	const activeRequestRef = useRef<string | null>(null);
 
-	// Track if the current update is from backend sync to prevent loops
 	const isBackendSyncRef = useRef<boolean>(false);
-	// Track previous values to avoid unnecessary local updates
 	const prevCharacterIdRef = useRef<string>(selectedCharacter.characterId);
-	const prevGenesisQuestRef = useRef<string | null>(selectedCharacter.currentGenesisQuest);
-	const prevGenesisPointsRef = useRef<number>(selectedCharacter.currentGenesisPoints);
-	const prevGenesisPassRef = useRef<boolean>(Boolean(selectedCharacter.genesisPass));
+	const prevDestinyQuestRef = useRef<string | null>(selectedCharacter.currentDestinyQuest);
+	const prevDestinyPointsRef = useRef<number>(selectedCharacter.currentDestinyPoints);
 
-	const disableProgress = (selectedCharacter?.level ?? 0) < GENESIS_MIN_LEVEL;
+	const liberated = selectedCharacter?.liberated;
+	const disableProgress = (selectedCharacter?.level ?? 0) <= DESTINY_MIN_LEVEL && !liberated;
 
 	const questPoints = Number(calculateQuestPoints(selectedQuest, QUEST_TYPE) ?? 0);
-	const cumulativeTracesPoints = Number(calculateCumulativePoints(selectedQuest, QUEST_TYPE, tracesPoints) ?? 0);
+	const cumulativeTracesPoints = Number(calculateCumulativePoints(selectedQuest, QUEST_TYPE, determinationPoints) ?? 0);
 
-	const remainingTotalTraces = totalPoints - cumulativeTracesPoints;
-	const remainingCurrentTraces = questPoints - tracesPoints;
+	const remainingTotalDetermination = totalPoints - cumulativeTracesPoints;
+	const remainingCurrentDetermination = questPoints - determinationPoints;
 
 	useEffect((): void => {
 		setSelectedDate((prev) => (prev.isSame(currentDay, 'day') ? prev : currentDay));
 	}, [currentDate]);
 
+	// Handle backend sync updates without triggering new syncs
 	useEffect((): void => {
-		// Skip if this is the initial load or if nothing changed
 		const characterChanged = prevCharacterIdRef.current !== selectedCharacter.characterId;
-		const questChanged = prevGenesisQuestRef.current !== selectedCharacter.currentGenesisQuest;
-		const pointsChanged = prevGenesisPointsRef.current !== selectedCharacter.currentGenesisPoints;
-		const passChanged = prevGenesisPassRef.current !== Boolean(selectedCharacter.genesisPass);
-		if (!characterChanged && !questChanged && !pointsChanged && !passChanged) {
+		const questChanged = prevDestinyQuestRef.current !== selectedCharacter.currentDestinyQuest;
+		const pointsChanged = prevDestinyPointsRef.current !== selectedCharacter.currentDestinyPoints;
+		if (!characterChanged && !questChanged && !pointsChanged) {
 			return;
 		}
 
 		isBackendSyncRef.current = true;
 
 		if (questChanged) {
-			setSelectedQuest(selectedCharacter.currentGenesisQuest);
+			setSelectedQuest(selectedCharacter.currentDestinyQuest);
 		}
 		if (pointsChanged) {
-			setTracesPoints(selectedCharacter.currentGenesisPoints);
-		}
-		if (passChanged) {
-			setGenesisPass(Boolean(selectedCharacter.genesisPass));
+			setDeterminationPoints(selectedCharacter.currentDestinyPoints);
 		}
 
 		prevCharacterIdRef.current = selectedCharacter.characterId;
-		prevGenesisQuestRef.current = selectedCharacter.currentGenesisQuest;
-		prevGenesisPointsRef.current = selectedCharacter.currentGenesisPoints;
-		prevGenesisPassRef.current = Boolean(selectedCharacter.genesisPass);
+		prevDestinyQuestRef.current = selectedCharacter.currentDestinyQuest;
+		prevDestinyPointsRef.current = selectedCharacter.currentDestinyPoints;
 
 		setTimeout(() => {
 			isBackendSyncRef.current = false;
 		}, 100);
-	}, [
-		selectedCharacter.characterId,
-		selectedCharacter.currentGenesisQuest,
-		selectedCharacter.currentGenesisPoints,
-		selectedCharacter.genesisPass,
-	]);
+	}, [selectedCharacter.characterId, selectedCharacter.currentDestinyQuest, selectedCharacter.currentDestinyPoints]);
+
+	useEffect((): void => {
+		previousProgressRef.current = null;
+		currentDayCacheRef.current = null;
+		activeRequestRef.current = null;
+	}, [selectedCharacter.characterId]);
+
+	useEffect((): void => {
+		setSelectedQuest(selectedCharacter.currentDestinyQuest);
+		setDeterminationPoints(selectedCharacter.currentDestinyPoints);
+	}, [selectedCharacter.currentDestinyQuest, selectedCharacter.currentDestinyPoints]);
 
 	useEffect((): void => {
 		if (!selectedDate.isSame(currentDay, 'day')) {
@@ -186,51 +175,26 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 		void run();
 	}, [currentDate, selectedDate, selectedCharacter.characterId, server]);
 
-	const handleLiberatedToggle = (): void => {
-		setLiberated((prev) => {
-			const next = !prev;
-
-			if (next) {
-				previousProgressRef.current = { selectedQuest: selectedQuest ?? firstQuest, tracesPoints };
-
-				setSelectedQuest(lastQuest);
-				setTracesPoints(1000);
-			} else {
-				const previous = previousProgressRef.current;
-
-				setSelectedQuest(previous?.selectedQuest ?? firstQuest);
-				setTracesPoints(previous?.tracesPoints ?? 0);
-			}
-
-			return next;
-		});
-	};
-
 	// Handle user updates - only trigger sync for user-initiated changes
 	useEffect(() => {
 		if (isBackendSyncRef.current || !selectedCharacter) {
 			return;
 		}
 
-		const questChanged = selectedQuest !== selectedCharacter.currentGenesisQuest;
-		const pointsChanged = tracesPoints !== selectedCharacter.currentGenesisPoints;
-		const passChanged = genesisPass !== Boolean(selectedCharacter.genesisPass);
-		const liberatedChanged = liberated !== selectedCharacter.liberated;
-		if (!questChanged && !pointsChanged && !passChanged && !liberatedChanged) {
+		const questChanged = selectedQuest !== selectedCharacter.currentDestinyQuest;
+		const pointsChanged = determinationPoints !== selectedCharacter.currentDestinyPoints;
+		if (!questChanged && !pointsChanged) {
 			return;
 		}
 
 		if (onCharacterUpdate) {
 			onCharacterUpdate({
-				currentGenesisQuest: selectedQuest ?? undefined,
-				currentGenesisPoints: tracesPoints,
-				genesisPass,
+				currentDestinyQuest: selectedQuest ?? undefined,
+				currentDestinyPoints: determinationPoints,
 				liberated,
 			});
 		}
-	}, [selectedQuest, tracesPoints, genesisPass, liberated, selectedCharacter, onCharacterUpdate]);
-
-	const IconComponent = liberated ? CheckedIcon : CircleIcon;
+	}, [selectedQuest, determinationPoints, liberated, selectedCharacter, onCharacterUpdate]);
 
 	return (
 		<div>
@@ -241,7 +205,7 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 							<LockIcon height={56} width={56} />
 							<p className={styles.title}>Level Requirement Not Met</p>
 							<p className={styles.description}>
-								Genesis Liberation tracker is available only for characters level 255 or higher.
+								Destiny Liberation tracker is available only for characters level 275 who finished Genesis Liberation.
 							</p>
 							<p className={styles.description}>Please update character data to unlock.</p>
 						</div>
@@ -256,47 +220,21 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 							<p className={styles.inputTitle}>Current Mission</p>
 							<QuestDropdown
 								onSelectBoss={setSelectedQuest}
-								quest={genesisQuests}
+								quest={destinyQuests}
 								selectedQuest={selectedQuest}
 								type={QUEST_TYPE}
 							/>
 						</div>
 
 						<div>
-							<p className={styles.inputTitle}>Current Traces</p>
-							<PointsInput onChangePoints={setTracesPoints} points={tracesPoints} />
-						</div>
-
-						<div className={styles.toggleDiv}>
-							<p className={styles.inputTitle}>Genesis Pass</p>
-							<Image
-								className={clsx(styles.genesisPass, { [styles.off]: !genesisPass })}
-								alt="Genesis Pass"
-								height={64}
-								onClick={(): void => setGenesisPass((prev) => !prev)}
-								src="/assets/icons/menu/genesisPass.webp"
-								width={88}
-							/>
-						</div>
-
-						<div className={styles.toggleDiv}>
-							<p className={styles.inputTitle}>Liberated</p>
-							<Tooltip
-								content="Required for Destiny Liberation. Updates automatically as you earn points or enter them manually."
-								placement="top">
-								<IconComponent
-									className={styles.liberatedIcon}
-									height={56}
-									onClick={handleLiberatedToggle}
-									width={56}
-								/>
-							</Tooltip>
+							<p className={styles.inputTitle}>Current Determination</p>
+							<PointsInput onChangePoints={setDeterminationPoints} points={determinationPoints} />
 						</div>
 					</div>
 
 					<ProgressionBarDiv
 						cumulativeTracesPoints={cumulativeTracesPoints}
-						currentPoints={tracesPoints}
+						currentPoints={determinationPoints}
 						questPoints={questPoints}
 						totalPoints={totalPoints}
 					/>
@@ -321,13 +259,13 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 				</div>
 
 				<div className={styles.column}>
-					<GenesisSchedule
+					<DestinySchedule
+						determinationPoints={determinationPoints}
 						disableProgress={disableProgress}
-						genesisPass={genesisPass}
-						handleToggleGenesisPass={(): void => setGenesisPass((prev) => !prev)}
-						remainingCurrentTraces={remainingCurrentTraces}
-						remainingTotalTraces={remainingTotalTraces}
+						remainingCurrentDetermination={remainingCurrentDetermination}
+						remainingTotalDetermination={remainingTotalDetermination}
 						selectedDate={selectedDate}
+						selectedQuest={selectedQuest}
 						weeklyMonthlyPoints={weeklyMonthlyPoints}
 					/>
 					<WeeklyBreakdown bosses={bosses} type={QUEST_TYPE} weeklyMonthlyPoints={weeklyMonthlyPoints} />
@@ -337,4 +275,4 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 	);
 };
 
-export default GenesisProgression;
+export default DestinyProgression;

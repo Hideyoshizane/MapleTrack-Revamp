@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { serverSchema, characterIdRawSchema } from '@features/character/schemas/character.schema';
 
-import { questTypeSchema, bossNameSchema } from './liberation.response.schema';
+import { questTypeSchema, genesisBossNameSchema, destinyBossNameSchema } from './liberation.response.schema';
 
 export const getLiberationListRequestSchema = z
 	.object({
@@ -26,12 +26,13 @@ export type getCheckedBossesListRequesBody = z.infer<typeof getCheckedBossesList
 export const updateLiberationCharacterRequestSchema = z
 	.object({
 		characterId: characterIdRawSchema,
-		type: questTypeSchema,
 
-		currentQuest: bossNameSchema,
-		currentPoints: z.number().min(0),
-		genesisPass: z.boolean().optional(),
-		liberated: z.boolean().optional(),
+		currentGenesisQuest: genesisBossNameSchema,
+		currentGenesisPoints: z.number().min(0),
+		currentDestinyQuest: destinyBossNameSchema,
+		currentDestinyPoints: z.number().min(0),
+		genesisPass: z.boolean(),
+		liberated: z.boolean(),
 	})
 	.strict();
 

@@ -1,12 +1,8 @@
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
 import { prisma } from '@lib/prisma';
+import dayjs from '@utils/dayjs';
 import { hasDailyResetOccurred, hasWeeklyResetOccurred, hasMonthlyResetOccurred } from '@utils/time';
 
 import type { PrismaClient } from '@prisma/client';
-
-dayjs.extend(utc);
 
 type TransactionClient = Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>;
 
@@ -97,11 +93,12 @@ export const characterToBossList = async (
 			userId: authenticatedUserId,
 			characterId: characterId,
 			server: serverName,
-			type: 'Genesis',
-			currentQuest: 'Von Leon',
-			currentPoints: 0,
+			currentGenesisQuest: 'Von Leon',
+			currentGenesisPoints: 0,
 			genesisPass: false,
 			liberated: false,
+			currentDestinyQuest: 'Seren',
+			currentDestinyPoints: 0,
 		},
 	});
 
