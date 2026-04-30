@@ -1,54 +1,54 @@
 import { NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
 
+import { auth } from '@/auth';
+import { LASTVERSION } from '@data/user/constants';
 import { isPublicPath } from '@lib/config/access';
-import { enforceVersion } from '@lib/config/tokenChange';
 import { generateCsrfToken } from '@lib/security/security';
 
-import type { NextRequest } from 'next/server';
+export const proxy = auth((req) => {
+	const session = req.auth;
+	const { pathname, searchParams } = req.nextUrl;
 
-export const proxy = async (req: NextRequest): Promise<NextResponse> => {
-	const { pathname } = req.nextUrl;
-
-	// Skip static files and API routes
+	// Skip static + API
 	if (/^\/(_next|api)|\.[a-z0-9]+$/i.test(pathname)) {
 		return NextResponse.next();
 	}
 
-	const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-	const isAuthenticated = Boolean(token);
+	if (session?.user && pathname !== '/force-logout') {
+		const tokenVersion = Number(session.user.version ?? -1);
 
-	// Redirect if token version mismatch
-	const versionCheck = await enforceVersion(req);
-	if (versionCheck) {
-		return versionCheck;
+		if (tokenVersion !== LASTVERSION) {
+			const url = new URL('/force-logout', req.url);
+			url.searchParams.set('reason', 'version_update');
+
+			return NextResponse.redirect(url);
+		}
 	}
 
-	const segments = pathname.split('/').filter(Boolean);
-	const topLevelPath = '/' + (segments[0] ?? '');
+	const isVersionRedirect = searchParams.has('version_update');
+	const isAuthenticated = Boolean(session);
+	const topLevelPath = '/' + (pathname.split('/').filter(Boolean)[0] ?? '');
 
 	let response: NextResponse;
 
-	if (isAuthenticated && isPublicPath(topLevelPath)) {
-		// Redirect authenticated users to /home
+	if (isAuthenticated && isPublicPath(topLevelPath) && !isVersionRedirect) {
 		response = NextResponse.redirect(new URL('/home?logged=1', req.url));
-	} else if (!isAuthenticated && !isPublicPath(topLevelPath)) {
-		// Redirect unauthenticated users
+	} else if (!isAuthenticated && !isPublicPath(topLevelPath) && !isVersionRedirect) {
 		response = NextResponse.redirect(new URL('/login?unauthorized=1', req.url));
 	} else {
 		response = NextResponse.next();
 	}
 
-	const newToken = generateCsrfToken();
-	response.cookies.set('csrf-token', newToken, {
-		path: '/',
-		httpOnly: false,
-		sameSite: 'lax',
-		secure: process.env.NODE_ENV === 'production',
-	});
+	if (!req.cookies.get('csrf-token')) {
+		response.cookies.set('csrf-token', generateCsrfToken(), {
+			path: '/',
+			httpOnly: false,
+			sameSite: 'lax',
+			secure: process.env.NODE_ENV === 'production',
+		});
+	}
 
 	return response;
-};
+});
 
-// Only match real pages, excluding static assets, APIs, and files with extensions
 export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico|api).*)'] };

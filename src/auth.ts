@@ -9,6 +9,8 @@ import { prisma } from '@lib/prisma';
 import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
 import { validateUsernameLogin, validatePasswordLogin } from '@utils/validators';
 
+import { updateMissingSymbolsForCharacters } from './features/character/characterUpdate';
+
 import type { DefaultSession } from 'next-auth';
 
 type AppUser = {
@@ -72,11 +74,10 @@ export const { auth, handlers } = NextAuth({
 						return null;
 					}
 
-					const user = await prisma.user.findUnique({ where: { username: cleanUsername } });
-
 					const dummyHash =
 						'$argon2id$v=19$m=65536,t=3,p=4$uX1p9U1nE8p4cXb3rFxNcg$hX57IVHIUi7fYcl0jYxA/0hhQ2PzefRgQdIMZcPgYG8';
 
+					const user = await prisma.user.findUnique({ where: { username: cleanUsername } });
 					if (!user) {
 						await argon2.verify(dummyHash, cleanPassword).catch(() => null);
 						return null;
@@ -87,12 +88,15 @@ export const { auth, handlers } = NextAuth({
 						return null;
 					}
 
+					const nextVersion = user.version < LASTVERSION ? LASTVERSION : user.version;
+
 					await Promise.all([
 						updateLastLogin(user.id),
+						updateMissingSymbolsForCharacters(user.id),
 						user.version < LASTVERSION ? updateUserVersion(user.id) : Promise.resolve(),
 					]);
 
-					return { id: user.id, username: user.username, version: user.version ?? 0 };
+					return { id: user.id, username: user.username, version: nextVersion };
 				} catch (err) {
 					console.error('Authorize error:', err);
 					return null;
@@ -120,12 +124,7 @@ export const { auth, handlers } = NextAuth({
 			const tokenData = token as AppJWT;
 			return {
 				...session,
-				user: {
-					...session.user,
-					id: tokenData.id,
-					username: tokenData.username,
-					version: tokenData.version ?? 0,
-				},
+				user: { ...session.user, id: tokenData.id, username: tokenData.username, version: tokenData.version ?? 0 },
 			} as AppSession;
 		},
 		redirect: ({ url, baseUrl }) => {

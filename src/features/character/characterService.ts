@@ -51,7 +51,7 @@ const generateSymbol = (
 
 const DAILY = 'Daily Quest';
 
-const SYMBOL_TEMPLATES = {
+export const SYMBOL_TEMPLATES = {
 	arcane: [
 		generateSymbol('Vanishing Journey', 'arcane', [DAILY, 'Erda Spectrum', 'Reverse City']),
 		generateSymbol('Chu Chu Island', 'arcane', [DAILY, 'Hungry Muto', 'Yum Yum Island']),
