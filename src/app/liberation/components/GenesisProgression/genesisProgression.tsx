@@ -1,6 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
+import { startOfDay } from 'date-fns';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -13,7 +14,7 @@ import { GENESIS_MIN_LEVEL } from '@data/liberation/constant';
 import { createNormalizedEmptyBossList, getBossesByType } from '@data/liberation/liberationBosses';
 import { getQuestsByType, getLiberationTotal } from '@data/liberation/liberationQuests';
 import { liberationApi } from '@features/liberation/liberationApi';
-import dayjs from '@utils/dayjs';
+import { isSameDay } from '@utils/time';
 
 import { calculateQuestPoints, calculateCumulativePoints } from '../../lib/calculatePoints';
 import BossesSelectionComponent from '../BossesSelectionComponent/bossesSelectionComponent';
@@ -31,12 +32,11 @@ import type {
 	checkedBossResponseBody,
 	GetLiberationListCharacterResponseBody,
 } from '@features/liberation/schemas/liberation.response.schema';
-import type { Dayjs } from 'dayjs';
 import type { JSX } from 'react';
 
 type Props = {
 	selectedCharacter: GetLiberationListCharacterResponseBody | null;
-	currentDate: Date | string;
+	currentDate: Date;
 	server: string;
 	onCharacterUpdate?: (updatedCharacter: Partial<GetLiberationListCharacterResponseBody>) => void;
 };
@@ -64,7 +64,7 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 		redirect('/error');
 	}
 
-	const currentDay = dayjs(currentDate).utc();
+	const currentDay = currentDate;
 
 	const [selectedQuest, setSelectedQuest] = useState<string | null>(selectedCharacter.currentGenesisQuest);
 	const [tracesPoints, setTracesPoints] = useState<number>(selectedCharacter.currentGenesisPoints);
@@ -73,7 +73,7 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 
 	const [liberated, setLiberated] = useState<boolean>(Boolean(selectedCharacter.liberated));
 
-	const [selectedDate, setSelectedDate] = useState<Dayjs>(currentDay);
+	const [selectedDate, setSelectedDate] = useState<Date>(currentDay);
 	const [checkedBosses, setCheckedBosses] = useState<checkedBossResponseBody[]>([]);
 
 	const [weeklyMonthlyPoints, setWeeklyMonthlyPoints] = useState<WeeklyMonthlyPoints>({
@@ -104,9 +104,9 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 	const remainingTotalTraces = totalPoints - cumulativeTracesPoints;
 	const remainingCurrentTraces = questPoints - tracesPoints;
 
-	useEffect((): void => {
-		setSelectedDate((prev) => (prev.isSame(currentDay, 'day') ? prev : currentDay));
-	}, [currentDate]);
+	useEffect(() => {
+		setSelectedDate((prev) => (prev && isSameDay(prev, currentDay) ? prev : currentDay));
+	}, [currentDay]);
 
 	useEffect((): void => {
 		// Skip if this is the initial load or if nothing changed
@@ -146,8 +146,9 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 	]);
 
 	useEffect((): void => {
-		if (!selectedDate.isSame(currentDay, 'day')) {
+		if (!isSameDay(selectedDate, currentDay)) {
 			setCheckedBosses(createNormalizedEmptyBossList(QUEST_TYPE) ?? []);
+
 			return;
 		}
 
@@ -155,6 +156,7 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 		const cache = currentDayCacheRef.current;
 		if (cache?.characterId === characterId) {
 			setCheckedBosses(cache.data);
+
 			return;
 		}
 
@@ -167,7 +169,7 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 					server,
 					type: QUEST_TYPE,
 					characterId: selectedCharacter.characterId,
-					requestDate: currentDay.toDate(),
+					requestDate: currentDay,
 				});
 
 				if (activeRequestRef.current !== requestKey) {
@@ -307,7 +309,10 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 					<ProgressPrevision
 						onChangeDate={(value: string): void => {
 							if (value) {
-								setSelectedDate(dayjs.utc(value));
+								const [y, m, d] = value.split('-').map(Number);
+								const localDate = new Date(y, m - 1, d);
+
+								setSelectedDate(startOfDay(localDate));
 							}
 						}}
 						selectedDate={selectedDate}

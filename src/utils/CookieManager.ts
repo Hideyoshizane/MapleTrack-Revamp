@@ -1,10 +1,24 @@
-import Cookies from 'universal-cookie';
-
 import { COOKIE_EXPIRES_DAYS, MIN_VALUE_BONUS_COOKIE, MAX_VALUE_BONUS_COOKIE } from '@constants/cookiesConstants';
 
-const cookies = new Cookies();
-
 const daysToSeconds = (days: number): number => days * 24 * 60 * 60;
+
+const getCookie = (key: string): string | undefined => {
+	if (typeof document === 'undefined') {
+		return undefined;
+	}
+
+	const match = document.cookie.match(new RegExp(`(?:^|; )${key}=([^;]*)`));
+
+	return match ? decodeURIComponent(match[1]) : undefined;
+};
+
+const setCookie = (key: string, value: string, maxAge: number): void => {
+	if (typeof document === 'undefined') {
+		return;
+	}
+
+	document.cookie = `${key}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; samesite=lax`;
+};
 
 type StringCookieManager<T extends string> = {
 	get: () => T[] | undefined;
@@ -24,7 +38,7 @@ export const createCookieManager = <T extends string>(
 ): StringCookieManager<T> => {
 	return {
 		get: (): T[] | undefined => {
-			const value = cookies.get(key) as string | undefined;
+			const value = getCookie(key);
 			if (!value) {
 				return;
 			}
@@ -36,14 +50,14 @@ export const createCookieManager = <T extends string>(
 		},
 
 		set: (values: T[]): void => {
-			const invalid = values.filter((value): boolean => !allowed.includes(value));
+			const invalid = values.filter((value) => !allowed.includes(value));
 
 			if (invalid.length) {
 				throw new Error(`Invalid ${key}: "${invalid.join(',')}"`);
 			}
 
 			const uniqueValues = Array.from(new Set(values));
-			cookies.set(key, uniqueValues.join(','), { path: '/', maxAge: daysToSeconds(expiresDays) });
+			setCookie(key, uniqueValues.join(','), daysToSeconds(expiresDays));
 		},
 	};
 };
@@ -56,17 +70,18 @@ export const createNumericCookieManager = (
 ): NumericCookieManager => {
 	return {
 		get: (): number | undefined => {
-			const value = cookies.get(key) as string | undefined;
+			const value = getCookie(key);
 
 			if (!value) {
 				return;
 			}
 
-			const numberValue = Number(value);
-			if (Number.isNaN(numberValue) || numberValue < min || numberValue > max) {
+			const parsed = Number(value);
+			if (Number.isNaN(parsed) || parsed < min || parsed > max) {
 				return undefined;
 			}
-			return numberValue;
+
+			return parsed;
 		},
 
 		set: (value: number): void => {
@@ -74,7 +89,7 @@ export const createNumericCookieManager = (
 				throw new Error(`Invalid ${key}: ${value}. Must be ${min}-${max}.`);
 			}
 
-			cookies.set(key, String(value), { path: '/', maxAge: daysToSeconds(expiresDays) });
+			setCookie(key, String(value), daysToSeconds(expiresDays));
 		},
 	};
 };

@@ -7,11 +7,14 @@ $spacingMedium: 8px;
 .selectedServerWrapper {
 	display: flex;
 	align-items: center;
+
 	width: 256px;
 	height: $dropdownHeight;
+
 	border: none;
 	border-radius: $borderRadius;
 	background-color: var(--server-color-button);
+
 	cursor: pointer;
 	outline: none;
 
@@ -22,6 +25,7 @@ $spacingMedium: 8px;
 
 	.serverName {
 		width: 140px;
+
 		font-size: 32px;
 		text-align: start;
 		color: var(--default-white);
@@ -30,7 +34,9 @@ $spacingMedium: 8px;
 	.icon {
 		width: $iconSize;
 		height: $iconSize;
+
 		color: var(--default-white);
+
 		margin-left: $spacingMedium;
 		margin-right: $spacingSmall;
 	}
@@ -40,11 +46,15 @@ $spacingMedium: 8px;
 	z-index: 10;
 	display: flex;
 	flex-direction: column;
+
 	width: 256px;
+
 	overflow: hidden;
+
 	border-radius: $borderRadius;
 	background-color: var(--server-color-button);
 	filter: drop-shadow(0 0 3px #121212);
+
 	margin-top: 8px;
 }
 

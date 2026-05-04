@@ -11,16 +11,22 @@ $hoverColor: 80%;
 	position: relative;
 	display: flex;
 	align-items: center;
+
 	width: $dropdownWidth;
 	height: $dropdownHeight;
+
 	overflow: hidden;
+
 	border-radius: $borderRadius;
 	background-color: var(--boss-dropdown-color);
+
 	transition: background-color 0.2s ease-in;
+
 	cursor: pointer;
 
 	&[data-disabled='true'] {
 		background-color: var(--boss-dropdown-color-disabled);
+
 		cursor: not-allowed;
 	}
 
@@ -30,12 +36,14 @@ $hoverColor: 80%;
 
 	.classIcon {
 		position: absolute;
+
 		opacity: 0.25;
 	}
 
 	.nameDiv {
 		display: flex;
 		flex-direction: column;
+
 		margin-left: 112px;
 
 		.characterName {
@@ -53,7 +61,9 @@ $hoverColor: 80%;
 	.iconsDiv {
 		display: flex;
 		align-items: center;
+
 		gap: 4px;
+
 		margin-left: auto;
 		margin-right: 16px;
 
@@ -66,12 +76,14 @@ $hoverColor: 80%;
 		.iconClear {
 			width: $iconSize;
 			height: $iconSize;
+
 			color: var(--default-button-text);
 		}
 
 		.icon {
 			width: $chevronIconSize;
 			height: $chevronIconSize;
+
 			color: var(--default-button-text);
 		}
 	}
@@ -80,10 +92,14 @@ $hoverColor: 80%;
 .characterList {
 	width: $dropdownWidth;
 	max-height: $dropdownMaxHeight;
+
 	overflow: hidden;
+
 	border-radius: $borderRadius;
 	background-color: var(--boss-dropdown-color);
+
 	filter: drop-shadow(0 0 3px #121212);
+
 	margin-bottom: 4px;
 	margin-top: 4px;
 }
@@ -91,7 +107,9 @@ $hoverColor: 80%;
 .characterItem {
 	display: flex;
 	align-items: center;
+
 	transition: background-color 0.2s ease-in;
+
 	cursor: pointer;
 
 	&:hover {
@@ -129,17 +147,24 @@ $hoverColor: 80%;
 
 .scrollAreaViewport {
 	max-height: inherit;
+
 	overflow: auto;
+
 	overscroll-behavior: contain;
 }
 
 .scrollAreaScrollbar {
 	display: flex;
+
 	width: 6px;
+
 	padding: 2px;
+
 	user-select: none;
+
 	padding-bottom: $scrollbarLimit;
 	padding-top: $scrollbarLimit;
+
 	touch-action: none;
 
 	&[data-orientation='vertical'] {
@@ -150,6 +175,8 @@ $hoverColor: 80%;
 .scrollAreaThumb {
 	position: relative;
 	flex: 1;
+
 	border-radius: 999px;
+
 	background: var(--default-black);
 }

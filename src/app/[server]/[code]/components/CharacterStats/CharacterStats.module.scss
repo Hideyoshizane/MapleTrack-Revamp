@@ -4,14 +4,17 @@ $bossIconSize: 90px;
 .bigBlock {
 	display: flex;
 	justify-content: flex-end;
+
 	width: inherit;
 	height: $bigBlockHeight;
+
 	margin-top: 16px;
 	padding-right: 24px;
 
 	.characterBossLinkLegion {
 		display: flex;
 		justify-content: space-between;
+
 		width: 377px;
 		height: 98px;
 
@@ -21,6 +24,7 @@ $bossIconSize: 90px;
 
 			.bossIcon {
 				color: var(--default-button-text);
+
 				margin-top: 8px;
 			}
 		}
@@ -30,6 +34,7 @@ $bossIconSize: 90px;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
+
 		width: 515px;
 		height: $bigBlockHeight;
 
@@ -50,15 +55,20 @@ $bossIconSize: 90px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+
 	width: inherit;
+
 	margin-top: 16px;
 
 	.levelInput {
 		display: flex;
 		align-items: flex-end;
 		justify-content: flex-end;
+
 		gap: 8px;
+
 		width: inherit;
+
 		padding-right: 24px;
 
 		.levelText {

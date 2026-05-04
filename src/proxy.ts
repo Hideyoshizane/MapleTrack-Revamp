@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { LASTVERSION } from '@data/user/constants';
 import { isPublicPath } from '@lib/config/access';
-import { generateCsrfToken } from '@lib/security/security';
 
 export const proxy = auth((req) => {
 	const session = req.auth;
@@ -29,26 +28,15 @@ export const proxy = auth((req) => {
 	const isAuthenticated = Boolean(session);
 	const topLevelPath = '/' + (pathname.split('/').filter(Boolean)[0] ?? '');
 
-	let response: NextResponse;
-
 	if (isAuthenticated && isPublicPath(topLevelPath) && !isVersionRedirect) {
-		response = NextResponse.redirect(new URL('/home?logged=1', req.url));
-	} else if (!isAuthenticated && !isPublicPath(topLevelPath) && !isVersionRedirect) {
-		response = NextResponse.redirect(new URL('/login?unauthorized=1', req.url));
-	} else {
-		response = NextResponse.next();
+		return NextResponse.redirect(new URL('/home?logged=1', req.url));
 	}
 
-	if (!req.cookies.get('csrf-token')) {
-		response.cookies.set('csrf-token', generateCsrfToken(), {
-			path: '/',
-			httpOnly: false,
-			sameSite: 'lax',
-			secure: process.env.NODE_ENV === 'production',
-		});
+	if (!isAuthenticated && !isPublicPath(topLevelPath) && !isVersionRedirect) {
+		return NextResponse.redirect(new URL('/login?unauthorized=1', req.url));
 	}
 
-	return response;
+	return NextResponse.next();
 });
 
 export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico|api).*)'] };

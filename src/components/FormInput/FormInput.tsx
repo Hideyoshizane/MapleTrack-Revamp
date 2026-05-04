@@ -2,20 +2,20 @@
 
 import { clsx } from 'clsx';
 import { useState } from 'react';
-import { Controller, type Control, type Path, type FieldValues } from 'react-hook-form';
+import { Controller, type Control, type FieldValues, type Path } from 'react-hook-form';
 
 import styles from './formInput.module.scss';
 import ValidationIcon from './ValidationIcon/validationIcon';
 
-import type { ValidationResult } from '@utils/validateField';
+import type { Validator } from '@utils/validateField';
 import type { HTMLInputTypeAttribute, JSX } from 'react';
 
-type FormInputProps<TFieldValues extends FieldValues> = {
+type Props<TFieldValues extends FieldValues> = {
 	id: Path<TFieldValues>;
 	label: string;
 	type: HTMLInputTypeAttribute;
 	control: Control<TFieldValues>;
-	validation?: (value: string) => ValidationResult;
+	validators?: Validator[];
 	isLogin?: boolean;
 	isLightmode?: boolean;
 };
@@ -25,23 +25,30 @@ const FormInput = <TFieldValues extends FieldValues>({
 	label,
 	type,
 	control,
-	validation,
+	validators,
 	isLogin = false,
 	isLightmode = false,
-}: FormInputProps<TFieldValues>): JSX.Element => {
+}: Props<TFieldValues>): JSX.Element => {
 	const [touched, setTouched] = useState(false);
 
-	const containerClass: string = clsx(styles.inputContainer, { [styles.marginSignUp]: !isLogin });
+	const containerClass = clsx(styles.inputContainer, { [styles.marginSignUp]: !isLogin });
 
 	return (
 		<Controller
 			control={control}
 			name={id}
-			render={({ field, fieldState }): JSX.Element => {
-				const showError = Boolean(fieldState.error);
-				const showValid = touched && !fieldState.error;
+			render={({ field }): JSX.Element => {
+				const value = field.value ?? '';
+
+				const errors = validators?.map((v) => v(value)).filter((e): e is string => Boolean(e)) ?? [];
+
+				const errorMessage = errors.length > 0 ? errors.join('\n') : undefined;
+
+				const showError = Boolean(errorMessage);
+				const showValid = touched && !showError;
 				const showInvalid = touched && showError;
-				const tooltipMessage = showError ? (fieldState.error?.message ?? 'Invalid input') : 'Enter a value';
+
+				const tooltipMessage = showError ? (errorMessage ?? 'Invalid input') : 'Enter a value';
 
 				const inputClass = clsx(styles.input, {
 					[styles.valid]: !isLogin && showValid,
@@ -53,17 +60,17 @@ const FormInput = <TFieldValues extends FieldValues>({
 					<div className={containerClass}>
 						<div className={styles.inputRow}>
 							<input
+								{...field}
 								className={inputClass}
 								aria-describedby={!isLogin && showError ? `${String(id)}-error` : undefined}
 								aria-invalid={!isLogin && showError}
 								id={id}
-								placeholder={label}
-								type={type}
-								{...field}
 								onBlur={(): void => {
 									setTouched(true);
 									field.onBlur();
 								}}
+								placeholder={label}
+								type={type}
 								value={field.value ?? ''}
 							/>
 
@@ -81,15 +88,6 @@ const FormInput = <TFieldValues extends FieldValues>({
 						</div>
 					</div>
 				);
-			}}
-			rules={{
-				validate: (value: string): boolean | string => {
-					if (!validation) {
-						return true;
-					}
-					const result = validation(value);
-					return result.isValid || result.error || 'Invalid input';
-				},
 			}}
 		/>
 	);

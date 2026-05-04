@@ -9,7 +9,7 @@ import type { JobType } from '@components/ProgressBar/progressBar';
 import type { getEditCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
-type CharacterStatsProps = {
+type Props = {
 	character?: getEditCharacterDataResponseBody;
 	levelInput: string;
 	setLevelInput: (value: string) => void;
@@ -33,7 +33,7 @@ const CharacterStats = ({
 	jobType,
 	level,
 	targetLevel,
-}: CharacterStatsProps): JSX.Element => {
+}: Props): JSX.Element => {
 	return (
 		<div className={styles.levelDiv}>
 			<div className={styles.levelArea}>
@@ -60,7 +60,7 @@ const CharacterStats = ({
 					value={targetLevelInput}
 				/>
 			</div>
-			{/* Progress bar showing current vs target level */}
+
 			<ProgressBar height={32} jobType={jobType} maxValue={targetLevel} value={level} width={900} />
 		</div>
 	);

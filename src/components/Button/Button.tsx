@@ -6,7 +6,7 @@ import styles from './button.module.scss';
 
 import type { JSX, MouseEvent, KeyboardEvent } from 'react';
 
-type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 	isLoading?: boolean;
 	loadingText?: string;
 	loaderSize?: number;
@@ -26,7 +26,7 @@ const Button = ({
 	onClick,
 	onKeyDown,
 	...props
-}: ButtonProps): JSX.Element => {
+}: Props): JSX.Element => {
 	const isActuallyDisabled = Boolean(isLoading || disabled);
 
 	const handleClick = (event: MouseEvent<HTMLButtonElement>): void => {
@@ -62,6 +62,7 @@ const Button = ({
 			{isLoading && (
 				<Loader borderWidth={loaderBorderWidth} color={loaderColor} height={loaderSize} width={loaderSize} />
 			)}
+
 			<span className={styles.buttonText}>{isLoading ? loadingText : children}</span>
 		</button>
 	);

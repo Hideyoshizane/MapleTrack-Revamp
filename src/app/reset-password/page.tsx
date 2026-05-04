@@ -7,18 +7,19 @@ import { useSearchParams } from 'next/navigation';
 import Button from '@components/Button/button';
 import FooterOutside from '@components/FooterOutside/footerOutside';
 import FormInput from '@components/FormInput/formInput';
-import { validatePassword, validatePasswordConfirmation } from '@utils/validators';
+import { passwordFieldSchema } from '@features/user/schemas/user.schema';
+import { zodValidator, confirmPasswordValidator } from '@utils/validators';
 
 import { useResetPassword } from './hooks/useResetPassword';
 import styles from './page.module.scss';
 
 import type { ResetPasswordFormData } from '@sharedTypes/form';
-import type { ValidationResult } from '@utils/validateField';
 import type { JSX } from 'react';
 
 const ResetPasswordPage = (): JSX.Element => {
 	const searchParams = useSearchParams();
 	const token = searchParams.get('token') ?? '';
+
 	const { control, handleSubmit, isSubmitting, isSubmitted, getValues, onSubmit } = useResetPassword(token);
 
 	const commonInputProps = { control, isSubmitted };
@@ -39,7 +40,7 @@ const ResetPasswordPage = (): JSX.Element => {
 					id="password"
 					label="Password"
 					type="password"
-					validation={validatePassword}
+					validators={[zodValidator(passwordFieldSchema)]}
 					{...commonInputProps}
 					isLogin={false}
 				/>
@@ -48,7 +49,7 @@ const ResetPasswordPage = (): JSX.Element => {
 					id="confirmPassword"
 					label="Confirm Password"
 					type="password"
-					validation={(value): ValidationResult => validatePasswordConfirmation(getValues('password'), value)}
+					validators={[zodValidator(passwordFieldSchema), confirmPasswordValidator(() => getValues('password'))]}
 					{...commonInputProps}
 					isLogin={false}
 				/>

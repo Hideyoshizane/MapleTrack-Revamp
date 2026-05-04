@@ -6,7 +6,7 @@ import styles from './fullPageLoader.module.scss';
 
 import type { JSX } from 'react';
 
-type FullPageLoaderProps = {
+type Props = {
 	width?: number;
 	height?: number;
 	color?: string;
@@ -18,7 +18,7 @@ const FullPageLoader = ({
 	height = 120,
 	color = 'var(--default-black)',
 	borderWidth = 12,
-}: FullPageLoaderProps): JSX.Element => {
+}: Props): JSX.Element => {
 	return (
 		<div className={styles.mainDiv}>
 			<div className={styles.loaderDiv}>

@@ -5,8 +5,8 @@ import { addPointsToLiberation } from '@features/liberation/liberationService';
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
-import dayjs from '@utils/dayjs';
 import { logZodError, logApiFailure, logError } from '@utils/logger';
+import { nowInUtc } from '@utils/time';
 
 import type { toggleBossListResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { ApiResponse } from '@sharedTypes/api';
@@ -17,19 +17,16 @@ const route = 'api/bossList/toggleBossList';
 const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
 	try {
 		const parseResult = toggleBossListRequestSchema.safeParse(await request.json());
-
 		if (!parseResult.success) {
 			logZodError(parseResult.error, { route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
 		const data = parseResult.data;
 
 		const bossData = await prisma.boss.findFirst({
-			where: {
-				id: data.bossMonsterId,
-				character: { server: { bossList: { userId: authenticatedUserId } } },
-			},
+			where: { id: data.bossMonsterId, character: { server: { bossList: { userId: authenticatedUserId } } } },
 			select: {
 				id: true,
 				name: true,
@@ -47,24 +44,23 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		if (!bossData) {
 			logApiFailure('Boss Data not found', { route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Boss data not found' }, 404);
 		}
 
 		const server = bossData.character.server;
-
 		if (!server) {
 			logApiFailure('Server Data not found', { route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'server data not found' }, 404);
 		}
 
 		const bossList = server.bossList;
-
 		if (!bossList) {
 			logApiFailure('Boss List not found', { route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Boss list not found' }, 404);
 		}
-
-		const now = dayjs().utc().toDate();
 
 		const responseData = await prisma.$transaction(async (tx) => {
 			const currentBoss = await tx.boss.findUnique({
@@ -94,7 +90,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				data: { weeklyBosses: { increment: sign }, totalGains: { increment: bossValueWithSign } },
 			});
 
-			await tx.bossList.update({ where: { id: bossList.id }, data: { lastUpdate: now } });
+			await tx.bossList.update({ where: { id: bossList.id }, data: { lastUpdate: nowInUtc() } });
 
 			const liberationPoints = await addPointsToLiberation(
 				tx,
@@ -117,6 +113,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const validation = toggleBossListResponseSchema.safeParse(responseData);
 		if (!validation.success) {
 			logZodError(validation.error, { route });
+
 			throw new Error('Invalid Boss List data');
 		}
 
@@ -125,11 +122,8 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			200,
 		);
 	} catch (error) {
-		if (error instanceof Error && error.message === 'BOSS_LOCKED') {
-			return createResponse<ApiResponse>({ success: false, message: 'Boss is locked' }, 403);
-		}
-
 		logError(error, { route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

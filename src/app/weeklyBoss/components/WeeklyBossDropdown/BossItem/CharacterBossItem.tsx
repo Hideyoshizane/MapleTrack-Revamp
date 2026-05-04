@@ -12,14 +12,14 @@ import styles from './characterBossItem.module.scss';
 import type { getBossListBossResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX, KeyboardEvent } from 'react';
 
-type CharacterBossItemProps = {
+type Props = {
 	boss: getBossListBossResponseBody;
 	server: string;
 	isSelected: boolean;
 	onClick?: () => void;
 };
 
-const CharacterBossItem = ({ boss, server, isSelected, onClick }: CharacterBossItemProps): JSX.Element => {
+const CharacterBossItem = ({ boss, server, isSelected, onClick }: Props): JSX.Element => {
 	const handleKey = (event: KeyboardEvent<HTMLDivElement>): void => {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();
@@ -50,6 +50,7 @@ const CharacterBossItem = ({ boss, server, isSelected, onClick }: CharacterBossI
 				<ResponsiveText className={styles.bossName} height={34} maxFontSize={28} minFontSize={20} width={284}>
 					{boss.difficulty} {boss.name}
 				</ResponsiveText>
+
 				<p className={styles.bossValue}>{bossValue}</p>
 			</div>
 

@@ -5,9 +5,12 @@ $iconSize: 32px;
 .wrapper {
 	display: flex;
 	align-items: center;
+
 	width: 480px;
 	height: 80px;
+
 	transition: background-color 0.2s;
+
 	cursor: pointer;
 
 	&:hover {
@@ -16,12 +19,14 @@ $iconSize: 32px;
 
 	.classIcon {
 		position: absolute;
+
 		opacity: 0.25;
 	}
 
 	.nameDiv {
 		display: flex;
 		flex-direction: column;
+
 		margin-left: 112px;
 
 		.characterName {
@@ -39,14 +44,17 @@ $iconSize: 32px;
 	.iconsDiv {
 		right: 0;
 		display: flex;
+
 		margin-left: auto;
 		margin-right: 16px;
 
 		.icon {
 			right: 0;
 			display: flex;
+
 			width: $iconSize;
 			height: $iconSize;
+
 			color: var(--default-button-text);
 		}
 	}

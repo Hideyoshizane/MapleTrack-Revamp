@@ -1,9 +1,7 @@
 .skeleton {
-	/* Animação padrão skeleton wave */
 	position: relative;
 	overflow: hidden;
 
-	/* Sombra leve para dar profundidade */
 	&::after {
 		position: absolute;
 		background: linear-gradient(
@@ -12,9 +10,11 @@
 			rgb(255 255 255 / 40%) 50%,
 			rgb(255 255 255 / 0%) 100%
 		);
+
 		transform: translateX(-100%);
 		animation: wave 1.6s ease-in-out infinite;
 		content: '';
+
 		inset: 0;
 	}
 }
@@ -29,7 +29,6 @@
 	}
 }
 
-/* Variants */
 .text {
 	border-radius: 4px;
 }

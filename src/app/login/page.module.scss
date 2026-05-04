@@ -8,8 +8,10 @@ $margin: 32px;
 
 	.logoDiv {
 		position: relative;
+
 		width: 750px;
 		height: 250px;
+
 		margin-bottom: $margin;
 		margin-top: 5%;
 	}
@@ -17,15 +19,19 @@ $margin: 32px;
 	.forgotPassword {
 		display: flex;
 		justify-content: flex-end;
+
 		font-size: $fontSize;
 		color: var(--default-white);
+
 		cursor: pointer;
+
 		margin-bottom: $margin;
 	}
 
 	.submitButton {
 		width: 320px;
 		height: 48px;
+
 		border: 1px solid var(--primary-color-button);
 		background-color: var(--primary-color-button);
 	}
@@ -34,12 +40,15 @@ $margin: 32px;
 		font-size: $fontSize;
 		text-align: center;
 		color: var(--default-white);
+
 		margin-top: $margin;
 	}
 
 	.signupLink {
 		color: var(--link-color);
+
 		cursor: pointer;
+
 		text-decoration: underline;
 	}
 

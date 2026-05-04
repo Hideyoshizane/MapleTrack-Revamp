@@ -2,7 +2,9 @@ $height: 24px;
 
 .buttonLines {
 	display: flex;
+
 	gap: 8px;
+
 	margin-top: 8px;
 }
 
@@ -14,7 +16,9 @@ $height: 24px;
 .button {
 	width: 112px;
 	height: $height;
+
 	background-color: var(--primary-color-button);
+
 	font-size: 14px !important;
 	font-weight: 500 !important;
 	color: var(--default-button-text);

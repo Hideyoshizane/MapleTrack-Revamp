@@ -1,38 +1,52 @@
+$textColor: var(--default-white);
+
 .page {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+
 	width: 100vw;
 	height: 100vh;
+
 	background-color: var(--default-black);
 
 	.main {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+
 		color: var(--background-white);
 
 		.title {
 			font-size: 40px;
 			font-weight: 500;
-			color: var(--default-white);
+			color: $textColor;
 		}
 
 		.text {
 			font-size: 24px;
-			color: var(--default-white);
+			color: $textColor;
+
 			margin-top: 32px;
 		}
 
 		.displayButton {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+
 			width: 320px;
 			height: 60px;
+
 			border: none;
 			border-radius: 50px;
 			background-color: var(--primary-color-button);
+
 			font-size: 24px;
 			color: var(--default-button-text);
+
 			cursor: pointer;
+
 			margin-top: 56px;
 
 			&:hover {

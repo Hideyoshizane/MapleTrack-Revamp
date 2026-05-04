@@ -1,6 +1,5 @@
 import { prisma } from '@lib/prisma';
-import dayjs from '@utils/dayjs';
-import { hasDailyResetOccurred, hasWeeklyResetOccurred, hasMonthlyResetOccurred } from '@utils/time';
+import { hasDailyResetOccurred, hasWeeklyResetOccurred, hasMonthlyResetOccurred, nowInUtc } from '@utils/time';
 
 import type { PrismaClient } from '@prisma/client';
 
@@ -9,9 +8,7 @@ type TransactionClient = Omit<PrismaClient, '$connect' | '$disconnect' | '$on' |
 // Creates a BossList object ready to be stored in the database.
 export const createBossList = async (tx: TransactionClient, authenticatedUserId: string): Promise<void> => {
 	try {
-		await tx.bossList.create({
-			data: { userId: authenticatedUserId, lastUpdate: new Date() },
-		});
+		await tx.bossList.create({ data: { userId: authenticatedUserId, lastUpdate: nowInUtc() } });
 	} catch (error) {
 		console.error('Error creating BossList:', error);
 		throw error;
@@ -26,11 +23,7 @@ const addServerToBossList = async (
 ): Promise<string | null> => {
 	try {
 		// Return early if server already exists
-		const bossList = await tx.bossList.findUnique({
-			where: { userId: authenticatedUserId },
-			select: { id: true },
-		});
-
+		const bossList = await tx.bossList.findUnique({ where: { userId: authenticatedUserId }, select: { id: true } });
 		if (!bossList) {
 			throw new Error('BossList not found for user.');
 		}
@@ -39,7 +32,6 @@ const addServerToBossList = async (
 			where: { bossListId: bossList.id, serverName },
 			select: { id: true },
 		});
-
 		if (!server) {
 			server = await tx.bossServer.create({
 				data: { serverName, weeklyBosses: 0, totalGains: 0, bossList: { connect: { id: bossList.id } } },
@@ -68,17 +60,12 @@ export const characterToBossList = async (
 	}
 
 	if (!isBossCharacter) {
-		await tx.bossCharacter.deleteMany({
-			where: { characterId, serverId },
-		});
+		await tx.bossCharacter.deleteMany({ where: { characterId, serverId } });
 
-		await tx.liberation.deleteMany({
-			where: { characterId, userId: authenticatedUserId },
-		});
+		await tx.liberation.deleteMany({ where: { characterId, userId: authenticatedUserId } });
+
 		return;
 	}
-
-	const now = dayjs().utc().toDate();
 
 	await tx.bossCharacter.upsert({
 		where: { serverId_characterId: { serverId, characterId } },
@@ -102,10 +89,7 @@ export const characterToBossList = async (
 		},
 	});
 
-	await tx.user.update({
-		where: { id: authenticatedUserId },
-		data: { liberationLastUpdate: now },
-	});
+	await tx.user.update({ where: { id: authenticatedUserId }, data: { liberationLastUpdate: nowInUtc() } });
 };
 
 type resetBossListRequestBody = {
@@ -133,7 +117,6 @@ export const resetBossList = async (serverData: resetBossListRequestBody): Promi
 			},
 		},
 	});
-
 	if (!bossList) {
 		return;
 	}
@@ -141,7 +124,6 @@ export const resetBossList = async (serverData: resetBossListRequestBody): Promi
 	const isDailyReset = hasDailyResetOccurred(bossList.lastUpdate);
 	const isWeeklyReset = hasWeeklyResetOccurred(bossList.lastUpdate);
 	const isMonthlyReset = hasMonthlyResetOccurred(bossList.lastUpdate);
-
 	if (!isDailyReset && !isWeeklyReset && !isMonthlyReset) {
 		return;
 	}
@@ -152,11 +134,11 @@ export const resetBossList = async (serverData: resetBossListRequestBody): Promi
 	}
 
 	const serverUpdate: { weeklyBosses?: number; totalGains?: number } = {};
-
 	if (isWeeklyReset) {
 		serverUpdate.weeklyBosses = 0;
 		serverUpdate.totalGains = 0;
 	}
+
 	await prisma.$transaction(async (tx) => {
 		for (const character of server.characters) {
 			const updatedBosses = character.bosses.map((boss) => {
@@ -185,21 +167,15 @@ export const resetBossList = async (serverData: resetBossListRequestBody): Promi
 			});
 
 			for (const boss of updatedBosses) {
-				await tx.boss.updateMany({
-					where: { id: boss.id },
-					data: { cleared: boss.cleared, locked: boss.locked },
-				});
+				await tx.boss.updateMany({ where: { id: boss.id }, data: { cleared: boss.cleared, locked: boss.locked } });
 			}
 		}
 
-		await tx.bossServer.update({
-			where: { id: server.id },
-			data: serverUpdate,
-		});
+		await tx.bossServer.update({ where: { id: server.id }, data: serverUpdate });
 	});
 
 	await prisma.bossList.update({
 		where: { userId: serverData.authenticatedUserId },
-		data: { lastUpdate: new Date() },
+		data: { lastUpdate: nowInUtc() },
 	});
 };

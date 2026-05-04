@@ -9,22 +9,7 @@ import styles from './legionBlock.module.scss';
 
 import type { JSX } from 'react';
 
-type LegionBlockProps = {
-	characterLevel: number;
-	characterCode: string;
-	characterJobType: string;
-	characterLegionType: string;
-	iconSize?: number;
-	showTooltip?: boolean;
-};
-
-const RANK_MAP: Record<string, string> = {
-	rank_b: 'B',
-	rank_a: 'A',
-	rank_s: 'S',
-	rank_ss: 'SS',
-	rank_sss: 'SSS',
-};
+const RANK_MAP: Record<string, string> = { rank_b: 'B', rank_a: 'A', rank_s: 'S', rank_ss: 'SS', rank_sss: 'SSS' };
 
 const normalizeRank = (rank: string): string => RANK_MAP[rank] ?? 'no_rank';
 
@@ -50,6 +35,15 @@ const getTooltipContent = (legionRank: string, legionData: ReturnType<typeof get
 	);
 };
 
+type Props = {
+	characterLevel: number;
+	characterCode: string;
+	characterJobType: string;
+	characterLegionType: string;
+	iconSize?: number;
+	showTooltip?: boolean;
+};
+
 const LegionBlock = ({
 	characterLevel,
 	characterCode,
@@ -57,7 +51,7 @@ const LegionBlock = ({
 	characterLegionType,
 	iconSize = 48,
 	showTooltip = false,
-}: LegionBlockProps): JSX.Element => {
+}: Props): JSX.Element => {
 	const LegionThresholdCode = codeToLegionThresholdSet(characterCode);
 	const legionRank = getRank(characterLevel, LegionThresholdCode);
 	const legionData = getLegionData(characterLegionType);
@@ -71,6 +65,7 @@ const LegionBlock = ({
 	const content = (
 		<div className={styles.iconDiv}>
 			<p className={showTooltip ? styles.iconDivText : styles.iconDivTextWhite}>Legion:</p>
+
 			<Image
 				alt={`${characterJobType} legion ${legionRank} Icon`}
 				height={iconSize}

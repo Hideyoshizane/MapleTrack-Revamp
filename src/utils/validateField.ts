@@ -1,39 +1,23 @@
-import { toast } from 'react-toastify';
+import type { FieldValues, Path, UseFormSetError } from 'react-hook-form';
+import type { ZodError } from 'zod';
 
-import type { z } from 'zod';
+export type Validator = (value: string) => string | undefined;
 
-export type ValidationResult = {
-	isValid: boolean;
-	error?: string;
-};
+export const mapZodErrorsToForm = <T extends FieldValues>(error: ZodError<T>, setError: UseFormSetError<T>): void => {
+	const fieldErrors = new Map<Path<T>, string[]>();
 
-const extractErrorMessage = (
-	result: { success: false; error: { issues: { message?: string }[] } } | { success: true },
-): string => {
-	if (result.success) {
-		return '';
+	for (const issue of error.issues) {
+		const fieldName = issue.path[0] as Path<T> | undefined;
+		if (!fieldName) {
+			continue;
+		}
+
+		const existing = fieldErrors.get(fieldName) ?? [];
+		existing.push(issue.message);
+		fieldErrors.set(fieldName, existing);
 	}
 
-	return result.error.issues.map((issue): string => `- ${issue.message ?? 'Invalid input.'}`).join('\n');
-};
-
-export const validateValue = <T>(schema: z.ZodType<T>, value: unknown): ValidationResult => {
-	const result = schema.safeParse(value);
-
-	return result.success ? { isValid: true } : { isValid: false, error: extractErrorMessage(result) };
-};
-
-export const handleFieldValidation = <T extends string>(
-	field: T,
-	validationResult: ValidationResult,
-	setError: (field: T, error: { message: string }) => void,
-): boolean => {
-	if (!validationResult.isValid) {
-		const message = validationResult.error ?? `Invalid ${field}`;
-		setError(field, { message });
-		toast.error(message);
-		return true;
+	for (const [field, messages] of fieldErrors.entries()) {
+		setError(field, { type: 'manual', message: messages.map((msg) => `- ${msg}`).join('\n') });
 	}
-
-	return false;
 };

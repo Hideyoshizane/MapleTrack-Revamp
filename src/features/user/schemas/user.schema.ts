@@ -3,20 +3,26 @@ import { z } from 'zod';
 import { usernameRawSchema, emailRawSchema, passwordRawSchema } from './user.raw.schema';
 import { canonicalizeUsername, canonicalizeEmail, isReservedUsername } from './utils';
 
-export const userSchema = z.object({
-	username: usernameRawSchema.transform(canonicalizeUsername).refine((value) => !isReservedUsername(value), {
+export const usernameFieldSchema = usernameRawSchema
+	.transform(canonicalizeUsername)
+	.refine((value) => !isReservedUsername(value), {
 		message: 'This username is reserved and cannot be used.',
-	}),
+	});
 
-	email: emailRawSchema.transform(canonicalizeEmail),
+export const emailFieldSchema = emailRawSchema.transform(canonicalizeEmail);
 
-	password: passwordRawSchema,
+export const passwordFieldSchema = passwordRawSchema;
+
+export const userSchema = z.object({
+	username: usernameFieldSchema,
+	email: emailFieldSchema,
+	password: passwordFieldSchema,
 });
 
 // Login
 export const credentialsSchema = z.object({
-	username: usernameRawSchema,
-	password: passwordRawSchema,
+	username: usernameFieldSchema,
+	password: passwordFieldSchema,
 });
 
 export type Credentials = z.infer<typeof credentialsSchema>;
@@ -46,7 +52,9 @@ export const resetPasswordRequestSchema = z.object({
 export type ResetPasswordRequestBody = z.infer<typeof resetPasswordRequestSchema>;
 
 // Forgot password
-export const forgotPasswordRequestSchema = z.object({ email: emailRawSchema });
+export const forgotPasswordRequestSchema = z.object({
+	email: emailRawSchema,
+});
 
 export type ForgotPasswordRequestBody = z.infer<typeof forgotPasswordRequestSchema>;
 

@@ -21,6 +21,7 @@ const LiberationPage = async (): Promise<JSX.Element> => {
 	return (
 		<main className="container">
 			<Navbar username={session.user.username} />
+
 			<LiberationClient initialServer={initialServer} />
 		</main>
 	);

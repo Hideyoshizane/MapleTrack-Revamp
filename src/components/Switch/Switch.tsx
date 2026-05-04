@@ -8,7 +8,7 @@ import styles from './switch.module.scss';
 
 import type { JSX } from 'react';
 
-type SwitchProps = {
+type Props = {
 	title?: string;
 	checked: boolean;
 	tooltipMessage?: string;
@@ -16,11 +16,12 @@ type SwitchProps = {
 	disabled?: boolean;
 };
 
-const Switch = ({ title, checked, tooltipMessage, onCheckedChange, disabled }: SwitchProps): JSX.Element => {
+const Switch = ({ title, checked, tooltipMessage, onCheckedChange, disabled }: Props): JSX.Element => {
 	return (
 		<Tooltip content={tooltipMessage} enabled={!!tooltipMessage} placement="bottom">
 			<div className={styles.wrapper}>
 				{title && <div className={styles.title}>{title}</div>}
+
 				<SwitchPrimitive.Root
 					className={styles.root}
 					checked={checked}

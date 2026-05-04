@@ -14,6 +14,7 @@ const handler = async (_request: NextRequest, authenticatedUserId: string): Prom
 		const existingUser = await prisma.user.findUnique({ where: { id: authenticatedUserId }, select: { id: true } });
 		if (!existingUser) {
 			logApiFailure('User not found error', { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Unauthorized' }, 401);
 		}
 		// Delete all related to user in cascade
@@ -25,6 +26,7 @@ const handler = async (_request: NextRequest, authenticatedUserId: string): Prom
 		);
 	} catch (error) {
 		logError(error, { route: route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

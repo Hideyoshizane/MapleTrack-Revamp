@@ -12,11 +12,11 @@ import SearchBar from './SearchBar/searchBar';
 
 import type { JSX } from 'react';
 
-type NavbarProps = {
+type Props = {
 	username: string;
 };
 
-const Navbar = ({ username }: NavbarProps): JSX.Element => {
+const Navbar = ({ username }: Props): JSX.Element => {
 	const router = useRouter();
 
 	const handleLogoClick = (): void => {
@@ -29,9 +29,13 @@ const Navbar = ({ username }: NavbarProps): JSX.Element => {
 				<Image alt="MapleTrack Logo" fill priority sizes="312px" src="/assets/logo/logo-nav.webp" />
 				<p className={styles.version}>{APP_VERSION}</p>
 			</button>
+
 			<Timer target="daily" />
+
 			<SearchBar />
+
 			<Timer target="weekly" />
+
 			<CustomDropdownMenu username={username} />
 		</nav>
 	);

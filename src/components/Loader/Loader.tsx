@@ -2,14 +2,14 @@ import styles from './loader.module.scss';
 
 import type { JSX } from 'react';
 
-type LoaderProps = {
+type Props = {
 	width?: number | string;
 	height?: number | string;
 	color?: string;
 	borderWidth?: number;
 };
 
-const Loader = ({ width = 48, height = 48, color = '#FFF', borderWidth = 5 }: LoaderProps): JSX.Element => {
+const Loader = ({ width = 48, height = 48, color = '#FFF', borderWidth = 5 }: Props): JSX.Element => {
 	const style: React.CSSProperties = {
 		width: typeof width === 'number' ? `${width}px` : width,
 		height: typeof height === 'number' ? `${height}px` : height,
@@ -17,6 +17,7 @@ const Loader = ({ width = 48, height = 48, color = '#FFF', borderWidth = 5 }: Lo
 		// Dynamic border
 		borderWidth: `${borderWidth}px`,
 		borderColor: color,
+
 		borderBottomColor: 'transparent',
 	};
 

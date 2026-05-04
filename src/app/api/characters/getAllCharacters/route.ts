@@ -17,6 +17,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const parseResult = getAllCharactersRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			logZodError(parseResult.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 		const { server } = parseResult.data;
@@ -54,6 +55,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			const validation = getAllCharactersResponseSchema.safeParse(characterWithGroupedSymbols);
 			if (!validation.success) {
 				logZodError(validation.error, { route });
+
 				throw new Error('Invalid character data');
 			}
 			return validation.data;
@@ -65,6 +67,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		);
 	} catch (error) {
 		logError(error, { route: route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

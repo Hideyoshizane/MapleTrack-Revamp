@@ -21,8 +21,10 @@ const Error = (): JSX.Element => {
 		<div className={styles.page}>
 			<main className={styles.main}>
 				<ErrorIcon className={styles.icon} height={ICON_SIZE} width={ICON_SIZE} />
+
 				<p className={styles.title}>404 File Not Found</p>
 				<p className={styles.text}>The page you requested may have been moved or deleted.</p>
+
 				<button className={styles.displayButton} onClick={handleBackToHome}>
 					Back to Home
 				</button>

@@ -4,14 +4,12 @@ import { useRouter } from 'next/navigation';
 import { useForm, type Control, type UseFormHandleSubmit, type UseFormGetValues } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
+import { signupRequestSchema } from '@features/user/schemas/user.schema';
 import { userApi } from '@features/user/userApi';
-import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
-import { handleFieldValidation } from '@utils/validateField';
-import { validateUsername, validateEmail, validatePassword, validatePasswordConfirmation } from '@utils/validators';
+import { mapZodErrorsToForm } from '@utils/validateField';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { SignupFormData } from '@sharedTypes/form';
-import type { ValidationResult } from '@utils/validateField';
 
 type UseSignupReturn = {
 	control: Control<SignupFormData>;
@@ -40,51 +38,46 @@ export const useSignup = (): UseSignupReturn => {
 
 	const onSubmit = async (data: SignupFormData): Promise<void> => {
 		try {
-			const sanitizedData: SignupFormData = {
-				username: sanitizeInputFrontend(data.username),
-				email: sanitizeInputFrontend(data.email),
-				password: sanitizeInputFrontend(data.password),
-				confirmPassword: sanitizeInputFrontend(data.confirmPassword),
-			};
-
-			const validations = {
-				username: validateUsername(sanitizedData.username),
-				email: validateEmail(sanitizedData.email),
-				password: validatePassword(sanitizedData.password),
-				confirmPassword: validatePasswordConfirmation(sanitizedData.password, sanitizedData.confirmPassword),
-			};
-
-			const hasErrors = (Object.entries(validations) as [keyof SignupFormData, ValidationResult][]).some(
-				([field, result]): boolean => handleFieldValidation(field, result, setError),
-			);
-
-			if (hasErrors) {
+			const parsedResult = signupRequestSchema.safeParse(data);
+			if (!parsedResult.success) {
+				mapZodErrorsToForm(parsedResult.error, setError);
 				toast.error('Invalid input.');
+
 				return;
 			}
 
-			const result: ApiResponse = await userApi.signup(sanitizedData);
-
+			const result = await userApi.signUp(parsedResult.data);
 			if (result.success) {
 				router.push('/login?success=1');
-			} else {
+
+				return;
+			}
+
+			if (typeof result.message === 'string') {
 				toast.error(result.message);
-				if (result.message) {
-					for (const [field, msg] of Object.entries(result.message)) {
-						setError(field as keyof SignupFormData, { message: msg ?? 'Invalid input' });
-					}
+			} else {
+				toast.error('Signup failed');
+			}
+
+			if (result.message && typeof result.message === 'object') {
+				for (const [field, msg] of Object.entries(result.message)) {
+					setError(field as keyof SignupFormData, {
+						type: 'manual',
+						message: typeof msg === 'string' ? msg : 'Invalid input',
+					});
 				}
 			}
 		} catch (error: unknown) {
 			if (axios.isAxiosError<ApiResponse>(error) && error.response) {
 				const apiMessage = error.response.data?.message;
-
 				toast.error(apiMessage ?? 'Signup failed');
+
 				return;
 			}
 
 			if (error instanceof DOMException && error.name === 'AbortError') {
 				toast.error('Request timed out. Please try again.');
+
 				return;
 			}
 

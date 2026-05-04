@@ -17,7 +17,7 @@ import type {
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import type { JSX } from 'react';
 
-type CharacterHeaderProps = {
+type Props = {
 	character: getCharacterDataResponseBody;
 	extraData: getCharacterDataFromAPIResponseBody | null;
 	router: AppRouterInstance;
@@ -25,13 +25,7 @@ type CharacterHeaderProps = {
 	setDisableAllDaily: (value: boolean) => void;
 };
 
-const CharacterHeader = ({
-	character,
-	extraData,
-	router,
-	onIncreaseAll,
-	setDisableAllDaily,
-}: CharacterHeaderProps): JSX.Element => {
+const CharacterHeader = ({ character, extraData, router, onIncreaseAll, setDisableAllDaily }: Props): JSX.Element => {
 	const pathname = usePathname();
 	const characterImage = character.syncing ? (
 		extraData ? (

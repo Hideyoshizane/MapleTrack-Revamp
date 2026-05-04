@@ -1,6 +1,3 @@
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 import { calculateNewLevelFromExp } from '@data/symbols/symbolMappings';
 import { characterToBossList } from '@features/boss/bossListService';
@@ -9,16 +6,14 @@ import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
 import { logZodError } from '@utils/logger';
+import { nowInUtc } from '@utils/time';
 
 import type { SymbolCategory } from '@prisma/client';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
 type SymbolCategoryKey = 'arcane' | 'sacred' | 'grand';
-
 const symbolCategoryKeys: SymbolCategoryKey[] = ['arcane', 'sacred', 'grand'];
-
-dayjs.extend(utc);
 
 const route = 'api/characters/updateCharacter';
 
@@ -28,12 +23,12 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const parseResult = updateCharacterRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			logZodError(parseResult.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
 		const { server, class: className, id } = parseResult.data;
 		const data = parseResult.data;
-		const now = dayjs().utc().toDate();
 
 		const isValidObjectId = (value: string): boolean => {
 			return value.length === 24;
@@ -46,13 +41,11 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		await prisma.$transaction(async (tx) => {
 			const existingCharacter = await tx.character.findUnique({
 				where: whereClause,
-				select: {
-					id: true,
-					bossing: true,
-				},
+				select: { id: true, bossing: true },
 			});
 
 			const isNullLevel = data.level == 0;
+			const now = nowInUtc();
 
 			const character = await tx.character.upsert({
 				where: whereClause,
@@ -137,6 +130,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		return createResponse<ApiResponse>({ success: true, message: 'Character updated successfully.' }, 200);
 	} catch (error) {
 		console.error('Search error:', error);
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

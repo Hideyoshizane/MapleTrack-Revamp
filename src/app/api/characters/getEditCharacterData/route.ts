@@ -20,6 +20,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const parseResult = getCharacterDataRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			logZodError(parseResult.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
@@ -60,6 +61,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			const classData = getClassByName(className);
 			if (!classData) {
 				logApiFailure('Class name not found', { route });
+
 				return createResponse<ApiResponse>({ success: false, message: `Class with name ${className} not found` }, 404);
 			}
 
@@ -86,6 +88,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			const validation = getEditCharacterDataResponseSchema.safeParse(responseData);
 			if (!validation.success) {
 				logZodError(validation.error, { route: route });
+
 				return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 			}
 		}

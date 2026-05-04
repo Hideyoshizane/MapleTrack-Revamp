@@ -6,28 +6,38 @@ $spacing: 8px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+
 	width: 280px;
 	height: 120px;
+
 	border: none;
 	background: transparent;
+
 	font-size: 32px;
 	color: $textColor;
+
 	cursor: pointer;
+
 	outline: none;
+
 	padding-left: $spacing;
+
 	text-decoration: none;
 
 	.usernameText {
 		min-width: 0;
 		max-width: 200px;
+
 		overflow: hidden;
 		flex-shrink: 1;
+
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
 	.icon {
 		color: $textColor;
+
 		flex-shrink: 0;
 		margin-right: 2 * $spacing;
 	}
@@ -36,13 +46,16 @@ $spacing: 8px;
 .dropdownContent {
 	z-index: 1001;
 	overflow: hidden;
+
 	border-radius: 8px;
 	background-color: $menuBgColor;
+
 	margin-right: $spacing;
 
 	.separator {
 		height: 1px;
 		margin: 0;
+
 		background-color: $textColor;
 	}
 }

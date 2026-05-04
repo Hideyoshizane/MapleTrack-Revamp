@@ -24,10 +24,6 @@ import type {
 } from '@features/liberation/schemas/liberation.response.schema';
 import type { JSX } from 'react';
 
-type LiberationClientProps = {
-	initialServer: ServerName;
-};
-
 const getTabFromCharacter = (character: GetLiberationListCharacterResponseBody | null): string => {
 	if (!character) {
 		return 'tab1';
@@ -36,7 +32,11 @@ const getTabFromCharacter = (character: GetLiberationListCharacterResponseBody |
 	return character.liberated ? 'tab2' : 'tab1';
 };
 
-const LiberationClient = ({ initialServer }: LiberationClientProps): JSX.Element => {
+type Props = {
+	initialServer: ServerName;
+};
+
+const LiberationClient = ({ initialServer }: Props): JSX.Element => {
 	const { server, setServerCookie } = useServerCookie(initialServer);
 
 	const [loading, setLoading] = useState<boolean>(true);
@@ -112,7 +112,10 @@ const LiberationClient = ({ initialServer }: LiberationClientProps): JSX.Element
 	}, [liberationList, selectedCharacter]);
 
 	useEffect(() => {
-		if (!selectedCharacter || isManualTabChangeRef.current) return;
+		if (!selectedCharacter || isManualTabChangeRef.current) {
+			return;
+		}
+
 		setActiveTab(getTabFromCharacter(selectedCharacter));
 	}, [selectedCharacter?.characterId]);
 
@@ -151,7 +154,9 @@ const LiberationClient = ({ initialServer }: LiberationClientProps): JSX.Element
 		}
 
 		setLiberationList((prev) => {
-			if (!prev) return prev;
+			if (!prev) {
+				return prev;
+			}
 
 			return {
 				...prev,
@@ -182,6 +187,7 @@ const LiberationClient = ({ initialServer }: LiberationClientProps): JSX.Element
 				<div className={styles.serverDropdown}>
 					<ServerDropdown server={server} setServerCookie={setServerCookie} />
 				</div>
+
 				<FullPageLoader />
 			</section>
 		);

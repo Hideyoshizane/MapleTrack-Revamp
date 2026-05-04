@@ -20,6 +20,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const parseResult = getLiberationListRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			logZodError(parseResult.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
@@ -43,6 +44,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		if (!liberationList || liberationList.length === 0) {
 			logApiFailure('List not found', { route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'List not found.' }, 200);
 		}
 
@@ -64,6 +66,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const validation = getLiberationListResponseSchema.safeParse(responsePayload);
 		if (!validation.success) {
 			logZodError(validation.error, { route });
+
 			throw new Error('Invalid Liberation List data');
 		}
 
@@ -74,6 +77,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		);
 	} catch (error) {
 		logError(error, { route: route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

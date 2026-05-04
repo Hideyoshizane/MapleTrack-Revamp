@@ -5,6 +5,7 @@ $marginBottom: 8px;
 @mixin iconTextBase {
 	font-size: $fontSize;
 	font-weight: $fontWeight;
+
 	margin-bottom: $marginBottom;
 }
 
@@ -21,6 +22,7 @@ $marginBottom: 8px;
 	.iconDivTextWhite {
 		@include iconTextBase;
 		color: var(--default-white);
+
 		margin-top: 4px;
 	}
 }

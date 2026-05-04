@@ -51,12 +51,7 @@ const BossesSelectionComponent = ({ type, bosses, checkedBosses, onChangeWeeklyT
 				difficulty = boss.difficulties.find((d) => d.name === matched.type) ?? null;
 			}
 
-			nextState[boss.name] = {
-				difficulty,
-				partySize: 1,
-				excludedWeek: isLocked,
-				excludedMonth: isLocked,
-			};
+			nextState[boss.name] = { difficulty, partySize: 1, excludedWeek: isLocked, excludedMonth: isLocked };
 		}
 
 		setState(nextState);

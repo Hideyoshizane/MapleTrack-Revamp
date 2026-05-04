@@ -8,11 +8,13 @@ import HomePageClient from './homePageClient';
 
 import type { JSX } from 'react';
 
-type HomePageProps = {
-	searchParams?: Record<string, string | undefined>;
+type Props = {
+	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-const HomePage = async ({ searchParams }: HomePageProps): Promise<JSX.Element> => {
+const HomePage = async ({ searchParams }: Props): Promise<JSX.Element> => {
+	const resolvedSearchParams = await searchParams;
+
 	const session = await auth();
 
 	const initialServer = await resolveServerFromCookies();
@@ -25,7 +27,7 @@ const HomePage = async ({ searchParams }: HomePageProps): Promise<JSX.Element> =
 	return (
 		<main className="container">
 			<Navbar username={session.user.username} />
-			<HomePageClient initialServer={initialServer} searchParams={searchParams} />
+			<HomePageClient initialServer={initialServer} searchParams={resolvedSearchParams} />
 		</main>
 	);
 };

@@ -8,12 +8,10 @@ import styles from './symbolsSection.module.scss';
 import type { getCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
-type SymbolsSectionProps = {
+type Props = {
 	character: getCharacterDataResponseBody;
 	disableAllDaily: boolean;
 };
-
-const SYMBOL_SIZE = 56;
 
 const CATEGORY_TITLES: Record<keyof getCharacterDataResponseBody['symbols'], string> = {
 	arcane: 'Arcane Symbols',
@@ -21,14 +19,18 @@ const CATEGORY_TITLES: Record<keyof getCharacterDataResponseBody['symbols'], str
 	grand: 'Grand Sacred Symbols',
 };
 
-const SymbolsSection = ({ character, disableAllDaily }: SymbolsSectionProps): JSX.Element => {
+const SYMBOL_SIZE = 56;
+
+const SymbolsSection = ({ character, disableAllDaily }: Props): JSX.Element => {
 	const { level, jobType, symbols } = character;
 
 	return (
 		<div className={styles.symbols}>
 			{(Object.keys(symbols) as (keyof typeof symbols)[]).map((category) => {
 				const categorySymbols = symbols[category];
-				if (categorySymbols.length === 0) return null;
+				if (categorySymbols.length === 0) {
+					return null;
+				}
 
 				return (
 					<div key={category}>

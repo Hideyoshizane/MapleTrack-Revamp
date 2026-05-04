@@ -8,7 +8,7 @@ import styles from './classFilter.module.scss';
 import type { ClassFilterOption } from '@utils/classFilterCookie';
 import type { JSX } from 'react';
 
-type ClassFilterProps = {
+type Props = {
 	selectedClasses: ClassFilterOption[];
 	setSelectedClasses: (values: ClassFilterOption[]) => void;
 	loading?: boolean;
@@ -16,11 +16,7 @@ type ClassFilterProps = {
 
 const toCapitalCase = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
-export const ClassFilter = ({
-	selectedClasses,
-	setSelectedClasses,
-	loading = false,
-}: ClassFilterProps): JSX.Element => {
+export const ClassFilter = ({ selectedClasses, setSelectedClasses, loading = false }: Props): JSX.Element => {
 	const toggleClass = (className: ClassFilterOption): void => {
 		const lowerName = className.toLowerCase() as ClassFilterOption;
 

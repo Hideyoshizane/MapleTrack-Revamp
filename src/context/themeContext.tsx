@@ -5,12 +5,12 @@ import { createContext, useState, useEffect } from 'react';
 import type { Theme } from '@sharedTypes/theme';
 import type { JSX, ReactNode } from 'react';
 
-type ThemeContextProps = {
+type Props = {
 	theme: Theme;
 	setTheme: (value: Theme) => void;
 };
 
-const ThemeContext = createContext<ThemeContextProps | null>(null);
+const ThemeContext = createContext<Props | null>(null);
 
 const getInitialTheme = (): Theme => {
 	if (typeof window === 'undefined') {

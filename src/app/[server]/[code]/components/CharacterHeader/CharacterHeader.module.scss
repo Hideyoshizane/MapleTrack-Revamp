@@ -8,15 +8,20 @@ $characterImgSize: 80px;
 .buttonLine {
 	display: flex;
 	justify-content: center;
+
 	gap: 24px;
+
 	width: inherit;
+
 	padding-top: 24px;
 
 	.increaseAllButton {
 		width: $buttonWidth;
 		height: $buttonHeight;
+
 		border-radius: $buttonRadius;
 		background-color: var(--primary-color-button);
+
 		font-size: $fontSizeButton;
 		font-weight: $fontWeightButton;
 		color: var(--default-button-text);
@@ -25,8 +30,10 @@ $characterImgSize: 80px;
 	.editCharacterButton {
 		width: $buttonWidth;
 		height: $buttonHeight;
+
 		border-radius: $buttonRadius;
 		background-color: var(--default-color-button);
+
 		font-size: $fontSizeButton;
 		font-weight: $fontWeightButton;
 		color: var(--default-button-text);
@@ -36,9 +43,12 @@ $characterImgSize: 80px;
 .usernameLine {
 	display: flex;
 	justify-content: flex-end;
+
 	gap: 16px;
+
 	width: inherit;
 	height: 80px;
+
 	margin-top: 16px;
 	padding-right: 24px;
 

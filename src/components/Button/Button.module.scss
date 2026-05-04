@@ -2,19 +2,25 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+
 	border: none;
 	border-radius: 25px;
+
 	font-size: 1.125rem;
 	font-weight: 700;
 	color: var(--default-button-text);
+
 	transition: background 0.2s ease-in-out;
+
 	cursor: pointer;
 
 	&.disabled,
 	&[aria-disabled='true'] {
 		gap: 12px;
+
 		border: 1px solid var(--disabled);
 		background-color: var(--disabled);
+
 		cursor: not-allowed;
 	}
 

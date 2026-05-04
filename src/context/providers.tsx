@@ -37,13 +37,7 @@ const Providers = ({ children }: ProvidersProps): JSX.Element => {
 	const [queryClient] = useState(
 		(): QueryClient =>
 			new QueryClient({
-				defaultOptions: {
-					queries: {
-						refetchOnWindowFocus: false,
-						staleTime: 30 * 1000,
-						retry: 1,
-					},
-				},
+				defaultOptions: { queries: { refetchOnWindowFocus: false, staleTime: 30 * 1000, retry: 1 } },
 			}),
 	);
 	return (

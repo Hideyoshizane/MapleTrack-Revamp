@@ -25,20 +25,20 @@ import type { getCharacterDataSymbolsResponseBody } from '@features/character/sc
 import type { SymbolCategory, CharacterContent } from '@prisma/client';
 import type { JSX } from 'react';
 
-type SymbolObjectProps = {
+const SYMBOL_SIZE_DEFAULT = 24;
+
+const getExpDisplay = (type: SymbolCategory, level: number, exp: number): string => {
+	const maxExp = getExpForLevel(type, level);
+	return maxExp === 0 ? 'EXP: MAX' : `EXP: ${exp}/${maxExp}`;
+};
+
+type Props = {
 	type: SymbolCategory;
 	symbol: getCharacterDataSymbolsResponseBody;
 	characterLevel: number;
 	characterJobType: string;
 	size?: number;
 	disableAllDaily: boolean;
-};
-
-const SYMBOL_SIZE_DEFAULT = 24;
-
-const getExpDisplay = (type: SymbolCategory, level: number, exp: number): string => {
-	const maxExp = getExpForLevel(type, level);
-	return maxExp === 0 ? 'EXP: MAX' : `EXP: ${exp}/${maxExp}`;
 };
 
 const SymbolObject = ({
@@ -48,7 +48,7 @@ const SymbolObject = ({
 	characterJobType,
 	size = SYMBOL_SIZE_DEFAULT,
 	disableAllDaily,
-}: SymbolObjectProps): JSX.Element => {
+}: Props): JSX.Element => {
 	const { level, exp, contents } = symbol;
 	const name = symbol.name as SymbolName;
 

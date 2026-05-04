@@ -18,6 +18,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const parseResult = getBossListRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			logZodError(parseResult.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
@@ -49,9 +50,9 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				},
 			},
 		});
-
 		if (!bossList || bossList.servers.length === 0) {
 			logApiFailure('Boss List not found', { route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Boss List not found.' }, 200);
 		}
 
@@ -89,6 +90,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const validation = getBossListResponseSchema.safeParse(serverData);
 		if (!validation.success) {
 			logZodError(validation.error, { route });
+
 			throw new Error('Invalid Boss List data');
 		}
 

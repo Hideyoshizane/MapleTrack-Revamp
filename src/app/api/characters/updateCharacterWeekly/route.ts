@@ -1,6 +1,3 @@
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
 import { getContentValue, calculateNewLevelFromExp, toSymbolName } from '@data/symbols/symbolMappings';
 import { updateCharacterWeeklyRequestSchema } from '@features/character/schemas/character.request.schema';
 import { updateCharacterWeeklyResponseSchema } from '@features/character/schemas/character.response.schema';
@@ -8,12 +5,11 @@ import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
 import { logError, logApiFailure, logZodError } from '@utils/logger';
+import { nowInUtc } from '@utils/time';
 
 import type { LevelUpResult } from '@data/symbols/symbolMappings';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
-
-dayjs.extend(utc);
 
 const route = 'api/characters/updateCharacterDaily';
 
@@ -23,30 +19,32 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const parseResult = updateCharacterWeeklyRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			logZodError(parseResult.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
-		const id = parseResult.data.id;
 
-		const now = dayjs().utc().toDate();
+		const id = parseResult.data.id;
 
 		// Search for the symbol
 		const symbol = await prisma.characterSymbol.findUnique({
 			where: { id: id, character: { userId: authenticatedUserId } },
 			select: { id: true, name: true, level: true, exp: true, category: true, contents: true },
 		});
-
 		if (!symbol) {
 			logApiFailure('Symbol not found', { route });
+
 			return createResponse<ApiResponse>({ success: true, message: 'Character not found.' }, 200);
 		}
 
 		const weeklyContent = symbol.contents.find((content): boolean => content.tries !== null);
 		if (!weeklyContent) {
 			logApiFailure('Weekly not found', { route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Weekly content not found for symbol.' }, 404);
 		}
 		if (weeklyContent.cleared === true) {
 			logApiFailure('Weekly already cleared', { route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Weekly already cleared.' }, 409);
 		}
 
@@ -66,10 +64,8 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				data: { level: newValues.currentLevel, exp: newValues.currentExp },
 			}),
 			prisma.characterContent.update({
-				where: {
-					symbolId_contentType: { symbolId: symbol.id, contentType: weeklyContent.contentType },
-				},
-				data: { tries: remainingTries, cleared: isCleared, date: now },
+				where: { symbolId_contentType: { symbolId: symbol.id, contentType: weeklyContent.contentType } },
+				data: { tries: remainingTries, cleared: isCleared, date: nowInUtc() },
 			}),
 		]);
 
@@ -77,6 +73,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const validation = updateCharacterWeeklyResponseSchema.safeParse(returnData);
 		if (!validation.success) {
 			logZodError(validation.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 		}
 
@@ -86,6 +83,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		);
 	} catch (error) {
 		logError(error, { route: route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

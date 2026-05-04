@@ -7,8 +7,10 @@ $width: 320px;
 
 	.logoDiv {
 		position: relative;
+
 		width: 750px;
 		height: 250px;
+
 		margin-bottom: 32px;
 		margin-top: 5%;
 	}
@@ -17,23 +19,28 @@ $width: 320px;
 		font-size: 2rem;
 		text-align: center;
 		color: var(--default-white);
+
 		margin-bottom: 8px;
 	}
 
 	.text {
 		width: $width;
+
 		font-size: 0.875rem;
 		font-weight: 300;
 		line-height: 1.4;
 		color: var(--background-white);
+
 		margin-bottom: 24px;
 	}
 
 	.submitButton {
 		width: $width;
 		height: 48px;
+
 		border: 1px solid var(--primary-color-button);
 		background-color: var(--primary-color-button);
+
 		margin-left: 32px;
 		margin-top: 8px;
 	}

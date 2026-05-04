@@ -8,13 +8,17 @@ $font: 32px;
 .cardBody {
 	width: 502px;
 	height: 368px;
+
 	padding: $paddingSmall;
+
 	border-radius: 25px;
 	background-color: var(--default-black);
+
 	cursor: pointer;
 
 	.topPart {
 		display: flex;
+
 		width: $innerWidth;
 		height: $topHeight;
 
@@ -24,6 +28,7 @@ $font: 32px;
 
 			.title {
 				margin: 3px 0;
+
 				font-weight: 700;
 				text-align: center;
 				color: var(--default-white);
@@ -31,6 +36,7 @@ $font: 32px;
 
 			.symbolGrid {
 				display: grid;
+
 				gap: $gap;
 
 				grid-template-columns: repeat(2, 1fr);
@@ -39,7 +45,9 @@ $font: 32px;
 				.symbolsLine {
 					display: flex;
 					align-items: center;
+
 					gap: $gap;
+
 					width: 60px;
 
 					img {
@@ -59,6 +67,7 @@ $font: 32px;
 		.classImg {
 			width: 355px;
 			height: $topHeight;
+
 			border-radius: 17px;
 
 			&.cardOff {
@@ -69,12 +78,14 @@ $font: 32px;
 
 	.bottomPart {
 		display: flex;
+
 		width: $innerWidth;
 		height: $bottomHeight;
 
 		.bottomHalfIcon {
 			display: flex;
 			justify-content: space-around;
+
 			width: 243px;
 			height: $bottomHeight;
 		}
@@ -83,8 +94,10 @@ $font: 32px;
 			display: flex;
 			align-items: center;
 			justify-content: flex-end;
+
 			width: 243px;
 			height: $bottomHeight;
+
 			padding-top: $paddingSmall;
 
 			.bossIcon {
@@ -99,7 +112,9 @@ $font: 32px;
 				.characterName {
 					display: flex;
 					justify-content: flex-end;
+
 					width: 180px;
+
 					font-size: $font;
 					color: var(--default-white);
 				}
@@ -108,6 +123,7 @@ $font: 32px;
 					font-size: 24px;
 					font-weight: 300;
 					color: var(--default-white);
+
 					margin-top: $gap;
 				}
 			}
@@ -119,6 +135,7 @@ $font: 32px;
 		flex-direction: column;
 		align-items: flex-end;
 		justify-content: flex-end;
+
 		width: $innerWidth;
 		height: 58px;
 

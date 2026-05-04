@@ -3,9 +3,11 @@ $marginTop: 16px;
 
 .title {
 	align-items: center;
+
 	font-size: 40px;
 	font-weight: 500;
 	color: var(--default-button-text);
+
 	margin-top: 32px;
 }
 
@@ -13,8 +15,10 @@ $marginTop: 16px;
 	position: relative;
 	display: flex;
 	justify-content: flex-end;
+
 	width: $widthSize;
 	height: 56px;
+
 	margin-top: $marginTop;
 	padding-right: 32px;
 }
@@ -22,7 +26,9 @@ $marginTop: 16px;
 .characterDropdown {
 	display: flex;
 	justify-content: flex-start;
+
 	width: 100%;
+
 	margin-bottom: 16px;
 	margin-top: $marginTop;
 	padding-left: 32px;
@@ -31,25 +37,34 @@ $marginTop: 16px;
 .tabHolder {
 	display: flex;
 	align-items: center;
+
 	gap: 8px;
+
 	width: 712px;
 	height: 72px;
+
 	border-radius: 23px;
 	background-color: var(--background-white);
+
 	padding-left: 8px;
 
 	.tabButton {
 		display: flex;
 		align-items: center;
 		justify-content: center;
+
 		gap: 8px;
+
 		width: 344px;
 		height: 56px;
+
 		border: none;
 		border-radius: 15px;
 		background-color: var(--background-white);
+
 		font-size: 32px;
 		color: var(--default-button-text);
+
 		transition: background-color 200ms ease-in;
 
 		&[data-state='active'] {
@@ -64,5 +79,6 @@ $marginTop: 16px;
 
 .tabContent {
 	width: 100%;
+
 	margin-top: 16px;
 }

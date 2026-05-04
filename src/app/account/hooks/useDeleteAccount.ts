@@ -37,6 +37,7 @@ export const useDeleteAccount = (): UseDeleteAccountReturn => {
 			await signOut({ callbackUrl: '/login?accountDeleted=1' });
 		} catch (error: unknown) {
 			const message = error instanceof Error ? error.message : 'Unknown error occurred.';
+
 			toast.error(message);
 			console.error('Delete account error:', error);
 		}

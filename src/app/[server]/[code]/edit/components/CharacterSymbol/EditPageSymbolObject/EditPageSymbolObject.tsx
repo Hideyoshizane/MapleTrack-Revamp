@@ -1,9 +1,10 @@
 'use client';
 
 import * as Checkbox from '@radix-ui/react-checkbox';
-import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
 import Image from 'next/image';
 
+import CheckIcon from '@assets/svg/check.svg';
+import CrossIcon from '@assets/svg/cross-2.svg';
 import ProgressBar from '@components/ProgressBar/progressBar';
 import Tooltip from '@components/Tooltip/tooltip';
 import { getExpForLevel } from '@data/symbols/exp/expTable';
@@ -28,15 +29,6 @@ import type {
 } from '@features/character/schemas/character.response.schema';
 import type { CharacterContent, SymbolCategory } from '@prisma/client';
 import type { JSX } from 'react';
-
-type EditPageSymbolObjectProps = {
-	type: SymbolCategory;
-	symbol: getEditCharacterDataSymbolsResponseBody;
-	characterLevel: number;
-	characterJobType: string;
-	size?: number;
-	updateCharacter: (recipe: (draft: getEditCharacterDataResponseBody) => void) => void;
-};
 
 type SymbolUpdatePayload =
 	| { type: 'level'; value: number; category: SymbolCategory; name: string }
@@ -119,13 +111,22 @@ function ContentCheckbox({ content, index, characterLevel, onToggle, symbolName 
 				disabled={isDisabled}
 				onCheckedChange={(checked) => onToggle(index, checked === true)}>
 				<Checkbox.Indicator className={styles.checkboxIndicator}>
-					{isDisabled ? <Cross2Icon /> : <CheckIcon />}
+					{isDisabled ? <CrossIcon /> : <CheckIcon />}
 				</Checkbox.Indicator>
 			</Checkbox.Root>
 			{content.contentType}: +{getContentValue(symbolName as SymbolName, content.contentType)}
 		</label>
 	);
 }
+
+type Props = {
+	type: SymbolCategory;
+	symbol: getEditCharacterDataSymbolsResponseBody;
+	characterLevel: number;
+	characterJobType: string;
+	size?: number;
+	updateCharacter: (recipe: (draft: getEditCharacterDataResponseBody) => void) => void;
+};
 
 function EditPageSymbolObject({
 	type,
@@ -134,7 +135,7 @@ function EditPageSymbolObject({
 	characterJobType,
 	size = 24,
 	updateCharacter,
-}: EditPageSymbolObjectProps): JSX.Element {
+}: Props): JSX.Element {
 	const isSymbolUsable = canUseSymbol(characterLevel, symbol.name as SymbolName);
 	const maxLevel = getSymbolMaxLevel(type);
 	const src = getSymbolImagePath(symbol.name as SymbolName);
@@ -154,7 +155,6 @@ function EditPageSymbolObject({
 		updateCharacter((draft) => {
 			const targetArray = draft.symbols[payload.category];
 			const target = targetArray.find((s) => s.name === payload.name);
-
 			if (!target) {
 				return;
 			}
@@ -163,14 +163,17 @@ function EditPageSymbolObject({
 				case 'level':
 					target.level = payload.value;
 					target.exp = Math.min(target.exp, getExpForLevel(payload.category, payload.value));
+
 					break;
 				case 'exp':
 					target.exp = payload.value;
+
 					break;
 				case 'content':
 					if (target.contents[payload.index]) {
 						target.contents[payload.index].checked = payload.checked;
 					}
+
 					break;
 			}
 		});

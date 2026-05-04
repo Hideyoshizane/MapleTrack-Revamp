@@ -1,7 +1,7 @@
 import { GENESIS_MIN_LEVEL, DESTINY_MIN_LEVEL } from '@data/liberation/constant';
 import { getBossPoints, getBossType } from '@data/liberation/liberationBosses';
 import { resolveNextLiberationState } from '@data/liberation/liberationQuests';
-import dayjs from '@utils/dayjs';
+import { nowInUtc } from '@utils/time';
 
 import type { Prisma, PrismaClient } from '@prisma/client';
 
@@ -39,11 +39,13 @@ export const addPointsToLiberation = async (
 		if (!characterData) {
 			throw new Error('BossList not found for user.');
 		}
+
 		const bossType = getBossType(bossName);
 		const points = getBossPoints(bossName, bossDifficulty);
 		if (points == 0 || bossType == null) {
 			return { bossType, points: null };
 		}
+
 		const isGenesisEnabled = characterData.character.level <= GENESIS_MIN_LEVEL;
 		const isDestinyEnabled = characterData.liberated && characterData.character.level <= DESTINY_MIN_LEVEL;
 		if ((!isGenesisEnabled && bossType == 'genesis') || (!isDestinyEnabled && bossType == 'destiny')) {
@@ -72,10 +74,8 @@ export const addPointsToLiberation = async (
 			updateData.currentDestinyPoints = newState.points;
 		}
 
-		const now = dayjs().utc().toDate();
-
 		await Promise.all([
-			tx.user.update({ where: { id: authenticatedUserId }, data: { liberationLastUpdate: now } }),
+			tx.user.update({ where: { id: authenticatedUserId }, data: { liberationLastUpdate: nowInUtc() } }),
 			tx.liberation.update({ where: { id: characterData.id }, data: updateData }),
 		]);
 

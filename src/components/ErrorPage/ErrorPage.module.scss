@@ -11,12 +11,14 @@ $iconSize: 240px;
 		font-size: 40px;
 		font-weight: 500;
 		color: var(--default-button-text);
+
 		margin-bottom: 60px;
 	}
 
 	.icon {
 		width: $iconSize;
 		height: $iconSize;
+
 		color: var(--icon-danger-color);
 	}
 
@@ -24,6 +26,7 @@ $iconSize: 240px;
 		font-size: 24px;
 		font-weight: 400;
 		color: var(--default-button-text);
+
 		margin-bottom: 40px;
 		margin-top: 64px;
 	}

@@ -9,7 +9,7 @@ import styles from './validatedInput.module.scss';
 
 import type { JSX } from 'react';
 
-type ValidatedInputProps = {
+type Props = {
 	value?: string;
 	placeholder?: string;
 	error?: string | null;
@@ -17,13 +17,7 @@ type ValidatedInputProps = {
 	onCommit?: (value: string) => void;
 };
 
-const ValidatedInputInner = ({
-	value = '',
-	placeholder,
-	error,
-	onBlur,
-	onCommit,
-}: ValidatedInputProps): JSX.Element => {
+const ValidatedInputInner = ({ value = '', placeholder, error, onBlur, onCommit }: Props): JSX.Element => {
 	const [inputValue, setInputValue] = useState<string>(value);
 
 	const handleChange = (val: string): void => {
@@ -57,7 +51,7 @@ const ValidatedInputInner = ({
 	);
 };
 
-const ValidatedInput = (props: ValidatedInputProps): JSX.Element => {
+const ValidatedInput = (props: Props): JSX.Element => {
 	return <ValidatedInputInner key={props.value} {...props} />;
 };
 

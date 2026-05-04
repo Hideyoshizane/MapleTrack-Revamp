@@ -1,13 +1,11 @@
 import crypto from 'crypto';
 
-import argon2 from 'argon2';
-import dayjs from 'dayjs';
-
 import { resetPasswordRequestSchema } from '@features/user/schemas/user.schema';
 import { prisma } from '@lib/prisma';
+import { verifyPassword, hashPassword } from '@lib/security/password';
 import { createResponse } from '@utils/createResponse';
 import { logError, logApiFailure, logZodError } from '@utils/logger';
-import { validatePassword } from '@utils/validators';
+import { nowInUtc } from '@utils/time';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextRequest, NextResponse } from 'next/server';
@@ -19,59 +17,46 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		const parseResult = resetPasswordRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			logZodError(parseResult.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
-		const normalizedToken = parseResult.data.token.trim();
-		const newPassword = parseResult.data.password;
-
-		const passwordValidation = validatePassword(newPassword);
-		if (!passwordValidation.isValid) {
-			const message = [passwordValidation.error].filter(Boolean).join('\n');
-
-			logApiFailure(message, { route: route });
-			return createResponse<ApiResponse>({ success: false, message: message }, 400);
-		}
-
-		const hashedToken = crypto.createHash('sha256').update(normalizedToken).digest('hex');
+		const { token, password } = parseResult.data;
+		const hashedToken = crypto.createHash('sha256').update(token.trim()).digest('hex');
+		const now = nowInUtc();
 
 		const result = await prisma.$transaction(async (tx) => {
 			const user = await tx.user.findFirst({
-				where: { resetPasswordToken: hashedToken, resetPasswordExpires: { gt: dayjs.utc().toDate() } },
+				where: { resetPasswordToken: hashedToken, resetPasswordExpires: { gt: now } },
 				select: { id: true, password: true },
 			});
-
 			if (!user) {
 				return { status: 'invalid' };
 			}
 
-			let isSamePassword = false;
-			try {
-				isSamePassword = await argon2.verify(user.password, newPassword);
-			} catch {
-				return { status: 'invalid' };
-			}
-
+			const isSamePassword = await verifyPassword(user.password, password);
 			if (isSamePassword) {
-				return { status: 'same_password' };
+				return { status: 'same_password' as const };
 			}
 
-			const hashedPassword = await argon2.hash(newPassword, { type: argon2.argon2id });
+			const hashedPassword = await hashPassword(password);
 			await tx.user.update({
-				where: { id: user.id, resetPasswordToken: hashedToken, resetPasswordExpires: { gt: dayjs.utc().toDate() } },
+				where: { id: user.id, resetPasswordToken: hashedToken, resetPasswordExpires: { gt: now } },
 				data: { password: hashedPassword, resetPasswordToken: null, resetPasswordExpires: null },
 			});
 
-			return { status: 'success' };
+			return { status: 'success' as const };
 		});
 
 		if (result.status === 'invalid') {
 			logApiFailure('Invalid or expired token', { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid or expired token' }, 404);
 		}
 
 		if (result.status === 'same_password') {
 			logApiFailure('New password same as current', { route: route });
+
 			return createResponse<ApiResponse>(
 				{ success: false, message: 'New password must be different from the current password' },
 				400,
@@ -81,6 +66,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		return createResponse<ApiResponse>({ success: true, message: 'Password reset successfully.' }, 200);
 	} catch (error) {
 		logError(error, { route: route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

@@ -1,164 +1,231 @@
-.page {
-  --gray-rgb: 0, 0, 0;
-  --gray-alpha-200: rgb(var(--gray-rgb), 0.08);
-  --gray-alpha-100: rgb(var(--gray-rgb), 0.05);
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
+$paddingSize: 64px;
+$badgeIconSize: 36px;
+$textColor: var(--default-white);
+$spacingSmall: 8px;
+$spacingLarge: 32px;
+$fontSizeMedium: 32px;
+$fontSizeLarge: 40px;
+$fontSizeExtraLarge: 48px;
 
-  display: grid;
-  gap: 64px;
-  min-height: 100svh;
-  padding: 80px;
-  font-family: var(--font-geist-sans);
-  grid-template-rows: 20px 1fr 20px;
-  place-items: center center;
+.mainDiv {
+	background-color: var(--default-black);
+	color: $textColor;
 }
 
-@media (prefers-color-scheme: dark) {
-  .page {
-    --gray-rgb: 255, 255, 255;
-    --gray-alpha-200: rgb(var(--gray-rgb), 0.145);
-    --gray-alpha-100: rgb(var(--gray-rgb), 0.06);
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
-  }
+.topBar {
+	position: fixed;
+	z-index: 10;
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	height: 168px;
+	background: linear-gradient(180deg, #000 0%, rgb(0 0 0 / 51%) 55.08%, rgb(0 0 0 / 0%) 85.07%);
+	inset: 0 0 auto;
+
+	padding-left: $spacingLarge;
+	padding-right: $spacingLarge;
+	padding-top: $spacingSmall;
+
+	.buttonDiv {
+		display: flex;
+		align-items: center;
+		gap: 32px;
+
+		height: 128px;
+
+		.signInButton {
+			border: none;
+			background-color: transparent;
+			font-size: 24px;
+
+			cursor: pointer;
+		}
+
+		.signUpButton {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+
+			width: 192px;
+			height: 48px;
+
+			border: none;
+			border-radius: 50px;
+
+			background-color: var(--primary-color-button);
+
+			font-size: 24px;
+			font-weight: 600;
+			color: var(--default-button-text);
+
+			cursor: pointer;
+		}
+	}
 }
 
-.main {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  grid-row-start: 2;
-}
+.block {
+	position: relative;
+	height: 100vh;
 
-.main ol {
-  margin: 0;
-  font-family: var(--font-geist-mono);
-  font-size: 14px;
-  line-height: 24px;
-  letter-spacing: -0.01em;
-  list-style-position: inside;
-  padding-left: 0;
-}
+	.content,
+	.finalContent {
+		position: relative;
+		z-index: 2;
 
-.main li:not(:last-of-type) {
-  margin-bottom: 8px;
-}
+		display: flex;
+		flex-direction: column;
 
-.main code {
-  padding: 2px 4px;
-  border-radius: 4px;
-  background: var(--gray-alpha-100);
-  font-family: inherit;
-  font-weight: 600;
-}
+		height: 100%;
+	}
 
-.ctas {
-  display: flex;
-  gap: 16px;
-}
+	.content {
+		justify-content: center;
 
-.ctas a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 48px;
-  padding: 0 20px;
-  border: 1px solid transparent;
-  border-radius: 128px;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 20px;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    border-color 0.2s;
-  cursor: pointer;
-  appearance: none;
-}
+		padding-left: $paddingSize;
+		padding-right: $paddingSize;
 
-a.primary {
-  gap: 8px;
-  background: var(--foreground);
-  color: var(--background);
-}
+		.welcomeDiv {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
 
-a.secondary {
-  min-width: 158px;
-  border-color: var(--gray-alpha-200);
-}
+			.title {
+				font-size: 88px;
+				font-weight: 700;
+				transform: translateY(-64px);
+			}
 
-.footer {
-  display: flex;
-  gap: 24px;
-  grid-row-start: 3;
-}
+			.subTitle {
+				max-width: 500px;
+				font-size: $fontSizeLarge;
+				text-align: center;
+			}
 
-.footer a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+			.info {
+				font-size: $fontSizeLarge;
+				font-weight: 300;
+				transform: translateY(264px);
+			}
+		}
 
-.footer img {
-  flex-shrink: 0;
-}
+		.showcaseDiv {
+			display: flex;
+			align-items: center;
+			justify-content: space-around;
 
-/* Enable hover only on non-touch devices */
-@media (hover: hover) and (pointer: fine) {
-  a.primary:hover {
-    background: var(--button-primary-hover);
-    border-color: transparent;
-  }
+			&[data-reverse='true'] {
+				flex-direction: row-reverse;
+			}
 
-  a.secondary:hover {
-    background: var(--button-secondary-hover);
-    border-color: transparent;
-  }
+			.showcaseImage {
+				border-radius: 25px;
+			}
 
-  .footer a:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-}
+			.showcaseTextDiv {
+				display: flex;
+				flex-direction: column;
+				gap: 24px;
+				max-width: 700px;
 
-@media (width <=600px) {
-  .page {
-    padding: 32px;
-    padding-bottom: 80px;
-  }
+				.showcaseTitle {
+					font-size: $fontSizeExtraLarge;
+					font-weight: 600;
+				}
 
-  .main {
-    align-items: center;
-  }
+				.showcaseDescription {
+					font-size: $fontSizeLarge;
+				}
+			}
+		}
+	}
 
-  .main ol {
-    text-align: center;
-  }
+	.finalContent {
+		justify-content: end;
 
-  .ctas {
-    flex-direction: column;
-  }
+		padding-right: $paddingSize;
 
-  .ctas a {
-    height: 40px;
-    padding: 0 16px;
-    font-size: 14px;
-  }
+		.finalDiv {
+			display: flex;
+			align-items: stretch;
+			justify-content: space-between;
 
-  a.secondary {
-    min-width: auto;
-  }
+			.ctaDiv {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: space-between;
 
-  .footer {
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-  }
-}
+				height: 100%;
+				text-align: center;
 
-@media (prefers-color-scheme: dark) {
-  .logo {
-    filter: invert();
-  }
+				padding-bottom: 160px;
+				padding-top: 80px;
+
+				.ctaTitle {
+					font-size: $fontSizeExtraLarge;
+					font-weight: 600;
+				}
+
+				.ctaDescription {
+					font-size: $fontSizeLarge;
+				}
+
+				.badgeDiv {
+					display: flex;
+					gap: 16px;
+					padding-bottom: 80px;
+
+					.badge {
+						display: flex;
+						align-items: center;
+						gap: $spacingSmall;
+
+						height: 56px;
+
+						border-radius: 15px;
+						background-color: $textColor;
+
+						font-size: $fontSizeMedium;
+						color: var(--default-button-text);
+						padding-right: 12px;
+
+						.badgeIcon {
+							width: $badgeIconSize;
+							height: $badgeIconSize;
+							margin-left: $spacingSmall;
+						}
+					}
+				}
+
+				.signUpButton {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+
+					width: 320px;
+					height: 80px;
+
+					border: none;
+					border-radius: 50px;
+
+					background-color: var(--primary-color-button);
+
+					font-size: $fontSizeMedium;
+					font-weight: 600;
+					color: var(--default-button-text);
+
+					cursor: pointer;
+				}
+			}
+		}
+	}
+
+	.backgroundImage {
+		z-index: 1;
+		filter: brightness(0.4);
+		object-fit: cover;
+	}
 }

@@ -12,7 +12,7 @@ import type { JobType } from '@components/ProgressBar/progressBar';
 import type { getCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
-type CharacterStatsProps = {
+type Props = {
 	character: getCharacterDataResponseBody;
 	job: string;
 	jobType: JobType;
@@ -21,7 +21,7 @@ type CharacterStatsProps = {
 const BOSS_ICON_SIZE = 90;
 const ICON_SIZE = 64;
 
-const CharacterStats = ({ character, job, jobType }: CharacterStatsProps): JSX.Element => {
+const CharacterStats = ({ character, job, jobType }: Props): JSX.Element => {
 	const { level, targetLevel, bossing, linkSkill, jobType: charJobType, legion, class: charClass } = character;
 	return (
 		<>

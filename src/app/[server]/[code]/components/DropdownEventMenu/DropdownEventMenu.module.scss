@@ -2,18 +2,24 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+
 	width: 284px;
 	height: 56px;
+
 	border: none;
 	border-radius: 15px;
 	background-color: var(--event-color-button);
+
 	font-size: 32px;
 	color: var(--default-black);
+
 	cursor: pointer;
+
 	outline: none;
 
 	.icon {
 		color: var(--default-black);
+
 		margin-left: 8px;
 	}
 }
@@ -24,10 +30,13 @@
 
 .dropdownContent {
 	min-width: 284px;
+
 	padding: 8px;
+
 	border-radius: 6px;
 	background-color: var(--default-black);
 	color: var(--default-white);
+
 	will-change: opacity, transform;
 
 	&[data-state='open'] {
@@ -42,11 +51,13 @@
 @keyframes fade-in {
 	from {
 		transform: translateY(-10px);
+
 		opacity: 0;
 	}
 
 	to {
 		transform: translateY(0);
+
 		opacity: 1;
 	}
 }
@@ -54,11 +65,13 @@
 @keyframes fade-out {
 	from {
 		transform: translateY(0);
+
 		opacity: 1;
 	}
 
 	to {
 		transform: translateY(-10px);
+
 		opacity: 0;
 	}
 }
@@ -72,15 +85,20 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+
 	gap: 8px;
+
 	padding: 8px;
+
 	font-weight: bold;
 	text-align: center;
+
 	border-bottom: 1px solid var(--default-white);
 }
 
 .leftColumn {
 	box-sizing: border-box;
+
 	padding-right: 4px;
 }
 
@@ -89,15 +107,21 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+
 	padding: 6px 8px;
+
 	border-radius: 4px;
+
 	font-size: 14px;
 	text-align: center;
+
 	cursor: pointer;
+
 	margin-top: 4px;
 
 	&:hover {
 		background-color: #333;
+
 		outline: none;
 	}
 
@@ -107,9 +131,12 @@
 
 	.checkIcon {
 		position: absolute;
+
 		top: 50%;
 		right: 8px;
+
 		transform: translateY(-50%);
+
 		vertical-align: middle;
 	}
 }

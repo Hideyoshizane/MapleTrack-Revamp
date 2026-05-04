@@ -15,12 +15,12 @@ import styles from './page.module.scss';
 import type { ServerName } from '@data/servers/servers';
 import type { JSX } from 'react';
 
-type HomePageClientProps = {
-	searchParams?: Record<string, string | undefined>;
+type Props = {
+	searchParams: { [key: string]: string | string[] | undefined };
 	initialServer: ServerName;
 };
 
-const HomePageClient = ({ initialServer }: HomePageClientProps): JSX.Element => {
+const HomePageClient = ({ initialServer }: Props): JSX.Element => {
 	const { server, setServerCookie } = useServerCookie(initialServer);
 	const { selectedClasses, setClasses, loading } = useClassFilterCookie();
 

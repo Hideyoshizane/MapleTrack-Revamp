@@ -1,6 +1,3 @@
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
 import { updateBossListRequestSchema } from '@features/boss/schemas/bossList.request.schema';
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
@@ -10,8 +7,6 @@ import { logZodError, logApiFailure, logError } from '@utils/logger';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
-dayjs.extend(utc);
-
 const route = 'api/bossList/updateBossList';
 
 const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
@@ -20,6 +15,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const parseResult = updateBossListRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			logZodError(parseResult.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
@@ -34,12 +30,14 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		});
 		if (!existingBossList) {
 			logApiFailure('Boss List not found', { route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Boss list not found' }, 404);
 		}
 
 		const targetServer = existingBossList.servers.find((server): boolean => server.id === data.id);
 		if (!targetServer) {
 			logApiFailure('Server not found', { route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Server not found' }, 404);
 		}
 
@@ -48,7 +46,6 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				const existingCharacter = targetServer.characters.find(
 					(character): boolean => character.characterId === incomingCharacter.characterId,
 				);
-
 				if (!existingCharacter) {
 					continue;
 				}
@@ -100,7 +97,9 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 				for (const boss of bossesToUpdate) {
 					const existing = existingMap.get(bossKey(boss));
-					if (!existing) continue;
+					if (!existing) {
+						continue;
+					}
 
 					await tx.boss.update({
 						where: { id: existing.id },
@@ -114,6 +113,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		return createResponse<ApiResponse>({ success: true, message: 'Boss list updated successfully' }, 200);
 	} catch (error) {
 		logError(error, { route: route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

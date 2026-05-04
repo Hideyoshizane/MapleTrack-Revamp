@@ -57,21 +57,8 @@ export const useLiberationSyncPayload = ({
 		});
 	};
 
-	const isValidDestinyState = (character: getLiberationListResponseBody['characters'][number]): boolean => {
-		if (!character) {
-			return false;
-		}
-
-		if (!character.currentDestinyQuest) {
-			return false;
-		}
-
-		if (character.currentDestinyPoints < 0) {
-			return false;
-		}
-
-		return true;
-	};
+	const isValidDestinyState = (character: getLiberationListResponseBody['characters'][number]): boolean =>
+		!!character && !!character.currentDestinyQuest && character.currentDestinyPoints >= 0;
 
 	// Initialize cache on mount
 	useEffect(() => {
@@ -82,6 +69,7 @@ export const useLiberationSyncPayload = ({
 		for (const character of liberationList.characters) {
 			currentCacheRef.current.set(character.characterId, serializeCharacter(character));
 		}
+
 		hasInitializedRef.current = true;
 	}, [liberationList]);
 
@@ -122,6 +110,7 @@ export const useLiberationSyncPayload = ({
 
 				if (!currentLiberationList?.characters) {
 					pendingCharacterIdRef.current = null;
+
 					return;
 				}
 				const latestCharacter = currentLiberationList.characters.find(
@@ -129,6 +118,7 @@ export const useLiberationSyncPayload = ({
 				);
 				if (!latestCharacter) {
 					pendingCharacterIdRef.current = null;
+
 					return;
 				}
 
@@ -137,6 +127,7 @@ export const useLiberationSyncPayload = ({
 
 				if (cachedSerialized === currentSerialized) {
 					pendingCharacterIdRef.current = null;
+
 					return;
 				}
 
@@ -145,6 +136,7 @@ export const useLiberationSyncPayload = ({
 				try {
 					if (!isValidDestinyState(latestCharacter)) {
 						toast.error('Invalid Destiny state blocked from sync');
+
 						return;
 					}
 

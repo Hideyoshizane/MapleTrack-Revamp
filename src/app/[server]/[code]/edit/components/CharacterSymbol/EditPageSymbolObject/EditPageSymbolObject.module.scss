@@ -7,12 +7,14 @@ $checkboxSize: 17px;
 
 .symbolContainer {
 	display: flex;
+
 	width: 298px;
 	height: $symbolContainerHeight;
 
 	.imageContainer {
 		display: flex;
 		align-items: center;
+
 		height: $symbolContainerHeight;
 	}
 
@@ -23,9 +25,11 @@ $checkboxSize: 17px;
 	.symbolOff {
 		.unlockLevel {
 			width: $symbolInfoWidth;
+
 			font-size: 16px;
 			font-weight: 600;
 			color: var(--default-button-text);
+
 			margin-top: $gapSmall;
 		}
 	}
@@ -34,17 +38,22 @@ $checkboxSize: 17px;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
+
 		height: $symbolContainerHeight;
+
 		margin-left: $gapSmall;
 
 		.levelExpInfo {
 			display: flex;
 			justify-content: space-between;
+
 			width: $symbolInfoWidth;
+
 			height: 23px;
 
 			.symbolLevelText {
 				width: auto;
+
 				font-size: $fontSizeLarge;
 				font-weight: $fontWeightRegular;
 			}
@@ -52,8 +61,10 @@ $checkboxSize: 17px;
 			.symbolLevel,
 			.symbolExp {
 				width: 45px;
+
 				border: none;
 				background-color: transparent;
+
 				font-size: $fontSizeLarge;
 				font-weight: $fontWeightRegular;
 				text-align: end;
@@ -69,28 +80,37 @@ $checkboxSize: 17px;
 		.progressDiv {
 			display: flex;
 			flex-direction: column;
+
 			height: 8px;
+
 			margin-top: $gapSmall;
 		}
 
 		.contentList {
 			display: flex;
 			flex-direction: column;
+
 			gap: $gapSmall;
+
 			height: 59px;
+
 			margin-top: $gapSmall;
 
 			.contentItem {
 				display: flex;
 				align-items: center;
+
 				gap: $gapSmall;
+
 				font-size: 14px;
 
 				.checkboxRoot {
 					display: flex;
 					justify-content: center;
+
 					width: $checkboxSize;
 					height: $checkboxSize;
+
 					border: 1px solid var(--default-button-text);
 					border-radius: 4px;
 					background: transparent;
@@ -102,7 +122,9 @@ $checkboxSize: 17px;
 
 					&[data-disabled] {
 						background: var(--icon-danger-color);
+
 						cursor: not-allowed;
+
 						border-color: var(--icon-danger-color);
 					}
 

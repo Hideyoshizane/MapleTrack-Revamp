@@ -8,7 +8,8 @@ import LockIcon from '@assets/svg/lock.svg';
 import Button from '@components/Button/button';
 import FooterOutside from '@components/FooterOutside/footerOutside';
 import FormInput from '@components/FormInput/formInput';
-import { validateEmail } from '@utils/validators';
+import { emailFieldSchema } from '@features/user/schemas/user.schema';
+import { zodValidator } from '@utils/validators';
 
 import { useForgotPassword } from './hooks/useForgotPassword';
 import styles from './page.module.scss';
@@ -21,10 +22,9 @@ const ForgotPasswordPage = (): JSX.Element => {
 		control,
 		handleSubmit,
 		formState: { isSubmitting, isSubmitted },
-		setError,
 	} = useForm<ForgotPasswordFormData>({ mode: 'onBlur', defaultValues: { email: '' } });
 
-	const { submitForgotPassword } = useForgotPassword(setError);
+	const { submitForgotPassword } = useForgotPassword();
 	const commonInputProps = { control, isSubmitted, isLogin: false };
 
 	return (
@@ -53,7 +53,7 @@ const ForgotPasswordPage = (): JSX.Element => {
 					id="email"
 					label="Email"
 					type="email"
-					validation={validateEmail}
+					validators={[zodValidator(emailFieldSchema)]}
 					{...commonInputProps}
 					isLogin
 				/>

@@ -17,7 +17,6 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 	try {
 		const { searchParams } = new URL(request.url);
 		const searchTerm = searchParams.get('parameters');
-
 		if (!searchTerm) {
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
@@ -25,6 +24,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const parseResult = searchCharacterRequestSchema.safeParse({ parameters: searchTerm });
 		if (!parseResult.success) {
 			logZodError(parseResult.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
@@ -46,7 +46,6 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		if (baseResults.length < 6) {
 			const match = findBestClassMatch(searchTerm);
 			const remaining = 6 - baseResults.length;
-
 			if (match) {
 				const extraResults = await prisma.character.findMany({
 					where: {
@@ -66,13 +65,8 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					const uniqueServers: string[] = Array.from(new Set(finalResults.map((c): string => c.server)));
 
 					const allowedServers = getServersExcept(extraStep, uniqueServers);
-
 					const generatedResults = allowedServers.map((server): (typeof finalResults)[number] => {
-						return {
-							name: 'Character',
-							class: match,
-							server,
-						};
+						return { name: 'Character', class: match, server };
 					});
 
 					finalResults = [...finalResults, ...generatedResults];
@@ -85,6 +79,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const validation = searchCharacterResponseSchema.safeParse(returnQuery);
 		if (!validation.success) {
 			logZodError(validation.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 		}
 
@@ -94,6 +89,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		);
 	} catch (error) {
 		logError(error, { route: route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

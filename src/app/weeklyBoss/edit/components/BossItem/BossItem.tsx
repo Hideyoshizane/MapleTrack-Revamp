@@ -2,7 +2,7 @@
 
 import NumberFlow from '@number-flow/react';
 import { clsx } from 'clsx';
-import { motion, AnimatePresence } from 'motion/react';
+import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
@@ -138,91 +138,93 @@ const BossItem = ({
 	}, [anySelected, totalGold, showGoldContainer]);
 
 	return (
-		<motion.div
-			className={styles.bossSlotBody}
-			animate={{ width: parentWidthExpanded ? 720 : 576 }}
-			layout
-			transition={{ duration: 0.2, ease: 'easeInOut' }}>
-			<div className={styles.bossSlotContent}>
-				<Image
-					className={styles.bossIcon}
-					alt={`${boss.name} portrait`}
-					height={64}
-					priority
-					src={getBossImage(boss.name as BossName)}
-					width={64}
-				/>
+		<LazyMotion features={domAnimation} strict>
+			<m.div
+				className={styles.bossSlotBody}
+				animate={{ width: parentWidthExpanded ? 720 : 576 }}
+				layout
+				transition={{ duration: 0.2, ease: 'easeInOut' }}>
+				<div className={styles.bossSlotContent}>
+					<Image
+						className={styles.bossIcon}
+						alt={`${boss.name} portrait`}
+						height={64}
+						priority
+						src={getBossImage(boss.name as BossName)}
+						width={64}
+					/>
 
-				<ResponsiveText className={styles.bossName} height={52} maxFontSize={28} minFontSize={20} width={120}>
-					{boss.name}
-				</ResponsiveText>
+					<ResponsiveText className={styles.bossName} height={52} maxFontSize={28} minFontSize={20} width={120}>
+						{boss.name}
+					</ResponsiveText>
 
-				<div className={clsx(styles.bossButtons, gapClass)}>
-					{boss.difficulties.map((difficulty) => {
-						const selection = getSelection(difficulty.name, difficulty.reset);
-						const isSelected = !!selection;
+					<div className={clsx(styles.bossButtons, gapClass)}>
+						{boss.difficulties.map((difficulty) => {
+							const selection = getSelection(difficulty.name, difficulty.reset);
+							const isSelected = !!selection;
 
-						if (difficulty.reset === 'Daily') {
+							if (difficulty.reset === 'Daily') {
+								return (
+									<BossDropdownButton
+										difficulty={difficulty}
+										isSmallButtons={isSmallButtons}
+										key={difficulty.name}
+										locked={selectedCharacterLevel < difficulty.minLevel}
+										onSelectDifficulty={(diff, multiplier) => {
+											handleBossUpdate(serverCookie, boss.name, diff.name, 'Daily', multiplier);
+										}}
+										selected={isSelected}
+										value={selection?.dailyTotal ?? 0}
+									/>
+								);
+							}
+
 							return (
-								<BossDropdownButton
+								<BossButton
+									characterLevel={selectedCharacterLevel}
 									difficulty={difficulty}
 									isSmallButtons={isSmallButtons}
 									key={difficulty.name}
-									locked={selectedCharacterLevel < difficulty.minLevel}
-									onSelectDifficulty={(diff, multiplier) => {
-										handleBossUpdate(serverCookie, boss.name, diff.name, 'Daily', multiplier);
+									onSelect={() => {
+										handleBossUpdate(serverCookie, boss.name, difficulty.name, difficulty.reset);
 									}}
 									selected={isSelected}
-									value={selection?.dailyTotal ?? 0}
 								/>
 							);
-						}
+						})}
+					</div>
 
-						return (
-							<BossButton
-								characterLevel={selectedCharacterLevel}
-								difficulty={difficulty}
-								isSmallButtons={isSmallButtons}
-								key={difficulty.name}
-								onSelect={() => {
-									handleBossUpdate(serverCookie, boss.name, difficulty.name, difficulty.reset);
-								}}
-								selected={isSelected}
-							/>
-						);
-					})}
-				</div>
-
-				<AnimatePresence>
-					{showGoldContainer && (
-						<motion.div
-							className={styles.goldValue}
-							animate={{ opacity: goldOpacity }}
-							exit={{ opacity: 0 }}
-							initial={{ opacity: 0 }}
-							onAnimationComplete={() => {
-								if (closing && goldOpacity === 0) {
-									setParentWidthExpanded(false);
-									setShowGoldContainer(false);
-									setClosing(false);
-								}
-							}}
-							transition={{ duration: 0.2 }}>
-							<NumberFlow
-								className={styles.goldText}
-								onAnimationsFinish={() => {
-									if (closing) {
-										setGoldOpacity(0);
+					<AnimatePresence>
+						{showGoldContainer && (
+							<m.div
+								className={styles.goldValue}
+								animate={{ opacity: goldOpacity }}
+								exit={{ opacity: 0 }}
+								initial={{ opacity: 0 }}
+								onAnimationComplete={() => {
+									if (closing && goldOpacity === 0) {
+										setParentWidthExpanded(false);
+										setShowGoldContainer(false);
+										setClosing(false);
 									}
 								}}
-								transformTiming={{ duration: 200 }}
-								value={numberFlowValue}
-							/>
-						</motion.div>
-					)}
-				</AnimatePresence>
-			</div>
-		</motion.div>
+								transition={{ duration: 0.2 }}>
+								<NumberFlow
+									className={styles.goldText}
+									onAnimationsFinish={() => {
+										if (closing) {
+											setGoldOpacity(0);
+										}
+									}}
+									transformTiming={{ duration: 200 }}
+									value={numberFlowValue}
+								/>
+							</m.div>
+						)}
+					</AnimatePresence>
+				</div>
+			</m.div>
+		</LazyMotion>
 	);
 };
 

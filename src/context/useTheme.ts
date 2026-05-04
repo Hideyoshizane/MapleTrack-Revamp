@@ -6,12 +6,12 @@ import { ThemeContext } from './themeContext';
 
 import type { Theme } from '@sharedTypes/theme';
 
-type ThemeContextProps = {
+type Props = {
 	theme: Theme;
 	setTheme: (value: Theme) => void;
 };
 
-export const useTheme = (): ThemeContextProps => {
+export const useTheme = (): Props => {
 	// Read the context
 	const ctx = useContext(ThemeContext);
 

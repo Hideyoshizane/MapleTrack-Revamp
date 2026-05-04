@@ -25,12 +25,12 @@ import { useBonusContext } from './useBonusContext';
 import type { JobType } from '@components/ProgressBar/progressBar';
 import type { JSX } from 'react';
 
-type CharacterPageProps = {
+type Props = {
 	server: string;
 	code: string;
 };
 
-const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
+const CharacterPage = ({ server, code }: Props): JSX.Element => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const success = searchParams.get('success');
@@ -89,6 +89,7 @@ const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
 			</section>
 		);
 	}
+
 	if (!character) {
 		return (
 			<section className="mainContent">

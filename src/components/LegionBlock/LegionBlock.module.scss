@@ -6,6 +6,7 @@ $marginTopWhite: 4px;
 @mixin iconText($marginTop: 0) {
 	font-size: $fontSizeBase;
 	font-weight: $fontWeight;
+
 	margin-bottom: $marginBottom;
 	margin-top: $marginTop;
 }

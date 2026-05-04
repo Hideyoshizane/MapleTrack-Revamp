@@ -3,14 +3,18 @@ $iconSize: 48px;
 .checkDiv {
 	display: flex;
 	justify-content: center;
+
 	width: 83px;
 
 	.checkIcon {
 		right: 0;
 		display: flex;
+
 		width: $iconSize;
 		height: $iconSize;
+
 		color: var(--default-button-text);
+
 		cursor: pointer;
 
 		&.cleared {

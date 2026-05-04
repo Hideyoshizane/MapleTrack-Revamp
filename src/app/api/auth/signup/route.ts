@@ -1,42 +1,48 @@
-import argon2 from 'argon2';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
 import { LASTVERSION } from '@data/user/constants';
 import { createBossList } from '@features/boss/bossListService';
 import { signupRequestSchema } from '@features/user/schemas/user.schema';
 import { prisma } from '@lib/prisma';
+import { hashPassword } from '@lib/security/password';
 import { createResponse } from '@utils/createResponse';
 import { logError, logZodError } from '@utils/logger';
+import { nowInUtc } from '@utils/time';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextRequest, NextResponse } from 'next/server';
 
 const route = '/api/account/signup';
 
-dayjs.extend(utc);
-
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
 		const parseResult = signupRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			logZodError(parseResult.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 		const { username, email, password } = parseResult.data;
 
-		const hashedPassword = await argon2.hash(password, {
-			type: argon2.argon2id,
-			memoryCost: 2 ** 16,
-			timeCost: 3,
-			parallelism: 1,
+		const existingUser = await prisma.user.findFirst({
+			where: { OR: [{ username }, { email }] },
+			select: { id: true, username: true, email: true },
 		});
 
-		const now = dayjs().utc().toDate();
+		if (existingUser) {
+			const isUsernameTaken = existingUser.username === username;
+			return createResponse<ApiResponse>(
+				{
+					success: false,
+					message: isUsernameTaken ? 'This username is already taken.' : 'This e-mail already in use.',
+				},
+				409,
+			);
+		}
+
+		const hashedPassword = await hashPassword(password);
 
 		await prisma.$transaction(async (tx) => {
 			const newUser = await tx.user.create({
-				data: { username, email, password: hashedPassword, version: LASTVERSION, liberationLastUpdate: now },
+				data: { username, email, password: hashedPassword, version: LASTVERSION, liberationLastUpdate: nowInUtc() },
 				select: { id: true },
 			});
 
@@ -46,6 +52,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		return createResponse<ApiResponse>({ success: true, message: 'User created successfully' }, 201);
 	} catch (error) {
 		logError(error, { route: route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'An error occurred during signup' }, 500);
 	}
 };

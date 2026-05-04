@@ -8,7 +8,9 @@ const ErrorPage = (): JSX.Element => {
 	return (
 		<div className={styles.mainBody}>
 			<p className={styles.title}>Internal Server Error</p>
+
 			<ErrorIcon className={styles.icon} />
+
 			<p className={styles.infoText}>An error has ocurred and could not complete your request.</p>
 		</div>
 	);

@@ -14,13 +14,13 @@ import ServerItem from './ServerItem/serverItem';
 import type { Server, ServerName } from '@data/servers/servers';
 import type { JSX } from 'react';
 
-type ServerDropdownProps = {
+type Props = {
 	server: ServerName;
 	setServerCookie?: (value: ServerName) => void;
 };
 
-const ServerDropdown = ({ server, setServerCookie }: ServerDropdownProps): JSX.Element => {
-	const selectedServer: Server | undefined = servers.find((s: Server): boolean => s.name === server);
+const ServerDropdown = ({ server, setServerCookie }: Props): JSX.Element => {
+	const selectedServer = servers.find((s: Server): boolean => s.name === server);
 
 	if (!selectedServer) {
 		return <SkeletonWrapper color="light" height={368} variant="rounded" width={502} />;

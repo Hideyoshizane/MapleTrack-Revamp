@@ -13,6 +13,7 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
 	const parseResult = getCharacterDataFromAPIRequestSchema.safeParse(await request.json());
 	if (!parseResult.success) {
 		logZodError(parseResult.error, { route: route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Invalid parameters.' }, 400);
 	}
 
@@ -27,6 +28,7 @@ const handler = async (request: NextRequest): Promise<NextResponse> => {
 		);
 	} catch (error: unknown) {
 		logError(error, { route: route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal server error.' }, 500);
 	}
 };

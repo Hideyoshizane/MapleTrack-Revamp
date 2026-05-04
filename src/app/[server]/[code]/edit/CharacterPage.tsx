@@ -22,12 +22,12 @@ import styles from './page.module.scss';
 import type { JobType } from '@components/ProgressBar/progressBar';
 import type { JSX } from 'react';
 
-type CharacterPageProps = {
+type Props = {
 	server: string;
 	code: string;
 };
 
-const CharacterPage = ({ server, code }: CharacterPageProps): JSX.Element => {
+const CharacterPage = ({ server, code }: Props): JSX.Element => {
 	const router = useRouter();
 	const pathname = usePathname();
 

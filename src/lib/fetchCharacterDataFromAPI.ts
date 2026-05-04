@@ -41,7 +41,7 @@ export const fetchCharacterDataFromApi = async (
 		const character = data.ranks?.[0];
 
 		if (!character) {
-			throw new Error('Character not found');
+			throw new Error(`Character "${characterName}" not found`);
 		}
 
 		return { characterImgURL: character.characterImgURL, level: character.level };
@@ -49,7 +49,12 @@ export const fetchCharacterDataFromApi = async (
 		if ((error as AxiosError).isAxiosError) {
 			const axiosError = error as AxiosError;
 
-			console.error('Nexon API request failed', { status: axiosError.response?.status, url: axiosError.config?.url });
+			console.error('Nexon API request failed', {
+				status: axiosError.response?.status,
+				url: axiosError.config?.url,
+				params: axiosError.config?.params,
+			});
+
 			throw new Error(`External API failed: ${axiosError.response?.status ?? 'unknown'}`);
 		}
 

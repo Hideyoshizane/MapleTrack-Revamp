@@ -9,14 +9,20 @@ $iconSize: 32px;
 	position: relative;
 	display: flex;
 	align-items: center;
+
 	width: $dropdownWidth;
 	height: $dropdownHeight;
+
 	overflow: hidden;
+
 	box-sizing: border-box;
+
 	border: solid 2px var(--default-black);
 	border-radius: $borderRadius;
 	background-color: var(--background-white);
+
 	cursor: pointer;
+
 	outline: none;
 
 	&:hover {
@@ -26,9 +32,11 @@ $iconSize: 32px;
 	.bossDiv {
 		display: flex;
 		align-items: center;
+
 		gap: 8px;
 
 		color: var(--default-button-text);
+
 		margin-left: 16px;
 
 		.bossName {
@@ -40,15 +48,19 @@ $iconSize: 32px;
 	.iconsDiv {
 		right: 0;
 		display: flex;
+
 		gap: 16px;
+
 		margin-left: auto;
 		margin-right: 16px;
 
 		.menuIcon {
 			right: 0;
 			display: flex;
+
 			width: $iconSize;
 			height: $iconSize;
+
 			color: var(--default-button-text);
 		}
 	}
@@ -58,11 +70,15 @@ $iconSize: 32px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+
 	width: 112px;
 	height: 40px;
+
 	box-sizing: border-box;
+
 	border: none;
 	border-radius: 25px;
+
 	font-size: 16px;
 	color: var(--default-button-text);
 }
@@ -99,13 +115,18 @@ $iconSize: 32px;
 .bossList {
 	width: $dropdownWidth;
 	max-height: $dropdownOpenHeight;
+
 	overflow: hidden;
+
 	border: solid 2px var(--default-black);
 	border-radius: $borderRadius;
 	background-color: var(--background-white);
+
 	cursor: pointer;
+
 	margin-bottom: 8px;
 	margin-top: 8px;
+
 	outline: none;
 }
 
@@ -132,22 +153,29 @@ $iconSize: 32px;
 	.itemContent {
 		display: flex;
 		align-items: center;
+
 		gap: 8px;
+
 		height: $dropdownHeight;
+
 		font-size: 24px;
 
 		.iconsDiv {
 			right: 0;
 			display: flex;
+
 			gap: 16px;
+
 			margin-left: auto;
 			margin-right: 16px;
 
 			.icon {
 				right: 0;
 				display: flex;
+
 				width: $iconSize;
 				height: $iconSize;
+
 				color: var(--default-button-text);
 			}
 		}
@@ -160,17 +188,24 @@ $iconSize: 32px;
 
 .scrollAreaViewport {
 	max-height: inherit;
+
 	overflow: auto;
+
 	overscroll-behavior: contain;
 }
 
 .scrollAreaScrollbar {
 	display: flex;
+
 	width: 6px;
+
 	padding: 2px;
+
 	user-select: none;
+
 	padding-bottom: $scrollbarLimit;
 	padding-top: $scrollbarLimit;
+
 	touch-action: none;
 
 	&[data-orientation='vertical'] {
@@ -181,6 +216,8 @@ $iconSize: 32px;
 .scrollAreaThumb {
 	position: relative;
 	flex: 1;
+
 	border-radius: 999px;
+
 	background: var(--default-black);
 }

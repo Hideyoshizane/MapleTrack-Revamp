@@ -1,32 +1,28 @@
-import { usernameRawSchema, emailRawSchema, passwordRawSchema } from '@features/user/schemas/user.raw.schema';
+import { ZodError } from 'zod';
 
-import { validateValue, type ValidationResult } from './validateField';
+import type { Validator } from './validateField';
+import type { ZodType } from 'zod';
 
-// Front End Validations
-export const validateUsername = (username: unknown): ValidationResult => validateValue(usernameRawSchema, username);
+export const zodValidator =
+	(schema: ZodType<string>): Validator =>
+	(value: string): string | undefined => {
+		try {
+			schema.parse(value);
 
-export const validateEmail = (email: unknown): ValidationResult => validateValue(emailRawSchema, email);
+			return undefined;
+		} catch (error) {
+			if (error instanceof ZodError) {
+				return error.issues.map((i) => `- ${i.message}`).join('\n');
+			}
+			return '- Invalid input';
+		}
+	};
 
-export const validatePassword = (password: unknown): ValidationResult => validateValue(passwordRawSchema, password);
-
-export const validatePasswordConfirmation = (password: unknown, confirmPassword: unknown): ValidationResult => {
-	if (typeof password !== 'string' || typeof confirmPassword !== 'string') {
-		return { isValid: false, error: 'Passwords must be valid strings.' };
-	}
-
-	if (password !== confirmPassword) {
-		return { isValid: false, error: 'Passwords do not match.' };
-	}
-
-	return { isValid: true };
-};
-
-export const validateUsernameLogin = (username: unknown): ValidationResult =>
-	typeof username !== 'string' || username.trim() === ''
-		? { isValid: false, error: 'Please enter your username.' }
-		: { isValid: true };
-
-export const validatePasswordLogin = (password: unknown): ValidationResult =>
-	typeof password !== 'string' || password.trim() === ''
-		? { isValid: false, error: 'Please enter your password.' }
-		: { isValid: true };
+export const confirmPasswordValidator =
+	(getPassword: () => string): Validator =>
+	(value: string): string | undefined => {
+		if (value !== getPassword()) {
+			return '- Passwords do not match.';
+		}
+		return undefined;
+	};

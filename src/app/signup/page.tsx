@@ -6,17 +6,18 @@ import Link from 'next/link';
 import Button from '@components/Button/button';
 import FooterOutside from '@components/FooterOutside/footerOutside';
 import FormInput from '@components/FormInput/formInput';
-import { validateUsername, validateEmail, validatePassword, validatePasswordConfirmation } from '@utils/validators';
+import { usernameFieldSchema, emailFieldSchema, passwordFieldSchema } from '@features/user/schemas/user.schema';
+import { zodValidator, confirmPasswordValidator } from '@utils/validators';
 
 import { useSignup } from './hooks/useSignup';
 import styles from './page.module.scss';
 
 import type { SignupFormData } from '@sharedTypes/form';
-import type { ValidationResult } from '@utils/validateField';
 import type { JSX } from 'react';
 
 const SignupPage = (): JSX.Element => {
 	const { control, handleSubmit, isSubmitting, isSubmitted, isValid, getValues, onSubmit } = useSignup();
+
 	const commonInputProps = { control, isSubmitted };
 
 	return (
@@ -34,7 +35,7 @@ const SignupPage = (): JSX.Element => {
 					id="username"
 					label="Username"
 					type="text"
-					validation={validateUsername}
+					validators={[zodValidator(usernameFieldSchema)]}
 					{...commonInputProps}
 				/>
 
@@ -42,7 +43,7 @@ const SignupPage = (): JSX.Element => {
 					id="email"
 					label="Email"
 					type="email"
-					validation={validateEmail}
+					validators={[zodValidator(emailFieldSchema)]}
 					{...commonInputProps}
 				/>
 
@@ -50,7 +51,7 @@ const SignupPage = (): JSX.Element => {
 					id="password"
 					label="Password"
 					type="password"
-					validation={validatePassword}
+					validators={[zodValidator(passwordFieldSchema)]}
 					{...commonInputProps}
 				/>
 
@@ -58,7 +59,7 @@ const SignupPage = (): JSX.Element => {
 					id="confirmPassword"
 					label="Confirm Password"
 					type="password"
-					validation={(value): ValidationResult => validatePasswordConfirmation(getValues('password'), value)}
+					validators={[zodValidator(passwordFieldSchema), confirmPasswordValidator(() => getValues('password'))]}
 					{...commonInputProps}
 				/>
 

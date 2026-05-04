@@ -1,13 +1,13 @@
 import reserved from 'reserved-usernames';
 
-import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
+import { sanitizeInput } from '@/utils/sanitizeInput';
 
 import { CUSTOM_RESERVED_USERNAMES } from './constants';
 
 const RESERVED_SET = new Set([...reserved, ...CUSTOM_RESERVED_USERNAMES].map((u) => u.toLowerCase()));
 
 export const canonicalizeUsername = (value: string): string => {
-	const sanitized = sanitizeInputBackEnd(value);
+	const sanitized = sanitizeInput(value);
 
 	return sanitized
 		.normalize('NFD')
@@ -17,7 +17,7 @@ export const canonicalizeUsername = (value: string): string => {
 };
 
 export const canonicalizeEmail = (value: string): string => {
-	return sanitizeInputBackEnd(value).toLowerCase();
+	return sanitizeInput(value).toLowerCase();
 };
 
 export const isReservedUsername = (value: string): boolean => {

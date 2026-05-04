@@ -10,7 +10,7 @@ import type {
 	getCharacterDataResponseBody,
 } from '@features/character/schemas/character.response.schema';
 
-type UseCharacterPageDataProps = {
+type Props = {
 	server: string;
 	className: string;
 	nameOverride?: string;
@@ -33,7 +33,7 @@ export const useCharacterPageData = ({
 	nameOverride,
 	syncEnabled,
 	setFirstLoad,
-}: UseCharacterPageDataProps): UseCharacterPageDataReturn => {
+}: Props): UseCharacterPageDataReturn => {
 	// Main character data
 	const { data: serverCharacter, isLoading: characterLoading, error } = useCharacterQuery({ server, className });
 	const [editableCharacter, setEditableCharacter] = useState<getCharacterDataResponseBody | null>(

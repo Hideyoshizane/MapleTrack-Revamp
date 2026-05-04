@@ -6,16 +6,21 @@ $fontTiny: 32px;
 .buttonLine {
 	display: flex;
 	justify-content: flex-end;
+
 	gap: 24px;
+
 	width: inherit;
+
 	padding-right: 24px;
 	padding-top: 24px;
 
 	.discardButton {
 		width: $buttonWidth;
 		height: $buttonHeight;
+
 		border-radius: $buttonRadius;
 		background-color: var(--danger-color-button);
+
 		font-size: $fontTiny;
 		font-weight: 500;
 		color: var(--default-white);
@@ -24,8 +29,10 @@ $fontTiny: 32px;
 	.saveChangesButton {
 		width: $buttonWidth;
 		height: $buttonHeight;
+
 		border-radius: $buttonRadius;
 		background-color: var(--primary-color-button);
+
 		font-size: $fontTiny;
 		font-weight: 500;
 		color: var(--default-button-text);
@@ -33,6 +40,7 @@ $fontTiny: 32px;
 		&[aria-disabled='true'] {
 			border: 1px solid var(--disabled);
 			background-color: var(--disabled);
+
 			cursor: not-allowed;
 		}
 	}

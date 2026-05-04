@@ -70,6 +70,7 @@ const SearchBar = (): JSX.Element => {
 				<div className={styles.searchBar}>
 					<div className={styles.searchDiv}>
 						<SearchIcon className={styles.icon} height={32} width={32} />
+
 						<input
 							className={styles.search}
 							aria-controls="async-select-list"
@@ -115,6 +116,7 @@ const SearchBar = (): JSX.Element => {
 											onMouseDown={(event): void => event.preventDefault()}
 											role="option">
 											<Image alt={`${character.server} Icon`} height={48} src={imageSrc} width={48} />
+
 											<span>
 												{character.server}: {character.name} - {character.class}
 											</span>

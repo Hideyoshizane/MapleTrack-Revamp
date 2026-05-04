@@ -1,9 +1,11 @@
 .searchBar {
 	display: flex;
 	align-items: center;
+
 	width: 100%;
 	max-width: 648px;
 	height: 56px;
+
 	border-radius: 15px;
 	background-color: var(--default-white);
 
@@ -13,10 +15,14 @@
 
 	.searchDiv {
 		display: flex;
+
 		align-items: center;
+
 		gap: 16px;
+
 		width: 100%;
 		height: 100%;
+
 		margin-left: 16px;
 
 		.icon {
@@ -25,9 +31,12 @@
 
 		.search {
 			flex: 1;
+
 			height: 100%;
+
 			border: none;
 			background: transparent;
+
 			font-size: 24px;
 			color: var(--default-button-text);
 
@@ -46,12 +55,17 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+
 	width: 648px;
 	min-height: 64px;
+
 	border-radius: 15px;
 	background-color: var(--default-white);
+
 	font-size: 24px;
+
 	filter: drop-shadow(0 0 3px #121212);
+
 	margin-top: 8px;
 }
 
@@ -72,10 +86,15 @@
 	.resultItem {
 		display: flex;
 		align-items: center;
+
 		gap: 8px;
+
 		height: 64px;
+
 		transition: background-color 0.15s ease;
+
 		cursor: pointer;
+
 		padding-left: 8px;
 
 		&:hover {

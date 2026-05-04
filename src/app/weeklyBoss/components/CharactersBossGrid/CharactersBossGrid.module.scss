@@ -2,8 +2,12 @@
 	display: grid;
 	align-items: start;
 	justify-content: space-between;
+
 	gap: 16px;
+
 	width: 1480px;
+
 	grid-template-columns: repeat(3, 480px);
+
 	margin-top: 24px;
 }

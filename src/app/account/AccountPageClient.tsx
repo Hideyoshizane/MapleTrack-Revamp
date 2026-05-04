@@ -4,7 +4,8 @@ import { useForm, useWatch } from 'react-hook-form';
 
 import Button from '@components/Button/button';
 import FormInput from '@components/FormInput/formInput';
-import { validatePassword, validatePasswordConfirmation } from '@utils/validators';
+import { passwordFieldSchema } from '@features/user/schemas/user.schema';
+import { zodValidator, confirmPasswordValidator } from '@utils/validators';
 
 import AlertDialogComponent from './Components/AlertDialogComponent/alertDialogComponent';
 import { useChangePassword } from './hooks/useChangePassword';
@@ -12,7 +13,6 @@ import { useDeleteAccount } from './hooks/useDeleteAccount';
 import styles from './page.module.scss';
 
 import type { ChangePasswordFormData } from '@sharedTypes/form';
-import type { ValidationResult } from '@utils/validateField';
 import type { JSX } from 'react';
 
 const AccountPageClient = (): JSX.Element => {
@@ -21,44 +21,33 @@ const AccountPageClient = (): JSX.Element => {
 		handleSubmit,
 		formState: { isSubmitting, isSubmitted },
 		getValues,
-		setError,
 	} = useForm<ChangePasswordFormData>({
 		mode: 'onBlur',
 		defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
 	});
 
-	const { onSubmit } = useChangePassword({ setError });
+	const { onSubmit } = useChangePassword();
 	const { isDeleteDialogOpen, openDeleteDialog, closeDeleteDialog, handleDelete } = useDeleteAccount();
 
 	const commonInputProps = { control, isSubmitted, isLightmode: true };
 
-	const handleFormSubmit = handleSubmit(onSubmit);
-
 	const newPassword: string = useWatch({ control, name: 'newPassword' });
-
 	const confirmPassword: string = useWatch({ control, name: 'confirmPassword' });
 
-	const isSubmitDisabled =
-		isSubmitting ||
-		!validatePassword(newPassword).isValid ||
-		!validatePasswordConfirmation(newPassword, confirmPassword).isValid;
+	const isSubmitDisabled = isSubmitting || !newPassword || !confirmPassword;
 
 	return (
 		<section className="mainContent">
 			<p className={styles.title}>Account Settings</p>
 			<p className={styles.subTitle}>Change Password</p>
 
-			<form
-				noValidate
-				onSubmit={(e): void => {
-					void handleFormSubmit(e);
-				}}>
+			<form noValidate onSubmit={(e): void => void handleSubmit(onSubmit)(e)}>
 				<div className={styles.firstInput}>
 					<FormInput<ChangePasswordFormData>
 						id="currentPassword"
 						label="Old password"
 						type="password"
-						validation={validatePassword}
+						validators={[zodValidator(passwordFieldSchema)]}
 						{...commonInputProps}
 						isLogin={true}
 					/>
@@ -68,7 +57,7 @@ const AccountPageClient = (): JSX.Element => {
 					id="newPassword"
 					label="New password"
 					type="password"
-					validation={validatePassword}
+					validators={[zodValidator(passwordFieldSchema)]}
 					{...commonInputProps}
 					isLightmode={true}
 				/>
@@ -76,7 +65,7 @@ const AccountPageClient = (): JSX.Element => {
 					id="confirmPassword"
 					label="Confirm password"
 					type="password"
-					validation={(value): ValidationResult => validatePasswordConfirmation(getValues('newPassword'), value)}
+					validators={[zodValidator(passwordFieldSchema), confirmPasswordValidator(() => getValues('newPassword'))]}
 					{...commonInputProps}
 					isLightmode={true}
 				/>

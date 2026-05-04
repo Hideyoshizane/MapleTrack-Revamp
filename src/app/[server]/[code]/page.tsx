@@ -10,11 +10,11 @@ import CharacterPage from './characterPage';
 
 import type { JSX } from 'react';
 
-type CharactersPageProps = {
+type Props = {
 	params: Promise<{ server: string; code: string }>;
 };
 
-const CharactersPage = async ({ params }: CharactersPageProps): Promise<JSX.Element> => {
+const CharactersPage = async ({ params }: Props): Promise<JSX.Element> => {
 	const { server, code } = await params;
 
 	const session = await auth();

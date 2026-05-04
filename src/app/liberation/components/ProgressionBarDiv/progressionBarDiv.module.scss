@@ -3,16 +3,21 @@ $smallMargin: 8px;
 .progressBar {
 	display: flex;
 	flex-direction: column;
+
 	gap: 16px;
+
 	margin-bottom: 16px;
 	margin-top: $smallMargin;
 
 	.progressBarText {
 		display: flex;
 		justify-content: space-between;
+
 		width: 100%;
+
 		font-size: 24px;
 		font-weight: 400;
+
 		margin-bottom: $smallMargin;
 	}
 }

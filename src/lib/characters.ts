@@ -1,6 +1,6 @@
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 import { prisma } from '@lib/prisma';
-import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
+import { sanitizeInput } from '@utils/sanitizeInput';
 import { hasWeeklyResetOccurred, hasDailyResetOccurred } from '@utils/time';
 
 import { fetchCharacterDataFromApi } from './fetchCharacterDataFromApi';
@@ -14,7 +14,7 @@ const sanitizeString = (input: unknown): string | null => {
 		return null;
 	}
 
-	return sanitizeInputBackEnd(input) || null;
+	return sanitizeInput(input) || null;
 };
 
 const getSymbolIds = async (tx: Prisma.TransactionClient, characterId: string): Promise<string[]> => {

@@ -5,6 +5,7 @@ $iconSize: 32px;
 .wrapper {
 	display: flex;
 	align-items: center;
+
 	width: 100%;
 	height: 56px;
 
@@ -22,6 +23,7 @@ $iconSize: 32px;
 
 	.serverName {
 		width: 140px;
+
 		font-size: 32px;
 		color: var(--default-white);
 	}
@@ -29,7 +31,9 @@ $iconSize: 32px;
 	.icon {
 		width: $iconSize;
 		height: $iconSize;
+
 		color: var(--default-white);
+
 		margin-left: $spacingMedium;
 		margin-right: $spacingSmall;
 	}

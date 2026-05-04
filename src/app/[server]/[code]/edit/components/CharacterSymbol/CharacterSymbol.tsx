@@ -7,7 +7,7 @@ import type { getEditCharacterDataResponseBody } from '@features/character/schem
 import type { SymbolCategory } from '@prisma/client';
 import type { JSX } from 'react';
 
-type SymbolGridsProps = {
+type Props = {
 	characterLevel: number;
 	characterJobType: JobType;
 	character?: getEditCharacterDataResponseBody;
@@ -25,12 +25,7 @@ const SYMBOL_SECTIONS: readonly SymbolSectionConfig[] = [
 	{ type: 'grand', title: 'Grand Sacred Symbols' },
 ] as const;
 
-const SymbolGrids = ({
-	characterLevel,
-	characterJobType,
-	character,
-	updateCharacter,
-}: SymbolGridsProps): JSX.Element => {
+const SymbolGrids = ({ characterLevel, characterJobType, character, updateCharacter }: Props): JSX.Element => {
 	if (!character) {
 		return <div />;
 	}

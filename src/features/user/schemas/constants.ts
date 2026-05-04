@@ -8,4 +8,4 @@ export const PASSWORD_MAX_LENGTH = 72;
 
 export const EMAIL_MAX_LENGTH = 100;
 
-export const CUSTOM_RESERVED_USERNAMES = ['mapletrack', 'maple-track'];
+export const CUSTOM_RESERVED_USERNAMES = ['MapleTrack', 'mapletrack', 'maple-track'];

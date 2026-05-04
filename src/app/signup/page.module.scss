@@ -5,8 +5,10 @@
 
 	.logoDiv {
 		position: relative;
+
 		width: 750px;
 		height: 250px;
+
 		margin-bottom: 32px;
 		margin-top: 5%;
 	}
@@ -14,14 +16,17 @@
 	.title {
 		font-size: 1.75rem;
 		color: var(--default-white);
+
 		margin-bottom: 32px;
 	}
 
 	.submitButton {
 		width: 320px;
 		height: 48px;
+
 		border: 1px solid var(--primary-color-button);
 		background-color: var(--primary-color-button);
+
 		margin-left: 32px;
 		margin-top: 24px;
 

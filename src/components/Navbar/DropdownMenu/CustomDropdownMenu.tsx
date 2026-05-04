@@ -12,14 +12,14 @@ import LogoutButton from './DropdownMenuButton/logoutButton';
 
 import type { JSX } from 'react';
 
-type CustomDropdownMenuProps = {
+type Props = {
 	username: string;
 };
 const MENU_ITEMS = [{ text: 'Classes' }, { text: 'Weekly' }, { text: 'Liberation' }, { text: 'Account' }] as const;
 
 const ICON_SIZE = 48;
 
-const CustomDropdownMenu = ({ username }: CustomDropdownMenuProps): JSX.Element => {
+const CustomDropdownMenu = ({ username }: Props): JSX.Element => {
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
@@ -27,6 +27,7 @@ const CustomDropdownMenu = ({ username }: CustomDropdownMenuProps): JSX.Element 
 					<ResponsiveText className={styles.usernameText} height={40} maxFontSize={32} minFontSize={12} width={200}>
 						{username}
 					</ResponsiveText>
+
 					<MenuIcon className={styles.icon} height={ICON_SIZE} width={ICON_SIZE} />
 				</button>
 			</DropdownMenu.Trigger>
@@ -37,6 +38,7 @@ const CustomDropdownMenu = ({ username }: CustomDropdownMenuProps): JSX.Element 
 						(item): JSX.Element => (
 							<Fragment key={item.text}>
 								<DropdownMenuButton text={item.text} />
+
 								<DropdownMenu.Separator className={styles.separator} />
 							</Fragment>
 						),

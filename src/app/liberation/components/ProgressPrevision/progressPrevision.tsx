@@ -1,12 +1,13 @@
 'use client';
 
+import { format } from 'date-fns';
+
 import styles from './progressPrevision.module.scss';
 
-import type { Dayjs } from 'dayjs';
 import type { JSX, ChangeEvent } from 'react';
 
 type Props = {
-	selectedDate: Dayjs;
+	selectedDate: Date;
 	onChangeDate: (value: string) => void;
 };
 
@@ -21,7 +22,7 @@ const ProgressPrevision = ({ selectedDate, onChangeDate }: Props): JSX.Element =
 				className={styles.date}
 				onChange={(event: ChangeEvent<HTMLInputElement>): void => onChangeDate(event.target.value)}
 				type="date"
-				value={selectedDate.utc().format('YYYY-MM-DD')}
+				value={format(selectedDate, 'yyyy-MM-dd')}
 			/>
 		</div>
 	);

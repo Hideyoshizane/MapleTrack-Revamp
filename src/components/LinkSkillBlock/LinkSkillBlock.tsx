@@ -10,7 +10,7 @@ import styles from './linkSkillBlock.module.scss';
 
 import type { JSX } from 'react';
 
-type LinkSkillProps = {
+type Props = {
 	characterLevel: number;
 	characterLinkSkill: string;
 	iconSize?: number;
@@ -22,9 +22,8 @@ const LinkSkillBlock = ({
 	characterLinkSkill,
 	iconSize = 48,
 	showTooltip = false,
-}: LinkSkillProps): JSX.Element | null => {
+}: Props): JSX.Element | null => {
 	const linkSkill = getLinkSkillByName(characterLinkSkill);
-
 	if (!linkSkill) {
 		return null;
 	}
@@ -34,6 +33,7 @@ const LinkSkillBlock = ({
 	const content = (
 		<div className={styles.iconDiv}>
 			<p className={clsx(showTooltip ? styles.iconDivText : styles.iconDivTextWhite)}>Link Skill:</p>
+
 			<Image alt={linkSkill.name} height={iconSize} quality={100} src={linkSkill.image} width={iconSize} />
 		</div>
 	);

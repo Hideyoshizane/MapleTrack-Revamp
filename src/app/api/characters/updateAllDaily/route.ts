@@ -1,6 +1,3 @@
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
 import {
 	getContentValue,
 	calculateNewLevelFromExp,
@@ -14,12 +11,11 @@ import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
 import { logError, logApiFailure, logZodError } from '@utils/logger';
+import { nowInUtc } from '@utils/time';
 
 import type { LevelUpResult } from '@data/symbols/symbolMappings';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
-
-dayjs.extend(utc);
 
 const DAILY_CONTENT_TYPE = 'Daily Quest' as const;
 
@@ -31,11 +27,11 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const parseResult = updateCharacterAllDailyRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
 			logZodError(parseResult.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
 		const { server, className, id, arcaneBonus, sacredBonus } = parseResult.data;
-		const now = dayjs().utc().toDate();
 
 		// Search for the character and update
 		const updatedResults = await prisma.$transaction(async (tx) => {
@@ -45,10 +41,10 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					symbols: { select: { id: true, name: true, level: true, exp: true, category: true, contents: true } },
 				},
 			});
-
 			if (!character) {
 				return null;
 			}
+
 			const results: Record<string, LevelUpResult> = {};
 			const symbolUpdates: Parameters<typeof tx.characterSymbol.update>[0][] = [];
 			const contentUpdates: Parameters<typeof tx.characterContent.update>[0][] = [];
@@ -96,7 +92,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 					contentUpdates.push({
 						where: { symbolId_contentType: { symbolId: symbol.id, contentType: dailyContent.contentType } },
-						data: { cleared: true, date: now },
+						data: { cleared: true, date: nowInUtc() },
 					});
 
 					results[symbol.name] = newValues;
@@ -117,12 +113,14 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		if (!updatedResults) {
 			logApiFailure('Character not found', { route });
+
 			return createResponse<ApiResponse>({ success: true, message: 'Character not found.' }, 200);
 		}
 
 		const validation = updateCharacterAllDailyResponseSchema.safeParse(updatedResults);
 		if (!validation.success) {
 			logZodError(validation.error, { route: route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 		}
 
@@ -132,6 +130,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		);
 	} catch (error) {
 		logError(error, { route: route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

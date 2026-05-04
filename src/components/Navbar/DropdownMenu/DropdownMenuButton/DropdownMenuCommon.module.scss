@@ -1,10 +1,14 @@
 .dropdownItem {
 	display: flex;
 	align-items: center;
+
 	gap: 8px;
+
 	width: 272px;
 	height: 56px;
+
 	cursor: pointer;
+
 	outline: none;
 	text-decoration: none;
 
@@ -14,6 +18,7 @@
 
 	.icon {
 		color: var(--default-white);
+
 		margin-left: 8px;
 	}
 

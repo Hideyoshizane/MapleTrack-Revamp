@@ -1,21 +1,26 @@
 .characterName {
 	width: 600px;
+
 	border: none;
 	background-color: transparent;
+
 	font-size: 72px;
 	font-weight: 600;
 	text-align: end;
 	color: var(--default-button-text);
+
 	outline: none;
 
 	&::placeholder {
 		border: none;
 		color: var(--placeholder-color-text);
+
 		outline: none;
 	}
 
 	&:focus {
 		border: none;
+
 		outline: none;
 	}
 

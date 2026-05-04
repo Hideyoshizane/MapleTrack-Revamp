@@ -7,7 +7,7 @@ import { characterNameRawSchema } from '@features/character/schemas/character.sc
 import type { getCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { Dispatch, SetStateAction } from 'react';
 
-type UseCharacterInputsProps = {
+type Props = {
 	character: getCharacterDataResponseBody | null;
 	updateCharacter: (recipe: (draft: getCharacterDataResponseBody) => void) => void;
 	setSyncEnabled: (value: boolean) => void;
@@ -27,11 +27,7 @@ type UseCharacterInputsReturn = {
 	toggleSync: () => void;
 };
 
-export const useCharacterInputs = ({
-	character,
-	updateCharacter,
-	setSyncEnabled,
-}: UseCharacterInputsProps): UseCharacterInputsReturn => {
+export const useCharacterInputs = ({ character, updateCharacter, setSyncEnabled }: Props): UseCharacterInputsReturn => {
 	const [levelInput, setLevelInput] = useState<string>(() => character?.level.toString() ?? '');
 	const [targetLevelInput, setTargetLevelInput] = useState<string>(() => character?.targetLevel.toString() ?? '');
 	const [syncEnabled, setLocalSyncEnabled] = useState<boolean>(() => !!character?.syncing);
@@ -63,6 +59,7 @@ export const useCharacterInputs = ({
 
 	const nameError: string | null =
 		character.name === 'Character Name' || !character.name.trim() ? 'Please enter a valid name' : null;
+
 	const handleNameBlur = (value: string): void => {
 		const result = characterNameRawSchema.safeParse(value);
 		if (!result.success) {

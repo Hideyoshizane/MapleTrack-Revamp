@@ -1,55 +1,83 @@
-import dayjs from './dayjs';
+import {
+	addDays,
+	addMonths,
+	addMinutes,
+	isAfter,
+	isSameDay as isSameDayFn,
+	nextDay,
+	startOfDay,
+	startOfMonth,
+	differenceInSeconds,
+} from 'date-fns';
 
-import type { Dayjs } from 'dayjs';
+export const nowInUtc = (): Date => new Date();
 
-// Returns current UTC time as a Dayjs instance
-export const nowInUtc = (): dayjs.Dayjs => dayjs.utc();
+const THURSDAY = 4;
 
-// Normalize input into a UTC Dayjs object
-export const toUtc = (date: string | Date | Dayjs): Dayjs => {
-	const day = dayjs.utc(date);
-	if (!day.isValid()) {
-		throw new Error(`Invalid date provided to toUtc(): ${date.toLocaleString()}`);
+export const getNextMidnight = (date: Date): Date => {
+	return startOfDay(addDays(date, 1));
+};
+
+export const getNextWeeklyResetDate = (date: Date): Date => {
+	return startOfDay(nextDay(date, THURSDAY));
+};
+
+export const getNextMonthFirstDay = (date: Date): Date => {
+	return startOfMonth(addMonths(date, 1));
+};
+
+const hasResetPassed = (nextResetDate: Date): boolean => {
+	return isAfter(nowInUtc(), nextResetDate);
+};
+
+export const hasDailyResetOccurred = (date: Date | null): boolean => {
+	if (!date) {
+		return true;
 	}
-
-	return day;
+	return hasResetPassed(getNextMidnight(date));
 };
 
-export enum WEEKDAYS {
-	THURSDAY = 4,
-}
-
-export const getNextResetTime = (date: string | Date | Dayjs, targetWeekday: number): Dayjs => {
-	const givenDate = toUtc(date);
-
-	// Calculate how many days until the target weekday
-	const daysUntilReset = (targetWeekday + 7 - givenDate.day()) % 7 || 7;
-
-	// Move to the target weekday and reset to midnight
-	return givenDate.add(daysUntilReset, 'day').startOf('day');
-};
-
-const hasResetOccurred = (resetTime: Dayjs): boolean => nowInUtc().isAfter(resetTime);
-
-export const hasDailyResetOccurred = (date: string | Date | Dayjs | null | undefined): boolean => {
+export const hasWeeklyResetOccurred = (date: Date | null): boolean => {
 	if (!date) {
 		return true;
 	}
 
-	return hasResetOccurred(toUtc(date).add(1, 'day').startOf('day'));
+	const nextThursdayReset = startOfDay(nextDay(date, THURSDAY));
+
+	return isAfter(nowInUtc(), nextThursdayReset);
 };
 
-export const hasWeeklyResetOccurred = (date: string | Date | Dayjs | null | undefined): boolean => {
+export const hasMonthlyResetOccurred = (date: Date | null): boolean => {
 	if (!date) {
 		return true;
 	}
-	return hasResetOccurred(getNextResetTime(date, WEEKDAYS.THURSDAY));
+	return hasResetPassed(getNextMonthFirstDay(date));
 };
 
-export const hasMonthlyResetOccurred = (date: string | Date | Dayjs | null | undefined): boolean => {
-	if (!date) {
-		return true;
-	}
+export const isSameDay = (date1: Date, date2: Date): boolean => {
+	return isSameDayFn(date1, date2);
+};
 
-	return hasResetOccurred(toUtc(date).add(1, 'month').startOf('month'));
+export const addMinutesToDate = (date: Date, minutes: number): Date => {
+	return addMinutes(date, minutes);
+};
+
+export type remainingTime = {
+	days?: number;
+	hours: number;
+	minutes: number;
+	seconds: number;
+};
+
+export const getRemainingTime = (target: Date, now: Date): remainingTime => {
+	const totalSeconds = Math.max(0, differenceInSeconds(target, now));
+
+	const days = Math.floor(totalSeconds / 86400);
+	const remainingSeconds = totalSeconds % 86400;
+
+	const hours = Math.floor(remainingSeconds / 3600);
+	const minutes = Math.floor((remainingSeconds % 3600) / 60);
+	const seconds = remainingSeconds % 60;
+
+	return { days, hours, minutes, seconds };
 };

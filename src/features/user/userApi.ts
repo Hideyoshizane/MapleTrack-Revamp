@@ -14,7 +14,7 @@ export const userApi = {
 	changePassword: (payload: ChangePasswordRequestBody): Promise<ApiResponse> =>
 		requestApi('/auth/change-password', 'POST', payload),
 
-	signup: (payload: SignupRequestBody): Promise<ApiResponse> => requestApi('/auth/signup', 'POST', payload),
+	signUp: (payload: SignupRequestBody): Promise<ApiResponse> => requestApi('/auth/signup', 'POST', payload),
 
 	resetPassword: (payload: ResetPasswordRequestBody): Promise<ApiResponse> =>
 		requestApi('/auth/reset-password', 'POST', payload),

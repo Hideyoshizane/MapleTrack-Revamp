@@ -9,12 +9,15 @@ $marginTopLarge: 40px;
 
 .topBar {
 	display: flex;
+
 	gap: 16px;
+
 	margin-top: 24px;
 
 	.bossHunt {
 		display: flex;
 		align-items: center;
+
 		width: 240px;
 
 		.bossIcon {
@@ -23,6 +26,7 @@ $marginTopLarge: 40px;
 
 		.bossTitle {
 			width: 152px;
+
 			font-size: 40px;
 			font-weight: $fontWeightMedium;
 			color: $textColor;
@@ -32,8 +36,10 @@ $marginTopLarge: 40px;
 	.weekProgress {
 		display: flex;
 		align-items: center;
+
 		width: 328px;
 		height: $heightTopbar;
+
 		border-radius: $borderRadius;
 		background-color: $hudColor;
 
@@ -53,6 +59,7 @@ $marginTopLarge: 40px;
 			.weekProgressNumber {
 				display: flex;
 				justify-content: flex-end;
+
 				font-size: 24px;
 				font-weight: $fontWeightMedium;
 				color: var(--default-button-text);
@@ -63,8 +70,10 @@ $marginTopLarge: 40px;
 	.totalGain {
 		display: flex;
 		align-items: center;
+
 		width: 376px;
 		height: $heightTopbar;
+
 		border-radius: $borderRadius;
 		background-color: $hudColor;
 
@@ -87,6 +96,7 @@ $marginTopLarge: 40px;
 				display: flex;
 				align-items: center;
 				justify-content: flex-end;
+
 				height: 38px;
 			}
 		}
@@ -95,20 +105,26 @@ $marginTopLarge: 40px;
 	.serverDropdown {
 		position: relative;
 		z-index: 900;
+
 		display: flex;
+
 		width: 256px;
 		height: $buttonHeight;
+
 		margin-top: $marginTopLarge;
 	}
 
 	.editCharacterButton {
 		width: 216px;
 		height: $buttonHeight;
+
 		border-radius: 50px;
 		background-color: var(--default-color-button);
+
 		font-size: 24px;
 		font-weight: 600;
 		color: var(--default-button-text);
+
 		margin-top: $marginTopLarge;
 	}
 }
@@ -136,6 +152,7 @@ $marginTopLarge: 40px;
 		.title {
 			font-size: 32px;
 			color: $textColor;
+
 			margin-bottom: 24px;
 			margin-top: 36px;
 		}

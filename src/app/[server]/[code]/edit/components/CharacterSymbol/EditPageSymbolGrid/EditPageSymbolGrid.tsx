@@ -10,7 +10,7 @@ import type {
 } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
-type EditPageSymbolGridProps = {
+type Props = {
 	type: 'arcane' | 'sacred' | 'grand';
 	symbols: getEditCharacterDataSymbolsResponseBody[];
 	characterLevel: number;
@@ -26,7 +26,7 @@ const EditPageSymbolGrid = ({
 	characterJobType,
 	size = 24,
 	updateCharacter,
-}: EditPageSymbolGridProps): JSX.Element => {
+}: Props): JSX.Element => {
 	return (
 		<div className={styles.symbolGrid}>
 			{symbols.map(
@@ -47,4 +47,3 @@ const EditPageSymbolGrid = ({
 };
 
 export default EditPageSymbolGrid;
-/**/

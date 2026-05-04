@@ -12,7 +12,7 @@ export const SERVER_NAMES = servers.map((server): string => server.name) as read
 
 export type ServerName = (typeof SERVER_NAMES)[number];
 
-export const DEFAULT_SERVER_NAME: ServerName = 'Scania';
+export const DEFAULT_SERVER_NAME: ServerName = 'Bera';
 
 const serversMap: ReadonlyMap<string, Server> = new Map(
 	servers.map((server): [string, Server] => [server.name.toLowerCase(), server]),

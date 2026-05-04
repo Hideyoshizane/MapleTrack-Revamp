@@ -24,13 +24,14 @@ import type { ServerName } from '@data/servers/servers';
 import type { getBossListResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
-type WeeklyPageClientProps = {
+type Props = {
 	initialServer: ServerName;
 };
 
-const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element => {
+const WeeklyPageClient = ({ initialServer }: Props): JSX.Element => {
 	const pathname = usePathname();
 	const router = useRouter();
+
 	const searchParams = useSearchParams();
 	const success = searchParams.get('success');
 
@@ -96,6 +97,7 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 				toast.error('Failed to update boss');
 				return;
 			}
+
 			if (response.data.bossType) {
 				const questType = response.data.bossType == 'genesis' ? 'Genesis' : 'Destiny';
 				if (response.data.liberationPoints !== null) {
@@ -151,6 +153,7 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 			<div className={styles.topBar}>
 				<div className={styles.bossHunt}>
 					<BossIcon className={styles.bossIcon} height={BOSS_ICON_SIZE} width={BOSS_ICON_SIZE} />
+
 					<p className={styles.bossTitle}>Boss Hunting</p>
 				</div>
 
@@ -166,9 +169,11 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 					/>
 					<div className={styles.content}>
 						<p className={styles.weekTitle}>Week Progress</p>
+
 						<p className={styles.weekProgressNumber}>
 							{weeklyBosses}/{WEEKLY_BOSSES_TOTAL}
 						</p>
+
 						<ProgressBar
 							height={16}
 							jobType={'default'}
@@ -191,6 +196,7 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 					/>
 					<div className={styles.content}>
 						<p className={styles.totalGainTitle}>Total Gain</p>
+
 						<NumberFlow className={styles.totalGainValue} value={totalGains} />
 					</div>
 				</div>
@@ -219,8 +225,11 @@ const WeeklyPageClient = ({ initialServer }: WeeklyPageClientProps): JSX.Element
 				<div className={styles.wrapper}>
 					<div className={styles.notFoundList}>
 						<ErrorIcon className={styles.errorIcon} height={BOSS_ICON_SIZE} width={BOSS_ICON_SIZE} />
+
 						<p className={styles.title}>No character found!</p>
+
 						<p className={styles.text}>You haven&apos;t marked any characters as Boss Slayer yet.</p>
+
 						<p className={styles.text}>Go to your desired character and set it as a Boss Slayer to see them here.</p>
 					</div>
 				</div>

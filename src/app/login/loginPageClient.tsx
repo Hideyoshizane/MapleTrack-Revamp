@@ -8,7 +8,8 @@ import { useForm } from 'react-hook-form';
 import Button from '@components/Button/button';
 import FooterOutside from '@components/FooterOutside/footerOutside';
 import FormInput from '@components/FormInput/formInput';
-import { validateUsernameLogin, validatePasswordLogin } from '@utils/validators';
+import { usernameRawSchema, passwordRawSchema } from '@features/user/schemas/user.raw.schema';
+import { zodValidator } from '@utils/validators';
 
 import { useLogin } from './hooks/useLogin';
 import { useToastQueryParams } from './hooks/useToastQueryParams';
@@ -22,11 +23,10 @@ const LoginPageClient = (): JSX.Element => {
 		control,
 		handleSubmit,
 		formState: { isSubmitting, isSubmitted },
-		setError,
 	} = useForm<LoginFormData>({ mode: 'onBlur', defaultValues: { username: '', password: '' } });
 	const router = useRouter();
 
-	const { submitLogin } = useLogin(setError, router);
+	const { submitLogin } = useLogin(router);
 
 	useToastQueryParams();
 
@@ -43,7 +43,7 @@ const LoginPageClient = (): JSX.Element => {
 					id="username"
 					label="Username"
 					type="text"
-					validation={validateUsernameLogin}
+					validators={[zodValidator(usernameRawSchema)]}
 					{...commonInputProps}
 					isLogin={true}
 				/>
@@ -52,7 +52,7 @@ const LoginPageClient = (): JSX.Element => {
 					id="password"
 					label="Password"
 					type="password"
-					validation={validatePasswordLogin}
+					validators={[zodValidator(passwordRawSchema)]}
 					{...commonInputProps}
 					isLogin={true}
 				/>

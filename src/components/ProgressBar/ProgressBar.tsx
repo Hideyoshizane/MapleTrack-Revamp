@@ -20,7 +20,7 @@ const jobTypeClassMap: Record<JobType, string> = {
 	complete: styles.complete,
 };
 
-type ProgressBarProps = {
+type Props = {
 	value: number;
 	maxValue: number;
 	jobType: JobType;
@@ -40,19 +40,17 @@ const ProgressBar = ({
 	height,
 	forceFull = false,
 	disabled = false,
-}: ProgressBarProps): JSX.Element => {
-	let percentage: number = 0;
+}: Props): JSX.Element => {
+	let percentage = 0;
 
 	if (forceFull) {
 		percentage = 100;
 	} else if (maxValue > 0 && value > 0 && !disabled) {
-		const rawPercent: number = (value / maxValue) * 100;
+		const rawPercent = (value / maxValue) * 100;
 		percentage = Math.min(Math.max(rawPercent, 5.35), 100);
 	}
 
-	const indicatorStyle: IndicatorStyle = {
-		'--progress-value': percentage,
-	};
+	const indicatorStyle: IndicatorStyle = { '--progress-value': percentage };
 
 	return (
 		<ProgressPrimitive.Root className={styles.progressRoot} max={100} style={{ width, height }} value={percentage}>

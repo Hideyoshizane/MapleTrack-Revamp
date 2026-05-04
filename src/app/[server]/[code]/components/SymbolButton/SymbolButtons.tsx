@@ -18,7 +18,7 @@ import type {
 } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
-type SymbolButtonsProps = {
+type Props = {
 	symbol: getCharacterDataSymbolsResponseBody;
 	dailyValue: number;
 	bonus: number;
@@ -42,7 +42,7 @@ const SymbolButtons = ({
 	disableAllDaily = false,
 	optimisticDailyCleared,
 	optimisticWeeklyTries,
-}: SymbolButtonsProps): JSX.Element => {
+}: Props): JSX.Element => {
 	const queryClient = useQueryClient();
 
 	const { mutateAsync: updateDaily } = useUpdateSymbolDaily();
@@ -52,13 +52,8 @@ const SymbolButtons = ({
 		try {
 			const [server, code] = window.location.pathname.split('/').filter(Boolean);
 			const className = getClassNameByCode(code);
-			const result = await updateDaily({
-				server,
-				className: className ?? '',
-				id: symbol.id,
-				bonus,
-			});
 
+			const result = await updateDaily({ server, className: className ?? '', id: symbol.id, bonus });
 			if (!result.success || !result.data) {
 				return;
 			}

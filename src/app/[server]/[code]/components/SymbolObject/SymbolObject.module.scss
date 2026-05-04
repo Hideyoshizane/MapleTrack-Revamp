@@ -6,12 +6,14 @@ $spacingSmall: 4px;
 
 .symbolContainer {
 	display: flex;
+
 	width: $symbolContainerWidth;
 	height: $fullHeight;
 
 	.imageContainer {
 		display: flex;
 		align-items: center;
+
 		height: $fullHeight;
 
 		.off {
@@ -24,11 +26,13 @@ $spacingSmall: 4px;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+
 		height: $fullHeight;
 
 		.levelInfo {
 			display: flex;
 			justify-content: space-between;
+
 			width: $infoWidth;
 			height: 23px;
 
@@ -45,6 +49,7 @@ $spacingSmall: 4px;
 			width: $infoWidth;
 			font-size: 16px;
 			color: var(--default-button-text);
+
 			margin-top: $spacingSmall;
 		}
 

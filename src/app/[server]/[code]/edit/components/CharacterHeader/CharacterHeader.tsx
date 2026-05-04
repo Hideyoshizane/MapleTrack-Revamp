@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import Button from '@components/Button/button';
 import Tooltip from '@components/Tooltip/tooltip';
 import { characterApi } from '@features/character/characterApi';
-import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
+import { sanitizeInput } from '@utils/sanitizeInput';
 
 import styles from './characterHeader.module.scss';
 
@@ -39,7 +39,7 @@ export const CharacterHeader = ({
 
 		try {
 			setSubmitLoading(true);
-			const payload: updateCharacterRequestBody = { ...character, server: sanitizeInputFrontend(server) };
+			const payload: updateCharacterRequestBody = { ...character, server: sanitizeInput(server) };
 			const result = await characterApi.updateCharacterData(payload);
 
 			if (result.success) {

@@ -5,7 +5,9 @@ $height: 56px;
 .classFilter {
 	display: flex;
 	align-items: center;
+
 	gap: 16px;
+
 	padding-left: 32px;
 
 	.title {
@@ -16,7 +18,9 @@ $height: 56px;
 
 	.options {
 		height: $height;
+
 		overflow: hidden;
+
 		border: 1px solid var(--default-black);
 		border-radius: 25px;
 
@@ -27,12 +31,16 @@ $height: 56px;
 			.option {
 				width: 180px;
 				height: $height;
+
 				border: none;
 				background-color: var(--default-white);
+
 				font-size: $fontSize;
 				font-weight: $fontWeight;
 				color: var(--default-button-text);
+
 				transition: background-color 0.2s ease;
+
 				cursor: pointer;
 
 				&:hover {
@@ -51,6 +59,7 @@ $height: 56px;
 			.separator {
 				width: 1px;
 				height: $height;
+
 				background-color: var(--default-black);
 			}
 		}

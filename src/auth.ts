@@ -1,13 +1,11 @@
-import argon2 from 'argon2';
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
 import { LASTVERSION } from '@data/user/constants';
-import { userSchema } from '@features/user/schemas/user.schema';
+import { credentialsSchema } from '@features/user/schemas/user.schema';
 import { updateLastLogin, updateUserVersion } from '@features/user/userService';
 import { prisma } from '@lib/prisma';
-import { sanitizeInputBackEnd } from '@utils/sanitizeInputBackEnd';
-import { validateUsernameLogin, validatePasswordLogin } from '@utils/validators';
+import { verifyPassword, DUMMY_HASH } from '@lib/security/password';
 
 import { updateMissingSymbolsForCharacters } from './features/character/characterUpdate';
 
@@ -43,8 +41,6 @@ type AppSession = DefaultSession & {
 	} & DefaultSession['user'];
 };
 
-type LoginCredentials = { username: string; password: string };
-
 export const { auth, handlers } = NextAuth({
 	providers: [
 		CredentialsProvider({
@@ -56,34 +52,20 @@ export const { auth, handlers } = NextAuth({
 
 			authorize: async (credentials) => {
 				try {
-					if (!credentials?.username || !credentials?.password) {
+					const parsedResult = credentialsSchema.safeParse(credentials);
+					if (!parsedResult.success) {
 						return null;
 					}
 
-					const { username, password } = credentials as LoginCredentials;
+					const { username, password } = parsedResult.data;
 
-					const cleanUsername = userSchema.shape.username.parse(username);
-					const cleanPassword = sanitizeInputBackEnd(password);
-					if (!cleanUsername || !cleanPassword) {
-						return null;
-					}
-
-					const usernameValid = validateUsernameLogin(cleanUsername);
-					const passwordValid = validatePasswordLogin(cleanPassword);
-					if (!usernameValid.isValid || !passwordValid.isValid) {
-						return null;
-					}
-
-					const dummyHash =
-						'$argon2id$v=19$m=65536,t=3,p=4$uX1p9U1nE8p4cXb3rFxNcg$hX57IVHIUi7fYcl0jYxA/0hhQ2PzefRgQdIMZcPgYG8';
-
-					const user = await prisma.user.findUnique({ where: { username: cleanUsername } });
+					const user = await prisma.user.findUnique({ where: { username } });
 					if (!user) {
-						await argon2.verify(dummyHash, cleanPassword).catch(() => null);
+						await verifyPassword(DUMMY_HASH, password);
 						return null;
 					}
 
-					const isValid = await argon2.verify(user.password, cleanPassword);
+					const isValid = await verifyPassword(user.password, password);
 					if (!isValid) {
 						return null;
 					}
@@ -111,6 +93,11 @@ export const { auth, handlers } = NextAuth({
 	},
 	session: { strategy: 'jwt', maxAge: 60 * 60 * 24 * 60 },
 	jwt: { maxAge: 60 * 60 * 24 * 60 },
+	cookies: {
+		sessionToken: {
+			options: { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', path: '/' },
+		},
+	},
 	callbacks: {
 		jwt: ({ token, user }) => {
 			if (user && isAppUser(user)) {

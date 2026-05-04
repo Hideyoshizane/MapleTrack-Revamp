@@ -16,7 +16,7 @@ import type { JSX } from 'react';
 const BOSS_ICON_SIZE = 90;
 const ICON_SIZE = 64;
 
-type CharacterBossLegionProps = {
+type Props = {
 	character: getEditCharacterDataResponseBody;
 	toggleBossing: () => void;
 	linkSkill: string;
@@ -25,14 +25,7 @@ type CharacterBossLegionProps = {
 	legion: string;
 };
 
-const CharacterBossLegion = ({
-	character,
-	toggleBossing,
-	linkSkill,
-	code,
-	jobType,
-	legion,
-}: CharacterBossLegionProps): JSX.Element => (
+const CharacterBossLegion = ({ character, toggleBossing, linkSkill, code, jobType, legion }: Props): JSX.Element => (
 	<div className={styles.characterBossLinkLegion}>
 		<div className={styles.bossSlot}>
 			<Tooltip content="Click to toggle Boss Slayer status" placement="bottom">

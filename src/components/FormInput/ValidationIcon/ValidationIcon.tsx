@@ -11,7 +11,12 @@ import styles from './validationIcon.module.scss';
 
 import type { FC, SVGProps, JSX } from 'react';
 
-type ValidationIconProps = {
+const ICONS: Record<'invalid' | 'info', FC<SVGProps<SVGSVGElement>>> = {
+	invalid: ErrorIcon as FC<SVGProps<SVGSVGElement>>,
+	info: InfoIcon as FC<SVGProps<SVGSVGElement>>,
+};
+
+type Props = {
 	showValid: boolean;
 	showInvalid: boolean;
 	tooltipMessage: string;
@@ -19,11 +24,6 @@ type ValidationIconProps = {
 	iconSize?: number;
 	className?: string;
 	isLightmode?: boolean;
-};
-
-const ICONS: Record<'invalid' | 'info', FC<SVGProps<SVGSVGElement>>> = {
-	invalid: ErrorIcon as FC<SVGProps<SVGSVGElement>>,
-	info: InfoIcon as FC<SVGProps<SVGSVGElement>>,
 };
 
 const ValidationIcon = ({
@@ -34,7 +34,7 @@ const ValidationIcon = ({
 	iconSize = 24,
 	className,
 	isLightmode = false,
-}: ValidationIconProps): JSX.Element => {
+}: Props): JSX.Element => {
 	// Show green check without tooltip
 	if (showValid) {
 		return <OkIcon className={clsx(styles.validIcon, className)} height={iconSize} width={iconSize} />;

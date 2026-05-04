@@ -10,13 +10,13 @@ import styles from './characterLiberationItem.module.scss';
 import type { GetLiberationListCharacterResponseBody } from '@features/liberation/schemas/liberation.response.schema';
 import type { JSX, KeyboardEvent } from 'react';
 
-type CharacterLiberationItemProps = {
+type Props = {
 	character: GetLiberationListCharacterResponseBody;
 	isSelected: boolean;
 	onClick?: () => void;
 };
 
-const CharacterLiberationItem = ({ character, isSelected, onClick }: CharacterLiberationItemProps): JSX.Element => {
+const CharacterLiberationItem = ({ character, isSelected, onClick }: Props): JSX.Element => {
 	const handleKey = (event: KeyboardEvent<HTMLDivElement>): void => {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();

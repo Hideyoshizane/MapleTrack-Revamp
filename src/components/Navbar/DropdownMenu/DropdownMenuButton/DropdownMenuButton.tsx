@@ -17,41 +17,26 @@ import type { FunctionComponent, SVGProps, JSX } from 'react';
 type SvgIconComponent = FunctionComponent<SVGProps<SVGSVGElement>>;
 
 const MENU_CONFIG = {
-	Classes: {
-		href: '/home',
-		label: 'Class Tracker',
-		Icon: ClassIcon as SvgIconComponent,
-	},
-	Weekly: {
-		href: '/weeklyBoss',
-		label: 'Weekly Bosses',
-		Icon: TrophyIcon as SvgIconComponent,
-	},
-	Liberation: {
-		href: '/liberation',
-		label: 'Liberation Quest',
-		Icon: SwordsIcon as SvgIconComponent,
-	},
-	Account: {
-		href: '/account',
-		label: 'Account Settings',
-		Icon: UserIcon as SvgIconComponent,
-	},
+	Classes: { href: '/home', label: 'Class Tracker', Icon: ClassIcon as SvgIconComponent },
+	Weekly: { href: '/weeklyBoss', label: 'Weekly Bosses', Icon: TrophyIcon as SvgIconComponent },
+	Liberation: { href: '/liberation', label: 'Liberation Quest', Icon: SwordsIcon as SvgIconComponent },
+	Account: { href: '/account', label: 'Account Settings', Icon: UserIcon as SvgIconComponent },
 } as const;
 
 type DropdownMenuKey = keyof typeof MENU_CONFIG;
 
-type DropdownMenuButtonProps = {
+type Props = {
 	text: DropdownMenuKey;
 };
 
-const DropdownMenuButton = ({ text }: DropdownMenuButtonProps): JSX.Element => {
+const DropdownMenuButton = ({ text }: Props): JSX.Element => {
 	const { href, label, Icon } = MENU_CONFIG[text];
 
 	return (
 		<DropdownMenu.Item className={commonStyles.dropdownItem} asChild>
 			<Link className={buttonStyles.dropdownLink} href={href}>
 				<Icon className={commonStyles.icon} height={DROPDOWN_ICON_SIZE} width={DROPDOWN_ICON_SIZE} />
+
 				<span className={commonStyles.text}>{label}</span>
 			</Link>
 		</DropdownMenu.Item>

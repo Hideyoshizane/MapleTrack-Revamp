@@ -4,15 +4,19 @@ $marginTop: 16px;
 .serverDropdown {
 	position: relative;
 	z-index: 900;
+
 	display: flex;
 	justify-content: flex-end;
+
 	width: $widthSize;
 	height: 56px;
+
 	margin-top: $marginTop;
 	padding-right: 32px;
 }
 
 .classFilter {
 	width: $widthSize;
+
 	margin-top: $marginTop;
 }

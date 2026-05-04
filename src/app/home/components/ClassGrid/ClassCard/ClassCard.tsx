@@ -22,19 +22,6 @@ import type { SymbolName } from '@data/symbols/symbolMappings';
 import type { getAllCharactersResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
-type ClassCardProps = {
-	character: getAllCharactersResponseBody;
-	serverCookie: string | undefined;
-};
-
-type SymbolProps = {
-	type: 'arcane' | 'sacred';
-	symbols: { name: string; level: number }[];
-	maxLevel: number;
-	size?: number;
-	characterLevel: number;
-};
-
 // Map JobType to class for conditional styles
 const jobLevelClassMap: Record<JobType, string> = {
 	default: styles.defaultLevel,
@@ -45,6 +32,14 @@ const jobLevelClassMap: Record<JobType, string> = {
 	xenon: styles.xenonLevel,
 	pirate: styles.pirateLevel,
 	complete: styles.complete,
+};
+
+type SymbolProps = {
+	type: 'arcane' | 'sacred';
+	symbols: { name: string; level: number }[];
+	maxLevel: number;
+	size?: number;
+	characterLevel: number;
 };
 
 // Subcomponent: renders Arcane/Sacred symbols in a grid
@@ -93,11 +88,17 @@ const IconSection = ({
 	</div>
 );
 
-const ClassCard = ({ character, serverCookie }: ClassCardProps): JSX.Element | null => {
+type Props = {
+	character: getAllCharactersResponseBody;
+	serverCookie: string | undefined;
+};
+
+const ClassCard = ({ character, serverCookie }: Props): JSX.Element | null => {
 	const router = useRouter();
 
 	if (!character.jobType || !character.legion) {
 		router.replace('/error');
+
 		return null;
 	}
 

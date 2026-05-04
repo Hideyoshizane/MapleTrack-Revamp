@@ -18,12 +18,6 @@ import type { JSX } from 'react';
 
 const CLASS_ORDER = ['mage', 'warrior', 'thief', 'bowman', 'pirate'];
 
-type ClassGridProps = {
-	serverCookie: string | undefined;
-	selectedClasses: ClassFilterOption[];
-	selectedClassesLoading: boolean;
-};
-
 const filterCharacters = (
 	results: getAllCharactersResponseBody[],
 	selectedClasses: ClassFilterOption[],
@@ -60,7 +54,13 @@ const sortCharacters = (characters: getAllCharactersResponseBody[]): getAllChara
 	});
 };
 
-const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: ClassGridProps): JSX.Element => {
+type Props = {
+	serverCookie: string | undefined;
+	selectedClasses: ClassFilterOption[];
+	selectedClassesLoading: boolean;
+};
+
+const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Props): JSX.Element => {
 	const router = useRouter();
 
 	const [allCharacters, setAllCharacters] = useState<getAllCharactersResponseBody[]>([]);

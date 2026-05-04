@@ -5,9 +5,12 @@ $iconSize: 40px;
 .wrapper {
 	display: flex;
 	align-items: center;
+
 	width: 100%;
 	height: 80px;
+
 	transition: background-color 0.2s;
+
 	cursor: pointer;
 
 	.bossIcon {
@@ -17,6 +20,7 @@ $iconSize: 40px;
 	.nameDiv {
 		display: flex;
 		flex-direction: column;
+
 		margin-left: 24px;
 
 		.bossName {
@@ -34,14 +38,17 @@ $iconSize: 40px;
 	.iconsDiv {
 		right: 0;
 		display: flex;
+
 		margin-left: auto;
 		margin-right: 16px;
 
 		.icon {
 			right: 0;
 			display: flex;
+
 			width: $iconSize;
 			height: $iconSize;
+
 			color: var(--default-button-text);
 		}
 	}

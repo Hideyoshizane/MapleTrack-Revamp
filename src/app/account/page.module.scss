@@ -6,11 +6,13 @@ $marginLeft: 32px;
 .title {
 	font-size: 48px;
 	font-weight: 500;
+
 	margin-top: $marginTop;
 }
 
 .subTitle {
 	font-size: 32px;
+
 	margin-top: $marginTop;
 }
 
@@ -22,8 +24,10 @@ $marginLeft: 32px;
 .submitButton {
 	width: $buttonWidth;
 	height: $buttonHeight;
+
 	border: 1px solid var(--primary-color-button);
 	background-color: var(--primary-color-button);
+
 	margin-left: $marginLeft;
 	margin-top: 16px;
 }
@@ -32,16 +36,20 @@ $marginLeft: 32px;
 	font-size: 40px;
 	font-weight: 700;
 	color: var(--danger-color-button);
+
 	margin-top: 160px;
 }
 
 .dangerButton {
 	width: $buttonWidth;
 	height: $buttonHeight;
+
 	border: 1px solid var(--danger-color-button);
 	background-color: var(--danger-color-button);
+
 	font-size: 16px;
 	font-weight: 600;
 	color: var(--default-white);
+
 	margin-top: 24px;
 }

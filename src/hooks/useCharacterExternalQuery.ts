@@ -23,9 +23,9 @@ export const useCharacterExternalQuery = ({
 			if (!name) {
 				throw new Error('Character name missing');
 			}
+
 			const payload = { characterName: name, server };
 			const res = await characterApi.getCharacterDataFromAPI(payload);
-
 			if (!res.success || !res.data) {
 				throw new Error('Failed to fetch external data');
 			}

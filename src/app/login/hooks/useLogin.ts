@@ -3,57 +3,33 @@
 import { signIn } from 'next-auth/react';
 import { toast } from 'react-toastify';
 
-import { sanitizeInputFrontend } from '@utils/sanitizeInputFrontEnd';
-import { handleFieldValidation } from '@utils/validateField';
-import { validateUsernameLogin, validatePasswordLogin } from '@utils/validators';
+import { credentialsSchema } from '@features/user/schemas/user.schema';
 
 import type { LoginFormData } from '@sharedTypes/form';
-import type { ValidationResult } from '@utils/validateField';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import type { UseFormSetError } from 'react-hook-form';
 
-export const useLogin = (
-	setError: UseFormSetError<LoginFormData>,
-	router: AppRouterInstance,
-): { submitLogin: (data: LoginFormData) => Promise<void> } => {
+export const useLogin = (router: AppRouterInstance): { submitLogin: (data: LoginFormData) => Promise<void> } => {
 	const submitLogin = async (data: LoginFormData): Promise<void> => {
 		try {
-			const username = sanitizeInputFrontend(data.username);
-			const password = sanitizeInputFrontend(data.password);
+			const parsed = credentialsSchema.safeParse(data);
 
-			const validations = {
-				username: validateUsernameLogin(username),
-				password: validatePasswordLogin(password),
-			};
+			const username = parsed.success ? parsed.data.username : data.username;
+			const password = parsed.success ? parsed.data.password : data.password;
 
-			const hasErrors = (Object.entries(validations) as [keyof LoginFormData, ValidationResult][]).some(
-				([field, result]): boolean => handleFieldValidation(field, result, setError),
-			);
+			const response = (await signIn('credentials', { redirect: false, username, password })) as
+				| { ok: boolean; error?: string | null }
+				| undefined;
 
-			if (hasErrors) {
-				return;
-			}
-
-			const response = (await signIn('credentials', {
-				redirect: false,
-				username,
-				password,
-			})) as { ok: boolean; error?: string; status?: number } | undefined;
-
-			if (!response) {
-				toast.error('Login failed: unknown error');
-				return;
-			}
-
-			if (response.error) {
+			if (!response || response.error) {
 				toast.error('Invalid username or password');
+
 				return;
 			}
 
 			toast.success('Login successful!');
 			void router.push('/home');
 		} catch (err: unknown) {
-			toast.error('Unexpected error occurred');
+			toast.error('Invalid username or password');
 			console.error('Login error:', err);
 		}
 	};

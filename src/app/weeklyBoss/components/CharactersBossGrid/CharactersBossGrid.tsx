@@ -9,13 +9,13 @@ import type { JSX } from 'react';
 
 type HandleBossToggle = (bossMosterId: string) => void | Promise<void>;
 
-type CharacterBossGridProps = {
+type Props = {
 	server: string;
 	characterList: getBossListCharacterResponseBody[];
 	handleBossToggle: HandleBossToggle;
 };
 
-const CharactersBossGrid = ({ server, characterList, handleBossToggle }: CharacterBossGridProps): JSX.Element => {
+const CharactersBossGrid = ({ server, characterList, handleBossToggle }: Props): JSX.Element => {
 	return (
 		<div className={styles.classGrid}>
 			{characterList.map((character): JSX.Element => {

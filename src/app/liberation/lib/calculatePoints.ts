@@ -4,6 +4,7 @@ export const calculateQuestPoints = (boss: string | null, type: string): number 
 	if (!boss) {
 		return 0;
 	}
+
 	return getLiberationPoints(type, boss);
 };
 
@@ -11,5 +12,6 @@ export const calculateCumulativePoints = (boss: string | null, type: string, tra
 	if (!boss) {
 		return 0;
 	}
+
 	return getCumulativeLiberationPoints(type, boss) + traces;
 };

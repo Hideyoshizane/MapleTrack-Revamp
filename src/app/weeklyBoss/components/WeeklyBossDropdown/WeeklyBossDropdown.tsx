@@ -19,17 +19,19 @@ import type { JSX } from 'react';
 
 type HandleBossToggle = (bossMosterId: string) => void | Promise<void>;
 
-type WeeklyBossDropdownProps = {
+type Props = {
 	character: getBossListCharacterResponseBody;
 	server: string;
 	handleBossToggle: HandleBossToggle;
 };
 
-const WeeklyBossDropdown = ({ character, server, handleBossToggle }: WeeklyBossDropdownProps): JSX.Element => {
+const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX.Element => {
 	const totalBosses = character.bosses.filter((boss) => !boss.locked).length;
 	const isDisabled = totalBosses === 0;
+
 	const clearedBosses = character.bosses.filter((boss) => boss.cleared).length;
 	const isCleared = clearedBosses === totalBosses;
+
 	const code = generateClassCode(character.class);
 
 	return (

@@ -46,6 +46,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		});
 		if (!existing) {
 			logApiFailure('Character not found.', { route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Character not found.' }, 200);
 		}
 
@@ -59,11 +60,13 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		if (genesisChanged && level < GENESIS_MIN_LEVEL) {
 			logApiFailure('Update blocked: insufficient level for Genesis.', { route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Update Failed.' }, 200);
 		}
 
 		if (destinyChanged && (!existing.liberated || level < DESTINY_MIN_LEVEL)) {
 			logApiFailure('Update blocked: insufficient level for Destiny.', { route });
+
 			return createResponse<ApiResponse>({ success: false, message: 'Update Failed.' }, 200);
 		}
 
@@ -124,6 +127,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const validation = updateLiberationCharacterResponseSchema.safeParse(responsePayload);
 		if (!validation.success) {
 			logZodError(validation.error, { route });
+
 			throw new Error('Invalid Liberation List data');
 		}
 
@@ -134,6 +138,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		);
 	} catch (error) {
 		logError(error, { route: route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

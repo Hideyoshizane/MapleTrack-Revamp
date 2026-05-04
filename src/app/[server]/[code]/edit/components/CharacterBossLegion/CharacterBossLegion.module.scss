@@ -3,6 +3,7 @@ $bossIconSize: 90px;
 .characterBossLinkLegion {
 	display: flex;
 	justify-content: space-between;
+
 	width: 377px;
 	height: 98px;
 
@@ -12,7 +13,9 @@ $bossIconSize: 90px;
 
 		.bossIcon {
 			color: var(--default-button-text);
+
 			transition: opacity 0.1s ease-in-out;
+
 			margin-top: 8px;
 
 			&.on {

@@ -7,7 +7,7 @@ import styles from './responsiveText.module.scss';
 
 import type { JSX, ReactNode } from 'react';
 
-type ResponsiveTextProps = {
+type Props = {
 	children: ReactNode;
 	width: number;
 	height: number;
@@ -16,14 +16,7 @@ type ResponsiveTextProps = {
 	minFontSize: number;
 };
 
-const ResponsiveText = ({
-	children,
-	width,
-	height,
-	className,
-	maxFontSize,
-	minFontSize,
-}: ResponsiveTextProps): JSX.Element => {
+const ResponsiveText = ({ children, width, height, className, maxFontSize, minFontSize }: Props): JSX.Element => {
 	const ref = useRef<HTMLParagraphElement>(null);
 	const [fontSize, setFontSize] = useState<number>(maxFontSize);
 

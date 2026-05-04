@@ -1,6 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
+import { startOfDay } from 'date-fns';
 import { redirect } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -9,7 +10,7 @@ import { DESTINY_MIN_LEVEL } from '@data/liberation/constant';
 import { createNormalizedEmptyBossList, getBossesByType } from '@data/liberation/liberationBosses';
 import { getQuestsByType, getLiberationTotal } from '@data/liberation/liberationQuests';
 import { liberationApi } from '@features/liberation/liberationApi';
-import dayjs from '@utils/dayjs';
+import { isSameDay } from '@utils/time';
 
 import { calculateQuestPoints, calculateCumulativePoints } from '../../lib/calculatePoints';
 import BossesSelectionComponent from '../BossesSelectionComponent/bossesSelectionComponent';
@@ -27,15 +28,7 @@ import type {
 	checkedBossResponseBody,
 	GetLiberationListCharacterResponseBody,
 } from '@features/liberation/schemas/liberation.response.schema';
-import type { Dayjs } from 'dayjs';
 import type { JSX } from 'react';
-
-type Props = {
-	selectedCharacter: GetLiberationListCharacterResponseBody | null;
-	currentDate: Date | string;
-	server: string;
-	onCharacterUpdate?: (updatedCharacter: Partial<GetLiberationListCharacterResponseBody>) => void;
-};
 
 type CachedEntry = {
 	characterId: string;
@@ -45,6 +38,13 @@ type CachedEntry = {
 type ProgressSnapshot = {
 	selectedQuest: string;
 	tracesPoints: number;
+};
+
+type Props = {
+	selectedCharacter: GetLiberationListCharacterResponseBody | null;
+	currentDate: Date;
+	server: string;
+	onCharacterUpdate?: (updatedCharacter: Partial<GetLiberationListCharacterResponseBody>) => void;
 };
 
 const QUEST_TYPE = 'Destiny';
@@ -58,12 +58,12 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 		redirect('/error');
 	}
 
-	const currentDay = dayjs(currentDate).utc();
+	const currentDay = currentDate;
 
 	const [selectedQuest, setSelectedQuest] = useState<string | null>(selectedCharacter.currentDestinyQuest);
 	const [determinationPoints, setDeterminationPoints] = useState<number>(selectedCharacter.currentDestinyPoints);
 
-	const [selectedDate, setSelectedDate] = useState<Dayjs>(currentDay);
+	const [selectedDate, setSelectedDate] = useState<Date>(currentDay);
 	const [checkedBosses, setCheckedBosses] = useState<checkedBossResponseBody[]>([]);
 
 	const [weeklyMonthlyPoints, setWeeklyMonthlyPoints] = useState<WeeklyMonthlyPoints>({
@@ -92,9 +92,9 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 	const remainingTotalDetermination = totalPoints - cumulativeTracesPoints;
 	const remainingCurrentDetermination = questPoints - determinationPoints;
 
-	useEffect((): void => {
-		setSelectedDate((prev) => (prev.isSame(currentDay, 'day') ? prev : currentDay));
-	}, [currentDate]);
+	useEffect(() => {
+		setSelectedDate((prev) => (prev && isSameDay(prev, currentDay) ? prev : currentDay));
+	}, [currentDay]);
 
 	// Handle backend sync updates without triggering new syncs
 	useEffect((): void => {
@@ -135,8 +135,9 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 	}, [selectedCharacter.currentDestinyQuest, selectedCharacter.currentDestinyPoints]);
 
 	useEffect((): void => {
-		if (!selectedDate.isSame(currentDay, 'day')) {
+		if (!isSameDay(selectedDate, currentDay)) {
 			setCheckedBosses(createNormalizedEmptyBossList(QUEST_TYPE) ?? []);
+
 			return;
 		}
 
@@ -144,6 +145,7 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 		const cache = currentDayCacheRef.current;
 		if (cache?.characterId === characterId) {
 			setCheckedBosses(cache.data);
+
 			return;
 		}
 
@@ -156,7 +158,7 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 					server,
 					type: QUEST_TYPE,
 					characterId: selectedCharacter.characterId,
-					requestDate: currentDay.toDate(),
+					requestDate: currentDay,
 				});
 
 				if (activeRequestRef.current !== requestKey) {
@@ -245,7 +247,10 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 					<ProgressPrevision
 						onChangeDate={(value: string): void => {
 							if (value) {
-								setSelectedDate(dayjs.utc(value));
+								const [y, m, d] = value.split('-').map(Number);
+								const localDate = new Date(y, m - 1, d);
+
+								setSelectedDate(startOfDay(localDate));
 							}
 						}}
 						selectedDate={selectedDate}

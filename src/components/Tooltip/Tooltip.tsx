@@ -8,14 +8,14 @@ import styles from './tooltip.module.scss';
 
 import type { ReactElement, ReactNode, JSX } from 'react';
 
-type CustomTooltipProps = {
+type Props = {
 	content: ReactNode;
 	children: ReactElement;
 	placement?: 'top' | 'bottom' | 'left' | 'right';
 	enabled?: boolean;
 };
 
-const Tooltip = ({ content, children, placement = 'top', enabled = true }: CustomTooltipProps): JSX.Element => {
+const Tooltip = ({ content, children, placement = 'top', enabled = true }: Props): JSX.Element => {
 	const { theme } = useTheme();
 
 	// Tooltip uses the opposite theme for contrast

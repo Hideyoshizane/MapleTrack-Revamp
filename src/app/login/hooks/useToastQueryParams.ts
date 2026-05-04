@@ -15,10 +15,13 @@ const TOAST_MESSAGES: ToastMessages = {
 export const useToastQueryParams = (): void => {
 	const searchParams = useSearchParams();
 	const router = useRouter();
+
 	const [hasShownToast, setHasShownToast] = useState(false);
 
 	useEffect((): void => {
-		if (hasShownToast) return;
+		if (hasShownToast) {
+			return;
+		}
 
 		for (const [param, { message, type: toastType }] of Object.entries(TOAST_MESSAGES)) {
 			if (searchParams.get(param) === '1') {
@@ -32,6 +35,7 @@ export const useToastQueryParams = (): void => {
 					setHasShownToast(true);
 				});
 				router.replace('/login');
+
 				break;
 			}
 		}

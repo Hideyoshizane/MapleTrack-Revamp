@@ -1,112 +1,22 @@
 'use client';
 
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
+import { calculatePointsSchedule, formatUTC } from '@/app/liberation/lib/calculateSchedule';
 import { getCumulativeLiberationPoints } from '@data/liberation/liberationQuests';
 
 import styles from './destinySchedule.module.scss';
 
 import type { WeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
-import type { Dayjs } from 'dayjs';
 import type { JSX } from 'react';
-
-dayjs.extend(utc);
-
-type TraceScheduleResult = {
-	weeksRequired: number;
-	completionDate: Dayjs;
-};
-
-const getNextThursdayUTC = (date: Dayjs): Dayjs => {
-	const THURSDAY = 4;
-
-	const cursor = date.startOf('day');
-	const diff = (THURSDAY - cursor.day() + 7) % 7;
-
-	return cursor.add(diff === 0 ? 7 : diff, 'day').startOf('day');
-};
-
-const getNextMonthStartUTC = (date: Dayjs): Dayjs => date.startOf('month').add(1, 'month');
-
-const calculateTraceSchedule = ({
-	selectedDate,
-	remainingTotalDetermination,
-	weeklyMonthlyPoints,
-}: {
-	selectedDate: Dayjs;
-	remainingTotalDetermination: number;
-	weeklyMonthlyPoints: WeeklyMonthlyPoints;
-}): TraceScheduleResult => {
-	const baseDate = selectedDate.utc().startOf('day');
-
-	if (remainingTotalDetermination <= 0) {
-		return { weeksRequired: 0, completionDate: baseDate };
-	}
-
-	const thisWeek = weeklyMonthlyPoints.thisWeekPoints;
-	const thisMonth = weeklyMonthlyPoints.thisMonthPoints;
-	const weekly = weeklyMonthlyPoints.totalWeeklyPoints;
-	const monthly = weeklyMonthlyPoints.totalMonthlyPoints;
-
-	if (thisWeek === 0 && thisMonth === 0 && weekly === 0 && monthly === 0) {
-		return { weeksRequired: Number.POSITIVE_INFINITY, completionDate: baseDate };
-	}
-
-	let accumulated = 0;
-
-	accumulated += thisWeek + thisMonth;
-
-	if (accumulated >= remainingTotalDetermination) {
-		return { weeksRequired: 0, completionDate: baseDate };
-	}
-
-	let nextWeek = getNextThursdayUTC(baseDate);
-	let nextMonth = getNextMonthStartUTC(baseDate);
-
-	let completionDate = baseDate;
-
-	while (accumulated < remainingTotalDetermination) {
-		if (nextWeek.isSame(nextMonth)) {
-			accumulated += weekly + monthly;
-			completionDate = nextWeek;
-
-			nextWeek = getNextThursdayUTC(nextWeek);
-			nextMonth = getNextMonthStartUTC(nextMonth);
-			continue;
-		}
-
-		if (nextWeek.isBefore(nextMonth)) {
-			accumulated += weekly;
-			completionDate = nextWeek;
-			nextWeek = getNextThursdayUTC(nextWeek);
-		} else {
-			accumulated += monthly;
-			completionDate = nextMonth;
-			nextMonth = getNextMonthStartUTC(nextMonth);
-		}
-
-		if (!Number.isFinite(accumulated)) {
-			break;
-		}
-	}
-
-	const weeksRequired = Math.ceil(completionDate.diff(baseDate, 'day') / 7);
-
-	return { weeksRequired, completionDate };
-};
 
 type Props = {
 	disableProgress: boolean;
-	selectedDate: Dayjs;
+	selectedDate: Date;
 	weeklyMonthlyPoints: WeeklyMonthlyPoints;
 	selectedQuest: string | null;
 	determinationPoints: number;
 	remainingTotalDetermination: number;
 	remainingCurrentDetermination: number;
 };
-
-const formatUTC = (date: Dayjs): string => date.utc().format('MMMM D, YYYY [(UTC)]');
 
 const DestinySchedule = ({
 	weeklyMonthlyPoints,
@@ -117,23 +27,21 @@ const DestinySchedule = ({
 	const firstLiberationPoints = getCumulativeLiberationPoints('Destiny', 'Kaling', true);
 	const secondLiberationPoints = getCumulativeLiberationPoints('Destiny', 'Baldrix', true);
 
-	const normalizedDate = selectedDate.utc().startOf('day');
-
-	const currentMissionSchedule = calculateTraceSchedule({
-		selectedDate: normalizedDate,
-		remainingTotalDetermination: remainingCurrentDetermination,
+	const currentMissionSchedule = calculatePointsSchedule({
+		selectedDate: selectedDate,
+		remainingTotalPoints: remainingCurrentDetermination,
 		weeklyMonthlyPoints,
 	});
 
-	const firstLiberationSchedule = calculateTraceSchedule({
-		selectedDate: normalizedDate,
-		remainingTotalDetermination: firstLiberationPoints,
+	const firstLiberationSchedule = calculatePointsSchedule({
+		selectedDate: selectedDate,
+		remainingTotalPoints: firstLiberationPoints,
 		weeklyMonthlyPoints,
 	});
 
-	const secondLiberationSchedule = calculateTraceSchedule({
-		selectedDate: normalizedDate,
-		remainingTotalDetermination: remainingTotalDetermination,
+	const secondLiberationSchedule = calculatePointsSchedule({
+		selectedDate: selectedDate,
+		remainingTotalPoints: remainingTotalDetermination,
 		weeklyMonthlyPoints,
 	});
 
@@ -145,7 +53,7 @@ const DestinySchedule = ({
 
 			<div className={styles.line}>
 				<p>Start Date:</p>
-				<div>{formatUTC(normalizedDate)}</div>
+				<div>{formatUTC(selectedDate)}</div>
 			</div>
 
 			<hr className={styles.lineBreak} />
