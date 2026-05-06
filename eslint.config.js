@@ -57,26 +57,34 @@ export default defineConfig([
 		},
 		rules: {
 			// Spreading recommended rules from plugins
-			...tseslint.configs.recommended[1].rules,
+			...tseslint.configs.recommendedTypeChecked.rules,
 			...nextPlugin.configs.recommended.rules,
 			...nextPlugin.configs['core-web-vitals'].rules,
 
 			// TypeScript
-			'@typescript-eslint/no-unused-vars': 'off',
-			'unused-imports/no-unused-imports': 'error',
-			'unused-imports/no-unused-vars': [
+			'@typescript-eslint/no-unused-vars': [
 				'error',
-				{ vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
+				{
+					vars: 'all',
+					args: 'after-used',
+					ignoreRestSiblings: true,
+					varsIgnorePattern: '^_',
+					argsIgnorePattern: '^_',
+				},
 			],
+
+			'unused-imports/no-unused-vars': 'off',
+
+			'unused-imports/no-unused-imports': 'error',
+
 			'@typescript-eslint/no-explicit-any': 'warn',
-			'@typescript-eslint/explicit-function-return-type': 'warn',
+			'@typescript-eslint/explicit-function-return-type': ['error', { allowExpressions: true }],
 			'@typescript-eslint/consistent-type-imports': 'error',
 			'@typescript-eslint/consistent-type-definitions': ['error', 'type'],
 			'@typescript-eslint/no-floating-promises': 'error',
 			'@typescript-eslint/no-misused-promises': 'error',
 			'@typescript-eslint/no-non-null-assertion': 'warn',
 			'@typescript-eslint/require-await': 'error',
-			'@typescript-eslint/explicit-function-return-type': ['error', { allowExpressions: true }],
 
 			// React
 			'no-console': ['error', { allow: ['warn', 'error'] }],
@@ -103,6 +111,8 @@ export default defineConfig([
 			'import/no-duplicates': 'error',
 			'import/no-extraneous-dependencies': 'error',
 			'import/no-cycle': 'error',
+
+			'no-unreachable': 'error',
 
 			// Unicorn
 			'unicorn/filename-case': ['error', { case: 'camelCase', ignore: ['not-found.tsx'] }],

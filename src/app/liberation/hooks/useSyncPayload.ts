@@ -85,15 +85,6 @@ export const useLiberationSyncPayload = ({
 	}, []);
 
 	const scheduleSync = (characterId: string): void => {
-		if (!liberationList?.characters) {
-			return;
-		}
-
-		const character = liberationList.characters.find((c) => c.characterId === characterId);
-		if (!character) {
-			return;
-		}
-
 		// Clear any existing timeout to reset debounce
 		if (debounceTimeoutRef.current) {
 			clearTimeout(debounceTimeoutRef.current);
@@ -152,9 +143,11 @@ export const useLiberationSyncPayload = ({
 
 					if (response.success && response.data) {
 						const mergedCharacter = { ...latestCharacter, ...response.data };
+
 						currentCacheRef.current.set(latestCharacter.characterId, serializeCharacter(mergedCharacter));
 
 						currentOnServerSync(response.data);
+
 						toast.success(response.message);
 					} else {
 						toast.error(response.message || 'Update error');

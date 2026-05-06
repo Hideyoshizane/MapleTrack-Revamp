@@ -1,3 +1,5 @@
+import { SYMBOL_MAP } from '@data/symbols/symbolMappings';
+
 import type {
 	getAllCharactersResponseBody,
 	getEditCharacterDataResponseBody,
@@ -23,73 +25,56 @@ type SymbolData = {
 
 type SymbolTemplate = Omit<SymbolData, 'id'>;
 
-type ReturnSymbolWithId = {
-	arcane: getCharacterDataSymbolsResponseBody[];
-	sacred: getCharacterDataSymbolsResponseBody[];
-	grand: getCharacterDataSymbolsResponseBody[];
-};
-
-type ReturnSymbolTemplate = {
-	arcane: SymbolTemplate[];
-	sacred: SymbolTemplate[];
-	grand: SymbolTemplate[];
-};
-
-const generateSymbol = (
-	name: string,
-	category: SymbolCategory,
-	contents: string[] = [],
-	overrides: Partial<SymbolTemplate> = {},
-): SymbolTemplate => ({
-	name,
-	level: 1,
-	exp: 1,
-	category,
-	contents: contents.map((type) => ({ contentType: type, checked: type === DAILY, cleared: false })),
-	...overrides,
-});
+type ReturnSymbolWithId = Record<SymbolCategory, getCharacterDataSymbolsResponseBody[]>;
+type ReturnSymbolTemplate = Record<SymbolCategory, SymbolTemplate[]>;
 
 const DAILY = 'Daily Quest';
 
-export const SYMBOL_TEMPLATES = {
-	arcane: [
-		generateSymbol('Vanishing Journey', 'arcane', [DAILY, 'Erda Spectrum', 'Reverse City']),
-		generateSymbol('Chu Chu Island', 'arcane', [DAILY, 'Hungry Muto', 'Yum Yum Island']),
-		generateSymbol('Lachelein', 'arcane', [DAILY, 'Midnight Chaser']),
-		generateSymbol('Arcana', 'arcane', [DAILY, 'Spirit Savior']),
-		generateSymbol('Morass', 'arcane', [DAILY, 'Ranheim Defense']),
-		generateSymbol('Esfera', 'arcane', [DAILY, 'Esfera Guardian']),
-	],
-	sacred: ['Cernium', 'Arcus', 'Odium', 'Shangri-La', 'Arteria', 'Carcion'].map((name) =>
-		generateSymbol(name, 'sacred', [DAILY]),
-	),
-	grand: [generateSymbol('Tallahart', 'grand', [DAILY])],
+const createSymbolTemplate = (name: string, info: (typeof SYMBOL_MAP)[string]): SymbolTemplate => ({
+	name,
+	level: 1,
+	exp: 1,
+	category: info.category,
+	contents: info.contents.map((c) => ({ contentType: c.name, checked: c.name === DAILY, cleared: false })),
+});
+
+const buildTemplates = (): ReturnSymbolTemplate => {
+	const grouped: ReturnSymbolTemplate = { arcane: [], sacred: [], grand: [] };
+
+	for (const [name, info] of Object.entries(SYMBOL_MAP)) {
+		grouped[info.category].push(createSymbolTemplate(name, info));
+	}
+
+	return grouped;
 };
 
-const mapToTemplate = (template: SymbolTemplate): SymbolTemplate => ({
+const cloneTemplate = (template: SymbolTemplate): SymbolTemplate => ({
 	...template,
-	category: template.category,
 	contents: template.contents.map((c) => ({ ...c })),
 });
 
-function createSymbolTemplates(includeGrand: boolean): ReturnSymbolTemplate {
-	return {
-		arcane: SYMBOL_TEMPLATES.arcane.map(mapToTemplate),
-		sacred: SYMBOL_TEMPLATES.sacred.map(mapToTemplate),
-		grand: includeGrand ? SYMBOL_TEMPLATES.grand.map(mapToTemplate) : [],
-	};
-}
-
-function createSymbolsWithIds(includeGrand: boolean): ReturnSymbolWithId {
-	const addId = (template: SymbolTemplate): getCharacterDataSymbolsResponseBody =>
-		({ id: '', ...mapToTemplate(template) }) as getCharacterDataSymbolsResponseBody;
+const createSymbolTemplates = (includeGrand: boolean): ReturnSymbolTemplate => {
+	const templates = buildTemplates();
 
 	return {
-		arcane: SYMBOL_TEMPLATES.arcane.map(addId),
-		sacred: SYMBOL_TEMPLATES.sacred.map(addId),
-		grand: includeGrand ? SYMBOL_TEMPLATES.grand.map(addId) : [],
+		arcane: templates.arcane.map(cloneTemplate),
+		sacred: templates.sacred.map(cloneTemplate),
+		grand: includeGrand ? templates.grand.map(cloneTemplate) : [],
 	};
-}
+};
+
+const createSymbolsWithIds = (includeGrand: boolean): ReturnSymbolWithId => {
+	const templates = createSymbolTemplates(includeGrand);
+
+	const withId = (t: SymbolTemplate): getCharacterDataSymbolsResponseBody =>
+		({ id: '', ...t }) as getCharacterDataSymbolsResponseBody;
+
+	return {
+		arcane: templates.arcane.map(withId),
+		sacred: templates.sacred.map(withId),
+		grand: templates.grand.map(withId),
+	};
+};
 
 type GenerateCharacterOptions = {
 	jobClassName: string;
@@ -99,7 +84,7 @@ type GenerateCharacterOptions = {
 };
 
 export const generateCharacterObjectHomePage = (options: GenerateCharacterOptions): getAllCharactersResponseBody => {
-	const allTemplates = createSymbolTemplates(false);
+	const templates = createSymbolTemplates(false);
 
 	return {
 		name: 'Character Name',
@@ -110,11 +95,7 @@ export const generateCharacterObjectHomePage = (options: GenerateCharacterOption
 		legion: options.legion,
 		linkSkill: options.linkSkill,
 		bossing: false,
-		symbols: {
-			arcane: allTemplates.arcane,
-			sacred: allTemplates.sacred,
-			grand: [],
-		},
+		symbols: { arcane: templates.arcane, sacred: templates.sacred, grand: [] },
 	} as getAllCharactersResponseBody;
 };
 
@@ -152,29 +133,43 @@ export function generateCharacterObjectEditCharacterPage(
 	};
 }
 
+const SYMBOL_CATEGORIES: ReadonlySet<SymbolCategory> = new Set(['arcane', 'sacred', 'grand']);
+
+const isSymbolCategory = (value: string): value is SymbolCategory => SYMBOL_CATEGORIES.has(value as SymbolCategory);
+
 export const groupSymbolsByCategory = (
 	symbols: getCharacterDataSymbolsResponseBody[],
-): Record<SymbolCategory, getCharacterDataSymbolsResponseBody[]> => {
-	return symbols.reduce<Record<SymbolCategory, getCharacterDataSymbolsResponseBody[]>>(
+): Record<SymbolCategory, getCharacterDataSymbolsResponseBody[]> =>
+	symbols.reduce<Record<SymbolCategory, getCharacterDataSymbolsResponseBody[]>>(
 		(acc, symbol) => {
-			const cat = symbol.category as SymbolCategory;
-			if (acc[cat]) {
-				acc[cat].push(symbol);
+			if (isSymbolCategory(symbol.category)) {
+				acc[symbol.category].push(symbol);
 			}
 			return acc;
 		},
 		{ arcane: [], sacred: [], grand: [] },
 	);
-};
 
 type JobClassLevel = 'No Job' | '1st Class' | '2nd Class' | '3rd Class' | '4th Class' | 'V Class' | 'VI Class';
 
 export const getJob = (level: number): JobClassLevel => {
-	if (level >= 260) return 'VI Class';
-	if (level >= 200) return 'V Class';
-	if (level >= 100) return '4th Class';
-	if (level >= 60) return '3rd Class';
-	if (level >= 30) return '2nd Class';
-	if (level >= 1) return '1st Class';
+	if (level >= 260) {
+		return 'VI Class';
+	}
+	if (level >= 200) {
+		return 'V Class';
+	}
+	if (level >= 100) {
+		return '4th Class';
+	}
+	if (level >= 60) {
+		return '3rd Class';
+	}
+	if (level >= 30) {
+		return '2nd Class';
+	}
+	if (level >= 1) {
+		return '1st Class';
+	}
 	return 'No Job';
 };

@@ -24,8 +24,7 @@ export const useChangePassword = (): UseChangePasswordReturn => {
 
 			const result = await userApi.changePassword(payload);
 			if (result.success) {
-				toast.success('Password changed successfully.');
-				await signOut({ callbackUrl: '/login' });
+				await signOut({ callbackUrl: '/login?reset=1' });
 
 				return;
 			}

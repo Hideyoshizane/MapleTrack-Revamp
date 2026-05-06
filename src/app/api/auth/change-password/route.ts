@@ -14,9 +14,11 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 	try {
 		const parseResult = changePasswordRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
-			logZodError(parseResult.error, { route: route });
+			logZodError(parseResult.error, { route });
 
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
+			const message = parseResult.error.issues[0]?.message ?? 'Validation failed';
+
+			return createResponse<ApiResponse>({ success: false, message }, 200);
 		}
 
 		const { currentPassword, newPassword } = parseResult.data;
@@ -36,7 +38,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		if (!isCurrentPasswordCorrect) {
 			logApiFailure('Password error', { route: route });
 
-			return createResponse<ApiResponse>({ success: false, message: 'Current password is incorrect' }, 401);
+			return createResponse<ApiResponse>({ success: false, message: 'Current password is incorrect.' }, 200);
 		}
 
 		const isSamePassword = await verifyPassword(user.password, newPassword);
@@ -44,8 +46,8 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			logApiFailure('Password error', { route: route });
 
 			return createResponse<ApiResponse>(
-				{ success: false, message: 'New password must be different from the current password' },
-				400,
+				{ success: false, message: 'New password must be different from the current password.' },
+				200,
 			);
 		}
 

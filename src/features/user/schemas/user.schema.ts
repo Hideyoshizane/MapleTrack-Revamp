@@ -13,12 +13,6 @@ export const emailFieldSchema = emailRawSchema.transform(canonicalizeEmail);
 
 export const passwordFieldSchema = passwordRawSchema;
 
-export const userSchema = z.object({
-	username: usernameFieldSchema,
-	email: emailFieldSchema,
-	password: passwordFieldSchema,
-});
-
 // Login
 export const credentialsSchema = z.object({
 	username: usernameFieldSchema,
@@ -62,7 +56,7 @@ export type ForgotPasswordRequestBody = z.infer<typeof forgotPasswordRequestSche
 export const changePasswordRequestSchema = z
 	.object({
 		currentPassword: z.string(),
-		newPassword: passwordRawSchema,
+		newPassword: passwordFieldSchema,
 	})
 	.refine((data) => data.currentPassword !== data.newPassword, {
 		path: ['newPassword'],

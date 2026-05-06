@@ -1,6 +1,6 @@
 import reserved from 'reserved-usernames';
 
-import { sanitizeInput } from '@/utils/sanitizeInput';
+import { sanitizeInput } from '@utils/sanitizeInput';
 
 import { CUSTOM_RESERVED_USERNAMES } from './constants';
 

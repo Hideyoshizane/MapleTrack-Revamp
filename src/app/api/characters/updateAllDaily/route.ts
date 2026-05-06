@@ -71,7 +71,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 						continue;
 					}
 
-					let dailyValue = getContentValue(symbol.name, DAILY_CONTENT_TYPE);
+					let dailyValue = getContentValue(symbol.name, DAILY_CONTENT_TYPE, character.level);
 					const extraArea: ReadonlySet<string> = new Set(['Reverse City', 'Yum Yum Island']);
 					const extraAreaContent = symbol.contents.some(
 						(content): boolean => content.checked === true && extraArea.has(content.contentType),

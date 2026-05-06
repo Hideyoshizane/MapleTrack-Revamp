@@ -3,14 +3,12 @@
 import { clsx } from 'clsx';
 import { startOfDay } from 'date-fns';
 import { redirect } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 import LockIcon from '@assets/svg/lock.svg';
 import { DESTINY_MIN_LEVEL } from '@data/liberation/constant';
-import { createNormalizedEmptyBossList, getBossesByType } from '@data/liberation/liberationBosses';
+import { getBossesByType } from '@data/liberation/liberationBosses';
 import { getQuestsByType, getLiberationTotal } from '@data/liberation/liberationQuests';
-import { liberationApi } from '@features/liberation/liberationApi';
-import { isSameDay } from '@utils/time';
 
 import { calculateQuestPoints, calculateCumulativePoints } from '../../lib/calculatePoints';
 import BossesSelectionComponent from '../BossesSelectionComponent/bossesSelectionComponent';
@@ -22,49 +20,44 @@ import WeeklyBreakdown from '../WeeklyBreakdown/weeklyBreakdown';
 
 import styles from './destinyProgression.module.scss';
 import DestinySchedule from './destinySchedule/destinySchedule';
+import { useDestinyCheckedBosses } from './hooks/useDestinyCheckedBosses';
+import { useDestinyProgressionState } from './hooks/useDestinyProgressionState';
 
 import type { WeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
-import type {
-	checkedBossResponseBody,
-	GetLiberationListCharacterResponseBody,
-} from '@features/liberation/schemas/liberation.response.schema';
+import type { GetLiberationListCharacterResponseBody } from '@features/liberation/schemas/liberation.response.schema';
 import type { JSX } from 'react';
-
-type CachedEntry = {
-	characterId: string;
-	data: checkedBossResponseBody[];
-};
-
-type ProgressSnapshot = {
-	selectedQuest: string;
-	tracesPoints: number;
-};
 
 type Props = {
 	selectedCharacter: GetLiberationListCharacterResponseBody | null;
 	currentDate: Date;
 	server: string;
-	onCharacterUpdate?: (updatedCharacter: Partial<GetLiberationListCharacterResponseBody>) => void;
+	onCharacterUpdate?: (updated: Partial<GetLiberationListCharacterResponseBody>) => void;
 };
 
-const QUEST_TYPE = 'Destiny';
+export const QUEST_TYPE = 'Destiny';
 
 const bosses = getBossesByType(QUEST_TYPE);
 const totalPoints = getLiberationTotal(QUEST_TYPE);
 
 const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacterUpdate }: Props): JSX.Element => {
 	const destinyQuests = getQuestsByType(QUEST_TYPE);
-	if (!destinyQuests || !selectedCharacter) {
-		redirect('/error');
-	}
 
-	const currentDay = currentDate;
+	if (!destinyQuests || !selectedCharacter) redirect('/error');
 
-	const [selectedQuest, setSelectedQuest] = useState<string | null>(selectedCharacter.currentDestinyQuest);
-	const [determinationPoints, setDeterminationPoints] = useState<number>(selectedCharacter.currentDestinyPoints);
+	const [selectedDate, setSelectedDate] = useState<Date>(currentDate);
 
-	const [selectedDate, setSelectedDate] = useState<Date>(currentDay);
-	const [checkedBosses, setCheckedBosses] = useState<checkedBossResponseBody[]>([]);
+	const { selectedQuest, setSelectedQuest, determinationPoints, setDeterminationPoints } = useDestinyProgressionState({
+		selectedCharacter,
+		onCharacterUpdate,
+	});
+
+	const checkedBosses = useDestinyCheckedBosses({
+		characterId: selectedCharacter.characterId,
+		server,
+		currentDate,
+		selectedDate,
+		type: QUEST_TYPE,
+	});
 
 	const [weeklyMonthlyPoints, setWeeklyMonthlyPoints] = useState<WeeklyMonthlyPoints>({
 		thisWeekPoints: 0,
@@ -74,147 +67,34 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 		bosses: {},
 	});
 
-	const previousProgressRef = useRef<ProgressSnapshot | null>(null);
-	const currentDayCacheRef = useRef<CachedEntry | null>(null);
-	const activeRequestRef = useRef<string | null>(null);
+	const liberated = selectedCharacter.liberated;
 
-	const isBackendSyncRef = useRef<boolean>(false);
-	const prevCharacterIdRef = useRef<string>(selectedCharacter.characterId);
-	const prevDestinyQuestRef = useRef<string | null>(selectedCharacter.currentDestinyQuest);
-	const prevDestinyPointsRef = useRef<number>(selectedCharacter.currentDestinyPoints);
-
-	const liberated = selectedCharacter?.liberated;
-	const disableProgress = (selectedCharacter?.level ?? 0) <= DESTINY_MIN_LEVEL && !liberated;
+	const isDestinyAvaiable = (selectedCharacter.level ?? 0) >= DESTINY_MIN_LEVEL && liberated;
 
 	const questPoints = Number(calculateQuestPoints(selectedQuest, QUEST_TYPE) ?? 0);
-	const cumulativeTracesPoints = Number(calculateCumulativePoints(selectedQuest, QUEST_TYPE, determinationPoints) ?? 0);
 
-	const remainingTotalDetermination = totalPoints - cumulativeTracesPoints;
-	const remainingCurrentDetermination = questPoints - determinationPoints;
+	const cumulative = Number(calculateCumulativePoints(selectedQuest, QUEST_TYPE, determinationPoints) ?? 0);
 
-	useEffect(() => {
-		setSelectedDate((prev) => (prev && isSameDay(prev, currentDay) ? prev : currentDay));
-	}, [currentDay]);
-
-	// Handle backend sync updates without triggering new syncs
-	useEffect((): void => {
-		const characterChanged = prevCharacterIdRef.current !== selectedCharacter.characterId;
-		const questChanged = prevDestinyQuestRef.current !== selectedCharacter.currentDestinyQuest;
-		const pointsChanged = prevDestinyPointsRef.current !== selectedCharacter.currentDestinyPoints;
-		if (!characterChanged && !questChanged && !pointsChanged) {
-			return;
-		}
-
-		isBackendSyncRef.current = true;
-
-		if (questChanged) {
-			setSelectedQuest(selectedCharacter.currentDestinyQuest);
-		}
-		if (pointsChanged) {
-			setDeterminationPoints(selectedCharacter.currentDestinyPoints);
-		}
-
-		prevCharacterIdRef.current = selectedCharacter.characterId;
-		prevDestinyQuestRef.current = selectedCharacter.currentDestinyQuest;
-		prevDestinyPointsRef.current = selectedCharacter.currentDestinyPoints;
-
-		setTimeout(() => {
-			isBackendSyncRef.current = false;
-		}, 100);
-	}, [selectedCharacter.characterId, selectedCharacter.currentDestinyQuest, selectedCharacter.currentDestinyPoints]);
-
-	useEffect((): void => {
-		previousProgressRef.current = null;
-		currentDayCacheRef.current = null;
-		activeRequestRef.current = null;
-	}, [selectedCharacter.characterId]);
-
-	useEffect((): void => {
-		setSelectedQuest(selectedCharacter.currentDestinyQuest);
-		setDeterminationPoints(selectedCharacter.currentDestinyPoints);
-	}, [selectedCharacter.currentDestinyQuest, selectedCharacter.currentDestinyPoints]);
-
-	useEffect((): void => {
-		if (!isSameDay(selectedDate, currentDay)) {
-			setCheckedBosses(createNormalizedEmptyBossList(QUEST_TYPE) ?? []);
-
-			return;
-		}
-
-		const characterId = selectedCharacter.characterId;
-		const cache = currentDayCacheRef.current;
-		if (cache?.characterId === characterId) {
-			setCheckedBosses(cache.data);
-
-			return;
-		}
-
-		const requestKey = `${selectedCharacter.characterId}-${currentDay.valueOf()}`;
-		activeRequestRef.current = requestKey;
-
-		const run = async (): Promise<void> => {
-			try {
-				const response = await liberationApi.getCheckedBossesList({
-					server,
-					type: QUEST_TYPE,
-					characterId: selectedCharacter.characterId,
-					requestDate: currentDay,
-				});
-
-				if (activeRequestRef.current !== requestKey) {
-					return;
-				}
-
-				const data = response.data ?? [];
-
-				currentDayCacheRef.current = { characterId: selectedCharacter.characterId, data };
-				setCheckedBosses(data);
-			} catch (error) {
-				console.error(error);
-			}
-		};
-
-		void run();
-	}, [currentDate, selectedDate, selectedCharacter.characterId, server]);
-
-	// Handle user updates - only trigger sync for user-initiated changes
-	useEffect(() => {
-		if (isBackendSyncRef.current || !selectedCharacter) {
-			return;
-		}
-
-		const questChanged = selectedQuest !== selectedCharacter.currentDestinyQuest;
-		const pointsChanged = determinationPoints !== selectedCharacter.currentDestinyPoints;
-		if (!questChanged && !pointsChanged) {
-			return;
-		}
-
-		if (onCharacterUpdate) {
-			onCharacterUpdate({
-				currentDestinyQuest: selectedQuest ?? undefined,
-				currentDestinyPoints: determinationPoints,
-				liberated,
-			});
-		}
-	}, [selectedQuest, determinationPoints, liberated, selectedCharacter, onCharacterUpdate]);
+	const remainingTotal = totalPoints - cumulative;
+	const remainingCurrent = questPoints - determinationPoints;
 
 	return (
 		<div>
 			<div className={styles.currentProgressWrapper}>
-				{disableProgress && (
+				{!isDestinyAvaiable && (
 					<div className={styles.disabledOverlay}>
 						<div className={styles.overlayContent}>
 							<LockIcon height={56} width={56} />
 							<p className={styles.title}>Level Requirement Not Met</p>
 							<p className={styles.description}>
-								Destiny Liberation tracker is available only for characters level 275 who finished Genesis Liberation.
+								Destiny Liberation tracker is available only for characters level {DESTINY_MIN_LEVEL} or higher who
+								completed Genesis Liberation.
 							</p>
-							<p className={styles.description}>Please update character data to unlock.</p>
 						</div>
 					</div>
 				)}
 
-				<div className={clsx(styles.currentProgress, { [styles.disabled]: disableProgress })}>
+				<div className={clsx(styles.currentProgress, { [styles.disabled]: !isDestinyAvaiable })}>
 					<p className={styles.title}>Current Progress</p>
 
 					<div className={styles.progressInput}>
@@ -235,26 +115,24 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 					</div>
 
 					<ProgressionBarDiv
-						cumulativeTracesPoints={cumulativeTracesPoints}
+						cumulativeTracesPoints={cumulative}
 						currentPoints={determinationPoints}
 						questPoints={questPoints}
 						totalPoints={totalPoints}
 					/>
 				</div>
 			</div>
+
 			<div className={styles.grid}>
 				<div className={styles.column}>
 					<ProgressPrevision
 						onChangeDate={(value: string): void => {
-							if (value) {
-								const [y, m, d] = value.split('-').map(Number);
-								const localDate = new Date(y, m - 1, d);
-
-								setSelectedDate(startOfDay(localDate));
-							}
+							const [y, m, d] = value.split('-').map(Number);
+							setSelectedDate(startOfDay(new Date(y, m - 1, d)));
 						}}
 						selectedDate={selectedDate}
 					/>
+
 					<BossesSelectionComponent
 						bosses={bosses}
 						checkedBosses={checkedBosses}
@@ -266,13 +144,14 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 				<div className={styles.column}>
 					<DestinySchedule
 						determinationPoints={determinationPoints}
-						disableProgress={disableProgress}
-						remainingCurrentDetermination={remainingCurrentDetermination}
-						remainingTotalDetermination={remainingTotalDetermination}
+						disableProgress={!isDestinyAvaiable}
+						remainingCurrentDetermination={remainingCurrent}
+						remainingTotalDetermination={remainingTotal}
 						selectedDate={selectedDate}
 						selectedQuest={selectedQuest}
 						weeklyMonthlyPoints={weeklyMonthlyPoints}
 					/>
+
 					<WeeklyBreakdown bosses={bosses} type={QUEST_TYPE} weeklyMonthlyPoints={weeklyMonthlyPoints} />
 				</div>
 			</div>

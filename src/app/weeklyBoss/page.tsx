@@ -14,7 +14,7 @@ const WeeklyBossPage = async (): Promise<JSX.Element> => {
 	const initialServer = await resolveServerFromCookies();
 
 	// If no session, redirect to login with a query param
-	if (!session) {
+	if (!session?.user?.id) {
 		redirect('/login?unauthorized=1');
 	}
 

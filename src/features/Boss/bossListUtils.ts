@@ -45,7 +45,6 @@ export const updateCharacterBoss = (
 				dailyTotal: isDaily ? (params.dailyTotal ?? 0) : 0,
 			});
 
-			draft.totalGains += newValue * multiplier;
 			character.totalIncome += newValue * multiplier;
 
 			return;
@@ -66,12 +65,10 @@ export const updateCharacterBoss = (
 			character.bosses.splice(bossIndex, 1);
 
 			character.totalIncome -= oldValue * oldMultiplier;
-			draft.totalGains -= oldValue * oldMultiplier;
 
 			return;
 		}
 
-		draft.totalGains -= oldValue * oldMultiplier;
 		character.totalIncome -= oldValue * oldMultiplier;
 
 		if (isDaily && params.dailyTotal === 0) {
@@ -89,7 +86,6 @@ export const updateCharacterBoss = (
 
 		const newMultiplier = isDaily ? (params.dailyTotal ?? existingBoss.dailyTotal ?? 0) : 1;
 
-		draft.totalGains += newValue * newMultiplier;
 		character.totalIncome += newValue * newMultiplier;
 	});
 };
@@ -118,4 +114,24 @@ export const countServerBosses = (serverData: getEditBossListResponseBody): numb
 	return serverData.characters.reduce<number>((total, character) => {
 		return total + countCharacterBosses(character);
 	}, 0);
+};
+
+export const countServerGains = (serverData: getEditBossListResponseBody, serverName: string): number => {
+	let total = 0;
+
+	for (const character of serverData.characters) {
+		for (const boss of character.bosses) {
+			const value = getBossDifficultyValue(boss.name, boss.difficulty, serverName);
+
+			if (value === null) {
+				continue;
+			}
+
+			const multiplier = boss.reset === 'Daily' ? (boss.dailyTotal ?? 0) : 1;
+
+			total += value * multiplier;
+		}
+	}
+
+	return total;
 };

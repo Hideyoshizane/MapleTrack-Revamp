@@ -1,21 +1,15 @@
-'use client';
+import { Suspense } from 'react';
 
-import { useSearchParams } from 'next/navigation';
-import { signOut } from 'next-auth/react';
-import { useEffect } from 'react';
+import ForceLogoutClient from './forceLogoutClient';
 
-const ForceLogoutPage = (): null => {
-	const searchParams = useSearchParams();
+import type { JSX } from 'react';
 
-	useEffect((): void => {
-		const reason = searchParams.get('reason');
-
-		const callbackUrl = reason === 'version_update' ? '/login?version_update=1' : '/login';
-
-		void signOut({ callbackUrl });
-	}, [searchParams]);
-
-	return null;
+const ForceLogoutPage = (): JSX.Element => {
+	return (
+		<Suspense fallback={null}>
+			<ForceLogoutClient />
+		</Suspense>
+	);
 };
 
 export default ForceLogoutPage;

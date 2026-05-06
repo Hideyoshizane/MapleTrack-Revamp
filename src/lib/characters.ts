@@ -30,6 +30,7 @@ const resetDailyQuests = async (tx: Prisma.TransactionClient, symbolIds: string[
 	if (!symbolIds.length) {
 		return;
 	}
+
 	const quests = await tx.characterContent.findMany({
 		where: { symbolId: { in: symbolIds }, contentType: 'Daily Quest' },
 		select: { id: true, date: true },
@@ -47,13 +48,13 @@ const resetWeeklyQuests = async (tx: Prisma.TransactionClient, symbolIds: string
 	if (!symbolIds.length) {
 		return;
 	}
+
 	const quests = await tx.characterContent.findMany({
 		where: { symbolId: { in: symbolIds }, tries: { not: null } },
 		select: { id: true, date: true },
 	});
 
 	const questsToReset = quests.filter((quest) => hasWeeklyResetOccurred(quest.date)).map((quest) => quest.id);
-
 	if (!questsToReset.length) {
 		return;
 	}
@@ -106,7 +107,6 @@ export const syncCharacterInfo = async ({
 					where: { characterId: character.id, name: symbolName, category: 'arcane' },
 					select: { id: true },
 				});
-
 				if (!symbol) {
 					return;
 				}
@@ -120,6 +120,7 @@ export const syncCharacterInfo = async ({
 			if (externalData.level > 205) {
 				await unlockSymbolContent('Vanishing Journey', 'Reverse City');
 			}
+
 			if (externalData.level > 215) {
 				await unlockSymbolContent('Chu Chu Island', 'Yum Yum Island');
 			}

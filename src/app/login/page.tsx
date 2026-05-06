@@ -9,7 +9,7 @@ import type { JSX } from 'react';
 const LoginPage = async (): Promise<JSX.Element> => {
 	const session = await auth();
 
-	if (session) {
+	if (session?.user?.id) {
 		redirect('/home?logged=1');
 	}
 

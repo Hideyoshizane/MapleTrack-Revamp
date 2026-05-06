@@ -14,6 +14,7 @@ export const zodValidator =
 			if (error instanceof ZodError) {
 				return error.issues.map((i) => `- ${i.message}`).join('\n');
 			}
+
 			return '- Invalid input';
 		}
 	};

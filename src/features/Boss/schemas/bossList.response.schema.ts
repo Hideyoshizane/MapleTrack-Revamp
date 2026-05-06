@@ -87,7 +87,6 @@ export const getEditBossListResponseSchema = z
 	.object({
 		id: IdRawSchema,
 		weeklyBosses: z.number().min(0),
-		totalGains: z.number().min(0),
 		characters: z.array(getEditBossListCharactersSchema).default([]),
 	})
 	.strict();

@@ -42,12 +42,13 @@ export const addPointsToLiberation = async (
 
 		const bossType = getBossType(bossName);
 		const points = getBossPoints(bossName, bossDifficulty);
+
 		if (points == 0 || bossType == null) {
 			return { bossType, points: null };
 		}
 
-		const isGenesisEnabled = characterData.character.level <= GENESIS_MIN_LEVEL;
-		const isDestinyEnabled = characterData.liberated && characterData.character.level <= DESTINY_MIN_LEVEL;
+		const isGenesisEnabled = characterData.character.level >= GENESIS_MIN_LEVEL;
+		const isDestinyEnabled = characterData.liberated && characterData.character.level >= DESTINY_MIN_LEVEL;
 		if ((!isGenesisEnabled && bossType == 'genesis') || (!isDestinyEnabled && bossType == 'destiny')) {
 			return { bossType, points: null };
 		}

@@ -432,20 +432,20 @@
 		]
 	},
 	{
-		"name": "Keen Edge",
+		"name": "Moonlit Blade Learnings",
 		"image": "/assets/link_skill/hayato.webp",
 		"levels": [
 			{
 				"level": 1,
-				"description": "All Stats: 15, \nAttack Power Increase: 10, \nMagic Attack Power Increase: 10."
+				"description": "If Critical Rate: 100%+ and Critical Damage: 50%, Critical Damage: +3%."
 			},
 			{
 				"level": 2,
-				"description": "All Stats: 25, \nAttack Power Increase: 15, \nMagic Attack Power Increase: 15."
+				"description": "If Critical Rate: 100%+ and Critical Damage: 50%, Critical Damage: +5%."
 			},
 			{
 				"level": 3,
-				"description": "All Stats: 35, \nAttack Power Increase: 20, \nMagic Attack Power Increase: 20."
+				"description": "If Critical Rate: 100%+ and Critical Damage: 50%, Critical Damage: +7%."
 			}
 		]
 	},
@@ -455,15 +455,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Permanent Damage Increase: 5%."
+				"description": "Activate an attack skill 40 times to meet the conditions. \nDamage: +10% Duration: 12 sec."
 			},
 			{
 				"level": 2,
-				"description": "Permanent Damage Increase: 10%."
+				"description": "Activate an attack skill 40 times to meet the conditions. \nDamage: +15% Duration: 12 sec."
 			},
 			{
 				"level": 3,
-				"description": "Permanent Damage Increase: 15%."
+				"description": "Activate an attack skill 40 times to meet the conditions. \nDamage: +20% Duration: 12 sec."
 			}
 		]
 	},
@@ -606,7 +606,7 @@
 		]
 	},
 	{
-		"name": "Tree of Stars",
+		"name": "Guiding Stars",
 		"image": "/assets/link_skill/sia_astelle.webp",
 		"levels": [
 			{

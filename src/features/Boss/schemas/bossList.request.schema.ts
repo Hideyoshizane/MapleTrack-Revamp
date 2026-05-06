@@ -55,7 +55,6 @@ export const updateBossListRequestSchema = z
 	.object({
 		id: IdRawSchema,
 		weeklyBosses: z.number().min(0),
-		totalGains: z.number().min(0),
 		characters: z.array(updateBossListCharactersSchema).default([]),
 	})
 	.strict();

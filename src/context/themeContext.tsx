@@ -26,6 +26,7 @@ const getInitialTheme = (): Theme => {
 	if (domTheme) {
 		return domTheme;
 	}
+
 	return 'dark';
 };
 

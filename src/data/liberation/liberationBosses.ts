@@ -33,17 +33,19 @@ export type WeeklyMonthlyPoints = {
 	bosses: Record<string, BossPoints>;
 };
 
-export const bosses: Boss[] = liberationBossesJson as Boss[];
+const bosses: Boss[] = liberationBossesJson as Boss[];
 
 // Zod validation
 export const bossNamesPoints = bosses.map((boss) => boss.name) as unknown as [string, ...string[]];
-export const bossDifficultyNames = [
-	...new Set(bosses.flatMap((boss) => boss.difficulties.map((d) => d.name))),
-] as unknown as [string, ...string[]];
+
+const bossDifficultyNames = [...new Set(bosses.flatMap((boss) => boss.difficulties.map((d) => d.name)))] as unknown as [
+	string,
+	...string[],
+];
+
 export const bossDifficultyWithSkip = ['Skip', ...bossDifficultyNames] as unknown as [string, ...string[]];
 
 type BossPointsMap = Map<string, Map<string, number>>;
-type BossResetMap = Map<string, Map<string, string>>;
 type BossesByTypeMap = Map<BossType, Boss[]>;
 
 const createBossPointsMap = (bossList: Boss[]): BossPointsMap => {
@@ -51,15 +53,6 @@ const createBossPointsMap = (bossList: Boss[]): BossPointsMap => {
 		bossList.map((boss): [string, Map<string, number>] => [
 			boss.name,
 			new Map(boss.difficulties.map((difficulty): [string, number] => [difficulty.name, difficulty.points])),
-		]),
-	);
-};
-
-const createBossResetMap = (bossList: Boss[]): BossResetMap => {
-	return new Map(
-		bossList.map((boss): [string, Map<string, string>] => [
-			boss.name,
-			new Map(boss.difficulties.map((difficulty): [string, string] => [difficulty.name, difficulty.reset])),
 		]),
 	);
 };
@@ -74,15 +67,10 @@ const createBossesByTypeMap = (bossList: Boss[]): BossesByTypeMap => {
 };
 
 const bossPointsMap: BossPointsMap = createBossPointsMap(bosses);
-const bossResetMap: BossResetMap = createBossResetMap(bosses);
 const bossesByTypeMap: BossesByTypeMap = createBossesByTypeMap(bosses);
 
 export const getBossPoints = (bossName: string, difficultyName: string): number => {
 	return bossPointsMap.get(bossName)?.get(difficultyName) ?? 0;
-};
-
-export const getBossReset = (bossName: string, difficultyName: string): string | null => {
-	return bossResetMap.get(bossName)?.get(difficultyName) ?? null;
 };
 
 export const getBossType = (bossName: string): BossType | null => {
@@ -91,9 +79,9 @@ export const getBossType = (bossName: string): BossType | null => {
 	if (isGenesis) {
 		return 'genesis';
 	}
+
 	const destinyBosses = bossesByTypeMap.get('destiny') ?? [];
 	const isDestiny = destinyBosses.some((boss) => boss.name === bossName);
-
 	if (isDestiny) {
 		return 'destiny';
 	}
@@ -101,13 +89,12 @@ export const getBossType = (bossName: string): BossType | null => {
 	return null;
 };
 
-export const isBossType = (value: string): value is BossType => {
+const isBossType = (value: string): value is BossType => {
 	return value === 'genesis' || value === 'destiny';
 };
 
-export const normalizeBossType = (value: string): BossType | null => {
+const normalizeBossType = (value: string): BossType | null => {
 	const normalizedValue = value.toLowerCase();
-
 	if (isBossType(normalizedValue)) {
 		return normalizedValue;
 	}
@@ -129,6 +116,7 @@ export const isValidBossDifficultyOrSkip = (bossName: BossName, difficultyName: 
 	if (difficultyName === 'Skip') {
 		return true;
 	}
+
 	return isValidBossDifficulty(bossName, difficultyName);
 };
 

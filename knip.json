@@ -1,5 +1,6 @@
 {
-	"entry": ["src/**/*", "next.config.*", "eslint.config.*"],
+	"entry": ["src/app/**/page.tsx", "src/app/**/layout.tsx", "src/app/**/not-found.tsx", "src/auth.ts"],
+	"project": ["src/**/*.{ts,tsx,js,jsx}"],
 	"ignoreDependencies": ["eslint-config-next", "eslint-config-prettier", "@svgr/webpack", "baseline-browser-mapping"],
 	"eslint": {
 		"config": ["eslint.config.js"],

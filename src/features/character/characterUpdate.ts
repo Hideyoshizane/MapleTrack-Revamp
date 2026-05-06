@@ -1,7 +1,31 @@
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
+import { SYMBOL_MAP } from '@data/symbols/symbolMappings';
 import { prisma } from '@lib/prisma';
 
-import { SYMBOL_TEMPLATES } from './characterService';
+import type { SymbolCategory } from '@prisma/client';
+
+const DAILY = 'Daily Quest';
+
+const SYMBOL_CATEGORIES: readonly SymbolCategory[] = ['arcane', 'sacred', 'grand'];
+
+const buildTemplatesByCategory = (): Record<
+	SymbolCategory,
+	{ name: string; contents: { contentType: string; checked: boolean; cleared: boolean }[] }[]
+> => {
+	const grouped: Record<
+		SymbolCategory,
+		{ name: string; contents: { contentType: string; checked: boolean; cleared: boolean }[] }[]
+	> = { arcane: [], sacred: [], grand: [] };
+
+	for (const [name, info] of Object.entries(SYMBOL_MAP)) {
+		grouped[info.category].push({
+			name,
+			contents: info.contents.map((c) => ({ contentType: c.name, checked: c.name === DAILY, cleared: false })),
+		});
+	}
+
+	return grouped;
+};
 
 export const updateMissingSymbolsForCharacters = async (userId: string): Promise<void> => {
 	const characters = await prisma.character.findMany({
@@ -9,17 +33,19 @@ export const updateMissingSymbolsForCharacters = async (userId: string): Promise
 		include: { symbols: { select: { name: true } } },
 	});
 
+	const templatesByCategory = buildTemplatesByCategory();
+
 	for (const character of characters) {
 		const existingNames = new Set(character.symbols.map((s) => s.name));
 
 		await prisma.$transaction(async (tx) => {
 			// Iterate over each category and template directly
-			for (const category of ['arcane', 'sacred', 'grand'] as const) {
-				for (const template of SYMBOL_TEMPLATES[category]) {
+			for (const category of SYMBOL_CATEGORIES) {
+				for (const template of templatesByCategory[category]) {
 					if (!existingNames.has(template.name)) {
 						// Create missing symbol
 						const symbolRecord = await tx.characterSymbol.create({
-							data: { name: template.name, level: 1, exp: 1, category: category, characterId: character.id },
+							data: { name: template.name, level: 1, exp: 1, category, characterId: character.id },
 						});
 
 						for (const content of template.contents) {

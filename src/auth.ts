@@ -42,6 +42,7 @@ type AppSession = DefaultSession & {
 };
 
 export const { auth, handlers } = NextAuth({
+	trustHost: true,
 	providers: [
 		CredentialsProvider({
 			name: 'Credentials',
@@ -87,9 +88,15 @@ export const { auth, handlers } = NextAuth({
 		}),
 	],
 	logger: {
-		error: () => {},
-		warn: () => {},
-		debug: () => {},
+		error: (...args) => {
+			console.error('[NextAuth ERROR]', ...args);
+		},
+		warn: (...args) => {
+			console.warn('[NextAuth WARN]', ...args);
+		},
+		debug: (...args) => {
+			console.warn('[NextAuth DEBUG]', ...args);
+		},
 	},
 	session: { strategy: 'jwt', maxAge: 60 * 60 * 24 * 60 },
 	jwt: { maxAge: 60 * 60 * 24 * 60 },
@@ -109,6 +116,11 @@ export const { auth, handlers } = NextAuth({
 		},
 		session: ({ session, token }) => {
 			const tokenData = token as AppJWT;
+
+			if (!tokenData?.id) {
+				return session;
+			}
+
 			return {
 				...session,
 				user: { ...session.user, id: tokenData.id, username: tokenData.username, version: tokenData.version ?? 0 },
@@ -126,5 +138,5 @@ export const { auth, handlers } = NextAuth({
 		},
 	},
 	pages: { signIn: '/login', error: '/login' },
-	secret: process.env.AUTH_SECRET,
+	secret: process.env.NEXTAUTH_SECRET,
 });

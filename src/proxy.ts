@@ -13,7 +13,14 @@ export const proxy = auth((req) => {
 		return NextResponse.next();
 	}
 
-	if (session?.user && pathname !== '/force-logout') {
+	const isAuthenticated = typeof session?.user?.id === 'string';
+	const isVersionRedirect = searchParams.get('reason') === 'version_update';
+
+	if (pathname === '/login') {
+		return NextResponse.next();
+	}
+
+	if (isAuthenticated && pathname !== '/force-logout') {
 		const tokenVersion = Number(session.user.version ?? -1);
 
 		if (tokenVersion !== LASTVERSION) {
@@ -24,15 +31,13 @@ export const proxy = auth((req) => {
 		}
 	}
 
-	const isVersionRedirect = searchParams.has('version_update');
-	const isAuthenticated = Boolean(session);
-	const topLevelPath = '/' + (pathname.split('/').filter(Boolean)[0] ?? '');
-
-	if (isAuthenticated && isPublicPath(topLevelPath) && !isVersionRedirect) {
+	// Prevent logged-in users from accessing public auth pages
+	if (isAuthenticated && isPublicPath(pathname) && !isVersionRedirect) {
 		return NextResponse.redirect(new URL('/home?logged=1', req.url));
 	}
 
-	if (!isAuthenticated && !isPublicPath(topLevelPath) && !isVersionRedirect) {
+	// Prevent unauthenticated users from accessing protected pages
+	if (!isAuthenticated && !isPublicPath(pathname) && !isVersionRedirect) {
 		return NextResponse.redirect(new URL('/login?unauthorized=1', req.url));
 	}
 

@@ -35,6 +35,10 @@ type SymbolUpdatePayload =
 	| { type: 'exp'; value: number; category: SymbolCategory; name: string }
 	| { type: 'content'; index: number; checked: boolean; category: SymbolCategory; name: string };
 
+type CharacterContentUI = CharacterContent & {
+	type: 'daily' | 'weekly';
+};
+
 type LevelExpInputProps = {
 	level: number;
 	exp: number;
@@ -114,7 +118,7 @@ function ContentCheckbox({ content, index, characterLevel, onToggle, symbolName 
 					{isDisabled ? <CrossIcon /> : <CheckIcon />}
 				</Checkbox.Indicator>
 			</Checkbox.Root>
-			{content.contentType}: +{getContentValue(symbolName as SymbolName, content.contentType)}
+			{content.contentType}: +{getContentValue(symbolName, content.contentType, 300)}
 		</label>
 	);
 }
@@ -144,7 +148,8 @@ function EditPageSymbolObject({
 
 	const { dailyValue, weeklyValue } = computeDailyWeeklyValues(
 		{ name: symbol.name, level: symbol.level, exp: symbol.exp, category: symbol.category as SymbolCategory },
-		symbol.contents as CharacterContent[],
+		symbol.contents as CharacterContentUI[],
+		characterLevel,
 	);
 
 	const computedValue = calculateDaysToCompleteSymbol(dailyValue, weeklyValue, type, symbol.level, symbol.exp);

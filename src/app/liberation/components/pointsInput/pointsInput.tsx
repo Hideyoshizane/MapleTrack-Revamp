@@ -15,25 +15,32 @@ type Props = {
 };
 const PointsInput = ({ points, onChangePoints }: Props): JSX.Element => {
 	const [inputValue, setInputValue] = useState<string>(String(points));
+	const [isDirty, setIsDirty] = useState<boolean>(false);
 
 	useEffect((): void => {
-		setInputValue(String(points));
-	}, [points]);
+		if (!isDirty) {
+			setInputValue(String(points));
+		}
+	}, [points, isDirty]);
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
 		const rawValue = event.target.value;
-
 		setInputValue(rawValue);
-		if (rawValue === '') {
+		setIsDirty(true);
+	};
+
+	const handleBlur = (): void => {
+		if (inputValue === '') {
+			setInputValue(String(points));
+			setIsDirty(false);
 			return;
 		}
 
-		const parsed = Number(rawValue);
-		if (Number.isNaN(parsed)) {
-			return;
+		const parsed = Number(inputValue);
+		if (!Number.isNaN(parsed) && parsed !== points) {
+			onChangePoints(parsed);
 		}
-
-		onChangePoints(parsed);
+		setIsDirty(false);
 	};
 
 	return (
@@ -43,6 +50,7 @@ const PointsInput = ({ points, onChangePoints }: Props): JSX.Element => {
 				id="points"
 				min="0"
 				name="points"
+				onBlur={handleBlur}
 				onChange={handleChange}
 				placeholder="0"
 				step="1"

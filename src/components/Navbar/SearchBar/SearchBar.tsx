@@ -3,66 +3,23 @@
 import * as Popover from '@radix-ui/react-popover';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef, useState, useTransition } from 'react';
+import { useRef, useState } from 'react';
 
 import SearchIcon from '@assets/svg/search.svg';
 import Loader from '@components/Loader/loader';
 import { generateClassCode } from '@data/classes/classes';
 import { getServerImageByName } from '@data/servers/servers';
-import { characterApi } from '@features/character/characterApi';
 
-import { useDebouncedValue } from './hooks/useDebouncedValue';
+import { useCharacterSearch } from './hooks/useCharacterSearch';
 import styles from './searchBar.module.scss';
 
-import type { searchCharacterResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
-
-const MIN_QUERY_LENGTH = 3;
-const DEBOUNCE_MS = 300;
 
 const SearchBar = (): JSX.Element => {
 	const [open, setOpen] = useState<boolean>(false);
-	const [query, setQuery] = useState<string>('');
-	const [options, setOptions] = useState<searchCharacterResponseBody['characters']>([]);
-	const [isPending, startTransition] = useTransition();
-
 	const inputRef = useRef<HTMLInputElement | null>(null);
-	const requestIdRef = useRef<number>(0);
 
-	const debouncedQuery = useDebouncedValue<string>(query, DEBOUNCE_MS);
-
-	useEffect((): void => {
-		if (debouncedQuery.length < MIN_QUERY_LENGTH) {
-			setOptions([]);
-			return;
-		}
-
-		const currentRequestId = ++requestIdRef.current;
-
-		startTransition((): void => {
-			void (async (): Promise<void> => {
-				try {
-					const response = await characterApi.searchCharacter({ parameters: debouncedQuery });
-
-					if (requestIdRef.current !== currentRequestId) {
-						return;
-					}
-
-					if (response.success) {
-						setOptions(response.data?.characters ?? []);
-					} else {
-						setOptions([]);
-					}
-				} catch {
-					if (requestIdRef.current === currentRequestId) {
-						setOptions([]);
-					}
-				}
-			})();
-		});
-	}, [debouncedQuery]);
-
-	const isLoading = isPending;
+	const { query, setQuery, results, isLoading, hasSearched } = useCharacterSearch();
 
 	return (
 		<Popover.Root onOpenChange={setOpen} open={open}>
@@ -97,13 +54,11 @@ const SearchBar = (): JSX.Element => {
 						</div>
 					)}
 
-					{!isLoading && debouncedQuery.length >= MIN_QUERY_LENGTH && options.length === 0 && (
-						<div className={styles.notFound}>No results</div>
-					)}
+					{!isLoading && hasSearched && results.length === 0 && <div className={styles.notFound}>No results</div>}
 
-					{!isLoading && options.length > 0 && (
+					{!isLoading && results.length > 0 && (
 						<div className={styles.results}>
-							{options.map((character): JSX.Element => {
+							{results.map((character): JSX.Element => {
 								const imageSrc = getServerImageByName(character.server) ?? '/assets/icons/servers/default.webp';
 
 								return (

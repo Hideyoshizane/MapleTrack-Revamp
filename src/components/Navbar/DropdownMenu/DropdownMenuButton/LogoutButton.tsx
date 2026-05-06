@@ -17,6 +17,7 @@ const LogoutButton = (): JSX.Element => {
 	const handleLogout = async (): Promise<void> => {
 		try {
 			await signOut({ callbackUrl: '/login' });
+
 			setTheme('dark');
 		} catch (error) {
 			console.error('Logout failed:', error);

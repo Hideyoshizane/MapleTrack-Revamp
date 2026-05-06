@@ -8,6 +8,7 @@ import ResponsiveText from '@components/ResponsiveText/responsiveText';
 import BossesDifficultySelector from './BossesDifficultySelector/bossesDifficultySelector';
 import styles from './bossesSelectionComponent.module.scss';
 import CheckedIcon from './CheckedIcon/checkedIcon';
+import { useBossesWeeklyMonthlyPoints } from './hooks/useBossesWeeklyMonthlyPoints';
 import PartySizeSelector from './PartySizeSelector/partySizeSelector';
 
 import type { Boss, BossDifficulty, WeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
@@ -23,23 +24,31 @@ type Props = {
 
 type BossSelectionState = Record<
 	string,
-	{ difficulty: BossDifficulty | null; partySize: number; excludedWeek: boolean; excludedMonth: boolean }
+	{
+		difficulty: BossDifficulty | null;
+		partySize: number;
+		excludedWeek: boolean;
+		excludedMonth: boolean;
+	}
 >;
 
 const buildCheckedMap = (checkedBosses: checkedBossResponseBody[]): Record<string, checkedBossResponseBody> => {
 	const map: Record<string, checkedBossResponseBody> = {};
+
 	for (const boss of checkedBosses) {
 		map[boss.name] = boss;
 	}
+
 	return map;
 };
 
 const BossesSelectionComponent = ({ type, bosses, checkedBosses, onChangeWeeklyTotals }: Props): JSX.Element => {
 	const [state, setState] = useState<BossSelectionState>({});
+
 	const checkedMap = buildCheckedMap(checkedBosses);
 
-	useEffect((): void => {
-		const nextState: BossSelectionState = {};
+	useEffect(() => {
+		const next: BossSelectionState = {};
 
 		for (const boss of bosses) {
 			const matched = checkedMap[boss.name];
@@ -51,11 +60,18 @@ const BossesSelectionComponent = ({ type, bosses, checkedBosses, onChangeWeeklyT
 				difficulty = boss.difficulties.find((d) => d.name === matched.type) ?? null;
 			}
 
-			nextState[boss.name] = { difficulty, partySize: 1, excludedWeek: isLocked, excludedMonth: isLocked };
+			next[boss.name] = { difficulty, partySize: 1, excludedWeek: isLocked, excludedMonth: isLocked };
 		}
 
-		setState(nextState);
+		setState(next);
 	}, [bosses, checkedBosses]);
+
+	useBossesWeeklyMonthlyPoints({
+		bosses,
+		state,
+		checkedBosses,
+		onChange: onChangeWeeklyTotals,
+	});
 
 	const handleSelectDifficulty = (bossName: string, difficulty: BossDifficulty): void => {
 		setState((prev) => {
@@ -64,11 +80,7 @@ const BossesSelectionComponent = ({ type, bosses, checkedBosses, onChangeWeeklyT
 				return prev;
 			}
 
-			if (difficulty.name === 'Skip') {
-				return { ...prev, [bossName]: { ...current, difficulty: null } };
-			}
-
-			return { ...prev, [bossName]: { ...current, difficulty } };
+			return { ...prev, [bossName]: { ...current, difficulty: difficulty.name === 'Skip' ? null : difficulty } };
 		});
 	};
 
@@ -104,53 +116,6 @@ const BossesSelectionComponent = ({ type, bosses, checkedBosses, onChangeWeeklyT
 			return { ...prev, [bossName]: { ...current, excludedMonth: !current.excludedMonth } };
 		});
 	};
-
-	useEffect((): void => {
-		const result: WeeklyMonthlyPoints = {
-			thisWeekPoints: 0,
-			totalWeeklyPoints: 0,
-			thisMonthPoints: 0,
-			totalMonthlyPoints: 0,
-			bosses: {},
-		};
-
-		for (const boss of bosses) {
-			const entry = state[boss.name];
-			if (!entry?.difficulty) {
-				continue;
-			}
-
-			const { difficulty, partySize, excludedWeek, excludedMonth } = entry;
-
-			const matched = checkedMap[boss.name];
-			const isLocked = Boolean(matched && matched.type !== 'Skip');
-
-			const value = Math.round((difficulty.points / partySize) * 100) / 100;
-
-			result.bosses[boss.name] = {
-				points: value,
-				reset: difficulty.reset,
-			};
-
-			if (difficulty.reset === 'Weekly') {
-				result.totalWeeklyPoints += value;
-
-				if (!isLocked && !excludedWeek) {
-					result.thisWeekPoints += value;
-				}
-			}
-
-			if (difficulty.reset === 'Monthly') {
-				result.totalMonthlyPoints += value;
-
-				if (!isLocked && !excludedMonth) {
-					result.thisMonthPoints += value;
-				}
-			}
-		}
-
-		onChangeWeeklyTotals(result);
-	}, [bosses, state, checkedBosses, onChangeWeeklyTotals]);
 
 	return (
 		<div className={styles.bossesDiv}>
@@ -189,13 +154,13 @@ const BossesSelectionComponent = ({ type, bosses, checkedBosses, onChangeWeeklyT
 
 							<BossesDifficultySelector
 								difficulties={boss.difficulties}
-								onChangeDifficulty={(difficulty): void => handleSelectDifficulty(boss.name, difficulty)}
+								onChangeDifficulty={(d): void => handleSelectDifficulty(boss.name, d)}
 								selectedDifficultyName={selectedDifficulty?.name ?? null}
 								type={type}
 							/>
 
 							<PartySizeSelector
-								onChangePartySize={(multiplier): void => handleSelectPartySize(boss.name, multiplier)}
+								onChangePartySize={(v): void => handleSelectPartySize(boss.name, v)}
 								selectedPartySize={selectedPartySize}
 							/>
 

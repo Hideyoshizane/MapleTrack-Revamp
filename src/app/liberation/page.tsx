@@ -14,7 +14,7 @@ const LiberationPage = async (): Promise<JSX.Element> => {
 	const initialServer = await resolveServerFromCookies();
 
 	// If no session, redirect to login
-	if (!session) {
+	if (!session?.user?.id) {
 		redirect('/login?unauthorized=1');
 	}
 

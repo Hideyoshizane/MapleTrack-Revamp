@@ -1,6 +1,5 @@
 'use client';
-
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 import ErrorIcon from '@assets/svg/error.svg';
 
@@ -11,12 +10,6 @@ import type { JSX } from 'react';
 const Error = (): JSX.Element => {
 	const ICON_SIZE = 400;
 
-	const router = useRouter();
-
-	const handleBackToHome = (): void => {
-		router.push('/home');
-	};
-
 	return (
 		<div className={styles.page}>
 			<main className={styles.main}>
@@ -25,9 +18,9 @@ const Error = (): JSX.Element => {
 				<p className={styles.title}>404 File Not Found</p>
 				<p className={styles.text}>The page you requested may have been moved or deleted.</p>
 
-				<button className={styles.displayButton} onClick={handleBackToHome}>
+				<Link className={styles.displayButton} href="/home">
 					Back to Home
-				</button>
+				</Link>
 			</main>
 		</div>
 	);

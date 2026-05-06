@@ -42,6 +42,7 @@ const getRankFromThresholds = (level: number, thresholds: ThresholdTuple): Legio
 	if (level < thresholds[4]) {
 		return 'rank_ss';
 	}
+
 	return 'rank_sss';
 };
 

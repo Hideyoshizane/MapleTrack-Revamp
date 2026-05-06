@@ -11,59 +11,36 @@ type CharacterSymbol = {
 	category: SymbolCategory;
 };
 
-export const SYMBOL_CONFIG = {
-	arcane: {
-		folder: '/assets/arcaneforce/',
-		maxLevel: 20,
-		names: ['Vanishing Journey', 'Chu Chu Island', 'Lachelein', 'Arcana', 'Morass', 'Esfera'],
-	},
-	sacred: {
-		folder: '/assets/sacredforce/',
-		maxLevel: 11,
-		names: ['Cernium', 'Arcus', 'Odium', 'Shangri-La', 'Arteria', 'Carcion'],
-	},
-	grand: {
-		folder: '/assets/grandsacredforce/',
-		maxLevel: 11,
-		names: ['Tallahart'],
-	},
-} as const satisfies Record<SymbolCategory, { folder: string; maxLevel: number; names: readonly string[] }>;
+export type SymbolName = (typeof allSymbols)[number]['name'];
 
-export type SymbolName = (typeof SYMBOL_CONFIG)[keyof typeof SYMBOL_CONFIG]['names'][number];
+type SymbolContent = (typeof allSymbols)[number]['contents'][number];
 
 type SymbolInfo = {
 	category: SymbolCategory;
 	file: string;
-	minLevel?: number;
+	minLevel: number;
 	maxLevel: number;
-	value: number;
+	contents: SymbolContent[];
 };
 
-const symbolRawMap = new Map(allSymbols.map((s) => [s.name, s]));
-const SYMBOL_MAP: Record<SymbolName, SymbolInfo> = Object.fromEntries(
-	(Object.entries(SYMBOL_CONFIG) as [SymbolCategory, (typeof SYMBOL_CONFIG)[SymbolCategory]][]).flatMap(
-		([category, config]) =>
-			config.names.map((name) => {
-				const raw = symbolRawMap.get(name);
-				return [
-					name,
-					{
-						category,
-						file: name.toLowerCase().replace(/ /g, '_'),
-						minLevel: raw?.minLevel ? Number(raw.minLevel) : undefined,
-						maxLevel: config.maxLevel,
-						value: raw ? Number(raw.value) : 0,
-					},
-				];
-			}),
-	),
+export const SYMBOL_MAP: Record<SymbolName, SymbolInfo> = Object.fromEntries(
+	allSymbols.map((symbol) => [
+		symbol.name,
+		{
+			category: symbol.category,
+			file: symbol.name.toLowerCase().replace(/ /g, '_'),
+			minLevel: symbol.minLevel,
+			maxLevel: symbol.maxLevel,
+			contents: symbol.contents,
+		},
+	]),
 ) as Record<SymbolName, SymbolInfo>;
 
-const contentValueMap = new Map<string, number>(allSymbols.map((s) => [s.name, Number(s.value) || 0]));
-const SYMBOL_CATEGORY_SET: ReadonlySet<SymbolCategory> = new Set(Object.keys(SYMBOL_CONFIG) as SymbolCategory[]);
-
-const isSymbolCategory = (value: unknown): value is SymbolCategory =>
-	typeof value === 'string' && SYMBOL_CATEGORY_SET.has(value as SymbolCategory);
+const SYMBOL_CATEGORY_FOLDER_MAP: Record<SymbolCategory, string> = {
+	arcane: 'arcaneforce',
+	sacred: 'sacredforce',
+	grand: 'grandsacredforce',
+};
 
 export const isSymbolName = (value: string): value is SymbolName => value in SYMBOL_MAP;
 
@@ -71,49 +48,102 @@ export const toSymbolName = (value: string): SymbolName | null => (isSymbolName(
 
 export const getSymbolImagePath = (name: SymbolName): string => {
 	const info = SYMBOL_MAP[name];
-	return `${SYMBOL_CONFIG[info.category].folder}${info.file}.webp`;
+	const folder = SYMBOL_CATEGORY_FOLDER_MAP[info.category];
+
+	return `/assets/${folder}/${info.file}.webp`;
 };
 
 export const canUseSymbol = (level: number, name: SymbolName): boolean => {
-	const minLevel = SYMBOL_MAP[name].minLevel;
-	return minLevel === undefined || level >= minLevel;
+	return level >= SYMBOL_MAP[name].minLevel;
 };
 
-export const getSymbolMinLevel = (name: SymbolName): number => SYMBOL_MAP[name].minLevel ?? 0;
+export const getSymbolMinLevel = (name: SymbolName): number => SYMBOL_MAP[name].minLevel;
 
 export const getSymbolMaxLevel = (input: SymbolCategory | SymbolName): number => {
-	if (isSymbolCategory(input)) {
-		return SYMBOL_CONFIG[input].maxLevel;
+	if (isSymbolName(input)) {
+		return SYMBOL_MAP[input].maxLevel;
 	}
-	return SYMBOL_MAP[input].maxLevel;
+
+	const symbols = allSymbols.filter((s) => s.category === input);
+	return Math.max(...symbols.map((s) => s.maxLevel));
 };
 
-export const getContentValue = (symbolName: SymbolName | null, contentType: string): number => {
+export const getContentValue = (symbolName: SymbolName | null, contentType: string, characterLevel: number): number => {
 	if (!symbolName) {
 		return 0;
 	}
-	if (contentType === 'Daily Quest') {
-		return SYMBOL_MAP[symbolName].value;
+
+	const symbol = SYMBOL_MAP[symbolName];
+	if (!symbol?.contents?.length) {
+		return 0;
 	}
-	return contentValueMap.get(contentType) ?? contentValueMap.get('Weekly') ?? 0;
+
+	if (contentType === 'Weekly') {
+		const weeklyContent = symbol.contents.find((content) => {
+			const isWeekly = content.type === 'weekly';
+			const matchesLevel = content.minLevel ? characterLevel >= content.minLevel : true;
+
+			return isWeekly && matchesLevel;
+		});
+
+		return weeklyContent?.value ?? 0;
+	}
+
+	const matchedContent = symbol.contents.find((content) => {
+		const matchesName = content.name === contentType;
+		const matchesLevel = content.minLevel ? characterLevel >= content.minLevel : true;
+
+		return matchesName && matchesLevel;
+	});
+
+	return matchedContent?.value ?? 0;
 };
 
-type CharacterContent = { contentType: string; checked: boolean; cleared: boolean };
+type CharacterContent = {
+	contentType: string;
+	checked: boolean;
+	cleared: boolean;
+	type: 'daily' | 'weekly';
+};
 
 export const computeDailyWeeklyValues = (
 	symbol: CharacterSymbol,
 	content: CharacterContent[],
+	characterLevel: number,
 ): { dailyValue: number; weeklyValue: number } => {
 	const symbolName = toSymbolName(symbol.name);
 	if (!symbolName) {
 		return { dailyValue: 0, weeklyValue: 0 };
 	}
 
-	const dailyValue =
-		(content[0]?.checked ? getContentValue(symbolName, content[0].contentType) : 0) +
-		(content[2]?.checked ? getContentValue(symbolName, content[2].contentType) : 0);
+	const symbolInfo = SYMBOL_MAP[symbolName];
 
-	const weeklyValue = content[1]?.checked ? getContentValue(symbolName, 'Weekly') : 0;
+	let dailyValue = 0;
+	let weeklyValue = 0;
+
+	for (const c of content) {
+		if (!c.checked) {
+			continue;
+		}
+
+		const matchedContent = symbolInfo.contents.find((item) => {
+			const matchesName = item.name === c.contentType;
+			const matchesLevel = item.minLevel ? characterLevel >= item.minLevel : true;
+
+			return matchesName && matchesLevel;
+		});
+
+		if (!matchedContent) {
+			continue;
+		}
+
+		if (matchedContent.type === 'weekly') {
+			weeklyValue += matchedContent.value;
+			continue;
+		}
+
+		dailyValue += matchedContent.value;
+	}
 
 	return { dailyValue, weeklyValue };
 };
@@ -126,9 +156,11 @@ export const calculateDaysToCompleteSymbol = (
 	symbolExp: number,
 ): number => {
 	let remaining = getRemainingExp(type, symbolLevel, symbolExp);
+
 	if (remaining <= 0) {
 		return 0;
 	}
+
 	if (daily <= 0 && weekly <= 0) {
 		return Infinity;
 	}
@@ -141,9 +173,11 @@ export const calculateDaysToCompleteSymbol = (
 	remaining -= weeks * totalPerWeek;
 
 	let remainingDays = 0;
+
 	while (remaining > 0) {
 		remainingDays++;
 		remaining -= daily;
+
 		if (remainingDays % 7 === 0) {
 			remaining -= weeklyTotal;
 		}
@@ -161,22 +195,21 @@ export const calculateNewLevelFromExp = (
 ): LevelUpResult => {
 	let level = currentLevel;
 	let exp = currentExp;
+
 	const maxLevel = getLastLevel(type);
 
 	while (level < maxLevel) {
 		const expForNext = getExpForLevel(type, level);
-		if (exp >= expForNext) {
-			exp -= expForNext;
-			level++;
-			continue;
+
+		if (exp < expForNext) {
+			break;
 		}
-		break;
+
+		exp -= expForNext;
+		level++;
 	}
-	if (type === 'arcane') {
-		level = Math.min(level, 20);
-	} else if ((type === 'sacred' && level >= 11) || (type === 'sacred' && level >= 11)) {
-		level = 11;
-	}
+
+	level = type === 'arcane' ? Math.min(level, 20) : Math.min(level, 11);
 
 	return { currentLevel: level, currentExp: exp };
 };

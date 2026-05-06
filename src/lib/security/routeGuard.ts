@@ -16,7 +16,6 @@ export const routeGuard =
 			if (MUTATING_METHODS.includes(request.method as MutatingMethod)) {
 				const origin = request.headers.get('origin');
 				const host = request.headers.get('host');
-
 				if (!origin || !host) {
 					return createResponse<ApiResponse>({ success: false, message: 'Invalid origin' }, 403);
 				}

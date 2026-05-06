@@ -15,6 +15,7 @@ export const sanitizeInput = (input: string, escapeForMongo: boolean = true): st
 		return clean.trim();
 	} catch (error) {
 		console.error('Sanitization failed:', error);
+
 		return '';
 	}
 };

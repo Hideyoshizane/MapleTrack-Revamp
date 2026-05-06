@@ -28,7 +28,15 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		// Search for the symbol
 		const symbol = await prisma.characterSymbol.findUnique({
 			where: { id: id, character: { userId: authenticatedUserId } },
-			select: { id: true, name: true, level: true, exp: true, category: true, contents: true },
+			select: {
+				id: true,
+				name: true,
+				level: true,
+				exp: true,
+				category: true,
+				contents: true,
+				character: { select: { level: true } },
+			},
 		});
 		if (!symbol) {
 			logApiFailure('Symbol not found', { route });
@@ -49,7 +57,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		}
 
 		// Find Symbol weekly Value
-		const weeklyValue = getContentValue(toSymbolName(symbol.name), 'Weekly');
+		const weeklyValue = getContentValue(toSymbolName(symbol.name), 'Weekly', symbol.character.level);
 
 		// Update symbol exp and level
 		const updatedExp = symbol.exp + weeklyValue;

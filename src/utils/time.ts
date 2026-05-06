@@ -34,6 +34,7 @@ export const hasDailyResetOccurred = (date: Date | null): boolean => {
 	if (!date) {
 		return true;
 	}
+
 	return hasResetPassed(getNextMidnight(date));
 };
 
@@ -51,6 +52,7 @@ export const hasMonthlyResetOccurred = (date: Date | null): boolean => {
 	if (!date) {
 		return true;
 	}
+
 	return hasResetPassed(getNextMonthFirstDay(date));
 };
 

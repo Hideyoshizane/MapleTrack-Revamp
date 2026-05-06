@@ -28,8 +28,16 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const { id, bonus } = parseResult.data;
 
 		const symbol = await prisma.characterSymbol.findFirst({
-			where: { id: id, character: { userId: authenticatedUserId } },
-			select: { id: true, name: true, level: true, exp: true, category: true, contents: true },
+			where: { id, character: { userId: authenticatedUserId } },
+			select: {
+				id: true,
+				name: true,
+				level: true,
+				exp: true,
+				category: true,
+				contents: true,
+				character: { select: { level: true } },
+			},
 		});
 		if (!symbol) {
 			logApiFailure('Symbol not found', { route });
@@ -55,7 +63,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			(content): boolean => content.checked === true && extraArea.has(content.contentType),
 		);
 
-		let dailyValue = getContentValue(toSymbolName(symbol.name), DAILY_QUEST_CONTENT_TYPE);
+		let dailyValue = getContentValue(toSymbolName(symbol.name), DAILY_QUEST_CONTENT_TYPE, symbol.character.level);
 
 		if (extraAreaContent) {
 			dailyValue += dailyValue;

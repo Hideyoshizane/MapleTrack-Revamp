@@ -11,9 +11,9 @@ import { nowInUtc, addMinutesToDate } from '@utils/time';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextRequest, NextResponse } from 'next/server';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL = process.env.NEXTAUTH_URL;
 if (!BASE_URL) {
-	throw new Error('NEXT_PUBLIC_BASE_URL is not defined');
+	throw new Error('NEXTAUTH_URL is not defined');
 }
 
 const route = '/api/auth/forgot-password';
@@ -58,7 +58,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		} catch (emailError) {
 			logApiFailure('Failed to send reset email', {
 				route,
-				userId: user.id,
 				additional: { error: emailError instanceof Error ? emailError.message : String(emailError) },
 			});
 			return createResponse<ApiResponse>({ success: false, message: 'Failed to send reset email' }, 500);

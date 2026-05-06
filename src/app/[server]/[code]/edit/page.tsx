@@ -18,7 +18,7 @@ const CharactersPage = async ({ params }: Props): Promise<JSX.Element> => {
 
 	// Redirect to login if not autenthicated
 	const session = await auth();
-	if (!session) {
+	if (!session?.user?.id) {
 		redirect('/login?unauthorized=1');
 	}
 

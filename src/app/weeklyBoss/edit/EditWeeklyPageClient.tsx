@@ -3,8 +3,6 @@
 import NumberFlow from '@number-flow/react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
 
 import BossIcon from '@assets/svg/boss_slayer.svg';
 import Button from '@components/Button/button';
@@ -14,100 +12,41 @@ import {
 	WEEKLY_BOSSES_PER_CHARACTER,
 	MONTHLY_BOSSES_PER_CHARACTER,
 } from '@constants/bossConstants';
-import { bossListApi } from '@features/boss/bossListApi';
-import {
-	updateCharacterBoss,
-	countCharacterBosses,
-	countMonthlyBosses,
-	countServerBosses,
-} from '@features/boss/bossListUtils';
 import { useServerCookie } from '@hooks/useServerCookie';
 
 import BossGrid from './components/BossGrid/bossGrid';
 import WeeklyBossDropdown from './components/CharacterSelectBossDropdown/characterSelectBossDropdown';
+import { useEditWeeklyBossList } from './hooks/useEditWeeklyBossList';
 import styles from './page.module.scss';
 
-import type { BossName, BossDifficultyName, BossReset } from '@data/bosses/bosses';
 import type { ServerName } from '@data/servers/servers';
-import type {
-	getEditBossListResponseBody,
-	getEditBossListCharacterResponseBody,
-} from '@features/boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
-type EditWeeklyPageClientProps = {
+type Props = {
 	initialServer: ServerName;
 };
 
-const EditWeeklyPageClient = ({ initialServer }: EditWeeklyPageClientProps): JSX.Element => {
+const EditWeeklyPageClient = ({ initialServer }: Props): JSX.Element => {
 	const pathname = usePathname();
 	const router = useRouter();
+
 	const { server } = useServerCookie(initialServer);
 
-	const [loading, setLoading] = useState<boolean>(true);
-
-	const [serverData, setServerData] = useState<getEditBossListResponseBody | null>(null);
-	const [selectedCharacter, setSelectedCharacter] = useState<getEditBossListCharacterResponseBody | null>(null);
-	const [totalBosses, setTotalBosses] = useState<number>(0);
-	const [totalGains, setTotalGains] = useState<number>(0);
-	const [characterWeeklyIncome, setCharacterWeeklyIncome] = useState<number>(0);
-	const [characterWeeklyBossAmount, setCharacterWeeklyBossAmount] = useState<number>(0);
-	const [characterMonthlyBossAmount, setCharacterMonthlyBossAmount] = useState<number>(0);
+	const {
+		loading,
+		serverData,
+		selectedCharacter,
+		totalBosses,
+		totalGains,
+		characterWeeklyIncome,
+		characterWeeklyBossAmount,
+		characterMonthlyBossAmount,
+		setSelectedCharacter,
+		handleBossUpdate,
+		handleSaveChanges,
+	} = useEditWeeklyBossList(server);
 
 	const BOSS_ICON_SIZE = 96;
-
-	useEffect(() => {
-		const fetchBossList = async (): Promise<void> => {
-			setLoading(true);
-			try {
-				const payload = { server };
-				const response = await bossListApi.getEditBossList(payload);
-
-				if (response.success && response.data) {
-					setServerData(response.data);
-					setSelectedCharacter(response.data.characters[0] || null);
-					setTotalBosses(countServerBosses(response.data));
-					setTotalGains(response.data.totalGains);
-					setCharacterWeeklyIncome(response.data.characters[0].totalIncome);
-					setCharacterWeeklyBossAmount(countCharacterBosses(response.data.characters[0]));
-					setCharacterMonthlyBossAmount(countMonthlyBosses(response.data.characters[0]));
-				}
-			} catch (error) {
-				console.error(error);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		void fetchBossList();
-	}, [server]);
-
-	useEffect(() => {
-		if (!serverData || !selectedCharacter) {
-			return;
-		}
-
-		const freshCharacter = serverData.characters.find((c) => c.name === selectedCharacter.name);
-		if (freshCharacter && freshCharacter !== selectedCharacter) {
-			setSelectedCharacter(freshCharacter);
-		}
-	}, [serverData]);
-
-	useEffect(() => {
-		if (!selectedCharacter) {
-			return;
-		}
-
-		setCharacterWeeklyIncome(selectedCharacter.totalIncome);
-		setCharacterWeeklyBossAmount(countCharacterBosses(selectedCharacter));
-		setCharacterMonthlyBossAmount(countMonthlyBosses(selectedCharacter));
-	}, [selectedCharacter]);
-
-	useEffect(() => {
-		if (!loading && !serverData) {
-			router.replace('/home?missingBossList=1');
-		}
-	}, [loading, serverData, router]);
 
 	if (loading || !serverData || !selectedCharacter) {
 		return (
@@ -116,42 +55,6 @@ const EditWeeklyPageClient = ({ initialServer }: EditWeeklyPageClientProps): JSX
 			</section>
 		);
 	}
-
-	const handleSaveChanges = async (): Promise<void> => {
-		try {
-			const result = await bossListApi.updateBossList(serverData);
-			if (result.success) {
-				const basePath = pathname.replace(/\/edit$/, '');
-				router.push(`${basePath}?success=1`);
-			} else {
-				toast.error(result.message || 'Failed to update Boss List.');
-			}
-		} catch (error) {
-			console.error('Failed to save:', error);
-		}
-	};
-
-	const handleBossUpdate = (
-		bossName: BossName,
-		difficulty: BossDifficultyName,
-		server: string,
-		reset: BossReset,
-		dailyTotal?: number,
-	): void => {
-		const updatedData = updateCharacterBoss(serverData, {
-			characterName: selectedCharacter.name,
-			bossName,
-			difficulty,
-			reset,
-			dailyTotal,
-			server,
-		});
-		setServerData(updatedData);
-		setTotalBosses(countServerBosses(updatedData));
-		setTotalGains(updatedData.totalGains);
-	};
-
-	const characters = serverData.characters;
 
 	return (
 		<section className="mainContent">
@@ -203,18 +106,14 @@ const EditWeeklyPageClient = ({ initialServer }: EditWeeklyPageClientProps): JSX
 					onClick={(): void => router.push(pathname.replace(/\/edit$/, ''))}>
 					Discard Changes
 				</Button>
-				<Button
-					className={styles.saveChangesButton}
-					onClick={() => {
-						void handleSaveChanges();
-					}}>
+				<Button className={styles.saveChangesButton} onClick={(): void => void handleSaveChanges(pathname)}>
 					Save Changes
 				</Button>
 			</div>
 			<div className={styles.charPart}>
 				<div className={styles.serverDropdown}>
 					<WeeklyBossDropdown
-						characters={characters}
+						characters={serverData.characters}
 						selectedCharacter={selectedCharacter}
 						setSelectedCharacter={setSelectedCharacter}
 					/>

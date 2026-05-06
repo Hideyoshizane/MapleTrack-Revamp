@@ -15,7 +15,7 @@ export type LiberationQuest = {
 	bosses: Record<string, LiberationEntry>;
 };
 
-export type LiberationMilestones = Record<string, LiberationQuest>;
+type LiberationMilestones = Record<string, LiberationQuest>;
 
 const normalizeLiberationData = (raw: Record<string, RawLiberationQuest>): LiberationMilestones => {
 	const result: LiberationMilestones = {};
@@ -24,15 +24,14 @@ const normalizeLiberationData = (raw: Record<string, RawLiberationQuest>): Liber
 		const bosses: Record<string, LiberationEntry> = {};
 
 		for (const [key, value] of Object.entries(questData)) {
-			if (key === 'total') continue;
+			if (key === 'total') {
+				continue;
+			}
 
 			bosses[key] = value as LiberationEntry;
 		}
 
-		result[questName] = {
-			total: questData.total,
-			bosses,
-		};
+		result[questName] = { total: questData.total, bosses };
 	}
 
 	return result;
@@ -63,8 +62,6 @@ export const questTypes = questTypesArray as unknown as readonly [
 	...(keyof typeof liberationQuestsJson)[],
 ];
 
-export type QuestType = (typeof questTypes)[number];
-
 const extractBossNamesByQuest = (): { genesisBossNames: string[]; destinyBossNames: string[] } => {
 	const genesisBosses: string[] = [];
 	const destinyBosses: string[] = [];
@@ -90,17 +87,10 @@ const { genesisBossNames, destinyBossNames } = extractBossNamesByQuest();
 export const genesisBosses = genesisBossNames as unknown as readonly [string, ...string[]];
 export const destinyBosses = destinyBossNames as unknown as readonly [string, ...string[]];
 
-export type GenesisBossName = (typeof genesisBosses)[number];
-export type DestinyBossName = (typeof destinyBosses)[number];
-
 // Aux functions
 
 export const getQuestsByType = (questType: string): LiberationQuest | null => {
 	return liberationMilestones[questType] ?? null;
-};
-
-export const getLiberationBossImage = (questType: string, bossName: string): string => {
-	return liberationMap.get(questType)?.get(bossName)?.img ?? '';
 };
 
 export const getLiberationPoints = (questType: string, bossName: string): number => {
@@ -127,6 +117,7 @@ export const getCumulativeLiberationPoints = (
 			if (!includeTargetBoss) {
 				totalPoints -= entry.points;
 			}
+
 			break;
 		}
 	}
@@ -175,6 +166,7 @@ export const resolveNextLiberationState = (
 	if (startIndex === -1) {
 		return resolveFinalState(questName, points);
 	}
+
 	const lastIndex = bossEntries.length - 1;
 	if (startIndex === lastIndex) {
 		return resolveFinalState(questName, points);
@@ -195,6 +187,7 @@ export const resolveNextLiberationState = (
 
 		if (currentIndex >= bossEntries.length) {
 			const [lastBossName] = bossEntries[bossEntries.length - 1];
+
 			return resolveFinalState(lastBossName, remainingPoints);
 		}
 	}

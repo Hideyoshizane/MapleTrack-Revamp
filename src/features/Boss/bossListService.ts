@@ -11,6 +11,7 @@ export const createBossList = async (tx: TransactionClient, authenticatedUserId:
 		await tx.bossList.create({ data: { userId: authenticatedUserId, lastUpdate: nowInUtc() } });
 	} catch (error) {
 		console.error('Error creating BossList:', error);
+
 		throw error;
 	}
 };

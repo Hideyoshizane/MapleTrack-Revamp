@@ -27,6 +27,9 @@ import type { JSX } from 'react';
 
 const SYMBOL_SIZE_DEFAULT = 24;
 
+type CharacterContentUI = CharacterContent & {
+	type: 'daily' | 'weekly';
+};
 const getExpDisplay = (type: SymbolCategory, level: number, exp: number): string => {
 	const maxExp = getExpForLevel(type, level);
 	return maxExp === 0 ? 'EXP: MAX' : `EXP: ${exp}/${maxExp}`;
@@ -49,7 +52,7 @@ const SymbolObject = ({
 	size = SYMBOL_SIZE_DEFAULT,
 	disableAllDaily,
 }: Props): JSX.Element => {
-	const { level, exp, contents } = symbol;
+	const { level, exp } = symbol;
 	const name = symbol.name as SymbolName;
 
 	// Bonuses
@@ -58,8 +61,10 @@ const SymbolObject = ({
 
 	const { dailyValue: baseDaily, weeklyValue } = computeDailyWeeklyValues(
 		{ name: symbol.name, level: symbol.level, exp: symbol.exp, category: symbol.category as SymbolCategory },
-		contents as CharacterContent[],
+		symbol.contents as CharacterContentUI[],
+		characterLevel,
 	);
+
 	const dailyValue = baseDaily + bonus;
 
 	const [optimisticExp, setOptimisticExp] = useState<number | null>(null);

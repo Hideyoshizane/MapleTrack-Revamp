@@ -46,6 +46,7 @@ const runArgon2 = (params: { password: string; salt: Buffer; config: typeof DEFA
 			(err, derivedKey) => {
 				if (err) {
 					reject(err);
+
 					return;
 				}
 				resolve(Buffer.from(derivedKey));

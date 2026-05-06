@@ -54,7 +54,6 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const serverData: getEditBossListResponseBody = {
 			id: serverDataRaw.id,
 			weeklyBosses: serverDataRaw.weeklyBosses,
-			totalGains: serverDataRaw.totalGains,
 
 			characters: serverDataRaw.characters.map((characterEntry) => {
 				if (!characterEntry.character) {

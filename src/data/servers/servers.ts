@@ -22,6 +22,7 @@ export const getServerByName = (name: string | undefined): Server | undefined =>
 	if (!name) {
 		return undefined;
 	}
+
 	return serversMap.get(name.toLowerCase());
 };
 

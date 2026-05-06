@@ -72,7 +72,7 @@
 		"jobType": "mage"
 	},
 	{
-		"linkSkill": "Tree of Stars",
+		"linkSkill": "Guiding Stars",
 		"legionType": "ABDAMAGE",
 		"className": "Sia Astelle",
 		"jobType": "mage"
@@ -169,7 +169,7 @@
 		"jobType": "warrior"
 	},
 	{
-		"linkSkill": "Keen Edge",
+		"linkSkill": "Moonlit Blade Learnings",
 		"legionType": "CRIT",
 		"className": "Hayato",
 		"jobType": "warrior"
