@@ -4,7 +4,9 @@
   <img alt="MapleTrack" title="#logo" src="public/assets/logo/logo.webp"/>
 </p>
 
-## A fully rebuilt MapleStory character progression and weekly boss tracking app.
+<h2 align="center">
+  A rebuilt MapleStory progression and weekly boss tracking app, developed with React.
+</h2>
 
 <p align="center">
   <img src="https://img.shields.io/static/v1?label=license&message=MIT&color=blue&style=for-the-badge"/>
