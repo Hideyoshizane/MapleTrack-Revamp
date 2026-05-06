@@ -5,9 +5,9 @@ import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'a
 // Tracks AbortController per request
 const abortControllerMap: WeakMap<InternalAxiosRequestConfig, AbortController> = new WeakMap();
 
-const baseURL: string = process.env.NEXT_PUBLIC_API_BASE_URL
-	? `${process.env.NEXT_PUBLIC_API_BASE_URL.replace(/\/$/, '')}/api`
-	: 'http://localhost:3000/api';
+const applicationBaseUrl = process.env.NEXTAUTH_URL?.replace(/\/$/u, '') ?? 'http://localhost:3000';
+
+const baseURL = `${applicationBaseUrl}/api`;
 
 const axiosInstance: AxiosInstance = axios.create({
 	baseURL,
