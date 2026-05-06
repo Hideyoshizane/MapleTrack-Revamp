@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import ErrorIcon from '@assets/svg/error.svg';
 
-import styles from '../styles/notFound.module.scss';
+import styles from '../styles/NotFound.module.scss';
 
 import type { JSX } from 'react';
 

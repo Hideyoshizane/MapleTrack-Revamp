@@ -4,11 +4,11 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Fragment } from 'react';
 
 import MenuIcon from '@assets/svg/menu.svg';
-import ResponsiveText from '@components/ResponsiveText/responsiveText';
+import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 
-import styles from './customDropdownMenu.module.scss';
-import DropdownMenuButton from './DropdownMenuButton/dropdownMenuButton';
-import LogoutButton from './DropdownMenuButton/logoutButton';
+import styles from './CustomDropdownMenu.module.scss';
+import DropdownMenuButton from './DropdownMenuButton/DropdownMenuButton';
+import LogoutButton from './DropdownMenuButton/LogoutButton';
 
 import type { JSX } from 'react';
 

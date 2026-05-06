@@ -3,10 +3,10 @@ export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
-import Navbar from '@components/Navbar/navbar';
+import Navbar from '@components/Navbar/Navbar';
 
-import { BonusProvider } from './bonusContext';
-import CharacterPage from './characterPage';
+import { BonusProvider } from './BonusContext';
+import CharacterPage from './CharacterPage';
 
 import type { JSX } from 'react';
 

@@ -1,6 +1,6 @@
 import { use } from 'react';
 
-import ResetPasswordClient from './resetPasswordClient';
+import ResetPasswordClient from './ResetPasswordClient';
 
 import type { JSX } from 'react';
 

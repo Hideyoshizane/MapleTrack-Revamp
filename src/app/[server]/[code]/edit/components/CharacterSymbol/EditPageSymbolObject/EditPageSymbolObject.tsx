@@ -5,8 +5,8 @@ import Image from 'next/image';
 
 import CheckIcon from '@assets/svg/check.svg';
 import CrossIcon from '@assets/svg/cross-2.svg';
-import ProgressBar from '@components/ProgressBar/progressBar';
-import Tooltip from '@components/Tooltip/tooltip';
+import ProgressBar from '@components/ProgressBar/ProgressBar';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { getExpForLevel } from '@data/symbols/exp/expTable';
 import {
 	getSymbolImagePath,
@@ -18,9 +18,9 @@ import {
 	calculateDaysToCompleteSymbol,
 } from '@data/symbols/symbolMappings';
 
-import styles from './editPageSymbolObject.module.scss';
+import styles from './EditPageSymbolObject.module.scss';
 
-import type { JobType } from '@components/ProgressBar/progressBar';
+import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { SymbolName } from '@data/symbols/symbolMappings';
 import type {
 	getEditCharacterDataSymbolsResponseBody,

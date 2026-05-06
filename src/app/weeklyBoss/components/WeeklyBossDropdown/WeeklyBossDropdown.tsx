@@ -11,8 +11,8 @@ import NoBossIcon from '@assets/svg/circle-x.svg';
 import MenuIcon from '@assets/svg/menu.svg';
 import { generateClassCode } from '@data/classes/classes';
 
-import CharacterBossItem from './BossItem/characterBossItem';
-import styles from './weeklyBossDropdown.module.scss';
+import CharacterBossItem from './BossItem/CharacterBossItem';
+import styles from './WeeklyBossDropdown.module.scss';
 
 import type { getBossListCharacterResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';

@@ -4,8 +4,8 @@ import { clsx } from 'clsx';
 import { useState } from 'react';
 import { Controller, type Control, type FieldValues, type Path } from 'react-hook-form';
 
-import styles from './formInput.module.scss';
-import ValidationIcon from './ValidationIcon/validationIcon';
+import styles from './FormInput.module.scss';
+import ValidationIcon from './ValidationIcon/ValidationIcon';
 
 import type { Validator } from '@utils/validateField';
 import type { HTMLInputTypeAttribute, JSX } from 'react';

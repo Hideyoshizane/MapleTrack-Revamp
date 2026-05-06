@@ -9,8 +9,8 @@ import TrophyIcon from '@assets/svg/trophy.svg';
 import UserIcon from '@assets/svg/user-round.svg';
 
 import { DROPDOWN_ICON_SIZE } from './constants';
-import buttonStyles from './dropdownMenuButton.module.scss';
-import commonStyles from './dropdownMenuCommon.module.scss';
+import buttonStyles from './DropdownMenuButton.module.scss';
+import commonStyles from './DropdownMenuCommon.module.scss';
 
 import type { FunctionComponent, SVGProps, JSX } from 'react';
 

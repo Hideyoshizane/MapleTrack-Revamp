@@ -4,9 +4,9 @@ import { clsx } from 'clsx';
 import Image from 'next/image';
 
 import { calculatePointsSchedule, formatUTC } from '@/app/liberation/lib/calculateSchedule';
-import Tooltip from '@components/Tooltip/tooltip';
+import Tooltip from '@components/Tooltip/Tooltip';
 
-import styles from './genesisSchedule.module.scss';
+import styles from './GenesisSchedule.module.scss';
 
 import type { WeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
 import type { JSX } from 'react';

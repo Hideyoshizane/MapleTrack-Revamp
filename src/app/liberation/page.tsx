@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
-import Navbar from '@components/Navbar/navbar';
+import Navbar from '@components/Navbar/Navbar';
 import { resolveServerFromCookies } from '@data/servers/resolveServerFromCookies';
 
-import LiberationClient from './liberationClient';
+import LiberationClient from './LiberationClient';
 
 import type { JSX } from 'react';
 

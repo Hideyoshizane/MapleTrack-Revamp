@@ -11,7 +11,7 @@ import { MAX_VALUE_BONUS_COOKIE } from '@constants/cookiesConstants';
 
 import { useBonusContext } from '../../useBonusContext';
 
-import styles from './dropdownEventMenu.module.scss';
+import styles from './DropdownEventMenu.module.scss';
 
 import type { JSX } from 'react';
 

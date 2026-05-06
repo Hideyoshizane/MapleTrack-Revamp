@@ -11,15 +11,15 @@ import { getBossesByType } from '@data/liberation/liberationBosses';
 import { getQuestsByType, getLiberationTotal } from '@data/liberation/liberationQuests';
 
 import { calculateQuestPoints, calculateCumulativePoints } from '../../lib/calculatePoints';
-import BossesSelectionComponent from '../BossesSelectionComponent/bossesSelectionComponent';
-import PointsInput from '../pointsInput/pointsInput';
-import ProgressionBarDiv from '../ProgressionBarDiv/progressionBarDiv';
-import ProgressPrevision from '../ProgressPrevision/progressPrevision';
-import QuestDropdown from '../QuestDropdown/questDropdown';
-import WeeklyBreakdown from '../WeeklyBreakdown/weeklyBreakdown';
+import BossesSelectionComponent from '../BossesSelectionComponent/BossesSelectionComponent';
+import PointsInput from '../PointsInput/PointsInput';
+import ProgressionBarDiv from '../ProgressionBarDiv/ProgressionBarDiv';
+import ProgressPrevision from '../ProgressPrevision/ProgressPrevision';
+import QuestDropdown from '../QuestDropdown/QuestDropdown';
+import WeeklyBreakdown from '../WeeklyBreakdown/WeeklyBreakdown';
 
-import styles from './destinyProgression.module.scss';
-import DestinySchedule from './destinySchedule/destinySchedule';
+import styles from './DestinyProgression.module.scss';
+import DestinySchedule from './DestinySchedule/DestinySchedule';
 import { useDestinyCheckedBosses } from './hooks/useDestinyCheckedBosses';
 import { useDestinyProgressionState } from './hooks/useDestinyProgressionState';
 

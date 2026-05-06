@@ -5,9 +5,9 @@ import { clsx } from 'clsx';
 
 import BanIcon from '@assets/svg/ban.svg';
 import CheckIcon from '@assets/svg/check.svg';
-import Tooltip from '@components/Tooltip/tooltip';
+import Tooltip from '@components/Tooltip/Tooltip';
 
-import styles from './bossDropdownButton.module.scss';
+import styles from './BossDropdownButton.module.scss';
 
 import type { JSX } from 'react';
 

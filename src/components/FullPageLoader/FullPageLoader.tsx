@@ -1,8 +1,8 @@
 'use client';
 
-import Loader from '@components/Loader/loader';
+import Loader from '@components/Loader/Loader';
 
-import styles from './fullPageLoader.module.scss';
+import styles from './FullPageLoader.module.scss';
 
 import type { JSX } from 'react';
 

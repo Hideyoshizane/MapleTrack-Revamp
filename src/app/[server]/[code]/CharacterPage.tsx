@@ -6,8 +6,8 @@ import { useRouter, useSearchParams, redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-import ErrorPage from '@components/ErrorPage/errorPage';
-import FullPageLoader from '@components/FullPageLoader/fullPageLoader';
+import ErrorPage from '@components/ErrorPage/ErrorPage';
+import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
 import { getClassNameByCode } from '@data/classes/classes';
 import { isValidServerName } from '@data/servers/servers';
 import { characterQueryKeys } from '@features/character/character.queryKeys';
@@ -15,14 +15,14 @@ import { getJob } from '@features/character/characterService';
 import { useCharacterExternalQuery } from '@hooks/useCharacterExternalQuery';
 import { useCharacterQuery } from '@hooks/useCharacterQuery';
 
-import CharacterHeader from './components/CharacterHeader/characterHeader';
-import CharacterStats from './components/CharacterStats/characterStats';
-import SymbolsSection from './components/SymbolsSection/symbolsSection';
+import CharacterHeader from './components/CharacterHeader/CharacterHeader';
+import CharacterStats from './components/CharacterStats/CharacterStats';
+import SymbolsSection from './components/SymbolsSection/SymbolsSection';
 import { useIncreaseAllSymbols } from './hooks/useIncreaseAllSymbols';
-import styles from './page.module.scss';
+import styles from './Page.module.scss';
 import { useBonusContext } from './useBonusContext';
 
-import type { JobType } from '@components/ProgressBar/progressBar';
+import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { JSX } from 'react';
 
 type Props = {

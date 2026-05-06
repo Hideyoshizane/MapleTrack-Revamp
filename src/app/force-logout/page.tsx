@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 
-import ForceLogoutClient from './forceLogoutClient';
+import ForceLogoutClient from './ForceLogoutClient';
 
 import type { JSX } from 'react';
 

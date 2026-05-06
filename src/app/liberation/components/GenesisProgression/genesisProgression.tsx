@@ -9,21 +9,21 @@ import { useState } from 'react';
 import CheckedIcon from '@assets/svg/check-boss.svg';
 import CircleIcon from '@assets/svg/circle-boss.svg';
 import LockIcon from '@assets/svg/lock.svg';
-import Tooltip from '@components/Tooltip/tooltip';
+import Tooltip from '@components/Tooltip/Tooltip';
 import { GENESIS_MIN_LEVEL } from '@data/liberation/constant';
 import { getBossesByType } from '@data/liberation/liberationBosses';
 import { getQuestsByType, getLiberationTotal } from '@data/liberation/liberationQuests';
 
 import { calculateQuestPoints, calculateCumulativePoints } from '../../lib/calculatePoints';
-import BossesSelectionComponent from '../BossesSelectionComponent/bossesSelectionComponent';
-import PointsInput from '../pointsInput/pointsInput';
-import ProgressionBarDiv from '../ProgressionBarDiv/progressionBarDiv';
-import ProgressPrevision from '../ProgressPrevision/progressPrevision';
-import QuestDropdown from '../QuestDropdown/questDropdown';
-import WeeklyBreakdown from '../WeeklyBreakdown/weeklyBreakdown';
+import BossesSelectionComponent from '../BossesSelectionComponent/BossesSelectionComponent';
+import PointsInput from '../PointsInput/PointsInput';
+import ProgressionBarDiv from '../ProgressionBarDiv/ProgressionBarDiv';
+import ProgressPrevision from '../ProgressPrevision/ProgressPrevision';
+import QuestDropdown from '../QuestDropdown/QuestDropdown';
+import WeeklyBreakdown from '../WeeklyBreakdown/WeeklyBreakdown';
 
-import styles from './genesisProgression.module.scss';
-import GenesisSchedule from './genesisSchedule/genesisSchedule';
+import styles from './GenesisProgression.module.scss';
+import GenesisSchedule from './GenesisSchedule/GenesisSchedule';
 import { useCheckedBosses } from './hooks/useCheckedBosses';
 import { useGenesisProgressionState } from './hooks/useGenesisProgressionState';
 

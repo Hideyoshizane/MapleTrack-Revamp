@@ -5,7 +5,7 @@ import * as Select from '@radix-ui/react-select';
 
 import MenuIcon from '@assets/svg/menu.svg';
 
-import styles from './partySizeSelector.module.scss';
+import styles from './PartySizeSelector.module.scss';
 
 import type { JSX } from 'react';
 

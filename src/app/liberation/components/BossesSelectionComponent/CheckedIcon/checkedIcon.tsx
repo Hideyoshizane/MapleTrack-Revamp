@@ -5,9 +5,9 @@ import { clsx } from 'clsx';
 import CheckIcon from '@assets/svg/check-boss.svg';
 import CircleIcon from '@assets/svg/circle-boss.svg';
 import CircleX from '@assets/svg/circle-x.svg';
-import Tooltip from '@components/Tooltip/tooltip';
+import Tooltip from '@components/Tooltip/Tooltip';
 
-import styles from './checkedIcon.module.scss';
+import styles from './CheckedIcon.module.scss';
 
 import type { JSX } from 'react';
 

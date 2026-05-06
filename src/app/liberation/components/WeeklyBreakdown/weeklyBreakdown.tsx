@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import styles from './weeklyBreakdown.module.scss';
+import styles from './WeeklyBreakdown.module.scss';
 
 import type { Boss, WeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
 import type { JSX } from 'react';

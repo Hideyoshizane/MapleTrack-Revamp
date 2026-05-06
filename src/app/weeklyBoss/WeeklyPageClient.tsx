@@ -6,16 +6,16 @@ import { usePathname, useRouter } from 'next/navigation';
 
 import BossIcon from '@assets/svg/boss_slayer.svg';
 import ErrorIcon from '@assets/svg/octagon-x.svg';
-import Button from '@components/Button/button';
-import FullPageLoader from '@components/FullPageLoader/fullPageLoader';
-import ProgressBar from '@components/ProgressBar/progressBar';
-import ServerDropdown from '@components/ServerDropdown/serverDropdown';
+import Button from '@components/Button/Button';
+import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
+import ProgressBar from '@components/ProgressBar/ProgressBar';
+import ServerDropdown from '@components/ServerDropdown/ServerDropdown';
 import { WEEKLY_BOSSES_TOTAL } from '@constants/bossConstants';
 import { useServerCookie } from '@hooks/useServerCookie';
 
-import CharactersBossGrid from './components/CharactersBossGrid/charactersBossGrid';
+import CharactersBossGrid from './components/CharactersBossGrid/CharactersBossGrid';
 import { useWeeklyBossList } from './hooks/useWeeklyBossList';
-import styles from './page.module.scss';
+import styles from './Page.module.scss';
 
 import type { ServerName } from '@data/servers/servers';
 import type { JSX } from 'react';

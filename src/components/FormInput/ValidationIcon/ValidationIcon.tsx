@@ -5,9 +5,9 @@ import { clsx } from 'clsx';
 import OkIcon from '@assets/svg/circle-check.svg';
 import ErrorIcon from '@assets/svg/circle-x.svg';
 import InfoIcon from '@assets/svg/info.svg';
-import Tooltip from '@components/Tooltip/tooltip';
+import Tooltip from '@components/Tooltip/Tooltip';
 
-import styles from './validationIcon.module.scss';
+import styles from './ValidationIcon.module.scss';
 
 import type { FC, SVGProps, JSX } from 'react';
 

@@ -3,14 +3,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import Button from '@components/Button/button';
-import FooterOutside from '@components/FooterOutside/footerOutside';
-import FormInput from '@components/FormInput/formInput';
+import Button from '@components/Button/Button';
+import FooterOutside from '@components/FooterOutside/FooterOutside';
+import FormInput from '@components/FormInput/FormInput';
 import { usernameFieldSchema, emailFieldSchema, passwordFieldSchema } from '@features/user/schemas/user.schema';
 import { zodValidator, confirmPasswordValidator } from '@utils/validators';
 
 import { useSignup } from './hooks/useSignup';
-import styles from './page.module.scss';
+import styles from './Page.module.scss';
 
 import type { SignupFormData } from '@sharedTypes/form';
 import type { JSX } from 'react';

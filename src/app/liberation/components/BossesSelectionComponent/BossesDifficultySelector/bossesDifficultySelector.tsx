@@ -7,7 +7,7 @@ import { clsx } from 'clsx';
 import CheckIcon from '@assets/svg/check.svg';
 import MenuIcon from '@assets/svg/menu.svg';
 
-import styles from './bossesDifficultySelector.module.scss';
+import styles from './BossesDifficultySelector.module.scss';
 
 import type { BossDifficulty } from '@data/liberation/liberationBosses';
 import type { JSX } from 'react';

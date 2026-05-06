@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { SessionProvider } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
-import { ThemeProvider } from '@context/themeContext';
+import { ThemeProvider } from '@context/ThemeContext';
 import { useTheme } from '@context/useTheme';
 import { isPublicPath } from '@lib/config/access';
 

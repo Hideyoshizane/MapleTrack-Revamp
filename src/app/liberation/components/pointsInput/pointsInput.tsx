@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 
 import InfoIcon from '@assets/svg/info.svg';
-import Tooltip from '@components/Tooltip/tooltip';
+import Tooltip from '@components/Tooltip/Tooltip';
 
-import styles from './pointsInput.module.scss';
+import styles from './PointsInput.module.scss';
 
 import type { ChangeEvent, JSX } from 'react';
 

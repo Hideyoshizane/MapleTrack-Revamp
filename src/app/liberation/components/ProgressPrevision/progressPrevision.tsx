@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns';
 
-import styles from './progressPrevision.module.scss';
+import styles from './ProgressPrevision.module.scss';
 
 import type { JSX, ChangeEvent } from 'react';
 

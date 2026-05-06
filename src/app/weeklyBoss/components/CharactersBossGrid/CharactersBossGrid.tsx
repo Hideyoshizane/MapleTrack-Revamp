@@ -1,8 +1,8 @@
 'use client';
 
-import WeeklyBossDropdown from '../WeeklyBossDropdown/weeklyBossDropdown';
+import WeeklyBossDropdown from '../WeeklyBossDropdown/WeeklyBossDropdown';
 
-import styles from './charactersBossGrid.module.scss';
+import styles from './CharactersBossGrid.module.scss';
 
 import type { getBossListCharacterResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';

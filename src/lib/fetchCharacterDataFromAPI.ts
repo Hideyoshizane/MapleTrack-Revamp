@@ -1,8 +1,9 @@
+import axios from 'axios';
+
 import { isRebootServer, getRegion, getServerByName } from '@data/servers/servers';
 import axiosInstance from '@lib/axios/axios';
 
 import type { getCharacterDataFromAPIResponseBody } from '@features/character/schemas/character.response.schema';
-import type { AxiosError } from 'axios';
 
 type NexonRankingResponse = {
 	ranks: getCharacterDataFromAPIResponseBody[];
@@ -39,23 +40,22 @@ export const fetchCharacterDataFromApi = async (
 
 		// Extract first ranked character
 		const character = data.ranks?.[0];
-
 		if (!character) {
 			throw new Error(`Character "${characterName}" not found`);
 		}
 
 		return { characterImgURL: character.characterImgURL, level: character.level };
-	} catch (error) {
-		if ((error as AxiosError).isAxiosError) {
-			const axiosError = error as AxiosError;
-
+	} catch (error: unknown) {
+		if (axios.isAxiosError(error)) {
 			console.error('Nexon API request failed', {
-				status: axiosError.response?.status,
-				url: axiosError.config?.url,
-				params: axiosError.config?.params,
+				status: error.response?.status,
+				url: error.config?.url,
+				params: error.config?.params,
 			});
 
-			throw new Error(`External API failed: ${axiosError.response?.status ?? 'unknown'}`);
+			throw new Error(`External API failed: ${error.response?.status ?? 'unknown'}`, {
+				cause: error,
+			});
 		}
 
 		throw error;

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import styles from '../../styles/root.module.scss';
+import styles from '../../styles/Root.module.scss';
 
 import type { JSX, ReactNode } from 'react';
 

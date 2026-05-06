@@ -1,4 +1,4 @@
-import styles from './footerOutside.module.scss';
+import styles from './FooterOutside.module.scss';
 
 import type { JSX } from 'react';
 

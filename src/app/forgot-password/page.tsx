@@ -5,14 +5,14 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 
 import LockIcon from '@assets/svg/lock.svg';
-import Button from '@components/Button/button';
-import FooterOutside from '@components/FooterOutside/footerOutside';
-import FormInput from '@components/FormInput/formInput';
+import Button from '@components/Button/Button';
+import FooterOutside from '@components/FooterOutside/FooterOutside';
+import FormInput from '@components/FormInput/FormInput';
 import { emailFieldSchema } from '@features/user/schemas/user.schema';
 import { zodValidator } from '@utils/validators';
 
 import { useForgotPassword } from './hooks/useForgotPassword';
-import styles from './page.module.scss';
+import styles from './Page.module.scss';
 
 import type { ForgotPasswordFormData } from '@sharedTypes/form';
 import type { JSX } from 'react';

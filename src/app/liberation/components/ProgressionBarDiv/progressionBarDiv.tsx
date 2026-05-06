@@ -1,8 +1,8 @@
 'use client';
 
-import ProgressBar from '@components/ProgressBar/progressBar';
+import ProgressBar from '@components/ProgressBar/ProgressBar';
 
-import styles from './progressionBarDiv.module.scss';
+import styles from './ProgressionBarDiv.module.scss';
 
 import type { JSX } from 'react';
 

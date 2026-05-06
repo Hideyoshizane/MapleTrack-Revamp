@@ -3,9 +3,9 @@
 import { clsx } from 'clsx';
 import { useState } from 'react';
 
-import Tooltip from '@components/Tooltip/tooltip';
+import Tooltip from '@components/Tooltip/Tooltip';
 
-import styles from './validatedInput.module.scss';
+import styles from './ValidatedInput.module.scss';
 
 import type { JSX } from 'react';
 

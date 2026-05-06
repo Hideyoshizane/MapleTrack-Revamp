@@ -5,15 +5,15 @@ import * as Tabs from '@radix-ui/react-tabs';
 import DestinyIcon from '@assets/svg/destiny.svg';
 import GenesisIcon from '@assets/svg/genesis.svg';
 import ErrorIcon from '@assets/svg/octagon-x.svg';
-import FullPageLoader from '@components/FullPageLoader/fullPageLoader';
-import ServerDropdown from '@components/ServerDropdown/serverDropdown';
+import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
+import ServerDropdown from '@components/ServerDropdown/ServerDropdown';
 import { useServerCookie } from '@hooks/useServerCookie';
 
-import CharacterSelectBossDropdown from './components/CharacterSelectDropdown/characterSelectBossDropdown';
-import DestinyProgression from './components/DestinyProgression/destinyProgression';
-import GenesisProgression from './components/GenesisProgression/genesisProgression';
+import CharacterSelectBossDropdown from './components/CharacterSelectDropdown/CharacterSelectBossDropdown';
+import DestinyProgression from './components/DestinyProgression/DestinyProgression';
+import GenesisProgression from './components/GenesisProgression/GenesisProgression';
 import { useLiberation } from './hooks/useLiberation';
-import styles from './page.module.scss';
+import styles from './Page.module.scss';
 
 import type { ServerName } from '@data/servers/servers';
 import type { JSX } from 'react';

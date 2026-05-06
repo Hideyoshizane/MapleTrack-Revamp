@@ -3,7 +3,7 @@
 import { calculatePointsSchedule, formatUTC } from '@/app/liberation/lib/calculateSchedule';
 import { getCumulativeLiberationPoints } from '@data/liberation/liberationQuests';
 
-import styles from './destinySchedule.module.scss';
+import styles from './DestinySchedule.module.scss';
 
 import type { WeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
 import type { JSX } from 'react';

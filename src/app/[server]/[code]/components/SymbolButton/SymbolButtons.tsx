@@ -1,10 +1,10 @@
 'use client';
 
-import Button from '@components/Button/button';
+import Button from '@components/Button/Button';
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 
 import { useSymbolButtons } from './hooks/useSymbolButtons';
-import styles from './symbolButtons.module.scss';
+import styles from './SymbolButtons.module.scss';
 
 import type { getCharacterDataSymbolsResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';

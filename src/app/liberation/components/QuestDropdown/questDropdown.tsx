@@ -7,7 +7,7 @@ import Image from 'next/image';
 import CheckIcon from '@assets/svg/check.svg';
 import MenuIcon from '@assets/svg/menu.svg';
 
-import styles from './questDropdown.module.scss';
+import styles from './QuestDropdown.module.scss';
 
 import type { LiberationQuest } from '@data/liberation/liberationQuests';
 import type { JSX } from 'react';

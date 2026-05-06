@@ -1,6 +1,6 @@
 import ErrorIcon from '@assets/svg/octagon-x.svg';
 
-import styles from './errorPage.module.scss';
+import styles from './ErrorPage.module.scss';
 
 import type { JSX } from 'react';
 

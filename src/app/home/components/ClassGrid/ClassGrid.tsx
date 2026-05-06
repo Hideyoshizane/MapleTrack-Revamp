@@ -2,14 +2,14 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import ErrorPage from '@components/ErrorPage/errorPage';
-import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
+import ErrorPage from '@components/ErrorPage/ErrorPage';
+import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 import { JobClasses } from '@data/classes/classes';
 import { characterApi } from '@features/character/characterApi';
 import { generateCharacterObjectHomePage } from '@features/character/characterService';
 
-import ClassCard from './ClassCard/classCard';
-import styles from './classGrid.module.scss';
+import ClassCard from './ClassCard/ClassCard';
+import styles from './ClassGrid.module.scss';
 
 import type { GetAllCharactersRequestBody } from '@features/character/schemas/character.request.schema';
 import type { getAllCharactersResponseBody } from '@features/character/schemas/character.response.schema';

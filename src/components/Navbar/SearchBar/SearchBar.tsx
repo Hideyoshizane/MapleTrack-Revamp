@@ -6,12 +6,12 @@ import Link from 'next/link';
 import { useRef, useState } from 'react';
 
 import SearchIcon from '@assets/svg/search.svg';
-import Loader from '@components/Loader/loader';
+import Loader from '@components/Loader/Loader';
 import { generateClassCode } from '@data/classes/classes';
 import { getServerImageByName } from '@data/servers/servers';
 
 import { useCharacterSearch } from './hooks/useCharacterSearch';
-import styles from './searchBar.module.scss';
+import styles from './SearchBar.module.scss';
 
 import type { JSX } from 'react';
 

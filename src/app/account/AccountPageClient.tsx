@@ -2,15 +2,15 @@
 
 import { useForm, useWatch } from 'react-hook-form';
 
-import Button from '@components/Button/button';
-import FormInput from '@components/FormInput/formInput';
+import Button from '@components/Button/Button';
+import FormInput from '@components/FormInput/FormInput';
 import { passwordFieldSchema } from '@features/user/schemas/user.schema';
 import { zodValidator, confirmPasswordValidator } from '@utils/validators';
 
-import AlertDialogComponent from './Components/AlertDialogComponent/alertDialogComponent';
+import AlertDialogComponent from './Components/AlertDialogComponent/AlertDialogComponent';
 import { useChangePassword } from './hooks/useChangePassword';
 import { useDeleteAccount } from './hooks/useDeleteAccount';
-import styles from './page.module.scss';
+import styles from './Page.module.scss';
 
 import type { ChangePasswordFormData } from '@sharedTypes/form';
 import type { JSX } from 'react';

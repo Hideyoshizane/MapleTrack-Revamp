@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createNormalizedEmptyBossList } from '@data/liberation/liberationBosses';
 import { liberationApi } from '@features/liberation/liberationApi';
 
-import { QUEST_TYPE } from '../genesisProgression';
+import { QUEST_TYPE } from '../GenesisProgression';
 
 import type { checkedBossResponseBody } from '@features/liberation/schemas/liberation.response.schema';
 

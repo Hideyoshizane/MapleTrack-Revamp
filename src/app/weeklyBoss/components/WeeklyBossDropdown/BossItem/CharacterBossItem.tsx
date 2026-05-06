@@ -4,10 +4,10 @@ import Image from 'next/image';
 
 import BossCheckedIcon from '@assets/svg/check-boss.svg';
 import CircleBossIcon from '@assets/svg/circle-boss.svg';
-import ResponsiveText from '@components/ResponsiveText/responsiveText';
+import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import { getBossImage, getBossDifficultyValue } from '@data/bosses/bosses';
 
-import styles from './characterBossItem.module.scss';
+import styles from './CharacterBossItem.module.scss';
 
 import type { getBossListBossResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX, KeyboardEvent } from 'react';

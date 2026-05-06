@@ -5,15 +5,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
-import Button from '@components/Button/button';
-import FooterOutside from '@components/FooterOutside/footerOutside';
-import FormInput from '@components/FormInput/formInput';
+import Button from '@components/Button/Button';
+import FooterOutside from '@components/FooterOutside/FooterOutside';
+import FormInput from '@components/FormInput/FormInput';
 import { usernameRawSchema, passwordRawSchema } from '@features/user/schemas/user.raw.schema';
 import { zodValidator } from '@utils/validators';
 
 import { useLogin } from './hooks/useLogin';
 import { useToastQueryParams } from './hooks/useToastQueryParams';
-import styles from './page.module.scss';
+import styles from './Page.module.scss';
 
 import type { LoginFormData } from '@sharedTypes/form';
 import type { JSX } from 'react';

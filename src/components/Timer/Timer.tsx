@@ -3,10 +3,10 @@
 import NumberFlow, { NumberFlowGroup } from '@number-flow/react';
 import { useEffect, useState } from 'react';
 
-import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
+import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 import { nowInUtc, getNextWeeklyResetDate, getNextMidnight, getRemainingTime } from '@utils/time';
 
-import styles from './timer.module.scss';
+import styles from './Timer.module.scss';
 
 import type { remainingTime } from '@utils/time';
 import type { JSX } from 'react';

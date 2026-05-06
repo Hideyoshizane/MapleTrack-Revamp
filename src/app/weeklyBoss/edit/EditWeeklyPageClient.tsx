@@ -5,8 +5,8 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 
 import BossIcon from '@assets/svg/boss_slayer.svg';
-import Button from '@components/Button/button';
-import FullPageLoader from '@components/FullPageLoader/fullPageLoader';
+import Button from '@components/Button/Button';
+import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
 import {
 	WEEKLY_BOSSES_TOTAL,
 	WEEKLY_BOSSES_PER_CHARACTER,
@@ -14,10 +14,10 @@ import {
 } from '@constants/bossConstants';
 import { useServerCookie } from '@hooks/useServerCookie';
 
-import BossGrid from './components/BossGrid/bossGrid';
-import WeeklyBossDropdown from './components/CharacterSelectBossDropdown/characterSelectBossDropdown';
+import BossGrid from './components/BossGrid/BossGrid';
+import WeeklyBossDropdown from './components/CharacterSelectBossDropdown/CharacterSelectBossDropdown';
 import { useEditWeeklyBossList } from './hooks/useEditWeeklyBossList';
-import styles from './page.module.scss';
+import styles from './Page.module.scss';
 
 import type { ServerName } from '@data/servers/servers';
 import type { JSX } from 'react';

@@ -7,7 +7,7 @@ import LogOutIcon from '@assets/svg/log-out.svg';
 import { useTheme } from '@context/useTheme';
 
 import { DROPDOWN_ICON_SIZE } from './constants';
-import styles from './dropdownMenuCommon.module.scss';
+import styles from './DropdownMenuCommon.module.scss';
 
 import type { JSX } from 'react';
 

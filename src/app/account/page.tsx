@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
-import Navbar from '@components/Navbar/navbar';
+import Navbar from '@components/Navbar/Navbar';
 
-import AccountPageClient from './accountPageClient';
+import AccountPageClient from './AccountPageClient';
 
 import type { JSX } from 'react';
 

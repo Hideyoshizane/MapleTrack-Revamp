@@ -5,18 +5,18 @@ import Image from 'next/image';
 import CheckIcon from '@assets/svg/check.svg';
 import { generateClassCode } from '@data/classes/classes';
 
-import styles from './characterBossItem.module.scss';
+import styles from './CharacterBossItem.module.scss';
 
 import type { getEditBossListCharacterResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX, KeyboardEvent } from 'react';
 
-type CharacterBossItemProps = {
+type Props = {
 	character: getEditBossListCharacterResponseBody;
 	isSelected: boolean;
 	onClick?: () => void;
 };
 
-const CharacterBossItem = ({ character, isSelected, onClick }: CharacterBossItemProps): JSX.Element => {
+const CharacterBossItem = ({ character, isSelected, onClick }: Props): JSX.Element => {
 	const handleKey = (event: KeyboardEvent<HTMLDivElement>): void => {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();

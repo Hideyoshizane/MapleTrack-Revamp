@@ -5,7 +5,7 @@ import Image from 'next/image';
 import CheckIcon from '@assets/svg/check.svg';
 import { generateClassCode } from '@data/classes/classes';
 
-import styles from './characterLiberationItem.module.scss';
+import styles from './CharacterLiberationItem.module.scss';
 
 import type { GetLiberationListCharacterResponseBody } from '@features/liberation/schemas/liberation.response.schema';
 import type { JSX, KeyboardEvent } from 'react';

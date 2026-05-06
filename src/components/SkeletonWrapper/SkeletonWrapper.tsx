@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 
-import styles from './skeletonWrapper.module.scss';
+import styles from './SkeletonWrapper.module.scss';
 
 import type { JSX } from 'react';
 

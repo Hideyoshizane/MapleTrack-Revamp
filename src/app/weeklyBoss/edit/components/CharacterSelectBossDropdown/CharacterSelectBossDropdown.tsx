@@ -7,8 +7,8 @@ import Image from 'next/image';
 import MenuIcon from '@assets/svg/menu.svg';
 import { generateClassCode } from '@data/classes/classes';
 
-import CharacterBossItem from './BossItem/characterBossItem';
-import styles from './characterSelectBossDropdown.module.scss';
+import CharacterBossItem from './BossItem/CharacterBossItem';
+import styles from './CharacterSelectBossDropdown.module.scss';
 
 import type { getEditBossListCharacterResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';

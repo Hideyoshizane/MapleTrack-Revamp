@@ -3,13 +3,13 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
-import ResponsiveText from '@components/ResponsiveText/responsiveText';
+import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 
-import BossesDifficultySelector from './BossesDifficultySelector/bossesDifficultySelector';
-import styles from './bossesSelectionComponent.module.scss';
-import CheckedIcon from './CheckedIcon/checkedIcon';
+import BossesDifficultySelector from './BossesDifficultySelector/BossesDifficultySelector';
+import styles from './BossesSelectionComponent.module.scss';
+import CheckedIcon from './CheckedIcon/CheckedIcon';
 import { useBossesWeeklyMonthlyPoints } from './hooks/useBossesWeeklyMonthlyPoints';
-import PartySizeSelector from './PartySizeSelector/partySizeSelector';
+import PartySizeSelector from './PartySizeSelector/PartySizeSelector';
 
 import type { Boss, BossDifficulty, WeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
 import type { checkedBossResponseBody } from '@features/liberation/schemas/liberation.response.schema';

@@ -5,11 +5,11 @@ import * as Select from '@radix-ui/react-select';
 import Image from 'next/image';
 
 import MenuIcon from '@assets/svg/menu.svg';
-import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
+import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 import { servers } from '@data/servers/servers';
 
-import styles from './serverDropdown.module.scss';
-import ServerItem from './ServerItem/serverItem';
+import styles from './ServerDropdown.module.scss';
+import ServerItem from './ServerItem/ServerItem';
 
 import type { Server, ServerName } from '@data/servers/servers';
 import type { JSX } from 'react';

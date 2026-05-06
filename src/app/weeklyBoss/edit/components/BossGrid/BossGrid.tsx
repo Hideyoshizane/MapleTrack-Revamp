@@ -2,9 +2,9 @@
 
 import { bosses } from '@data/bosses/bosses';
 
-import BossItem from '../BossItem/bossItem';
+import BossItem from '../BossItem/BossItem';
 
-import styles from './bossGrid.module.scss';
+import styles from './BossGrid.module.scss';
 
 import type { BossName, BossDifficultyName, BossReset } from '@data/bosses/bosses';
 import type { getEditBossListCharacterResponseBody } from '@features/boss/schemas/bossList.response.schema';

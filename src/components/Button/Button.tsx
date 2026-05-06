@@ -1,8 +1,8 @@
 import { clsx } from 'clsx';
 
-import Loader from '@components/Loader/loader';
+import Loader from '@components/Loader/Loader';
 
-import styles from './button.module.scss';
+import styles from './Button.module.scss';
 
 import type { JSX, MouseEvent, KeyboardEvent } from 'react';
 

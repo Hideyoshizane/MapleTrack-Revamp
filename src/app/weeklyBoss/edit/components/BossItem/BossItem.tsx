@@ -6,7 +6,7 @@ import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
-import ResponsiveText from '@components/ResponsiveText/responsiveText';
+import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import {
 	parseBossName,
 	parseBossDifficultyName,
@@ -15,10 +15,10 @@ import {
 	getBossImage,
 } from '@data/bosses/bosses';
 
-import BossButton from '../BossButton/bossButton';
-import BossDropdownButton from '../BossDropdownButton/bossDropdownButton';
+import BossButton from '../BossButton/BossButton';
+import BossDropdownButton from '../BossDropdownButton/BossDropdownButton';
 
-import styles from './bossItem.module.scss';
+import styles from './BossItem.module.scss';
 
 import type { BossName, BossDifficultyName, BossReset, Boss } from '@data/bosses/bosses';
 import type { getEditBossListBossResponseBody } from '@features/boss/schemas/bossList.response.schema';

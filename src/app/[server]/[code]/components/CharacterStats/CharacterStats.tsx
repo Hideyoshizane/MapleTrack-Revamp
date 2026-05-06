@@ -1,14 +1,14 @@
 'use client';
 
 import BossIcon from '@assets/svg/boss_slayer.svg';
-import LegionBlock from '@components/LegionBlock/legionBlock';
-import LinkSkillBlock from '@components/LinkSkillBlock/linkSkillBlock';
-import ProgressBar from '@components/ProgressBar/progressBar';
+import LegionBlock from '@components/LegionBlock/LegionBlock';
+import LinkSkillBlock from '@components/LinkSkillBlock/LinkSkillBlock';
+import ProgressBar from '@components/ProgressBar/ProgressBar';
 import { generateClassCode } from '@data/classes/classes';
 
-import styles from './characterStats.module.scss';
+import styles from './CharacterStats.module.scss';
 
-import type { JobType } from '@components/ProgressBar/progressBar';
+import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { getCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 

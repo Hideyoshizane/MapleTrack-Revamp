@@ -3,7 +3,7 @@
 import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { clsx } from 'clsx';
 
-import styles from './progressBar.module.scss';
+import styles from './ProgressBar.module.scss';
 
 import type { JSX } from 'react';
 

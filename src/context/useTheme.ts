@@ -2,7 +2,7 @@
 
 import { useContext } from 'react';
 
-import { ThemeContext } from './themeContext';
+import { ThemeContext } from './ThemeContext';
 
 import type { Theme } from '@sharedTypes/theme';
 

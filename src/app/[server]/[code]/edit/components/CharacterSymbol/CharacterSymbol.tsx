@@ -1,8 +1,8 @@
 'use client';
-import styles from './characterSymbol.module.scss';
-import EditPageSymbolGrid from './EditPageSymbolGrid/editPageSymbolGrid';
+import styles from './CharacterSymbol.module.scss';
+import EditPageSymbolGrid from './EditPageSymbolGrid/EditPageSymbolGrid';
 
-import type { JobType } from '@components/ProgressBar/progressBar';
+import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { getEditCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { SymbolCategory } from '@prisma/client';
 import type { JSX } from 'react';

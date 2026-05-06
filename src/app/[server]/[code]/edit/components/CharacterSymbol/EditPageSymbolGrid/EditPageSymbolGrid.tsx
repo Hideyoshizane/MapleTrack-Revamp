@@ -1,8 +1,8 @@
 'use client';
 
-import EditPageSymbolObject from '../EditPageSymbolObject/editPageSymbolObject';
+import EditPageSymbolObject from '../EditPageSymbolObject/EditPageSymbolObject';
 
-import styles from './editPageSymbolGrid.module.scss';
+import styles from './EditPageSymbolGrid.module.scss';
 
 import type {
 	getEditCharacterDataSymbolsResponseBody,

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
 
-import LoginPageClient from './loginPageClient';
+import LoginPageClient from './LoginPageClient';
 
 import type { JSX } from 'react';
 

@@ -4,10 +4,10 @@ import Link from 'next/link';
 import FasterIcon from '@assets/svg/chevrons-up.svg';
 import LightBulbIcon from '@assets/svg/lightbulb.svg';
 import UnifiedIcon from '@assets/svg/squares-unite.svg';
-import LandingSection from '@components/landingSection/landingSection';
-import LandingShowcase from '@components/landingShowcase/landingShowcase';
+import LandingSection from '@components/LandingSection/LandingSection';
+import LandingShowcase from '@components/LandingShowcase/LandingShowcase';
 
-import styles from '../styles/root.module.scss';
+import styles from '../styles/Root.module.scss';
 
 import type { JSX } from 'react';
 

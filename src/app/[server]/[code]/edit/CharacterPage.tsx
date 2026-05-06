@@ -3,23 +3,23 @@ import Image from 'next/image';
 import { useRouter, usePathname, redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
-import ErrorPage from '@components/ErrorPage/errorPage';
-import FullPageLoader from '@components/FullPageLoader/fullPageLoader';
+import ErrorPage from '@components/ErrorPage/ErrorPage';
+import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
 import { getClassNameByCode } from '@data/classes/classes';
 import { isValidServerName } from '@data/servers/servers';
 import { getJob } from '@features/character/characterService';
 
-import CharacterBossLegion from './components/CharacterBossLegion/characterBossLegion';
-import { CharacterHeader } from './components/CharacterHeader/characterHeader';
-import { CharacterImageAndSync } from './components/CharacterImageAndSync/characterImageAndSync';
-import CharacterStats from './components/CharacterStats/characterStats';
-import CharacterSymbol from './components/CharacterSymbol/characterSymbol';
-import ValidatedInput from './components/ValidadeInput/validatedInput';
+import CharacterBossLegion from './components/CharacterBossLegion/CharacterBossLegion';
+import { CharacterHeader } from './components/CharacterHeader/CharacterHeader';
+import { CharacterImageAndSync } from './components/CharacterImageAndSync/CharacterImageAndSync';
+import CharacterStats from './components/CharacterStats/CharacterStats';
+import CharacterSymbol from './components/CharacterSymbol/CharacterSymbol';
+import ValidatedInput from './components/ValidadeInput/ValidatedInput';
 import { useCharacterInputs } from './hooks/useCharacterInputs';
 import { useCharacterPageData } from './hooks/useCharacterPageData';
-import styles from './page.module.scss';
+import styles from './Page.module.scss';
 
-import type { JobType } from '@components/ProgressBar/progressBar';
+import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { JSX } from 'react';
 
 type Props = {

@@ -3,12 +3,12 @@
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
-import Button from '@components/Button/button';
-import { SkeletonWrapper } from '@components/SkeletonWrapper/skeletonWrapper';
+import Button from '@components/Button/Button';
+import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 
-import DropdownEventMenu from '../DropdownEventMenu/dropdownEventMenu';
+import DropdownEventMenu from '../DropdownEventMenu/DropdownEventMenu';
 
-import styles from './characterHeader.module.scss';
+import styles from './CharacterHeader.module.scss';
 
 import type {
 	getCharacterDataFromAPIResponseBody,

@@ -1,15 +1,15 @@
 import { clsx } from 'clsx';
 import { Roboto } from 'next/font/google';
 
-import ClientToaster from '@components/CustomToaster/customToaster';
+import ClientToaster from '@components/CustomToaster/CustomToaster';
 
-import Providers from '../context/providers';
+import Providers from '../context/Providers';
 
 export { metadata } from './metadata';
 
 import type { JSX } from 'react';
 
-import '../styles/globals.scss';
+import '../styles/Globals.scss';
 
 const roboto = Roboto({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700'], display: 'swap' });
 

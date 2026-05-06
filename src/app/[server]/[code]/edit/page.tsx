@@ -3,9 +3,9 @@ export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
-import Navbar from '@components/Navbar/navbar';
+import Navbar from '@components/Navbar/Navbar';
 
-import CharacterPage from './characterPage';
+import CharacterPage from './CharacterPage';
 
 import type { JSX } from 'react';
 

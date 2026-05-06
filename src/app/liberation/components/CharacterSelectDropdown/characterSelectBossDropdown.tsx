@@ -7,8 +7,8 @@ import Image from 'next/image';
 import MenuIcon from '@assets/svg/menu.svg';
 import { generateClassCode } from '@data/classes/classes';
 
-import CharacterLiberationItem from './CharacterLiberationItem/characterLiberationItem';
-import styles from './characterSelectBossDropdown.module.scss';
+import CharacterLiberationItem from './CharacterLiberationItem/CharacterLiberationItem';
+import styles from './CharacterSelectBossDropdown.module.scss';
 
 import type { GetLiberationListCharacterResponseBody } from '@features/liberation/schemas/liberation.response.schema';
 import type { JSX } from 'react';
