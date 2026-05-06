@@ -1,21 +1,13 @@
-import DOMPurify from 'isomorphic-dompurify';
-
-export const sanitizeInput = (input: string, escapeForMongo: boolean = true): string => {
-	if (!input || typeof input !== 'string') {
+export const sanitizeInput = (input: string): string => {
+	if (typeof input !== 'string') {
 		return '';
 	}
 
-	try {
-		let clean = DOMPurify.sanitize(input);
-
-		if (escapeForMongo) {
-			clean = clean.replace(/\$/g, '').replace(/\./g, '');
-		}
-
-		return clean.trim();
-	} catch (error) {
-		console.error('Sanitization failed:', error);
-
-		return '';
-	}
+	return (
+		input
+			.normalize('NFKC')
+			// eslint-disable-next-line no-control-regex
+			.replace(/[\u0000-\u001F\u007F]/gu, '')
+			.trim()
+	);
 };
