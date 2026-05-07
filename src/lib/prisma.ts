@@ -12,7 +12,10 @@ declare global {
 // Create Prisma client with logging configuration
 export const prisma: PrismaClient =
 	global.prisma ??
-	new PrismaClient({ log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'] });
+	new PrismaClient({
+		log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+		transactionOptions: { timeout: 15_000, maxWait: 10_000 },
+	});
 
 // In development, use global instance to prevent multiple instances during hot-reload
 if (process.env.NODE_ENV !== 'production') {
