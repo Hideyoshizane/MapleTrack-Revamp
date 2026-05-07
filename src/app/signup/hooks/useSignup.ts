@@ -68,15 +68,20 @@ export const useSignup = (): UseSignupReturn => {
 				}
 			}
 		} catch (error: unknown) {
-			if (axios.isAxiosError<ApiResponse>(error) && error.response) {
-				const apiMessage = error.response.data?.message;
-				toast.error(apiMessage ?? 'Signup failed');
+			if (axios.isAxiosError<ApiResponse>(error)) {
+				if (error.code === 'ECONNABORTED') {
+					toast.error('Request timed out. Please try again.');
 
-				return;
-			}
+					return;
+				}
 
-			if (error instanceof DOMException && error.name === 'AbortError') {
-				toast.error('Request timed out. Please try again.');
+				if (!error.response) {
+					toast.error('Network error. Please check your connection.');
+
+					return;
+				}
+
+				toast.error(error.response.data?.message ?? 'Signup failed');
 
 				return;
 			}
