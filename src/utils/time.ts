@@ -1,33 +1,39 @@
-import {
-	addDays,
-	addMonths,
-	addMinutes,
-	isAfter,
-	isSameDay as isSameDayFn,
-	nextDay,
-	startOfDay,
-	startOfMonth,
-	differenceInSeconds,
-} from 'date-fns';
+import { addMinutes, differenceInSeconds } from 'date-fns';
 
 export const nowInUtc = (): Date => new Date();
+
+const createUtcDate = (
+	year: number,
+	month: number,
+	day: number,
+	hours = 0,
+	minutes = 0,
+	seconds = 0,
+	milliseconds = 0,
+): Date => {
+	return new Date(Date.UTC(year, month, day, hours, minutes, seconds, milliseconds));
+};
 
 const THURSDAY = 4;
 
 export const getNextMidnight = (date: Date): Date => {
-	return startOfDay(addDays(date, 1));
+	return createUtcDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1);
 };
 
 export const getNextWeeklyResetDate = (date: Date): Date => {
-	return startOfDay(nextDay(date, THURSDAY));
+	const currentUtcDay = date.getUTCDay();
+
+	const daysUntilThursday = (THURSDAY - currentUtcDay + 7) % 7 || 7;
+
+	return createUtcDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + daysUntilThursday);
 };
 
 export const getNextMonthFirstDay = (date: Date): Date => {
-	return startOfMonth(addMonths(date, 1));
+	return createUtcDate(date.getUTCFullYear(), date.getUTCMonth() + 1, 1);
 };
 
 const hasResetPassed = (nextResetDate: Date): boolean => {
-	return isAfter(nowInUtc(), nextResetDate);
+	return nowInUtc().getTime() >= nextResetDate.getTime();
 };
 
 export const hasDailyResetOccurred = (date: Date | null): boolean => {
@@ -43,9 +49,7 @@ export const hasWeeklyResetOccurred = (date: Date | null): boolean => {
 		return true;
 	}
 
-	const nextThursdayReset = startOfDay(nextDay(date, THURSDAY));
-
-	return isAfter(nowInUtc(), nextThursdayReset);
+	return hasResetPassed(getNextWeeklyResetDate(date));
 };
 
 export const hasMonthlyResetOccurred = (date: Date | null): boolean => {
@@ -57,7 +61,11 @@ export const hasMonthlyResetOccurred = (date: Date | null): boolean => {
 };
 
 export const isSameDay = (date1: Date, date2: Date): boolean => {
-	return isSameDayFn(date1, date2);
+	return (
+		date1.getUTCFullYear() === date2.getUTCFullYear() &&
+		date1.getUTCMonth() === date2.getUTCMonth() &&
+		date1.getUTCDate() === date2.getUTCDate()
+	);
 };
 
 export const addMinutesToDate = (date: Date, minutes: number): Date => {
