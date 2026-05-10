@@ -9,7 +9,7 @@ import type { JSX } from 'react';
 
 type Props = {
 	character: getCharacterDataResponseBody;
-	disableAllDaily: boolean;
+	isBulkUpdating?: boolean;
 };
 
 const CATEGORY_TITLES: Record<keyof getCharacterDataResponseBody['symbols'], string> = {
@@ -20,7 +20,7 @@ const CATEGORY_TITLES: Record<keyof getCharacterDataResponseBody['symbols'], str
 
 const SYMBOL_SIZE = 56;
 
-const SymbolsSection = ({ character, disableAllDaily }: Props): JSX.Element => {
+const SymbolsSection = ({ character, isBulkUpdating = false }: Props): JSX.Element => {
 	const { level, jobType, symbols } = character;
 
 	return (
@@ -40,7 +40,7 @@ const SymbolsSection = ({ character, disableAllDaily }: Props): JSX.Element => {
 								<SymbolObject
 									characterJobType={jobType ?? 'default'}
 									characterLevel={level}
-									disableAllDaily={disableAllDaily}
+									isBulkUpdating={isBulkUpdating}
 									key={symbol.name}
 									size={SYMBOL_SIZE}
 									symbol={symbol}

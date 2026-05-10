@@ -24,70 +24,71 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		const {
 			characterId,
-			currentGenesisQuest: updateGenesisQuest,
-			currentGenesisPoints: updateGenesisPoints,
+			currentGenesisQuest: requestedGenesisQuest,
+			currentGenesisPoints: requestedGenesisPoints,
+			currentDestinyQuest: requestedDestinyQuest,
+			currentDestinyPoints: requestedDestinyPoints,
 			genesisPass,
 			liberated,
-			currentDestinyQuest: updateDestinyQuest,
-			currentDestinyPoints: updateDestinyPoints,
 		} = parseResult.data;
 
-		const existing = await prisma.liberation.findFirst({
+		const existingLiberation = await prisma.liberation.findFirst({
 			where: { userId: authenticatedUserId, characterId },
 			select: {
 				id: true,
-				currentDestinyPoints: true,
-				currentGenesisPoints: true,
 				currentGenesisQuest: true,
+				currentGenesisPoints: true,
 				currentDestinyQuest: true,
+				currentDestinyPoints: true,
 				liberated: true,
 				character: { select: { level: true } },
 			},
 		});
-		if (!existing) {
+		if (!existingLiberation) {
 			logApiFailure('Character not found.', { route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'Character not found.' }, 200);
 		}
 
-		const level = existing.character.level;
+		const characterLevel = existingLiberation.character.level;
 
 		const genesisChanged =
-			existing.currentGenesisQuest !== updateGenesisQuest || existing.currentGenesisPoints !== updateGenesisPoints;
-
+			existingLiberation.currentGenesisQuest !== requestedGenesisQuest ||
+			existingLiberation.currentGenesisPoints !== requestedGenesisPoints;
 		const destinyChanged =
-			existing.currentDestinyQuest !== updateDestinyQuest || existing.currentDestinyPoints !== updateDestinyPoints;
+			existingLiberation.currentDestinyQuest !== requestedDestinyQuest ||
+			existingLiberation.currentDestinyPoints !== requestedDestinyPoints;
 
-		if (genesisChanged && level < GENESIS_MIN_LEVEL) {
+		if (genesisChanged && characterLevel < GENESIS_MIN_LEVEL) {
 			logApiFailure('Update blocked: insufficient level for Genesis.', { route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'Update Failed.' }, 200);
 		}
 
-		if (destinyChanged && (!existing.liberated || level < DESTINY_MIN_LEVEL)) {
+		if (destinyChanged && (!existingLiberation.liberated || characterLevel < DESTINY_MIN_LEVEL)) {
 			logApiFailure('Update blocked: insufficient level for Destiny.', { route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'Update Failed.' }, 200);
 		}
 
-		let nextGenesisQuest = existing.currentGenesisQuest;
-		let nextGenesisPoints = existing.currentGenesisPoints;
-		let nextDestinyQuest = existing.currentDestinyQuest;
-		let nextDestinyPoints = existing.currentDestinyPoints;
+		let nextGenesisQuest = existingLiberation.currentGenesisQuest;
+		let nextGenesisPoints = existingLiberation.currentGenesisPoints;
+		let nextDestinyQuest = existingLiberation.currentDestinyQuest;
+		let nextDestinyPoints = existingLiberation.currentDestinyPoints;
 		let nextLiberated = liberated;
 
 		if (genesisChanged) {
-			const genesisResolve = resolveNextLiberationState('Genesis', updateGenesisQuest, updateGenesisPoints);
+			const resolvedGenesisState = resolveNextLiberationState('Genesis', requestedGenesisQuest, requestedGenesisPoints);
 
-			nextGenesisQuest = genesisResolve.questName;
-			nextGenesisPoints = genesisResolve.points;
-			nextLiberated = genesisResolve.liberated;
+			nextGenesisQuest = resolvedGenesisState.questName;
+			nextGenesisPoints = resolvedGenesisState.points;
+			nextLiberated = resolvedGenesisState.liberated;
 
 			// Unlock Destiny
 			if (
-				genesisResolve.liberated === true &&
-				genesisResolve.questName === 'Verus Hilla' &&
-				genesisResolve.points === 1000
+				resolvedGenesisState.liberated &&
+				resolvedGenesisState.questName === 'Verus Hilla' &&
+				resolvedGenesisState.points === 1000
 			) {
 				nextDestinyQuest = 'Seren';
 				nextDestinyPoints = 0;
@@ -96,25 +97,14 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		}
 
 		if (destinyChanged) {
-			const destinyResolve = resolveNextLiberationState('Destiny', updateDestinyQuest, updateDestinyPoints);
+			const resolvedDestinyState = resolveNextLiberationState('Destiny', requestedDestinyQuest, requestedDestinyPoints);
 
-			nextDestinyQuest = destinyResolve.questName;
-			nextDestinyPoints = destinyResolve.points;
+			nextDestinyQuest = resolvedDestinyState.questName;
+
+			nextDestinyPoints = resolvedDestinyState.points;
 		}
 
-		await prisma.liberation.update({
-			where: { id: existing.id },
-			data: {
-				currentGenesisQuest: nextGenesisQuest,
-				currentGenesisPoints: nextGenesisPoints,
-				currentDestinyQuest: nextDestinyQuest,
-				currentDestinyPoints: nextDestinyPoints,
-				genesisPass,
-				liberated: nextLiberated,
-			},
-		});
-
-		const responsePayload = {
+		const responsePayload: updateLiberationCharacterResponseBody = {
 			characterId,
 			currentGenesisQuest: nextGenesisQuest,
 			currentGenesisPoints: nextGenesisPoints,
@@ -130,6 +120,17 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 			throw new Error('Invalid Liberation List data');
 		}
+		await prisma.liberation.update({
+			where: { id: existingLiberation.id },
+			data: {
+				currentGenesisQuest: nextGenesisQuest,
+				currentGenesisPoints: nextGenesisPoints,
+				currentDestinyQuest: nextDestinyQuest,
+				currentDestinyPoints: nextDestinyPoints,
+				genesisPass,
+				liberated: nextLiberated,
+			},
+		});
 
 		// Success response
 		return createResponse<ApiResponse<updateLiberationCharacterResponseBody>>(

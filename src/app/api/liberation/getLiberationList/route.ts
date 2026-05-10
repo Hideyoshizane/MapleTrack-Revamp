@@ -38,30 +38,44 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				currentDestinyQuest: true,
 				currentDestinyPoints: true,
 				character: { select: { name: true, class: true, level: true } },
-				user: { select: { liberationLastUpdate: true } },
 			},
 		});
 
-		if (!liberationList || liberationList.length === 0) {
+		if (liberationList.length === 0) {
 			logApiFailure('List not found', { route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'List not found.' }, 200);
 		}
 
-		const liberationLastUpdate = liberationList[0].user.liberationLastUpdate;
+		const userData = await prisma.user.findUnique({
+			where: { id: authenticatedUserId },
+			select: { liberationLastUpdate: true },
+		});
 
-		const characters: GetLiberationListCharacterResponseBody[] = liberationList.map(
-			({ character, user: _, ...rest }): GetLiberationListCharacterResponseBody => ({
-				...rest,
-				genesisPass: rest.genesisPass ?? undefined,
-				liberated: rest.liberated ?? undefined,
-				name: character.name,
-				class: character.class,
-				level: character.level,
-			}),
-		);
+		const characters: GetLiberationListCharacterResponseBody[] = new Array(liberationList.length);
 
-		const responsePayload = { liberationLastUpdate, characters };
+		for (let liberationIndex = 0; liberationIndex < liberationList.length; liberationIndex += 1) {
+			const liberation = liberationList[liberationIndex];
+
+			characters[liberationIndex] = {
+				id: liberation.id,
+				characterId: liberation.characterId,
+				currentGenesisQuest: liberation.currentGenesisQuest,
+				currentGenesisPoints: liberation.currentGenesisPoints,
+				genesisPass: liberation.genesisPass ?? undefined,
+				liberated: liberation.liberated ?? undefined,
+				currentDestinyQuest: liberation.currentDestinyQuest,
+				currentDestinyPoints: liberation.currentDestinyPoints,
+				name: liberation.character.name,
+				class: liberation.character.class,
+				level: liberation.character.level,
+			};
+		}
+
+		const responsePayload: getLiberationListResponseBody = {
+			liberationLastUpdate: userData?.liberationLastUpdate ?? new Date(0),
+			characters,
+		};
 
 		const validation = getLiberationListResponseSchema.safeParse(responsePayload);
 		if (!validation.success) {

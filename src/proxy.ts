@@ -32,8 +32,14 @@ export const proxy = auth((req) => {
 	}
 
 	// Prevent logged-in users from accessing public auth pages
-	if (isAuthenticated && isPublicPath(pathname) && !isVersionRedirect) {
-		return NextResponse.redirect(new URL('/home?logged=1', req.url));
+	if (isAuthenticated && !isVersionRedirect) {
+		if (pathname === '/') {
+			return NextResponse.redirect(new URL('/home', req.url));
+		}
+
+		if (isPublicPath(pathname)) {
+			return NextResponse.redirect(new URL('/home?logged=1', req.url));
+		}
 	}
 
 	// Prevent unauthenticated users from accessing protected pages

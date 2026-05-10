@@ -9,19 +9,27 @@ type ScheduleResult = {
 	completionDate: Date;
 };
 
+type CalculatePointsScheduleParams = {
+	selectedDate: Date | string;
+	remainingTotalPoints: number;
+	weeklyMonthlyPoints: WeeklyMonthlyPoints;
+	genesisPass?: boolean;
+};
+
+const normalizeDate = (value: Date | string): Date => {
+	return value instanceof Date ? value : new Date(value);
+};
+
 export const calculatePointsSchedule = ({
 	selectedDate,
 	remainingTotalPoints,
 	weeklyMonthlyPoints,
 	genesisPass = false,
-}: {
-	selectedDate: Date;
-	remainingTotalPoints: number;
-	weeklyMonthlyPoints: WeeklyMonthlyPoints;
-	genesisPass?: boolean;
-}): ScheduleResult => {
+}: CalculatePointsScheduleParams): ScheduleResult => {
+	const normalizedDate = normalizeDate(selectedDate);
+
 	if (remainingTotalPoints <= 0) {
-		return { weeksRequired: 0, completionDate: selectedDate };
+		return { weeksRequired: 0, completionDate: normalizedDate };
 	}
 
 	const multiplier = genesisPass ? 3 : 1;
@@ -32,17 +40,17 @@ export const calculatePointsSchedule = ({
 	const monthly = weeklyMonthlyPoints.totalMonthlyPoints * multiplier;
 
 	if (thisWeek === 0 && thisMonth === 0 && weekly === 0 && monthly === 0) {
-		return { weeksRequired: Number.POSITIVE_INFINITY, completionDate: selectedDate };
+		return { weeksRequired: Number.POSITIVE_INFINITY, completionDate: normalizedDate };
 	}
 
 	let accumulated = thisWeek + thisMonth;
 	if (accumulated >= remainingTotalPoints) {
-		return { weeksRequired: 0, completionDate: selectedDate };
+		return { weeksRequired: 0, completionDate: normalizedDate };
 	}
 
-	let nextWeek = getNextWeeklyResetDate(selectedDate);
-	let nextMonth = getNextMonthFirstDay(selectedDate);
-	let completionDate = selectedDate;
+	let nextWeek = getNextWeeklyResetDate(normalizedDate);
+	let nextMonth = getNextMonthFirstDay(normalizedDate);
+	let completionDate = normalizedDate;
 
 	while (accumulated < remainingTotalPoints) {
 		const nextWeekMs = nextWeek.getTime();
@@ -69,9 +77,7 @@ export const calculatePointsSchedule = ({
 		}
 	}
 
-	const weeksRequired = Math.ceil(differenceInWeeks(completionDate, selectedDate));
-
-	return { weeksRequired, completionDate };
+	return { weeksRequired: Math.ceil(differenceInWeeks(completionDate, normalizedDate)), completionDate };
 };
 
 export const formatUTC = (date: Date): string => format(date, "MMMM d, yyyy '(UTC)'");

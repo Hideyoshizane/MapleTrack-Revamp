@@ -58,33 +58,44 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		const serverDataRaw = bossList.servers[0];
 
+		const characters: getBossListResponseBody['characters'] = [];
+
+		for (const characterEntry of serverDataRaw.characters) {
+			const characterData = characterEntry.character;
+
+			if (!characterData) {
+				continue;
+			}
+
+			const bosses = new Array(characterEntry.bosses.length);
+
+			for (let index = 0; index < characterEntry.bosses.length; index += 1) {
+				const boss = characterEntry.bosses[index];
+
+				bosses[index] = {
+					id: boss.id,
+					name: boss.name,
+					difficulty: boss.difficulty,
+					reset: boss.reset,
+					cleared: boss.cleared ?? false,
+					locked: boss.locked ?? false,
+				};
+			}
+
+			characters.push({
+				characterId: characterEntry.characterId,
+				name: characterData.name,
+				class: characterData.class,
+				level: characterData.level,
+				bosses,
+			});
+		}
+
 		const serverData: getBossListResponseBody = {
 			id: serverDataRaw.id,
 			weeklyBosses: serverDataRaw.weeklyBosses,
 			totalGains: serverDataRaw.totalGains,
-
-			characters: serverDataRaw.characters.map((characterEntry) => {
-				if (!characterEntry.character) {
-					throw new Error('Character relation missing');
-				}
-
-				return {
-					characterId: characterEntry.characterId,
-
-					name: characterEntry.character.name,
-					class: characterEntry.character.class,
-					level: characterEntry.character.level,
-
-					bosses: characterEntry.bosses.map((boss) => ({
-						id: boss.id,
-						name: boss.name,
-						difficulty: boss.difficulty,
-						reset: boss.reset,
-						cleared: boss.cleared ?? false,
-						locked: boss.locked ?? false,
-					})),
-				};
-			}),
+			characters,
 		};
 
 		const validation = getBossListResponseSchema.safeParse(serverData);

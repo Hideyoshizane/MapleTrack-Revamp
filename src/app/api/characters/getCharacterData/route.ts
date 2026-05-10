@@ -1,4 +1,5 @@
 import { getClassByName } from '@data/classes/classes';
+import { sortSymbolContents, sortSymbolsByMinLevel } from '@data/symbols/symbolMappings';
 import { generateCharacterObjectCharacterPage, groupSymbolsByCategory } from '@features/character/characterService';
 import { getCharacterDataRequestSchema } from '@features/character/schemas/character.request.schema';
 import { getCharacterDataResponseSchema } from '@features/character/schemas/character.response.schema';
@@ -72,12 +73,60 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				linkSkill: classData.linkSkill,
 			});
 		} else {
-			const normalizedSymbols = character.symbols.map((symbol) => ({
-				...symbol,
-				contents: symbol.contents.map((content) => ({ ...content, tries: content.tries ?? undefined })),
-			}));
-			const symbols = groupSymbolsByCategory(normalizedSymbols);
-			responseData = getCharacterDataResponseSchema.parse({ ...character, symbols: symbols });
+			const normalizedSymbols = new Array(character.symbols.length);
+
+			for (let symbolIndex = 0; symbolIndex < character.symbols.length; symbolIndex += 1) {
+				const symbol = character.symbols[symbolIndex];
+
+				const normalizedContents = new Array(symbol.contents.length);
+
+				for (let contentIndex = 0; contentIndex < symbol.contents.length; contentIndex += 1) {
+					const content = symbol.contents[contentIndex];
+
+					normalizedContents[contentIndex] = {
+						contentType: content.contentType,
+						checked: content.checked,
+						cleared: content.cleared,
+						tries: content.tries ?? undefined,
+					};
+				}
+
+				normalizedSymbols[symbolIndex] = {
+					id: symbol.id,
+					name: symbol.name,
+					level: symbol.level,
+					exp: symbol.exp,
+					category: symbol.category,
+
+					contents: sortSymbolContents(symbol.name, normalizedContents),
+				};
+			}
+
+			const sortedSymbols = sortSymbolsByMinLevel(normalizedSymbols);
+
+			const groupedSymbols = groupSymbolsByCategory(sortedSymbols);
+
+			responseData = {
+				id: character.id,
+				name: character.name,
+				level: character.level,
+				targetLevel: character.targetLevel,
+				class: character.class,
+				jobType: character.jobType,
+				legion: character.legion,
+				linkSkill: character.linkSkill,
+				bossing: character.bossing,
+				syncing: character.syncing,
+
+				symbols: groupedSymbols,
+			};
+
+			const validation = getCharacterDataResponseSchema.safeParse(responseData);
+			if (!validation.success) {
+				logZodError(validation.error, { route });
+
+				throw new Error('Invalid character data');
+			}
 		}
 
 		return createResponse<ApiResponse<getCharacterDataResponseBody>>(

@@ -140,59 +140,65 @@ export const resolveNextLiberationState = (
 	questName: string,
 	points: number,
 ): ResolveNextLiberationStateResult => {
-	const resolveFinalState = (bossName: string, rawPoints: number): ResolveNextLiberationStateResult => {
-		const isGenesisHilla = questType === 'Genesis' && bossName === 'Verus Hilla';
+	const quests = getQuestsByType(questType);
 
-		const normalizedPoints = isGenesisHilla ? Math.min(rawPoints, HillaThreshold) : rawPoints;
-
-		const liberated = questType === 'Destiny' || (isGenesisHilla && normalizedPoints === HillaThreshold);
-
-		return { questName: bossName, points: normalizedPoints, liberated };
+	const defaultResult: ResolveNextLiberationStateResult = {
+		questName,
+		points,
+		liberated: questType === 'Destiny',
 	};
 
-	const HillaThreshold = getLiberationPoints('Genesis', 'Verus Hilla');
-
-	const quest = getQuestsByType(questType);
-	if (!quest) {
-		return resolveFinalState(questName, points);
+	if (!quests) {
+		return defaultResult;
 	}
 
-	const bossEntries = Object.entries(quest.bosses);
+	const bossEntries = Object.entries(quests.bosses);
+
 	if (bossEntries.length === 0) {
-		return resolveFinalState(questName, points);
+		return defaultResult;
 	}
 
-	const startIndex = bossEntries.findIndex(([name]) => name === questName);
-	if (startIndex === -1) {
-		return resolveFinalState(questName, points);
+	const currentIndex = bossEntries.findIndex(([bossName]) => bossName === questName);
+
+	if (currentIndex === -1) {
+		return defaultResult;
 	}
 
-	const lastIndex = bossEntries.length - 1;
-	if (startIndex === lastIndex) {
-		return resolveFinalState(questName, points);
-	}
+	const hillaThreshold = questType === 'Genesis' ? getLiberationPoints('Genesis', 'Verus Hilla') : 0;
+
+	const resolveState = (bossName: string, rawPoints: number): ResolveNextLiberationStateResult => {
+		const isGenesisHilla = questType === 'Genesis' && bossName === 'Verus Hilla';
+
+		const normalizedPoints = isGenesisHilla ? Math.min(rawPoints, hillaThreshold) : rawPoints;
+
+		const liberated = questType === 'Destiny' || (isGenesisHilla && normalizedPoints === hillaThreshold);
+
+		return {
+			questName: bossName,
+			points: normalizedPoints,
+			liberated,
+		};
+	};
 
 	let remainingPoints = points;
-	let currentIndex = startIndex;
 
-	while (currentIndex < bossEntries.length) {
-		const [currentBossName, currentBoss] = bossEntries[currentIndex];
+	for (let index = currentIndex; index < bossEntries.length; index += 1) {
+		const [bossName, bossData] = bossEntries[index];
 
-		if (remainingPoints < currentBoss.points) {
-			return resolveFinalState(currentBossName, remainingPoints);
+		if (remainingPoints < bossData.points) {
+			return resolveState(bossName, remainingPoints);
 		}
 
-		remainingPoints -= currentBoss.points;
-		currentIndex += 1;
+		const isLastBoss = index === bossEntries.length - 1;
 
-		if (currentIndex >= bossEntries.length) {
-			const [lastBossName] = bossEntries[bossEntries.length - 1];
-
-			return resolveFinalState(lastBossName, remainingPoints);
+		if (isLastBoss) {
+			return resolveState(bossName, bossData.points);
 		}
+
+		remainingPoints -= bossData.points;
 	}
 
-	const [fallbackBossName] = bossEntries[bossEntries.length - 1];
+	const [lastBossName, lastBossData] = bossEntries[bossEntries.length - 1];
 
-	return resolveFinalState(fallbackBossName, remainingPoints);
+	return resolveState(lastBossName, lastBossData.points);
 };

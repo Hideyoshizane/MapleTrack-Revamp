@@ -23,19 +23,19 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
-		const id = parseResult.data.id;
+		const { id } = parseResult.data;
 
 		// Search for the symbol
-		const symbol = await prisma.characterSymbol.findUnique({
-			where: { id: id, character: { userId: authenticatedUserId } },
+		const symbol = await prisma.characterSymbol.findFirst({
+			where: { id, character: { userId: authenticatedUserId } },
 			select: {
 				id: true,
 				name: true,
 				level: true,
 				exp: true,
 				category: true,
-				contents: true,
 				character: { select: { level: true } },
+				contents: { select: { contentType: true, tries: true, cleared: true } },
 			},
 		});
 		if (!symbol) {
@@ -44,13 +44,21 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			return createResponse<ApiResponse>({ success: true, message: 'Character not found.' }, 200);
 		}
 
-		const weeklyContent = symbol.contents.find((content): boolean => content.tries !== null);
+		let weeklyContent: (typeof symbol.contents)[number] | undefined;
+
+		for (const content of symbol.contents) {
+			if (content.tries !== null) {
+				weeklyContent = content;
+
+				break;
+			}
+		}
 		if (!weeklyContent) {
 			logApiFailure('Weekly not found', { route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'Weekly content not found for symbol.' }, 404);
 		}
-		if (weeklyContent.cleared === true) {
+		if (weeklyContent.cleared) {
 			logApiFailure('Weekly already cleared', { route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'Weekly already cleared.' }, 409);
@@ -77,8 +85,8 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			}),
 		]);
 
-		const returnData = { id: id, currentExp: newValues.currentExp, currentLevel: newValues.currentLevel };
-		const validation = updateCharacterWeeklyResponseSchema.safeParse(returnData);
+		const responseData = { id, currentExp: newValues.currentExp, currentLevel: newValues.currentLevel };
+		const validation = updateCharacterWeeklyResponseSchema.safeParse(responseData);
 		if (!validation.success) {
 			logZodError(validation.error, { route: route });
 
@@ -86,7 +94,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		}
 
 		return createResponse<ApiResponse<LevelUpResult>>(
-			{ success: true, message: 'Character updated successfully.', data: returnData },
+			{ success: true, message: 'Character updated successfully.', data: responseData },
 			200,
 		);
 	} catch (error) {

@@ -75,7 +75,7 @@ export const CharacterImageAndSync = ({
 				checked={syncing}
 				onCheckedChange={handleToggle}
 				title="Sync Character"
-				tooltipMessage="Automatically update level from MapleStory API."
+				tooltipMessage="Automatically update level from MapleStory API. (Updates at around 1PM UTC)."
 			/>
 		</div>
 	);

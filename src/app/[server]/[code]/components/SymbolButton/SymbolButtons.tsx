@@ -19,9 +19,9 @@ type Props = {
 		dailyCleared?: boolean;
 		weeklyTries?: number;
 	}) => void;
-	disableAllDaily: boolean;
 	optimisticDailyCleared?: boolean;
 	optimisticWeeklyTries?: number;
+	isBulkUpdating?: boolean;
 };
 
 const SymbolButtons = ({
@@ -29,41 +29,59 @@ const SymbolButtons = ({
 	dailyValue,
 	bonus,
 	onValueChange,
-	disableAllDaily,
 	optimisticDailyCleared,
 	optimisticWeeklyTries,
+	isBulkUpdating = false,
 }: Props): JSX.Element => {
-	const { handleDailyUpdate, handleWeeklyUpdate } = useSymbolButtons({
+	const { handleDailyUpdate, handleWeeklyUpdate, isDailyLoading, isWeeklyLoading } = useSymbolButtons({
 		symbol,
 		bonus,
 		onValueChange,
 		optimisticWeeklyTries,
 	});
 
-	const dailyContent = symbol.contents[0];
-	const weeklyContent = symbol.contents[1];
+	const dailyContent = symbol.contents.at(0);
+	const weeklyContent = symbol.contents.length > 1 ? symbol.contents.at(-1) : undefined;
+
+	const isDailyUpdating = isDailyLoading || isBulkUpdating;
+	const isWeeklyUpdating = isWeeklyLoading;
 
 	const isDailyDisabled = !dailyContent?.checked;
-	const isDailyDone = disableAllDaily || optimisticDailyCleared;
+	const isDailyDone = optimisticDailyCleared;
 
 	const isWeeklyDisabled = !weeklyContent?.checked;
 	const isWeeklyDone = optimisticWeeklyTries === 0;
 
 	const dailyButtonDisabled = isDailyDisabled || isDailyDone;
-
 	const weeklyButtonDisabled = isWeeklyDisabled || isWeeklyDone;
 
-	const dailyButtonLabel = isDailyDisabled ? 'Disabled' : isDailyDone ? 'Daily done!' : `Daily: +${dailyValue}`;
+	const dailyShowLoading = isDailyUpdating && !dailyButtonDisabled;
 
-	const weeklyButtonLabel = isWeeklyDisabled
+	const dailyButtonLabel = isDailyDisabled
 		? 'Disabled'
-		: isWeeklyDone
-			? 'Weekly Done'
-			: `Weekly: ${optimisticWeeklyTries}/${DEFAULT_WEEKLY_TRIES}`;
+		: isDailyDone
+			? 'Daily done!'
+			: isDailyUpdating
+				? 'Updating...'
+				: `Daily: +${dailyValue}`;
+
+	const weeklyButtonLabel = isWeeklyUpdating
+		? 'Updating...'
+		: isWeeklyDisabled
+			? 'Disabled'
+			: isWeeklyDone
+				? 'Weekly Done'
+				: `Weekly: ${optimisticWeeklyTries}/${DEFAULT_WEEKLY_TRIES}`;
 
 	return (
 		<div className={styles.buttonLines}>
-			<Button className={styles.button} disabled={dailyButtonDisabled} onClick={(): void => void handleDailyUpdate()}>
+			<Button
+				className={styles.button}
+				disabled={dailyButtonDisabled}
+				isLoading={dailyShowLoading}
+				loaderBorderWidth={2}
+				loaderColor={'#121212'}
+				onClick={(): void => void handleDailyUpdate()}>
 				{dailyButtonLabel}
 			</Button>
 
@@ -72,6 +90,9 @@ const SymbolButtons = ({
 					<Button
 						className={styles.button}
 						disabled={weeklyButtonDisabled}
+						isLoading={isWeeklyLoading}
+						loaderBorderWidth={2}
+						loaderColor={'#121212'}
 						onClick={(): void => void handleWeeklyUpdate()}>
 						{weeklyButtonLabel}
 					</Button>

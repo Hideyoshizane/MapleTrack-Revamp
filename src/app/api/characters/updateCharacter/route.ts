@@ -15,6 +15,10 @@ import type { NextResponse, NextRequest } from 'next/server';
 type SymbolCategoryKey = 'arcane' | 'sacred' | 'grand';
 const symbolCategoryKeys: SymbolCategoryKey[] = ['arcane', 'sacred', 'grand'];
 
+const TRIES_ATTRIBUTE_EXCLUDE = new Set(['Daily Quest', 'Reverse City', 'Yum Yum Island']);
+
+const isValidObjectId = (value: string): boolean => value.length === 24;
+
 const route = 'api/characters/updateCharacter';
 
 const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
@@ -27,16 +31,13 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
-		const { server, class: className, id } = parseResult.data;
 		const data = parseResult.data;
 
-		const isValidObjectId = (value: string): boolean => {
-			return value.length === 24;
-		};
+		const whereClause = isValidObjectId(data.id)
+			? { id: data.id }
+			: { userId_server_class: { userId: authenticatedUserId, server: data.server, class: data.class } };
 
-		const whereClause = isValidObjectId(id)
-			? { id: id }
-			: { userId_server_class: { userId: authenticatedUserId, server, class: className } };
+		const currentDate = nowInUtc();
 
 		await prisma.$transaction(async (tx) => {
 			const existingCharacter = await tx.character.findUnique({
@@ -44,14 +45,13 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				select: { id: true, bossing: true },
 			});
 
-			const isNullLevel = data.level == 0;
-			const now = nowInUtc();
+			const normalizedLevel = data.level === 0 ? 10 : data.level;
 
 			const character = await tx.character.upsert({
 				where: whereClause,
 				create: {
 					name: data.name,
-					level: isNullLevel ? 10 : data.level,
+					level: normalizedLevel,
 					targetLevel: data.targetLevel,
 					class: data.class,
 					jobType: data.jobType,
@@ -60,12 +60,12 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					bossing: data.bossing,
 					syncing: data.syncing,
 					userId: authenticatedUserId,
-					server,
-					lastUpdate: now,
+					server: data.server,
+					lastUpdate: currentDate,
 				},
 				update: {
 					name: data.name,
-					level: isNullLevel ? 10 : data.level,
+					level: normalizedLevel,
 					targetLevel: data.targetLevel,
 					class: data.class,
 					jobType: data.jobType,
@@ -73,57 +73,106 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					linkSkill: data.linkSkill,
 					bossing: data.bossing,
 					syncing: data.syncing,
-					lastUpdate: now,
+					lastUpdate: currentDate,
 				},
+				select: { id: true },
 			});
 
-			const shouldSyncBossList = existingCharacter === null || existingCharacter.bossing !== data.bossing;
+			const shouldSyncBossList = !existingCharacter || existingCharacter.bossing !== data.bossing;
+
+			const symbolUpsertPromises: Promise<{ id: string }>[] = [];
+
+			type ContentPayload = {
+				symbolName: string;
+				contentType: string;
+				checked: boolean;
+			};
+
+			const pendingContents: ContentPayload[] = [];
 
 			for (const categoryKey of symbolCategoryKeys) {
-				const symbolsInCategory = data.symbols[categoryKey];
+				const symbols = data.symbols[categoryKey];
 
-				for (const symbol of symbolsInCategory) {
-					const isInitialState = symbol.level === 1 && symbol.exp === 0;
-					const matchingSymbol = data.symbols[categoryKey].find((s) => s.name === symbol.name);
-					if (!matchingSymbol) {
-						continue;
-					}
-					const newValues = calculateNewLevelFromExp(
+				for (const symbol of symbols) {
+					const calculatedValues = calculateNewLevelFromExp(
 						symbol.category as SymbolCategory,
-						matchingSymbol.level,
-						matchingSymbol.exp,
+						symbol.level,
+						symbol.exp,
 					);
 
-					const symbolRecord = await tx.characterSymbol.upsert({
-						where: { characterId_name: { characterId: character.id, name: symbol.name } },
-						create: {
-							name: symbol.name,
-							level: newValues.currentLevel,
-							exp: isInitialState ? 1 : newValues.currentExp,
-							category: categoryKey,
-							characterId: character.id,
-						},
-						update: { level: newValues.currentLevel, exp: newValues.currentExp, category: categoryKey },
-					});
+					const isInitialState = symbol.level === 1 && symbol.exp === 0;
 
-					const triesAttributeExclude: ReadonlySet<string> = new Set(['Daily Quest', 'Reverse City', 'Yum Yum Island']);
+					symbolUpsertPromises.push(
+						tx.characterSymbol.upsert({
+							where: { characterId_name: { characterId: character.id, name: symbol.name } },
+							create: {
+								name: symbol.name,
+								level: calculatedValues.currentLevel,
+								exp: isInitialState ? 1 : calculatedValues.currentExp,
+								category: categoryKey,
+								characterId: character.id,
+							},
+							update: {
+								level: calculatedValues.currentLevel,
+								exp: calculatedValues.currentExp,
+								category: categoryKey,
+							},
+							select: { id: true },
+						}),
+					);
 
 					for (const content of symbol.contents) {
-						await tx.characterContent.upsert({
-							where: { symbolId_contentType: { symbolId: symbolRecord.id, contentType: content.contentType } },
-							create: {
-								contentType: content.contentType,
-								checked: content.checked,
-								...(!triesAttributeExclude.has(content.contentType) && { tries: DEFAULT_WEEKLY_TRIES }),
-								symbolId: symbolRecord.id,
-							},
-							update: { checked: content.checked },
+						pendingContents.push({
+							symbolName: symbol.name,
+							contentType: content.contentType,
+							checked: content.checked ?? false,
 						});
 					}
 				}
 			}
+
+			const symbolRecords = await Promise.all(symbolUpsertPromises);
+
+			const symbolIdMap = new Map<string, string>();
+
+			let symbolIndex = 0;
+
+			for (const categoryKey of symbolCategoryKeys) {
+				for (const symbol of data.symbols[categoryKey]) {
+					const symbolRecord = symbolRecords[symbolIndex];
+					symbolIdMap.set(symbol.name, symbolRecord.id);
+					symbolIndex += 1;
+				}
+			}
+
+			const contentUpsertPromises: Promise<unknown>[] = [];
+
+			for (const content of pendingContents) {
+				const symbolId = symbolIdMap.get(content.symbolName);
+				if (!symbolId) {
+					continue;
+				}
+
+				contentUpsertPromises.push(
+					tx.characterContent.upsert({
+						where: { symbolId_contentType: { symbolId, contentType: content.contentType } },
+						create: {
+							contentType: content.contentType,
+							checked: content.checked,
+							...(!TRIES_ATTRIBUTE_EXCLUDE.has(content.contentType) && { tries: DEFAULT_WEEKLY_TRIES }),
+							symbolId,
+						},
+						update: { checked: content.checked },
+					}),
+				);
+			}
+
+			if (contentUpsertPromises.length > 0) {
+				await Promise.all(contentUpsertPromises);
+			}
+
 			if (shouldSyncBossList) {
-				await characterToBossList(tx, authenticatedUserId, server, character.id, data.bossing);
+				await characterToBossList(tx, authenticatedUserId, data.server, character.id, data.bossing);
 			}
 		});
 

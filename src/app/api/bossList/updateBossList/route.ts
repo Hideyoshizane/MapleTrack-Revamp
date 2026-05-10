@@ -4,8 +4,11 @@ import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
 import { logZodError, logApiFailure, logError } from '@utils/logger';
 
+import type { Prisma, BossReset } from '@prisma/client';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
+
+const getBossKey = (boss: { name: string; difficulty: string }): string => `${boss.name}-${boss.difficulty}`;
 
 const route = 'api/bossList/updateBossList';
 
@@ -41,71 +44,98 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			return createResponse<ApiResponse>({ success: false, message: 'Server not found' }, 404);
 		}
 
+		const existingCharacterMap = new Map(
+			targetServer.characters.map((character): [string, typeof character] => [character.characterId, character]),
+		);
+
 		await prisma.$transaction(async (tx) => {
+			const transactionPromises: Promise<unknown>[] = [];
+
 			for (const incomingCharacter of data.characters) {
-				const existingCharacter = targetServer.characters.find(
-					(character): boolean => character.characterId === incomingCharacter.characterId,
-				);
+				const existingCharacter = existingCharacterMap.get(incomingCharacter.characterId);
+
 				if (!existingCharacter) {
 					continue;
 				}
 
-				await tx.bossCharacter.update({
-					where: { id: existingCharacter.id },
-					data: { totalIncome: incomingCharacter.totalIncome },
-				});
+				transactionPromises.push(
+					tx.bossCharacter.update({
+						where: { id: existingCharacter.id },
+						data: { totalIncome: incomingCharacter.totalIncome },
+					}),
+				);
 
 				const existingBosses = await tx.boss.findMany({
 					where: { characterId: existingCharacter.id },
 					select: { id: true, name: true, difficulty: true, reset: true, dailyTotal: true },
 				});
 
-				const incomingBosses = incomingCharacter.bosses;
+				const existingBossMap = new Map(existingBosses.map((boss): [string, typeof boss] => [getBossKey(boss), boss]));
 
-				const bossKey = (boss: { name: string; difficulty: string }): string => `${boss.name}-${boss.difficulty}`;
+				const incomingBossMap = new Map(
+					incomingCharacter.bosses.map((boss): [string, typeof boss] => [getBossKey(boss), boss]),
+				);
 
-				const existingMap = new Map(existingBosses.map((boss): [string, typeof boss] => [bossKey(boss), boss]));
-				const incomingMap = new Map(incomingBosses.map((boss): [string, typeof boss] => [bossKey(boss), boss]));
+				const bossIdsToDelete: string[] = [];
+				const bossesToCreate: Prisma.BossCreateManyInput[] = [];
 
-				const bossesToDelete = existingBosses.filter((boss): boolean => !incomingMap.has(bossKey(boss)));
-				const bossesToCreate = incomingBosses.filter((boss): boolean => !existingMap.has(bossKey(boss)));
+				const bossesToUpdate: { id: string; reset: BossReset; dailyTotal: number }[] = [];
 
-				const bossesToUpdate = incomingBosses.filter((boss): boolean => {
-					const existing = existingMap.get(bossKey(boss));
-					if (!existing) {
-						return false;
+				for (const existingBoss of existingBosses) {
+					const bossKey = getBossKey(existingBoss);
+
+					if (!incomingBossMap.has(bossKey)) {
+						bossIdsToDelete.push(existingBoss.id);
 					}
-
-					return existing.reset !== boss.reset || existing.dailyTotal !== boss.dailyTotal;
-				});
-
-				if (bossesToDelete.length > 0) {
-					await tx.boss.deleteMany({ where: { id: { in: bossesToDelete.map((boss) => boss.id) } } });
 				}
 
-				if (bossesToCreate.length > 0) {
-					await tx.boss.createMany({
-						data: bossesToCreate.map((boss) => ({
-							name: boss.name,
-							difficulty: boss.difficulty,
-							reset: boss.reset,
-							dailyTotal: boss.dailyTotal,
+				for (const incomingBoss of incomingCharacter.bosses) {
+					const bossKey = getBossKey(incomingBoss);
+
+					const existingBoss = existingBossMap.get(bossKey);
+
+					if (!existingBoss) {
+						bossesToCreate.push({
+							name: incomingBoss.name,
+							difficulty: incomingBoss.difficulty,
+							reset: incomingBoss.reset,
+							dailyTotal: incomingBoss.dailyTotal,
 							characterId: existingCharacter.id,
-						})),
-					});
-				}
+						});
 
-				for (const boss of bossesToUpdate) {
-					const existing = existingMap.get(bossKey(boss));
-					if (!existing) {
 						continue;
 					}
 
-					await tx.boss.update({
-						where: { id: existing.id },
-						data: { reset: boss.reset, dailyTotal: boss.dailyTotal },
-					});
+					const hasChanged =
+						existingBoss.reset !== incomingBoss.reset || existingBoss.dailyTotal !== incomingBoss.dailyTotal;
+
+					if (!hasChanged) {
+						continue;
+					}
+
+					bossesToUpdate.push({ id: existingBoss.id, reset: incomingBoss.reset, dailyTotal: incomingBoss.dailyTotal });
 				}
+
+				if (bossIdsToDelete.length > 0) {
+					transactionPromises.push(tx.boss.deleteMany({ where: { id: { in: bossIdsToDelete } } }));
+				}
+
+				if (bossesToCreate.length > 0) {
+					transactionPromises.push(tx.boss.createMany({ data: bossesToCreate }));
+				}
+
+				for (const bossToUpdate of bossesToUpdate) {
+					transactionPromises.push(
+						tx.boss.update({
+							where: { id: bossToUpdate.id },
+							data: { reset: bossToUpdate.reset, dailyTotal: bossToUpdate.dailyTotal },
+						}),
+					);
+				}
+			}
+
+			if (transactionPromises.length > 0) {
+				await Promise.all(transactionPromises);
 			}
 		});
 

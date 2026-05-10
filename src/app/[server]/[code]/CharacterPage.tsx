@@ -3,7 +3,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useRouter, useSearchParams, redirect } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 import ErrorPage from '@components/ErrorPage/ErrorPage';
@@ -44,7 +44,6 @@ const CharacterPage = ({ server, code }: Props): JSX.Element => {
 
 	const queryClient = useQueryClient();
 
-	const [disableAllDaily, setDisableAllDaily] = useState(false);
 	const { arcaneBonus, sacredBonus } = useBonusContext();
 
 	useEffect((): void => {
@@ -79,6 +78,7 @@ const CharacterPage = ({ server, code }: Props): JSX.Element => {
 			onSuccess: (): void => {
 				void queryClient.invalidateQueries({ queryKey: characterQueryKeys.detail(server, className) });
 			},
+			onSettled: (): void => {},
 		});
 	};
 
@@ -117,11 +117,10 @@ const CharacterPage = ({ server, code }: Props): JSX.Element => {
 						extraData={characterDataApi ?? null}
 						onIncreaseAll={handleIncreaseAll}
 						router={router}
-						setDisableAllDaily={setDisableAllDaily}
 					/>
 
 					<CharacterStats character={character} job={job} jobType={jobType} />
-					<SymbolsSection character={character} disableAllDaily={disableAllDaily} />
+					<SymbolsSection character={character} isBulkUpdating={increaseAllMutation.isPending} />
 				</div>
 			</div>
 		</section>

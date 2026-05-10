@@ -99,6 +99,49 @@ export const getContentValue = (symbolName: SymbolName | null, contentType: stri
 	return matchedContent?.value ?? 0;
 };
 
+export const sortSymbolsByMinLevel = <TSymbol extends { name: string }>(symbols: TSymbol[]): TSymbol[] => {
+	return [...symbols].sort((leftSymbol, rightSymbol) => {
+		const leftSymbolName = toSymbolName(leftSymbol.name);
+		const rightSymbolName = toSymbolName(rightSymbol.name);
+
+		if (!leftSymbolName || !rightSymbolName) {
+			return 0;
+		}
+
+		return getSymbolMinLevel(leftSymbolName) - getSymbolMinLevel(rightSymbolName);
+	});
+};
+
+type SortableContent = {
+	contentType: string;
+};
+
+const getContentOrder = (symbolName: SymbolName, contentType: string): number => {
+	const symbol = SYMBOL_MAP[symbolName];
+
+	const index = symbol.contents.findIndex((content) => content.name === contentType);
+
+	return index === -1 ? Number.MAX_SAFE_INTEGER : index;
+};
+
+export const sortSymbolContents = <TContent extends SortableContent>(
+	symbolName: string,
+	contents: TContent[],
+): TContent[] => {
+	const parsedSymbolName = toSymbolName(symbolName);
+	if (!parsedSymbolName) {
+		return contents;
+	}
+
+	return [...contents].sort((leftContent, rightContent) => {
+		const leftOrder = getContentOrder(parsedSymbolName, leftContent.contentType);
+
+		const rightOrder = getContentOrder(parsedSymbolName, rightContent.contentType);
+
+		return leftOrder - rightOrder;
+	});
+};
+
 type CharacterContent = {
 	contentType: string;
 	checked: boolean;

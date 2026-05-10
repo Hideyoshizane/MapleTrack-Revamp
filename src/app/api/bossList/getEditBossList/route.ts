@@ -49,33 +49,44 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			return createResponse<ApiResponse>({ success: false, message: 'Boss List not found.' }, 200);
 		}
 
-		// Zod will happen here
-		const serverDataRaw = bossList.servers[0];
+		const serverDataRaw = bossList?.servers[0];
+
+		const characters: getEditBossListResponseBody['characters'] = [];
+
+		for (const characterEntry of serverDataRaw.characters) {
+			const characterData = characterEntry.character;
+
+			if (!characterData) {
+				continue;
+			}
+
+			const bosses = new Array(characterEntry.bosses.length);
+
+			for (let index = 0; index < characterEntry.bosses.length; index += 1) {
+				const boss = characterEntry.bosses[index];
+
+				bosses[index] = {
+					name: boss.name,
+					difficulty: boss.difficulty,
+					reset: boss.reset,
+					dailyTotal: boss.dailyTotal ?? 0,
+				};
+			}
+
+			characters.push({
+				characterId: characterEntry.characterId,
+				name: characterData.name,
+				class: characterData.class,
+				level: characterData.level,
+				totalIncome: characterEntry.totalIncome,
+				bosses,
+			});
+		}
+
 		const serverData: getEditBossListResponseBody = {
 			id: serverDataRaw.id,
 			weeklyBosses: serverDataRaw.weeklyBosses,
-
-			characters: serverDataRaw.characters.map((characterEntry) => {
-				if (!characterEntry.character) {
-					throw new Error('Character relation missing');
-				}
-
-				return {
-					characterId: characterEntry.characterId,
-
-					name: characterEntry.character.name,
-					class: characterEntry.character.class,
-					level: characterEntry.character.level,
-					totalIncome: characterEntry.totalIncome,
-
-					bosses: characterEntry.bosses.map((boss) => ({
-						name: boss.name,
-						difficulty: boss.difficulty,
-						reset: boss.reset,
-						dailyTotal: boss.dailyTotal ?? 0,
-					})),
-				};
-			}),
+			characters,
 		};
 
 		const validation = getEditBossListResponseSchema.safeParse(serverData);

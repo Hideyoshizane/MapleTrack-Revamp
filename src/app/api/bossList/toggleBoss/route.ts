@@ -23,10 +23,10 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
-		const data = parseResult.data;
+		const { bossMonsterId } = parseResult.data;
 
 		const bossData = await prisma.boss.findFirst({
-			where: { id: data.bossMonsterId, character: { server: { bossList: { userId: authenticatedUserId } } } },
+			where: { id: bossMonsterId, character: { server: { bossList: { userId: authenticatedUserId } } } },
 			select: {
 				id: true,
 				name: true,
@@ -48,6 +48,10 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			return createResponse<ApiResponse>({ success: false, message: 'Boss data not found' }, 404);
 		}
 
+		if (bossData.locked) {
+			return createResponse<ApiResponse>({ success: false, message: 'Boss is locked' }, 403);
+		}
+
 		const server = bossData.character.server;
 		if (!server) {
 			logApiFailure('Server Data not found', { route });
@@ -62,35 +66,23 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			return createResponse<ApiResponse>({ success: false, message: 'Boss list not found' }, 404);
 		}
 
+		const willBeCleared = !bossData.cleared;
+		const sign = willBeCleared ? 1 : -1;
+
+		const bossValue = getBossDifficultyValue(bossData.name, bossData.difficulty, server.serverName);
+		const bossValueWithSign = bossValue * sign;
+
 		const responseData = await prisma.$transaction(async (tx) => {
-			const currentBoss = await tx.boss.findUnique({
-				where: { id: data.bossMonsterId },
-				select: { id: true, cleared: true, locked: true },
-			});
+			await Promise.all([
+				tx.boss.update({ where: { id: bossMonsterId }, data: { cleared: willBeCleared } }),
 
-			if (!currentBoss) {
-				throw new Error('Boss not found during transaction');
-			}
+				tx.bossServer.update({
+					where: { id: server.id },
+					data: { weeklyBosses: { increment: sign }, totalGains: { increment: bossValueWithSign } },
+				}),
 
-			if (currentBoss.locked) {
-				throw new Error('BOSS_LOCKED');
-			}
-
-			const willBeCleared = !currentBoss.cleared;
-			const sign = willBeCleared ? 1 : -1;
-
-			const bossValue = getBossDifficultyValue(bossData.name, bossData.difficulty, server.serverName);
-
-			const bossValueWithSign = bossValue * sign;
-
-			await tx.boss.update({ where: { id: data.bossMonsterId }, data: { cleared: willBeCleared } });
-
-			await tx.bossServer.update({
-				where: { id: server.id },
-				data: { weeklyBosses: { increment: sign }, totalGains: { increment: bossValueWithSign } },
-			});
-
-			await tx.bossList.update({ where: { id: bossList.id }, data: { lastUpdate: nowInUtc() } });
+				tx.bossList.update({ where: { id: bossList.id }, data: { lastUpdate: nowInUtc() } }),
+			]);
 
 			const liberationPoints = await addPointsToLiberation(
 				tx,

@@ -1,3 +1,4 @@
+import { sortSymbolsByMinLevel } from '@data/symbols/symbolMappings';
 import { getAllCharactersRequestSchema } from '@features/character/schemas/character.request.schema';
 import { getAllCharactersResponseSchema } from '@features/character/schemas/character.response.schema';
 import { prisma } from '@lib/prisma';
@@ -38,31 +39,60 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			},
 		});
 
-		const validatedCharacters = characters.map((c) => {
-			// Filter out grand symbols
-			const filteredSymbols = c.symbols.filter((s) => s.category !== 'grand');
+		const formattedCharacters: getAllCharactersResponseBody[] = new Array(characters.length);
 
-			// Group remaining symbols by category
-			const groupedSymbols = filteredSymbols.reduce<Record<Exclude<SymbolCategory, 'grand'>, typeof filteredSymbols>>(
-				(acc, symbol) => {
-					(acc[symbol.category as Exclude<SymbolCategory, 'grand'>] ||= []).push(symbol);
-					return acc;
-				},
-				{ arcane: [], sacred: [] },
-			);
-			const characterWithGroupedSymbols = { ...c, symbols: groupedSymbols };
+		for (let characterIndex = 0; characterIndex < characters.length; characterIndex += 1) {
+			const character = characters[characterIndex];
 
-			const validation = getAllCharactersResponseSchema.safeParse(characterWithGroupedSymbols);
+			const filteredSymbols = [];
+
+			for (const symbol of character.symbols) {
+				if (symbol.category !== 'grand') {
+					filteredSymbols.push(symbol);
+				}
+			}
+
+			const sortedSymbols = sortSymbolsByMinLevel(filteredSymbols);
+
+			const groupedSymbols: Record<Exclude<SymbolCategory, 'grand'>, typeof sortedSymbols> = {
+				arcane: [],
+				sacred: [],
+			};
+
+			for (const symbol of sortedSymbols) {
+				if (symbol.category === 'grand') {
+					continue;
+				}
+
+				groupedSymbols[symbol.category].push(symbol);
+			}
+
+			formattedCharacters[characterIndex] = {
+				name: character.name,
+				class: character.class,
+				jobType: character.jobType,
+				legion: character.legion,
+				level: character.level,
+				targetLevel: character.targetLevel,
+				linkSkill: character.linkSkill,
+				bossing: character.bossing,
+
+				symbols: groupedSymbols,
+			};
+		}
+
+		for (const character of formattedCharacters) {
+			const validation = getAllCharactersResponseSchema.safeParse(character);
+
 			if (!validation.success) {
 				logZodError(validation.error, { route });
 
 				throw new Error('Invalid character data');
 			}
-			return validation.data;
-		});
+		}
 
 		return createResponse<ApiResponse<getAllCharactersResponseBody[]>>(
-			{ success: true, message: 'Request processed.', data: validatedCharacters },
+			{ success: true, message: 'Request processed.', data: formattedCharacters },
 			200,
 		);
 	} catch (error) {

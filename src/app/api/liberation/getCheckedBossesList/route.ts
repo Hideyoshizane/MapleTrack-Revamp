@@ -25,55 +25,44 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		const { server, characterId, type, requestDate } = parseResult.data;
 
-		const bossList = await prisma.bossList.findUnique({
-			where: { userId: authenticatedUserId },
+		const characterBossData = await prisma.bossCharacter.findFirst({
+			where: { characterId, server: { serverName: server, bossList: { userId: authenticatedUserId } } },
 			select: {
-				lastUpdate: true,
-				servers: {
-					where: { serverName: server },
-					select: {
-						characters: {
-							where: { characterId: characterId },
-							select: { bosses: { select: { name: true, difficulty: true, cleared: true } } },
-						},
-					},
-				},
+				bosses: { select: { name: true, difficulty: true, cleared: true } },
+				server: { select: { bossList: { select: { lastUpdate: true } } } },
 			},
 		});
 
-		if (!bossList || bossList.servers.length === 0) {
+		if (!characterBossData) {
 			logApiFailure('Boss List not found', { route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'Boss List not found.' }, 200);
 		}
 
-		const lastUpdate = bossList.lastUpdate;
-		const isSame = lastUpdate && isSameDay(lastUpdate, requestDate);
+		const lastUpdate = characterBossData.server.bossList?.lastUpdate;
+		const isCurrentDay = lastUpdate !== null && lastUpdate !== undefined && isSameDay(lastUpdate, requestDate);
 
-		const characterBosses = bossList.servers[0]?.characters[0]?.bosses ?? [];
 		const bosses = getBossesByType(type);
 
-		const bossesMap = new Map(characterBosses.map((boss) => [boss.name, boss]));
+		const bossesMap = new Map(
+			characterBossData.bosses.map((boss): [string, (typeof characterBossData.bosses)[number]] => [boss.name, boss]),
+		);
 
 		// Build response object
-		const normalizedBosses: Array<{ name: string; type: string }> = [];
+		const normalizedBosses: getCheckedBossesListResponseBody = new Array(bosses.length);
 
-		for (const boss of bosses) {
-			if (!isSame) {
-				normalizedBosses.push({ name: boss.name, type: 'Skip' });
+		for (let bossIndex = 0; bossIndex < bosses.length; bossIndex += 1) {
+			const boss = bosses[bossIndex];
 
-				continue;
-			}
-
-			const dbBoss = bossesMap.get(boss.name);
-
-			if (!dbBoss) {
-				normalizedBosses.push({ name: boss.name, type: 'Skip' });
+			if (!isCurrentDay) {
+				normalizedBosses[bossIndex] = { name: boss.name, type: 'Skip' };
 
 				continue;
 			}
 
-			normalizedBosses.push({ name: boss.name, type: dbBoss.cleared ? dbBoss.difficulty : 'Skip' });
+			const existingBoss = bossesMap.get(boss.name);
+
+			normalizedBosses[bossIndex] = { name: boss.name, type: existingBoss?.cleared ? existingBoss.difficulty : 'Skip' };
 		}
 
 		const validation = getCheckedBossesListResponseSchema.safeParse(normalizedBosses);

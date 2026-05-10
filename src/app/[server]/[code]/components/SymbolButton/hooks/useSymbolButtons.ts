@@ -1,6 +1,7 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 import { getClassNameByCode } from '@data/classes/classes';
@@ -29,6 +30,8 @@ type Params = {
 type UseSymbolButtonsReturn = {
 	handleDailyUpdate: () => Promise<void>;
 	handleWeeklyUpdate: () => Promise<void>;
+	isDailyLoading: boolean;
+	isWeeklyLoading: boolean;
 };
 
 export const useSymbolButtons = ({
@@ -38,6 +41,9 @@ export const useSymbolButtons = ({
 	optimisticWeeklyTries,
 }: Params): UseSymbolButtonsReturn => {
 	const queryClient = useQueryClient();
+
+	const [isDailyLoading, setIsDailyLoading] = useState(false);
+	const [isWeeklyLoading, setIsWeeklyLoading] = useState(false);
 
 	const { mutateAsync: updateDaily } = useUpdateSymbolDaily();
 	const { mutateAsync: updateWeekly } = useUpdateSymbolWeekly();
@@ -50,6 +56,12 @@ export const useSymbolButtons = ({
 	};
 
 	const handleDailyUpdate = async (): Promise<void> => {
+		// Prevent double clicks
+		if (isDailyLoading) {
+			return;
+		}
+
+		setIsDailyLoading(true);
 		try {
 			const { server, className } = getContext();
 
@@ -111,10 +123,18 @@ export const useSymbolButtons = ({
 			);
 		} catch (e) {
 			console.error(e);
+		} finally {
+			setIsDailyLoading(false);
 		}
 	};
 
 	const handleWeeklyUpdate = async (): Promise<void> => {
+		// Prevent double clicks
+		if (isWeeklyLoading) {
+			return;
+		}
+
+		setIsWeeklyLoading(true);
 		try {
 			const { server, className } = getContext();
 
@@ -168,8 +188,10 @@ export const useSymbolButtons = ({
 			);
 		} catch (e) {
 			console.error(e);
+		} finally {
+			setIsWeeklyLoading(false);
 		}
 	};
 
-	return { handleDailyUpdate, handleWeeklyUpdate };
+	return { handleDailyUpdate, handleWeeklyUpdate, isDailyLoading, isWeeklyLoading };
 };

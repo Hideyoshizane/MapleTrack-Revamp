@@ -19,6 +19,8 @@ import type { NextResponse, NextRequest } from 'next/server';
 
 const DAILY_CONTENT_TYPE = 'Daily Quest' as const;
 
+const EXTRA_AREA_CONTENTS = new Set(['Reverse City', 'Yum Yum Island']);
+
 const route = 'api/characters/updateAllDaily';
 
 const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
@@ -35,93 +37,105 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		// Search for the character and update
 		const updatedResults = await prisma.$transaction(async (tx) => {
-			const character = await tx.character.findUnique({
-				where: { id: id, userId: authenticatedUserId, server: server, class: className },
-				include: {
-					symbols: { select: { id: true, name: true, level: true, exp: true, category: true, contents: true } },
+			const character = await tx.character.findFirst({
+				where: { id, userId: authenticatedUserId, server, class: className },
+				select: {
+					level: true,
+					symbols: {
+						select: {
+							id: true,
+							name: true,
+							level: true,
+							exp: true,
+							category: true,
+							contents: { select: { contentType: true, checked: true, cleared: true } },
+						},
+					},
 				},
 			});
 			if (!character) {
 				return null;
 			}
+			const currentDate = nowInUtc();
 
 			const results: Record<string, LevelUpResult> = {};
-			const symbolUpdates: Parameters<typeof tx.characterSymbol.update>[0][] = [];
-			const contentUpdates: Parameters<typeof tx.characterContent.update>[0][] = [];
+			const symbolUpdatePromises: Promise<unknown>[] = [];
+			const contentUpdatePromises: Promise<unknown>[] = [];
 
-			// Helper to process symbol array
-			const processCategory = (category: 'arcane' | 'sacred' | 'grand', bonus: number): void => {
-				const symbols = character.symbols.filter((symbol): boolean => symbol.category === category);
+			for (const symbol of character.symbols) {
+				if (!isSymbolName(symbol.name)) {
+					continue;
+				}
 
-				for (const symbol of symbols) {
-					if (!isSymbolName(symbol.name)) {
-						continue;
+				if (!canUseSymbol(character.level, symbol.name)) {
+					continue;
+				}
+
+				const maxLevel = getSymbolMaxLevel(symbol.category);
+				if (symbol.level >= maxLevel) {
+					continue;
+				}
+
+				let dailyContent: (typeof symbol.contents)[number] | undefined;
+				let hasExtraArea = false;
+
+				for (const content of symbol.contents) {
+					if (content.contentType === DAILY_CONTENT_TYPE) {
+						dailyContent = content;
 					}
-					if (!canUseSymbol(character.level, symbol.name)) {
-						continue;
+					if (content.checked && EXTRA_AREA_CONTENTS.has(content.contentType)) {
+						hasExtraArea = true;
 					}
+				}
+				if (!dailyContent || dailyContent.cleared || !dailyContent.checked) {
+					continue;
+				}
 
-					const maxLevel = getSymbolMaxLevel(symbol.category);
-					if (symbol.level >= maxLevel) {
-						continue;
-					}
+				let dailyValue = getContentValue(symbol.name, DAILY_CONTENT_TYPE, character.level);
+				if (hasExtraArea) {
+					dailyValue *= 2;
+				}
 
-					const dailyContent = symbol.contents.find((content): boolean => content.contentType === DAILY_CONTENT_TYPE);
-					if (!dailyContent || dailyContent.cleared || dailyContent.checked !== true) {
-						continue;
-					}
+				dailyValue += symbol.category === 'arcane' ? (arcaneBonus ?? 0) : (sacredBonus ?? 0);
 
-					let dailyValue = getContentValue(symbol.name, DAILY_CONTENT_TYPE, character.level);
-					const extraArea: ReadonlySet<string> = new Set(['Reverse City', 'Yum Yum Island']);
-					const extraAreaContent = symbol.contents.some(
-						(content): boolean => content.checked === true && extraArea.has(content.contentType),
-					);
-					if (extraAreaContent) {
-						dailyValue += dailyValue;
-					}
+				const updatedExp = symbol.exp + dailyValue;
 
-					dailyValue += bonus;
+				const newValues = calculateNewLevelFromExp(symbol.category, symbol.level, updatedExp);
 
-					const updatedExp = symbol.exp + dailyValue;
-					const newValues = calculateNewLevelFromExp(symbol.category, symbol.level, updatedExp);
+				results[symbol.name] = newValues;
 
-					symbolUpdates.push({
+				symbolUpdatePromises.push(
+					tx.characterSymbol.update({
 						where: { id: symbol.id },
 						data: { level: newValues.currentLevel, exp: newValues.currentExp },
-					});
+					}),
+				);
 
-					contentUpdates.push({
-						where: { symbolId_contentType: { symbolId: symbol.id, contentType: dailyContent.contentType } },
-						data: { cleared: true, date: nowInUtc() },
-					});
+				contentUpdatePromises.push(
+					tx.characterContent.update({
+						where: { symbolId_contentType: { symbolId: symbol.id, contentType: DAILY_CONTENT_TYPE } },
+						data: { cleared: true, date: currentDate },
+					}),
+				);
+			}
 
-					results[symbol.name] = newValues;
-				}
-			};
-
-			processCategory('arcane', arcaneBonus ?? 0);
-			processCategory('sacred', sacredBonus ?? 0);
-			processCategory('grand', sacredBonus ?? 0);
-
-			await Promise.all([
-				...symbolUpdates.map((args) => tx.characterSymbol.update(args)),
-				...contentUpdates.map((args) => tx.characterContent.update(args)),
-			]);
+			if (symbolUpdatePromises.length > 0 || contentUpdatePromises.length > 0) {
+				await Promise.all([...symbolUpdatePromises, ...contentUpdatePromises]);
+			}
 
 			return results;
 		});
 
 		if (!updatedResults) {
 			logApiFailure('Character not found', { route });
-
 			return createResponse<ApiResponse>({ success: true, message: 'Character not found.' }, 200);
 		}
 
 		const validation = updateCharacterAllDailyResponseSchema.safeParse(updatedResults);
 		if (!validation.success) {
-			logZodError(validation.error, { route: route });
+			logZodError(validation.error, { route });
 
-			return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
+			throw new Error('Invalid response data');
 		}
 
 		return createResponse<ApiResponse<Record<string, LevelUpResult>>>(

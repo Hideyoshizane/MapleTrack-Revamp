@@ -17,64 +17,37 @@ const sanitizeString = (input: unknown): string | null => {
 	return sanitizeInput(input) || null;
 };
 
-const getSymbolIds = async (tx: Prisma.TransactionClient, characterId: string): Promise<string[]> => {
-	const symbols = await tx.characterSymbol.findMany({
-		where: { characterId },
-		select: { id: true },
-	});
-
-	return symbols.map((s) => s.id);
-};
-
-const resetDailyQuests = async (tx: Prisma.TransactionClient, symbolIds: string[]): Promise<void> => {
-	if (!symbolIds.length) {
-		return;
-	}
-
-	const quests = await tx.characterContent.findMany({
-		where: { symbolId: { in: symbolIds }, contentType: 'Daily Quest' },
-		select: { id: true, date: true },
-	});
-
-	const questsToReset = quests.filter((quest) => hasDailyResetOccurred(quest.date)).map((quest) => quest.id);
-	if (!questsToReset.length) {
-		return;
-	}
-
-	await tx.characterContent.updateMany({ where: { id: { in: questsToReset } }, data: { cleared: false } });
-};
-
-const resetWeeklyQuests = async (tx: Prisma.TransactionClient, symbolIds: string[]): Promise<void> => {
-	if (!symbolIds.length) {
-		return;
-	}
-
-	const quests = await tx.characterContent.findMany({
-		where: { symbolId: { in: symbolIds }, tries: { not: null } },
-		select: { id: true, date: true },
-	});
-
-	const questsToReset = quests.filter((quest) => hasWeeklyResetOccurred(quest.date)).map((quest) => quest.id);
-	if (!questsToReset.length) {
-		return;
-	}
-
-	await tx.characterContent.updateMany({
-		where: { id: { in: questsToReset } },
-		data: { tries: DEFAULT_WEEKLY_TRIES, cleared: false },
-	});
-};
-
-type syncCharacterInfoParams = {
+type SyncCharacterInfoParams = {
 	authenticatedUserId: string;
 	server: ServerOption;
 	className: string;
+};
+
+const unlockArcaneContent = async (
+	tx: Prisma.TransactionClient,
+	characterId: string,
+	symbolName: string,
+	contentType: string,
+): Promise<void> => {
+	const symbol = await tx.characterSymbol.findFirst({
+		where: { characterId, name: symbolName, category: 'arcane' },
+		select: { id: true },
+	});
+
+	if (!symbol) {
+		return;
+	}
+
+	await tx.characterContent.update({
+		where: { symbolId_contentType: { symbolId: symbol.id, contentType } },
+		data: { checked: true },
+	});
 };
 export const syncCharacterInfo = async ({
 	authenticatedUserId,
 	server,
 	className,
-}: syncCharacterInfoParams): Promise<void> => {
+}: SyncCharacterInfoParams): Promise<void> => {
 	// Validate that the properties are strings
 	const cleanUserId = sanitizeString(authenticatedUserId);
 	const cleanServer = sanitizeString(server);
@@ -91,42 +64,66 @@ export const syncCharacterInfo = async ({
 		return;
 	}
 
-	let externalData: getCharacterDataFromAPIResponseBody;
-	if (character.syncing) {
-		externalData = await fetchCharacterDataFromApi(character.name, cleanServer);
-	}
+	const externalDataPromise: Promise<getCharacterDataFromAPIResponseBody> | null = character.syncing
+		? fetchCharacterDataFromApi(character.name, cleanServer)
+		: null;
 
 	await prisma.$transaction(async (tx): Promise<void> => {
-		const symbolIds = await getSymbolIds(tx, character.id);
+		const symbolData = await tx.characterSymbol.findMany({
+			where: { characterId: character.id },
+			select: { id: true, contents: { select: { id: true, contentType: true, date: true, tries: true } } },
+		});
 
-		if (externalData && externalData.level > character.level) {
-			await tx.character.update({ where: { id: character.id }, data: { level: externalData.level } });
+		const dailyQuestIdsToReset: string[] = [];
+		const weeklyQuestIdsToReset: string[] = [];
 
-			const unlockSymbolContent = async (symbolName: string, contentType: string): Promise<void> => {
-				const symbol = await tx.characterSymbol.findFirst({
-					where: { characterId: character.id, name: symbolName, category: 'arcane' },
-					select: { id: true },
-				});
-				if (!symbol) {
-					return;
+		for (const symbol of symbolData) {
+			for (const content of symbol.contents) {
+				if (content.contentType === 'Daily Quest' && hasDailyResetOccurred(content.date)) {
+					dailyQuestIdsToReset.push(content.id);
 				}
 
-				await tx.characterContent.update({
-					where: { symbolId_contentType: { symbolId: symbol.id, contentType } },
-					data: { checked: true },
-				});
-			};
-
-			if (externalData.level > 205) {
-				await unlockSymbolContent('Vanishing Journey', 'Reverse City');
-			}
-
-			if (externalData.level > 215) {
-				await unlockSymbolContent('Chu Chu Island', 'Yum Yum Island');
+				if (content.tries != null && hasWeeklyResetOccurred(content.date)) {
+					weeklyQuestIdsToReset.push(content.id);
+				}
 			}
 		}
 
-		await resetDailyQuests(tx, symbolIds);
-		await resetWeeklyQuests(tx, symbolIds);
+		const transactionPromises: Promise<unknown>[] = [];
+
+		if (dailyQuestIdsToReset.length > 0) {
+			transactionPromises.push(
+				tx.characterContent.updateMany({ where: { id: { in: dailyQuestIdsToReset } }, data: { cleared: false } }),
+			);
+		}
+
+		if (weeklyQuestIdsToReset.length > 0) {
+			transactionPromises.push(
+				tx.characterContent.updateMany({
+					where: { id: { in: weeklyQuestIdsToReset } },
+					data: { tries: DEFAULT_WEEKLY_TRIES, cleared: false },
+				}),
+			);
+		}
+
+		const externalData = externalDataPromise ? await externalDataPromise : null;
+
+		if (externalData && externalData.level > character.level) {
+			transactionPromises.push(
+				tx.character.update({ where: { id: character.id }, data: { level: externalData.level } }),
+			);
+
+			if (externalData.level > 205) {
+				transactionPromises.push(unlockArcaneContent(tx, character.id, 'Vanishing Journey', 'Reverse City'));
+			}
+
+			if (externalData.level > 215) {
+				transactionPromises.push(unlockArcaneContent(tx, character.id, 'Chu Chu Island', 'Yum Yum Island'));
+			}
+		}
+
+		if (transactionPromises.length > 0) {
+			await Promise.all(transactionPromises);
+		}
 	});
 };

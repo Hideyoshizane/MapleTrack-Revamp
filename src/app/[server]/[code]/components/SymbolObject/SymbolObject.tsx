@@ -41,7 +41,7 @@ type Props = {
 	characterLevel: number;
 	characterJobType: string;
 	size?: number;
-	disableAllDaily: boolean;
+	isBulkUpdating?: boolean;
 };
 
 const SymbolObject = ({
@@ -50,7 +50,7 @@ const SymbolObject = ({
 	characterLevel,
 	characterJobType,
 	size = SYMBOL_SIZE_DEFAULT,
-	disableAllDaily,
+	isBulkUpdating = false,
 }: Props): JSX.Element => {
 	const { level, exp } = symbol;
 	const name = symbol.name as SymbolName;
@@ -77,7 +77,7 @@ const SymbolObject = ({
 	const effectiveLevel = optimisticLevel ?? level;
 
 	const effectiveDailyCleared = optimisticDailyCleared ?? symbol.contents[0]?.cleared;
-	const effectiveWeeklyTries = optimisticWeeklyTries ?? symbol.contents[1]?.tries;
+	const effectiveWeeklyTries = optimisticWeeklyTries ?? symbol.contents.at(-1)?.tries;
 
 	const usable = canUseSymbol(characterLevel, name);
 	const maxLevel = getSymbolMaxLevel(type);
@@ -147,7 +147,7 @@ const SymbolObject = ({
 							<SymbolButtons
 								bonus={bonus}
 								dailyValue={dailyValue}
-								disableAllDaily={disableAllDaily}
+								isBulkUpdating={isBulkUpdating}
 								onValueChange={handleSymbolChange}
 								optimisticDailyCleared={effectiveDailyCleared}
 								optimisticWeeklyTries={effectiveWeeklyTries}

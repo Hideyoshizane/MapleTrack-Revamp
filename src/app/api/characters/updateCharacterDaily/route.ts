@@ -13,6 +13,8 @@ import type { NextResponse, NextRequest } from 'next/server';
 
 const DAILY_QUEST_CONTENT_TYPE = 'Daily Quest' as const;
 
+const EXTRA_AREA_CONTENTS = new Set(['Reverse City', 'Yum Yum Island']);
+
 const route = 'api/characters/updateCharacterDaily';
 
 const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
@@ -45,28 +47,34 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			return createResponse<ApiResponse>({ success: false, message: 'Symbol not found' }, 404);
 		}
 
-		const dailyContent = symbol.contents.find((content): boolean => content.contentType === DAILY_QUEST_CONTENT_TYPE);
+		let hasExtraArea = false;
+
+		let dailyContent: (typeof symbol.contents)[number] | undefined;
+
+		for (const content of symbol.contents) {
+			if (content.contentType === DAILY_QUEST_CONTENT_TYPE) {
+				dailyContent = content;
+			}
+
+			if (content.checked && EXTRA_AREA_CONTENTS.has(content.contentType)) {
+				hasExtraArea = true;
+			}
+		}
 		if (!dailyContent) {
 			logApiFailure('Daily not found', { route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'Daily content not found for symbol' }, 404);
 		}
-		if (dailyContent.cleared === true) {
+		if (dailyContent.cleared) {
 			logApiFailure('Daily already cleared.', { route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'Daily already cleared.' }, 409);
 		}
 
-		// Find Symbol daily Value
-		const extraArea: ReadonlySet<string> = new Set(['Reverse City', 'Yum Yum Island']);
-		const extraAreaContent = symbol.contents.some(
-			(content): boolean => content.checked === true && extraArea.has(content.contentType),
-		);
-
 		let dailyValue = getContentValue(toSymbolName(symbol.name), DAILY_QUEST_CONTENT_TYPE, symbol.character.level);
 
-		if (extraAreaContent) {
-			dailyValue += dailyValue;
+		if (hasExtraArea) {
+			dailyValue *= 2;
 		}
 
 		dailyValue += bonus;
@@ -86,8 +94,8 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			}),
 		]);
 
-		const returnData = { id: id, currentExp: newValues.currentExp, currentLevel: newValues.currentLevel };
-		const validation = updateCharacterDailyResponseSchema.safeParse(returnData);
+		const responseData = { id, currentExp: newValues.currentExp, currentLevel: newValues.currentLevel };
+		const validation = updateCharacterDailyResponseSchema.safeParse(responseData);
 		if (!validation.success) {
 			logZodError(validation.error, { route: route });
 
@@ -96,7 +104,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		// Return value
 		return createResponse<ApiResponse<updateCharacterDailyResponseBody>>(
-			{ success: true, message: 'Character updated successfully.', data: returnData },
+			{ success: true, message: 'Character updated successfully.', data: responseData },
 			200,
 		);
 	} catch (error) {

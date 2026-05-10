@@ -22,10 +22,9 @@ type Props = {
 	extraData: getCharacterDataFromAPIResponseBody | null;
 	router: AppRouterInstance;
 	onIncreaseAll: () => void;
-	setDisableAllDaily: (value: boolean) => void;
 };
 
-const CharacterHeader = ({ character, extraData, router, onIncreaseAll, setDisableAllDaily }: Props): JSX.Element => {
+const CharacterHeader = ({ character, extraData, router, onIncreaseAll }: Props): JSX.Element => {
 	const pathname = usePathname();
 	const characterImage = character.syncing ? (
 		extraData ? (
@@ -48,7 +47,6 @@ const CharacterHeader = ({ character, extraData, router, onIncreaseAll, setDisab
 				<Button
 					className={styles.increaseAllButton}
 					onClick={(): void => {
-						setDisableAllDaily(true);
 						onIncreaseAll();
 					}}>
 					Increase All

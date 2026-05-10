@@ -11,12 +11,13 @@ import type { searchCharacterResponseBody } from '@features/character/schemas/ch
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
+const MAX_RESULTS = 6;
+
 const route = 'api/characters/searchCharacter';
 
 const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
 	try {
-		const { searchParams } = new URL(request.url);
-		const searchTerm = searchParams.get('parameters');
+		const searchTerm = new URL(request.url).searchParams.get('parameters');
 		if (!searchTerm) {
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
@@ -28,63 +29,76 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
+		const normalizedSearchTerm = searchTerm.trim();
+
 		const baseResults = await prisma.character.findMany({
 			where: {
 				userId: authenticatedUserId,
 				OR: [
-					{ name: { contains: searchTerm, mode: 'insensitive' } },
-					{ class: { contains: searchTerm, mode: 'insensitive' } },
+					{ name: { contains: normalizedSearchTerm, mode: 'insensitive' } },
+					{ class: { contains: normalizedSearchTerm, mode: 'insensitive' } },
 				],
 			},
-			select: { name: true, class: true, server: true },
+			select: { name: true, class: true, level: true, server: true },
 			orderBy: { name: 'asc' },
-			take: 6,
+			take: MAX_RESULTS,
 		});
 
-		let finalResults = baseResults;
+		const finalResults = baseResults.slice();
 
-		if (baseResults.length < 6) {
-			const match = findBestClassMatch(searchTerm);
-			const remaining = 6 - baseResults.length;
-			if (match) {
-				const extraResults = await prisma.character.findMany({
-					where: {
-						userId: authenticatedUserId,
-						class: { equals: match, mode: 'insensitive' },
-						NOT: baseResults.map((c) => ({ name: c.name })),
-					},
-					select: { name: true, class: true, level: true, server: true },
-					orderBy: { name: 'asc' },
-					take: remaining,
-				});
+		if (finalResults.length < MAX_RESULTS) {
+			const matchedClass = findBestClassMatch(normalizedSearchTerm);
 
-				finalResults = [...baseResults, ...extraResults];
+			if (matchedClass) {
+				const existingNames = new Set(finalResults.map((character): string => character.name));
 
-				const extraStep = 6 - finalResults.length;
-				if (extraStep > 0) {
-					const uniqueServers: string[] = Array.from(new Set(finalResults.map((c): string => c.server)));
+				const remainingResults = MAX_RESULTS - finalResults.length;
 
-					const allowedServers = getServersExcept(extraStep, uniqueServers);
-					const generatedResults = allowedServers.map((server): (typeof finalResults)[number] => {
-						return { name: 'Character', class: match, server };
+				if (remainingResults > 0) {
+					const extraResults = await prisma.character.findMany({
+						where: {
+							userId: authenticatedUserId,
+							class: { equals: matchedClass, mode: 'insensitive' },
+							name: { notIn: Array.from(existingNames) },
+						},
+						select: { name: true, class: true, level: true, server: true },
+						orderBy: { name: 'asc' },
+						take: remainingResults,
 					});
 
-					finalResults = [...finalResults, ...generatedResults];
+					for (const result of extraResults) {
+						finalResults.push(result);
+						existingNames.add(result.name);
+					}
+				}
+
+				const missingResults = MAX_RESULTS - finalResults.length;
+
+				if (missingResults > 0) {
+					const usedServers = new Set(finalResults.map((character): string => character.server));
+
+					const generatedServers = getServersExcept(missingResults, Array.from(usedServers));
+
+					for (const server of generatedServers) {
+						finalResults.push({ name: 'Character', level: 0, class: matchedClass, server });
+					}
 				}
 			}
 		}
 
-		const returnQuery = { characters: finalResults };
+		const responseData = { characters: finalResults };
 
-		const validation = searchCharacterResponseSchema.safeParse(returnQuery);
+		const validation = searchCharacterResponseSchema.safeParse(responseData);
 		if (!validation.success) {
-			logZodError(validation.error, { route: route });
+			logZodError(validation.error, {
+				route,
+			});
 
-			return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
+			throw new Error('Invalid search response');
 		}
 
 		return createResponse<ApiResponse<searchCharacterResponseBody>>(
-			{ success: true, message: 'Character updated successfully.', data: returnQuery },
+			{ success: true, message: 'Character updated successfully.', data: responseData },
 			200,
 		);
 	} catch (error) {

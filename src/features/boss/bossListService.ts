@@ -141,42 +141,50 @@ export const resetBossList = async (serverData: resetBossListRequestBody): Promi
 	}
 
 	await prisma.$transaction(async (tx) => {
+		const bossUpdatePromises: Promise<unknown>[] = [];
+
 		for (const character of server.characters) {
-			const updatedBosses = character.bosses.map((boss) => {
-				const nextState = { id: boss.id, cleared: boss.cleared, locked: boss.locked };
+			for (const boss of character.bosses) {
+				let nextCleared = boss.cleared ?? false;
+				let nextLocked = boss.locked ?? false;
 
 				if (isDailyReset && boss.reset === 'Daily') {
-					nextState.cleared = false;
+					nextCleared = false;
 				}
 
 				if (isWeeklyReset && boss.reset === 'Weekly') {
-					nextState.cleared = false;
+					nextCleared = false;
 				}
 
 				if (boss.reset === 'Monthly') {
 					if (isWeeklyReset) {
-						nextState.cleared = false;
-						nextState.locked = true;
+						nextCleared = false;
+						nextLocked = true;
 					}
 
 					if (isMonthlyReset) {
-						nextState.locked = false;
+						nextLocked = false;
 					}
 				}
 
-				return nextState;
-			});
+				const hasStateChanged = nextCleared !== (boss.cleared ?? false) || nextLocked !== (boss.locked ?? false);
 
-			for (const boss of updatedBosses) {
-				await tx.boss.updateMany({ where: { id: boss.id }, data: { cleared: boss.cleared, locked: boss.locked } });
+				if (!hasStateChanged) {
+					continue;
+				}
+
+				bossUpdatePromises.push(
+					tx.boss.update({ where: { id: boss.id }, data: { cleared: nextCleared, locked: nextLocked } }),
+				);
 			}
 		}
 
-		await tx.bossServer.update({ where: { id: server.id }, data: serverUpdate });
-	});
+		if (bossUpdatePromises.length > 0) {
+			await Promise.all(bossUpdatePromises);
+		}
 
-	await prisma.bossList.update({
-		where: { userId: serverData.authenticatedUserId },
-		data: { lastUpdate: nowInUtc() },
+		await tx.bossServer.update({ where: { id: server.id }, data: serverUpdate });
+
+		await tx.bossList.update({ where: { userId: serverData.authenticatedUserId }, data: { lastUpdate: nowInUtc() } });
 	});
 };
