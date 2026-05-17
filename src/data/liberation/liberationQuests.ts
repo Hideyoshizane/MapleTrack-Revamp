@@ -142,11 +142,7 @@ export const resolveNextLiberationState = (
 ): ResolveNextLiberationStateResult => {
 	const quests = getQuestsByType(questType);
 
-	const defaultResult: ResolveNextLiberationStateResult = {
-		questName,
-		points,
-		liberated: questType === 'Destiny',
-	};
+	const defaultResult: ResolveNextLiberationStateResult = { questName, points, liberated: questType === 'Destiny' };
 
 	if (!quests) {
 		return defaultResult;
@@ -173,11 +169,7 @@ export const resolveNextLiberationState = (
 
 		const liberated = questType === 'Destiny' || (isGenesisHilla && normalizedPoints === hillaThreshold);
 
-		return {
-			questName: bossName,
-			points: normalizedPoints,
-			liberated,
-		};
+		return { questName: bossName, points: normalizedPoints, liberated };
 	};
 
 	let remainingPoints = points;

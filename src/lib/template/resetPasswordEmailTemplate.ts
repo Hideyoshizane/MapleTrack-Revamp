@@ -15,7 +15,7 @@ const getForgotPasswordTemplate = (resetLink: string, username?: string): string
             <tr>
               <td bgcolor="#424242" style="padding: 16px; text-align: center; border-top-left-radius: 15px; border-top-right-radius: 15px;">
                 <img
-                  src="https://mapletrack.vercel.app/public/assets/logo/logo.webp"
+                  src="https://mapletrack.vercel.app/assets/logo/logoEmail.png"
                   alt="MapleTrack Logo"
                   width="200"
                   style="display: block; margin: 0 auto; max-width: 100%; height: auto;"

@@ -9,6 +9,7 @@ $hoverColor: 80%;
 
 .selectedCharacterWrapper {
 	position: relative;
+
 	display: flex;
 	align-items: center;
 
@@ -90,6 +91,7 @@ $hoverColor: 80%;
 }
 
 .characterList {
+	z-index: 1001;
 	width: $dropdownWidth;
 	max-height: $dropdownMaxHeight;
 
