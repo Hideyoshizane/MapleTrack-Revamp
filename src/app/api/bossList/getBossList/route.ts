@@ -24,8 +24,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		const { server } = parseResult.data;
 
-		// Update BossList function here
-		await resetBossList({ serverName: server, authenticatedUserId });
+		await resetBossList(authenticatedUserId);
 
 		// Query BossList and return only the requested server
 		const bossList = await prisma.bossList.findUnique({

@@ -58,6 +58,9 @@ export const addPointsToLiberation = async (
 	}
 
 	const isGenesisBoss = bossType === 'genesis';
+	if (isGenesisBoss && characterData.liberated) {
+		return { bossType, points: null };
+	}
 
 	const currentQuest = isGenesisBoss ? characterData.currentGenesisQuest : characterData.currentDestinyQuest;
 	const currentPoints = isGenesisBoss ? characterData.currentGenesisPoints : characterData.currentDestinyPoints;

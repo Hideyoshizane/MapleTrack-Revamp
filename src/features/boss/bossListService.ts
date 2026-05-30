@@ -93,20 +93,13 @@ export const characterToBossList = async (
 	await tx.user.update({ where: { id: authenticatedUserId }, data: { liberationLastUpdate: nowInUtc() } });
 };
 
-type resetBossListRequestBody = {
-	serverName: string;
-	authenticatedUserId: string;
-};
-
-export const resetBossList = async (serverData: resetBossListRequestBody): Promise<void> => {
-	// Query BossList and return only the requested server
+export const resetBossList = async (authenticatedUserId: string): Promise<void> => {
 	const bossList = await prisma.bossList.findUnique({
-		where: { userId: serverData.authenticatedUserId },
+		where: { userId: authenticatedUserId },
 		select: {
 			id: true,
 			lastUpdate: true,
 			servers: {
-				where: { serverName: serverData.serverName },
 				select: {
 					id: true,
 					weeklyBosses: true,
@@ -129,52 +122,50 @@ export const resetBossList = async (serverData: resetBossListRequestBody): Promi
 		return;
 	}
 
-	const server = bossList.servers[0];
-	if (!server) {
-		return;
-	}
-
-	const serverUpdate: { weeklyBosses?: number; totalGains?: number } = {};
-	if (isWeeklyReset) {
-		serverUpdate.weeklyBosses = 0;
-		serverUpdate.totalGains = 0;
-	}
-
 	await prisma.$transaction(async (tx) => {
 		const bossUpdatePromises: Promise<unknown>[] = [];
+		const serverUpdatePromises: Promise<unknown>[] = [];
 
-		for (const character of server.characters) {
-			for (const boss of character.bosses) {
-				let nextCleared = boss.cleared ?? false;
-				let nextLocked = boss.locked ?? false;
+		for (const server of bossList.servers) {
+			for (const character of server.characters) {
+				for (const boss of character.bosses) {
+					let nextCleared = boss.cleared ?? false;
+					let nextLocked = boss.locked ?? false;
 
-				if (isDailyReset && boss.reset === 'Daily') {
-					nextCleared = false;
-				}
-
-				if (isWeeklyReset && boss.reset === 'Weekly') {
-					nextCleared = false;
-				}
-
-				if (boss.reset === 'Monthly') {
-					if (isWeeklyReset) {
+					if (isDailyReset && boss.reset === 'Daily') {
 						nextCleared = false;
-						nextLocked = true;
 					}
 
-					if (isMonthlyReset) {
-						nextLocked = false;
+					if (isWeeklyReset && boss.reset === 'Weekly') {
+						nextCleared = false;
 					}
+
+					if (boss.reset === 'Monthly') {
+						if (isWeeklyReset) {
+							nextCleared = false;
+							nextLocked = true;
+						}
+
+						if (isMonthlyReset) {
+							nextLocked = false;
+						}
+					}
+
+					const hasStateChanged = nextCleared !== (boss.cleared ?? false) || nextLocked !== (boss.locked ?? false);
+
+					if (!hasStateChanged) {
+						continue;
+					}
+
+					bossUpdatePromises.push(
+						tx.boss.update({ where: { id: boss.id }, data: { cleared: nextCleared, locked: nextLocked } }),
+					);
 				}
+			}
 
-				const hasStateChanged = nextCleared !== (boss.cleared ?? false) || nextLocked !== (boss.locked ?? false);
-
-				if (!hasStateChanged) {
-					continue;
-				}
-
-				bossUpdatePromises.push(
-					tx.boss.update({ where: { id: boss.id }, data: { cleared: nextCleared, locked: nextLocked } }),
+			if (isWeeklyReset) {
+				serverUpdatePromises.push(
+					tx.bossServer.update({ where: { id: server.id }, data: { weeklyBosses: 0, totalGains: 0 } }),
 				);
 			}
 		}
@@ -183,8 +174,10 @@ export const resetBossList = async (serverData: resetBossListRequestBody): Promi
 			await Promise.all(bossUpdatePromises);
 		}
 
-		await tx.bossServer.update({ where: { id: server.id }, data: serverUpdate });
+		if (serverUpdatePromises.length > 0) {
+			await Promise.all(serverUpdatePromises);
+		}
 
-		await tx.bossList.update({ where: { userId: serverData.authenticatedUserId }, data: { lastUpdate: nowInUtc() } });
+		await tx.bossList.update({ where: { userId: authenticatedUserId }, data: { lastUpdate: nowInUtc() } });
 	});
 };
