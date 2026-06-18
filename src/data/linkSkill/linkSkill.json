@@ -131,15 +131,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Combo Kill Orb EXP: +400% (permanently)."
+				"description": "Permanently increases Combo Kill Orb EXP by +400%."
 			},
 			{
 				"level": 2,
-				"description": "Combo Kill Orb EXP: +650% (permanently)."
+				"description": "Permanently increases Combo Kill Orb EXP by +650%."
 			},
 			{
 				"level": 3,
-				"description": "Combo Kill Orb EXP: +900% (permanently)."
+				"description": "[Aran] Permanently increases Combo Kill Orb EXP by 900%. Passive Effect: Damage +5%. \n\n[Other Classes] Permanently increases Combo Kill Orb EXP by 900%."
 			}
 		]
 	},
@@ -157,7 +157,7 @@
 			},
 			{
 				"level": 3,
-				"description": "Liberated Rune Power Duration: +70%."
+				"description": "[Evan] Liberated Rune Power Duration +70%. Passive Effect: Damage +5%. \n\n[Other Classes] Liberated Rune Power Duration +70%"
 			}
 		]
 	},
@@ -167,15 +167,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Returns you to Elluel Cooldown: 1800 sec. \nAdditional Effect: Permanently receive 10% additional EXP."
+				"description": "Returns you to Elluel Cooldown: 1800 sec. \nPermanently increases EXP gained by 10%."
 			},
 			{
 				"level": 2,
-				"description": "Returns you to Elluel Cooldown: 1800 sec. \nAdditional Effect: Permanently receive 15% additional EXP."
+				"description": "Returns you to Elluel Cooldown: 1800 sec. \nPermanently increases EXP gained by 15%."
 			},
 			{
 				"level": 3,
-				"description": "Returns you to Elluel Cooldown: 1800 sec. \nAdditional Effect: Permanently receive 20% additional EXP."
+				"description": "Returns you to Elluel Cooldown: 1800 sec. \n\n[Mercedes] Permanently increases EXP gained by 20%. Passive Effect: Damage +5%. \n\n[Other Classes] Permanently increases EXP gained by 20%."
 			}
 		]
 	},
@@ -193,7 +193,7 @@
 			},
 			{
 				"level": 3,
-				"description": "Critical Rate +20%."
+				"description": "[Phantom] Critical Rate +20%. Passive Effect: Damage +5%. \n\n[Other Classes] Critical Rate +20%."
 			}
 		]
 	},
@@ -203,15 +203,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Enemy DEF Ignored: +10% when attacking enemies."
+				"description": "Ignores 10% of enemy Defense when attacking."
 			},
 			{
 				"level": 2,
-				"description": "Enemy DEF Ignored: +15% when attacking enemies."
+				"description": "Ignores 15% of enemy Defense when attacking."
 			},
 			{
 				"level": 3,
-				"description": "Enemy DEF Ignored: +20% when attacking enemies."
+				"description": "[Luminous] Ignores 20% of enemy Defense when attacking. Passive Effect: Damage +4%.\n\n[Other Classes] Ignores 20% of enemy Defense when attacking."
 			}
 		]
 	},
@@ -221,15 +221,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Fatal Attack Survival Chance: 5%."
+				"description": "5% chance to survive a Fatal Attack."
 			},
 			{
 				"level": 2,
-				"description": "Fatal Attack Survival Chance: 10%."
+				"description": "10% chance to survive a Fatal Attack."
 			},
 			{
 				"level": 3,
-				"description": "Fatal Attack Survival Chance: 15%."
+				"description": "[Shade] 15% chance to survive a Fatal Attack. Passive Effect: Damage +5%.\n\n[Other Classes] 15% chance to survive a Fatal Attack."
 			}
 		]
 	},
@@ -319,7 +319,7 @@
 			},
 			{
 				"level": 3,
-				"description": "Max HP: +20%."
+				"description": "[Kaiser] Max HP +15%, Damage +5% per Morph Gauge stage.\n\n[Other Classes] Max HP +20%."
 			}
 		]
 	},
@@ -473,15 +473,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Damage: +3%. \nActivate nature's help upon defeating 20 normal monsters. \nIncreases Damage Against Normal Monsters by 7% for 30 sec. when nature's help is active.\nCooldown: 30 sec."
+				"description": "Damage +3%. \nDefeating 20 normal enemies triggers Nature's Help, increasing Normal Enemy Damage by 7% for 30 sec. \nCooldown: 30 sec."
 			},
 			{
 				"level": 2,
-				"description": "Damage: +5%. \nActivate nature's help upon defeating 20 normal monsters. \nIncreases Damage Against Normal Monsters by 11% for 30 sec. when nature's help is active.\nCooldown: 30 sec."
+				"description": "Damage +5%. \nDefeating 20 normal enemies triggers Nature's Help, increasing Normal Enemy Damage by 11% for 30 sec. \nCooldown: 30 sec."
 			},
 			{
 				"level": 3,
-				"description": "Damage: +7%. \nActivate nature's help upon defeating 20 normal monsters. \nIncreases Damage Against Normal Monsters by 15% for 30 sec. when nature's help is active.\nCooldown: 30 sec."
+				"description": "[Lara] Damage +10%. Defeating 20 normal enemies triggers Nature's Help, increasing Normal Enemy Damage by 15% for 30 sec. Cooldown: 30 sec.\n\n[Other Classes] Damage +7%. Defeating 20 normal enemies triggers Nature's Help, increasing Normal Enemy Damage by 15% for 30 sec. Cooldown: 30 sec."
 			}
 		]
 	},
@@ -495,11 +495,11 @@
 			},
 			{
 				"level": 2,
-				"description": "Enemy DEF Ignored: +10%, Damage: +14% against enemies with 100% HP."
+				"description": "Enemy DEF Ignored: +10%, \nDamage: +14% against enemies with 100% HP."
 			},
 			{
 				"level": 3,
-				"description": "Enemy DEF Ignored: +15%, Damage: +19% against enemies with 100% HP."
+				"description": "[Hoyoung] Enemy DEF Ignored: +15%, Damage: +19% against enemies with 100% HP. Passive Effect: Damage +4%\n\n[Other Classes] Enemy DEF Ignored: +15%, Damage: +19% against enemies with 100% HP."
 			}
 		]
 	},
@@ -517,7 +517,7 @@
 			},
 			{
 				"level": 3,
-				"description": "Boss Damage: +10%. \nCritical Rate: +10%. \nMax HP +5%. \nMax MP: +5%."
+				"description": "Boss Damage: +11%. \nCritical Rate: +10%. \nMax HP +5%. \nMax MP: +5%."
 			}
 		]
 	},
@@ -527,27 +527,27 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Incoming damage reduced: 3%,\nDefense ignored: 2%."
+				"description": "Reduces damage taken by 3% and ignores 2% of enemy Defense when attacking."
 			},
 			{
 				"level": 2,
-				"description": "Incoming damage reduced: 6%,\nDefense ignored: 4%."
+				"description": "Reduces damage taken by 6% and ignores 4% of enemy Defense when attacking."
 			},
 			{
 				"level": 3,
-				"description": "Incoming damage reduced: 9%,\nDefense ignored: 6%."
+				"description": "Reduces damage taken by 9% and ignores 6% of enemy Defense when attacking."
 			},
 			{
 				"level": 4,
-				"description": "Incoming damage reduced: 12%,\nDefense ignored: 8%."
+				"description": "Reduces damage taken by 12% and ignores 8% of enemy Defense when attacking."
 			},
 			{
 				"level": 5,
-				"description": "Incoming damage reduced: 15%,\nDefense ignored: 10%."
+				"description": "Reduces damage taken by 15% and ignores 10% of enemy Defense when attacking."
 			},
 			{
 				"level": 6,
-				"description": "Incoming damage reduced: 18%,\nDefense ignored: 10%."
+				"description": "[Zero] Reduces damage taken by 20% and ignores 15% of enemy Defense when attacking. Passive Effect: Damage +4%.\n\n[Other Classes] Reduces damage taken by 20% and ignores 15% of enemy Defense when attacking."
 			}
 		]
 	},
@@ -575,15 +575,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Damage: +3%.\nUpon attacking, Recovery Chance: 100%, Recovery: 1% of Max HP/MP per sec, Duration: 5 sec. \nCooldown: 30 sec"
+				"description": "Damage: +3%.\nAttacking has a 100% chance to restore 1% of Max HP/MP every second for 5 sec. Cooldown: 30 sec."
 			},
 			{
 				"level": 2,
-				"description": "Damage: +5%.\nUpon attacking, Recovery Chance: 100%, Recovery: 2% of Max HP/MP per sec, Duration: 5 sec. \nCooldown: 30 sec"
+				"description": "Damage: +5%.\nAttacking has a 100% chance to restore 2% of Max HP/MP every second for 5 sec. Cooldown: 30 sec."
 			},
 			{
 				"level": 3,
-				"description": "Damage: +7%.\nUpon attacking, Recovery Chance: 100%, Recovery: 3% of Max HP/MP per sec, Duration: 5 sec. \nCooldown: 30 sec"
+				"description": "[Khali] Damage +10%.\nAttacking has a 100% chance to restore 3% of Max HP/MP every second for 5 sec. Cooldown: 30 sec.\n\n[Other Classes] Damage +7%.\nAttacking has a 100% chance to restore 3% of Max HP/MP every second for 5 sec. Cooldown: 30 sec."
 			}
 		]
 	},
@@ -629,15 +629,15 @@
 		"levels": [
 			{
 				"level": 1,
-				"description": "Damage: -2%, including attacks that inflict damage at a certain percentage of your Max HP."
+				"description": "Reduces damage taken by 2%, including attacks that inflict damage as a percentage of Max HP."
 			},
 			{
 				"level": 2,
-				"description": "Damage: -4%, including attacks that inflict damage at a certain percentage of your Max HP."
+				"description": "Reduces damage taken by 4%, including attacks that inflict damage as a percentage of Max HP."
 			},
 			{
 				"level": 3,
-				"description": "Damage: -6%, including attacks that inflict damage at a certain percentage of your Max HP."
+				"description": "[Ren] Reduces damage taken by 6%, including attacks that inflict damage as a percentage of Max HP. Passive Effect: Damage +5%\n\n[Other Classes] Reduces damage taken by 6%, including attacks that inflict damage as a percentage of Max HP."
 			}
 		]
 	}

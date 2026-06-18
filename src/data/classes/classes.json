@@ -217,6 +217,12 @@
 		"jobType": "warrior"
 	},
 	{
+		"linkSkill": "Guiding Stars",
+		"legionType": "BOSSDMG+",
+		"className": "Erel Light",
+		"jobType": "warrior"
+	},
+	{
 		"linkSkill": "Adventurer's Curiosity",
 		"legionType": "DEX+",
 		"className": "Bowmaster",

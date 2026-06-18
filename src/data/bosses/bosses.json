@@ -612,6 +612,24 @@
 		]
 	},
 	{
+		"name": "Malefic Star",
+		"img": "/assets/boss/malefic_star.webp",
+		"difficulties": [
+			{
+				"name": "Normal",
+				"value": 290400000,
+				"reset": "Weekly",
+				"minLevel": 280
+			},
+			{
+				"name": "Hard",
+				"value": 798000000,
+				"reset": "Weekly",
+				"minLevel": 280
+			}
+		]
+	},
+	{
 		"name": "Limbo",
 		"img": "/assets/boss/limbo.webp",
 		"difficulties": [

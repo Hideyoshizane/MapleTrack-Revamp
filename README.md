@@ -18,7 +18,7 @@
 
 ## Status
 
-### Updated up to Wild Hunter Remaster update.
+### Updated up to Ride The Lightning update.
 
 ## Demo
 
