@@ -121,7 +121,7 @@
 			},
 			{
 				"level": 3,
-				"description": "Duration: 20 sec. \nStatus Resistance: +100. \nCooldown: 120 sec."
+				"description": "[Mihile] Creates a shield for 30 sec that absorbs up to 9 hits, Damage +25%. \nHowever, damage from attacks that deal a percentage of Max HP is reduced by 30%. \nCooldown: 120 sec. \nPassive Effect: Damage +3%. \n\n[Other Classes] Status Resistance +100 for 20 sec. Cooldown: 120 sec."
 			}
 		]
 	},
