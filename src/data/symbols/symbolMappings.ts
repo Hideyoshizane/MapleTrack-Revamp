@@ -68,8 +68,6 @@ export const canUseSymbol = (level: number, name: SymbolName): boolean => level 
 
 export const getSymbolMinLevel = (name: SymbolName): number => SYMBOL_MAP[name].minLevel;
 
-export const getSymbolMaxLevelByName = (name: SymbolName): number => SYMBOL_MAP[name].maxLevel;
-
 export const getSymbolMaxLevelByCategory = (category: SymbolCategory): number =>
 	Math.max(...allSymbols.filter((symbol) => symbol.category === category).map((symbol) => symbol.maxLevel));
 export const getContentValue = (symbolName: SymbolName | null, contentType: string, characterLevel: number): number => {

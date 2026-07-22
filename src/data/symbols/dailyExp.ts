@@ -24,7 +24,7 @@ export type SymbolsData = {
 	weekly: { value: number };
 };
 
-export const symbolsData = raw as SymbolsData;
+const symbolsData = raw as SymbolsData;
 
 export const allSymbols = symbolsData.symbols;
 

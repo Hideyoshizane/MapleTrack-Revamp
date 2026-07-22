@@ -14,7 +14,7 @@ export const ASTRA_DAILY_AREAS = [...new Set(sacredAreas.map((area) => area.name
 
 export const getSacredAreas = (): readonly SacredArea[] => sacredAreas;
 
-export const getSacredAreaErion = (areaName: string): number => sacredAreaErionMap.get(areaName) ?? 0;
+const getSacredAreaErion = (areaName: string): number => sacredAreaErionMap.get(areaName) ?? 0;
 
 export const hasSacredArea = (areaName: string): boolean => sacredAreaErionMap.has(areaName);
 
