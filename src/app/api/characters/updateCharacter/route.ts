@@ -8,7 +8,6 @@ import { createResponse } from '@utils/createResponse';
 import { logZodError } from '@utils/logger';
 import { nowInUtc } from '@utils/time';
 
-import type { SymbolCategory } from '@prisma/client';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
@@ -57,6 +56,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					jobType: data.jobType,
 					legion: data.legion,
 					linkSkill: data.linkSkill,
+					lastSymbolDaily: data.lastSymbolDaily,
 					bossing: data.bossing,
 					syncing: data.syncing,
 					userId: authenticatedUserId,
@@ -74,6 +74,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					bossing: data.bossing,
 					syncing: data.syncing,
 					lastUpdate: currentDate,
+					lastSymbolDaily: data.lastSymbolDaily,
 				},
 				select: { id: true },
 			});
@@ -94,11 +95,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				const symbols = data.symbols[categoryKey];
 
 				for (const symbol of symbols) {
-					const calculatedValues = calculateNewLevelFromExp(
-						symbol.category as SymbolCategory,
-						symbol.level,
-						symbol.exp,
-					);
+					const calculatedValues = calculateNewLevelFromExp(symbol.category, symbol.level, symbol.exp);
 
 					const isInitialState = symbol.level === 1 && symbol.exp === 0;
 

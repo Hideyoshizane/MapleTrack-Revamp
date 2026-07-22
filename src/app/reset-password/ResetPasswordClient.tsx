@@ -49,7 +49,10 @@ const ResetPasswordClient = ({ token }: Props): JSX.Element => {
 					id="confirmPassword"
 					label="Confirm Password"
 					type="password"
-					validators={[zodValidator(passwordFieldSchema), confirmPasswordValidator(() => getValues('password'))]}
+					validators={[
+						zodValidator(passwordFieldSchema),
+						confirmPasswordValidator(() => getValues('password')),
+					]}
 					{...commonInputProps}
 					isLogin={false}
 				/>
@@ -62,7 +65,8 @@ const ResetPasswordClient = ({ token }: Props): JSX.Element => {
 					loaderColor="#121212"
 					loaderSize={16}
 					loadingText="Submitting..."
-					type="submit">
+					type="submit"
+				>
 					Reset Password
 				</Button>
 			</form>

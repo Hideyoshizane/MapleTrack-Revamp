@@ -33,9 +33,9 @@ const buildExpData = (data: ExpData): ExpDataNumeric => {
 };
 
 // Explicit constants for each system
-const arcaneExp: ExpDataNumeric = buildExpData(arcaneExpJson as ExpData);
-const sacredExp: ExpDataNumeric = buildExpData(sacredExpJson as ExpData);
-const grandSacredExp: ExpDataNumeric = buildExpData(grandSacredExpJson as ExpData);
+const arcaneExp: ExpDataNumeric = buildExpData(arcaneExpJson);
+const sacredExp: ExpDataNumeric = buildExpData(sacredExpJson);
+const grandSacredExp: ExpDataNumeric = buildExpData(grandSacredExpJson);
 
 const expTables: Record<ForceType, ExpDataNumeric> = { arcane: arcaneExp, sacred: sacredExp, grand: grandSacredExp };
 

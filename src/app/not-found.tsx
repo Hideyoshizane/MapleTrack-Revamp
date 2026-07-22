@@ -7,9 +7,9 @@ import styles from '../styles/NotFound.module.scss';
 
 import type { JSX } from 'react';
 
-const Error = (): JSX.Element => {
-	const ICON_SIZE = 400;
+const ICON_SIZE = 400;
 
+const Error = (): JSX.Element => {
 	return (
 		<div className={styles.page}>
 			<main className={styles.main}>

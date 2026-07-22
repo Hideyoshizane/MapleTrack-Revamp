@@ -15,7 +15,11 @@ export const useIncreaseAllSymbols = ({
 }: updateCharacterAllDailyRequestBody): UseMutationResult<updateCharacterAllDailyResponseBody, Error, void> => {
 	return useMutation<updateCharacterAllDailyResponseBody, Error, void>({
 		mutationFn: async (): Promise<updateCharacterAllDailyResponseBody> => {
-			return await characterApi.updateAllDaily({ server, className, id, arcaneBonus, sacredBonus });
+			const response = await characterApi.updateAllDaily({ server, className, id, arcaneBonus, sacredBonus });
+			if (!response.data) {
+				throw new Error(response.message);
+			}
+			return response.data;
 		},
 	});
 };

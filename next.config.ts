@@ -5,44 +5,41 @@ import type { RemotePattern } from 'next/dist/shared/lib/image-config';
 
 const patterns: RemotePattern[] = [
 	{
-		protocol: 'https',
 		hostname: 'www.nexon.com',
 		pathname: '/api/maplestory/**',
 		port: '',
+		protocol: 'https',
 		search: '',
 	},
 	{
-		protocol: 'https',
 		hostname: 'msavatar1.nexon.net',
 		pathname: '/Character/**',
 		port: '',
+		protocol: 'https',
 		search: '',
 	},
 ];
 
 const nextConfig: NextConfig = {
+	images: { qualities: [75, 100], remotePatterns: patterns },
 	turbopack: {
 		rules: {
 			'*.svg': {
+				as: '*.tsx',
 				loaders: [
 					{
 						loader: '@svgr/webpack',
 						options: {
-							exportType: 'default',
-
 							// Remove width/height from all SVGs so CSS can always control size
 							dimensions: false,
 
-							// Normalize SVGs so they scale infinitely with CSS
-							svgProps: { width: '100%', height: '100%', preserveAspectRatio: 'xMidYMid meet' },
+							exportType: 'default',
 						},
 					},
 				],
-				as: '*.ts',
 			},
 		},
 	},
-	images: { remotePatterns: patterns, qualities: [75, 100] },
 };
 
 export default withBundleAnalyzer({

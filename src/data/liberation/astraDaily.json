@@ -1,0 +1,42 @@
+[
+	{
+		"name": "Cernium",
+		"img": "/assets/sacredforce/cernium.webp",
+		"erion": 1
+	},
+	{
+		"name": "Arcus",
+		"img": "/assets/sacredforce/arcus.webp",
+		"erion": 3
+	},
+	{
+		"name": "Odium",
+		"img": "/assets/sacredforce/odium.webp",
+		"erion": 6
+	},
+	{
+		"name": "Shangri-La",
+		"img": "/assets/sacredforce/shangri-la.webp",
+		"erion": 10
+	},
+	{
+		"name": "Arteria",
+		"img": "/assets/sacredforce/arteria.webp",
+		"erion": 15
+	},
+	{
+		"name": "Carcion",
+		"img": "/assets/sacredforce/carcion.webp",
+		"erion": 25
+	},
+	{
+		"name": "Tallahart",
+		"img": "/assets/grandsacredforce/tallahart.webp",
+		"erion": 45
+	},
+	{
+		"name": "Geardock",
+		"img": "/assets/grandsacredforce/geardock.webp",
+		"erion": 65
+	}
+]

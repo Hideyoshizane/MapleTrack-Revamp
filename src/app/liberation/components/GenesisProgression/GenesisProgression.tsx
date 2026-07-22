@@ -11,7 +11,7 @@ import CircleIcon from '@assets/svg/circle-boss.svg';
 import LockIcon from '@assets/svg/lock.svg';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { GENESIS_MIN_LEVEL } from '@data/liberation/constant';
-import { getBossesByType } from '@data/liberation/liberationBosses';
+import { getBossesByType, createEmptyWeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
 import { getQuestsByType, getLiberationTotal } from '@data/liberation/liberationQuests';
 
 import { calculateQuestPoints, calculateCumulativePoints } from '../../lib/calculatePoints';
@@ -40,6 +40,9 @@ type Props = {
 
 export const QUEST_TYPE = 'Genesis';
 
+const bosses = getBossesByType(QUEST_TYPE);
+const totalPoints = getLiberationTotal(QUEST_TYPE);
+
 const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacterUpdate }: Props): JSX.Element => {
 	const genesisQuests = getQuestsByType(QUEST_TYPE);
 	if (!genesisQuests || !selectedCharacter) {
@@ -57,7 +60,7 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 		setGenesisPass,
 		liberated,
 		handleLiberatedToggle,
-	} = useGenesisProgressionState({ selectedCharacter, onCharacterUpdate });
+	} = useGenesisProgressionState({ selectedCharacter, onCharacterUpdateAction: onCharacterUpdate });
 
 	const checkedBosses = useCheckedBosses({
 		characterId: selectedCharacter.characterId,
@@ -67,9 +70,6 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 		type: QUEST_TYPE,
 	});
 
-	const bosses = getBossesByType(QUEST_TYPE);
-	const totalPoints = getLiberationTotal(QUEST_TYPE);
-
 	const questPoints = Number(calculateQuestPoints(selectedQuest, QUEST_TYPE) ?? 0);
 	const cumulativeTracesPoints = Number(calculateCumulativePoints(selectedQuest, QUEST_TYPE, tracesPoints) ?? 0);
 
@@ -78,13 +78,9 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 
 	const isGenesisAvaiable = (selectedCharacter.level ?? 0) >= GENESIS_MIN_LEVEL;
 
-	const [weeklyMonthlyPoints, setWeeklyMonthlyPoints] = useState<WeeklyMonthlyPoints>({
-		thisWeekPoints: 0,
-		totalWeeklyPoints: 0,
-		thisMonthPoints: 0,
-		totalMonthlyPoints: 0,
-		bosses: {},
-	});
+	const [weeklyMonthlyPoints, setWeeklyMonthlyPoints] = useState<WeeklyMonthlyPoints>(
+		createEmptyWeeklyMonthlyPoints(),
+	);
 
 	const IconComponent = liberated ? CheckedIcon : CircleIcon;
 
@@ -97,7 +93,8 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 							<LockIcon height={56} width={56} />
 							<p className={styles.title}>Level Requirement Not Met</p>
 							<p className={styles.description}>
-								Genesis Liberation tracker is available only for characters level {GENESIS_MIN_LEVEL} or higher.
+								Genesis Liberation tracker is available only for characters level {GENESIS_MIN_LEVEL} or
+								higher.
 							</p>
 						</div>
 					</div>
@@ -119,7 +116,7 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 
 						<div>
 							<p className={styles.inputTitle}>Current Traces</p>
-							<PointsInput onChangePoints={setTracesPoints} points={tracesPoints} />
+							<PointsInput onChangePoints={setTracesPoints} points={tracesPoints} type={QUEST_TYPE} />
 						</div>
 
 						<div className={styles.toggleDiv}>
@@ -138,7 +135,8 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 							<p className={styles.inputTitle}>Liberated</p>
 							<Tooltip
 								content="Required for Destiny Liberation. Updates automatically as you earn points or enter them manually."
-								placement="top">
+								placement="top"
+							>
 								<IconComponent
 									className={styles.liberatedIcon}
 									height={56}
@@ -154,6 +152,7 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 						currentPoints={tracesPoints}
 						questPoints={questPoints}
 						totalPoints={totalPoints}
+						type="genesis"
 					/>
 				</div>
 			</div>
@@ -172,7 +171,7 @@ const GenesisProgression = ({ selectedCharacter, currentDate, server, onCharacte
 						bosses={bosses}
 						checkedBosses={checkedBosses}
 						onChangeWeeklyTotals={setWeeklyMonthlyPoints}
-						type={QUEST_TYPE}
+						rawType={QUEST_TYPE}
 					/>
 				</div>
 

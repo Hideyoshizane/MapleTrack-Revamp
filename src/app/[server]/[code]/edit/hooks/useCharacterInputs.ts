@@ -9,8 +9,8 @@ import type { Dispatch, SetStateAction } from 'react';
 
 type Props = {
 	character: getCharacterDataResponseBody | null;
-	updateCharacter: (recipe: (draft: getCharacterDataResponseBody) => void) => void;
-	setSyncEnabled: (value: boolean) => void;
+	updateCharacterAction: (recipe: (draft: getCharacterDataResponseBody) => void) => void;
+	setSyncEnabledAction: (value: boolean) => void;
 };
 
 type UseCharacterInputsReturn = {
@@ -27,7 +27,11 @@ type UseCharacterInputsReturn = {
 	toggleSync: () => void;
 };
 
-export const useCharacterInputs = ({ character, updateCharacter, setSyncEnabled }: Props): UseCharacterInputsReturn => {
+export const useCharacterInputs = ({
+	character,
+	updateCharacterAction,
+	setSyncEnabledAction,
+}: Props): UseCharacterInputsReturn => {
 	const [levelInput, setLevelInput] = useState<string>(() => character?.level.toString() ?? '');
 	const [targetLevelInput, setTargetLevelInput] = useState<string>(() => character?.targetLevel.toString() ?? '');
 	const [syncEnabled, setLocalSyncEnabled] = useState<boolean>(() => !!character?.syncing);
@@ -36,10 +40,10 @@ export const useCharacterInputs = ({ character, updateCharacter, setSyncEnabled 
 		if (character?.syncing) {
 			setTimeout(() => {
 				setLocalSyncEnabled(true);
-				setSyncEnabled(true);
+				setSyncEnabledAction(true);
 			}, 0);
 		}
-	}, [character, setSyncEnabled]);
+	}, [character, setSyncEnabledAction]);
 
 	if (!character) {
 		return {
@@ -66,19 +70,19 @@ export const useCharacterInputs = ({ character, updateCharacter, setSyncEnabled 
 			return;
 		}
 
-		updateCharacter((draft) => {
+		updateCharacterAction((draft) => {
 			draft.name = result.data;
 		});
 	};
 
 	const toggleBossing = (): void => {
-		updateCharacter((draft) => {
+		updateCharacterAction((draft) => {
 			draft.bossing = !draft.bossing;
 		});
 	};
 
 	const handleLevelBlur = (): void => {
-		updateCharacter((draft) => {
+		updateCharacterAction((draft) => {
 			if (!draft) {
 				return;
 			}
@@ -87,7 +91,7 @@ export const useCharacterInputs = ({ character, updateCharacter, setSyncEnabled 
 	};
 
 	const handleTargetLevelBlur = (): void => {
-		updateCharacter((draft) => {
+		updateCharacterAction((draft) => {
 			if (!draft) {
 				return;
 			}
@@ -101,12 +105,12 @@ export const useCharacterInputs = ({ character, updateCharacter, setSyncEnabled 
 		}
 		const next = !syncEnabled;
 
-		updateCharacter((draft) => {
+		updateCharacterAction((draft) => {
 			draft.syncing = next;
 		});
 
 		setLocalSyncEnabled(next);
-		setSyncEnabled(next);
+		setSyncEnabledAction(next);
 	};
 
 	return {

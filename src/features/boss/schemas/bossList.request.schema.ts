@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { BOSS_DIFFICULTY_ENUM, BOSS_RESET_ENUM, BOSS_NAMES_ENUM } from '@data/bosses/bosses';
+import { BOSS_DIFFICULTY_ENUM, BOSS_RESET_ENUM, BOSS_NAMES_ENUM, getBossMaxPartySize } from '@data/bosses/bosses';
 import { CHARACTER_MAX_LEVEL } from '@data/character/constants';
 import { JOB_CLASSES } from '@data/classes/classes';
 import {
@@ -34,10 +34,21 @@ const updateBossListBossesSchema = z
 		name: z.enum(BOSS_NAMES_ENUM),
 		difficulty: z.enum(BOSS_DIFFICULTY_ENUM),
 		reset: z.enum(BOSS_RESET_ENUM),
-
+		partySize: z.number().int().min(1),
 		dailyTotal: z.number().min(0).max(7),
 	})
-	.strict();
+	.strict()
+	.superRefine((boss, context) => {
+		const maxPartySize = getBossMaxPartySize(boss.name);
+
+		if (boss.partySize > maxPartySize) {
+			context.addIssue({
+				code: 'custom',
+				path: ['partySize'],
+				message: `Party size cannot exceed ${maxPartySize} for ${boss.name}.`,
+			});
+		}
+	});
 
 const updateBossListCharactersSchema = z
 	.object({

@@ -75,55 +75,67 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Pr
 		),
 	);
 
-	const fetchCharacters = async (): Promise<void> => {
-		try {
-			setLoading(true);
-			setError(null);
-
-			if (!serverCookie) {
-				router.replace('/error');
-				return;
-			}
-
-			const payload: GetAllCharactersRequestBody = { server: serverCookie };
-
-			const response = await characterApi.getAllCharacters(payload);
-
-			if (!response.success) {
-				throw new Error(response.message ?? 'Failed to fetch characters');
-			}
-
-			const fetchedCharacters: getAllCharactersResponseBody[] = Array.isArray(response.data) ? response.data : [];
-
-			const results: getAllCharactersResponseBody[] = JobClasses.map((job): getAllCharactersResponseBody => {
-				const match = fetchedCharacters.find((char): boolean => char.class === job.className);
-				return (
-					match ??
-					generateCharacterObjectHomePage({
-						jobClassName: job.className,
-						jobType: job.jobType,
-						legion: job.legionType,
-						linkSkill: job.linkSkill,
-					})
-				);
-			});
-
-			setAllCharacters(results);
-		} catch (err: unknown) {
-			console.error('Error fetching characters:', err);
-			setError(err instanceof Error ? err.message : String(err));
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	useEffect((): void => {
+	useEffect((): (() => void) | undefined => {
 		if (!serverCookie) {
 			return;
 		}
 
-		void fetchCharacters();
-	}, [serverCookie]);
+		let cancelled = false;
+
+		const loadCharacters = async (): Promise<void> => {
+			try {
+				setLoading(true);
+				setError(null);
+
+				const payload: GetAllCharactersRequestBody = {
+					server: serverCookie,
+				};
+
+				const response = await characterApi.getAllCharacters(payload);
+
+				if (!response.success) {
+					throw new Error(response.message ?? 'Failed to fetch characters');
+				}
+
+				const fetchedCharacters: getAllCharactersResponseBody[] = Array.isArray(response.data)
+					? response.data
+					: [];
+
+				const results: getAllCharactersResponseBody[] = JobClasses.map((job): getAllCharactersResponseBody => {
+					const match = fetchedCharacters.find((char): boolean => char.class === job.className);
+
+					return (
+						match ??
+						generateCharacterObjectHomePage({
+							jobClassName: job.className,
+							jobType: job.jobType,
+							legion: job.legionType,
+							linkSkill: job.linkSkill,
+						})
+					);
+				});
+
+				if (!cancelled) {
+					setAllCharacters(results);
+				}
+			} catch (err: unknown) {
+				if (!cancelled) {
+					console.error('Error fetching characters:', err);
+					setError(err instanceof Error ? err.message : String(err));
+				}
+			} finally {
+				if (!cancelled) {
+					setLoading(false);
+				}
+			}
+		};
+
+		void loadCharacters();
+
+		return (): void => {
+			cancelled = true;
+		};
+	}, [router, serverCookie]);
 
 	const jobResults: getAllCharactersResponseBody[] = sortCharacters(filterCharacters(allCharacters, selectedClasses));
 
@@ -136,7 +148,9 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Pr
 			{loading || selectedClassesLoading
 				? skeletons
 				: jobResults.map(
-						(char): JSX.Element => <ClassCard character={char} key={char.class} serverCookie={serverCookie} />,
+						(char): JSX.Element => (
+							<ClassCard character={char} key={char.class} serverCookie={serverCookie} />
+						),
 					)}
 		</div>
 	);

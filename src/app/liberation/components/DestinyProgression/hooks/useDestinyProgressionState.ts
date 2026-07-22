@@ -7,7 +7,7 @@ import type { Dispatch, SetStateAction } from 'react';
 
 type Props = {
 	selectedCharacter: GetLiberationListCharacterResponseBody;
-	onCharacterUpdate?: (updated: Partial<GetLiberationListCharacterResponseBody>) => void;
+	onCharacterUpdateAction?: (updated: Partial<GetLiberationListCharacterResponseBody>) => void;
 };
 
 type ReturnType = {
@@ -17,7 +17,7 @@ type ReturnType = {
 	setDeterminationPoints: Dispatch<SetStateAction<number>>;
 };
 
-export const useDestinyProgressionState = ({ selectedCharacter, onCharacterUpdate }: Props): ReturnType => {
+export const useDestinyProgressionState = ({ selectedCharacter, onCharacterUpdateAction }: Props): ReturnType => {
 	const [selectedQuest, setSelectedQuest] = useState<string | null>(selectedCharacter.currentDestinyQuest);
 
 	const [determinationPoints, setDeterminationPoints] = useState<number>(selectedCharacter.currentDestinyPoints);
@@ -59,7 +59,7 @@ export const useDestinyProgressionState = ({ selectedCharacter, onCharacterUpdat
 	}, [selectedCharacter.characterId, selectedCharacter.currentDestinyQuest, selectedCharacter.currentDestinyPoints]);
 
 	useEffect(() => {
-		if (isBackendSyncRef.current || !onCharacterUpdate) {
+		if (isBackendSyncRef.current || !onCharacterUpdateAction) {
 			return;
 		}
 
@@ -71,8 +71,11 @@ export const useDestinyProgressionState = ({ selectedCharacter, onCharacterUpdat
 			return;
 		}
 
-		onCharacterUpdate({ currentDestinyQuest: selectedQuest ?? undefined, currentDestinyPoints: determinationPoints });
-	}, [selectedQuest, determinationPoints, selectedCharacter, onCharacterUpdate]);
+		onCharacterUpdateAction({
+			currentDestinyQuest: selectedQuest ?? undefined,
+			currentDestinyPoints: determinationPoints,
+		});
+	}, [selectedQuest, determinationPoints, selectedCharacter, onCharacterUpdateAction]);
 
 	return { selectedQuest, setSelectedQuest, determinationPoints, setDeterminationPoints };
 };

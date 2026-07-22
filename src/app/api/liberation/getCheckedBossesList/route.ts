@@ -28,7 +28,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const characterBossData = await prisma.bossCharacter.findFirst({
 			where: { characterId, server: { serverName: server, bossList: { userId: authenticatedUserId } } },
 			select: {
-				bosses: { select: { name: true, difficulty: true, cleared: true } },
+				bosses: { select: { name: true, difficulty: true, cleared: true, partySize: true } },
 				server: { select: { bossList: { select: { lastUpdate: true } } } },
 			},
 		});
@@ -45,24 +45,36 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const bosses = getBossesByType(type);
 
 		const bossesMap = new Map(
-			characterBossData.bosses.map((boss): [string, (typeof characterBossData.bosses)[number]] => [boss.name, boss]),
+			characterBossData.bosses.map((boss): [string, (typeof characterBossData.bosses)[number]] => [
+				boss.name,
+				boss,
+			]),
 		);
 
 		// Build response object
-		const normalizedBosses: getCheckedBossesListResponseBody = new Array(bosses.length);
+		const normalizedBosses: getCheckedBossesListResponseBody = Array.from({ length: bosses.length });
 
 		for (let bossIndex = 0; bossIndex < bosses.length; bossIndex += 1) {
 			const boss = bosses[bossIndex];
+			const existingBoss = bossesMap.get(boss.name);
 
 			if (!isCurrentDay) {
-				normalizedBosses[bossIndex] = { name: boss.name, type: 'Skip' };
+				normalizedBosses[bossIndex] = {
+					name: boss.name,
+					type: 'Skip',
+					cleared: false,
+					partySize: existingBoss?.partySize ?? 1,
+				};
 
 				continue;
 			}
 
-			const existingBoss = bossesMap.get(boss.name);
-
-			normalizedBosses[bossIndex] = { name: boss.name, type: existingBoss?.cleared ? existingBoss.difficulty : 'Skip' };
+			normalizedBosses[bossIndex] = {
+				name: boss.name,
+				type: existingBoss?.difficulty ?? 'Skip',
+				cleared: existingBoss?.cleared ?? false,
+				partySize: existingBoss?.partySize ?? 1,
+			};
 		}
 
 		const validation = getCheckedBossesListResponseSchema.safeParse(normalizedBosses);

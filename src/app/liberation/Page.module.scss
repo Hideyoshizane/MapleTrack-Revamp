@@ -41,7 +41,7 @@ $textColor: var(--default-button-text);
 
 	gap: 8px;
 
-	width: 712px;
+	width: 1064px;
 	height: 72px;
 
 	border-radius: 23px;
@@ -67,6 +67,7 @@ $textColor: var(--default-button-text);
 		color: var(--default-button-text);
 
 		transition: background-color 200ms ease-in;
+		cursor: pointer;
 
 		&[data-state='active'] {
 			background-color: var(--liberation-tab-color);

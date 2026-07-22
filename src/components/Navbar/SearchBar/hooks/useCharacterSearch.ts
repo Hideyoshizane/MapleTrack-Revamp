@@ -8,9 +8,6 @@ import { useDebouncedValue } from './useDebouncedValue';
 
 import type { searchCharacterResponseBody } from '@features/character/schemas/character.response.schema';
 
-const MIN_QUERY_LENGTH = 3;
-const DEBOUNCE_MS = 300;
-
 type UseCharacterSearchReturn = {
 	query: string;
 	setQuery: (value: string) => void;
@@ -18,6 +15,9 @@ type UseCharacterSearchReturn = {
 	isLoading: boolean;
 	hasSearched: boolean;
 };
+
+const MIN_QUERY_LENGTH = 3;
+const DEBOUNCE_MS = 300;
 
 export const useCharacterSearch = (): UseCharacterSearchReturn => {
 	const [query, setQuery] = useState<string>('');
@@ -30,8 +30,7 @@ export const useCharacterSearch = (): UseCharacterSearchReturn => {
 
 	useEffect((): void => {
 		if (debouncedQuery.length < MIN_QUERY_LENGTH) {
-			setResults([]);
-
+			requestIdRef.current++;
 			return;
 		}
 
@@ -56,5 +55,13 @@ export const useCharacterSearch = (): UseCharacterSearchReturn => {
 		});
 	}, [debouncedQuery]);
 
-	return { query, setQuery, results, isLoading: isPending, hasSearched: debouncedQuery.length >= MIN_QUERY_LENGTH };
+	const hasSearched = debouncedQuery.length >= MIN_QUERY_LENGTH;
+
+	return {
+		query,
+		setQuery,
+		results: hasSearched ? results : [],
+		isLoading: isPending,
+		hasSearched: debouncedQuery.length >= MIN_QUERY_LENGTH,
+	};
 };

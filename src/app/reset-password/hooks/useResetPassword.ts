@@ -18,6 +18,9 @@ type UseResetPasswordReturn = {
 	onSubmit: (data: ResetPasswordFormData) => Promise<void>;
 };
 
+// helper to avoid repeated toast calls
+const showResetError = (msg?: string): Id => toast.error(msg ?? 'Failed to reset the password');
+
 export const useResetPassword = (rawToken: string): UseResetPasswordReturn => {
 	const router = useRouter();
 
@@ -27,9 +30,6 @@ export const useResetPassword = (rawToken: string): UseResetPasswordReturn => {
 		formState: { isSubmitting, isSubmitted },
 		getValues,
 	} = useForm<ResetPasswordFormData>({ mode: 'onBlur', defaultValues: { password: '', confirmPassword: '' } });
-
-	// helper to avoid repeated toast calls
-	const showResetError = (msg?: string): Id => toast.error(msg ?? 'Failed to reset the password');
 
 	const onSubmit = async (data: ResetPasswordFormData): Promise<void> => {
 		try {

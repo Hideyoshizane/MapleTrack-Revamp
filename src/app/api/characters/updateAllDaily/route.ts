@@ -2,11 +2,13 @@ import {
 	getContentValue,
 	calculateNewLevelFromExp,
 	canUseSymbol,
-	getSymbolMaxLevel,
+	getSymbolMaxLevelByCategory,
+	getSymbolMinLevel,
 	isSymbolName,
 } from '@data/symbols/symbolMappings';
 import { updateCharacterAllDailyRequestSchema } from '@features/character/schemas/character.request.schema';
 import { updateCharacterAllDailyResponseSchema } from '@features/character/schemas/character.response.schema';
+import { addErionToLiberationDaily } from '@features/liberation/liberationService';
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
@@ -14,6 +16,7 @@ import { logError, logApiFailure, logZodError } from '@utils/logger';
 import { nowInUtc } from '@utils/time';
 
 import type { LevelUpResult } from '@data/symbols/symbolMappings';
+import type { updateCharacterAllDailyResponseBody } from '@features/character/schemas/character.response.schema';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
@@ -41,6 +44,8 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				where: { id, userId: authenticatedUserId, server, class: className },
 				select: {
 					level: true,
+					id: true,
+					server: true,
 					symbols: {
 						select: {
 							id: true,
@@ -62,6 +67,9 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			const symbolUpdatePromises: Promise<unknown>[] = [];
 			const contentUpdatePromises: Promise<unknown>[] = [];
 
+			let lastUpdatedSymbolName: string | null = null;
+			let highestLevelSoFar = -Infinity;
+
 			for (const symbol of character.symbols) {
 				if (!isSymbolName(symbol.name)) {
 					continue;
@@ -71,7 +79,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					continue;
 				}
 
-				const maxLevel = getSymbolMaxLevel(symbol.category);
+				const maxLevel = getSymbolMaxLevelByCategory(symbol.category);
 				if (symbol.level >= maxLevel) {
 					continue;
 				}
@@ -104,6 +112,12 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 				results[symbol.name] = newValues;
 
+				const symbolMinLevel = getSymbolMinLevel(symbol.name);
+				if (symbolMinLevel > highestLevelSoFar) {
+					highestLevelSoFar = symbolMinLevel;
+					lastUpdatedSymbolName = symbol.name;
+				}
+
 				symbolUpdatePromises.push(
 					tx.characterSymbol.update({
 						where: { id: symbol.id },
@@ -122,8 +136,18 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			if (symbolUpdatePromises.length > 0 || contentUpdatePromises.length > 0) {
 				await Promise.all([...symbolUpdatePromises, ...contentUpdatePromises]);
 			}
+			let erionPoints: number | null = null;
+			if (lastUpdatedSymbolName) {
+				erionPoints = await addErionToLiberationDaily(
+					tx,
+					lastUpdatedSymbolName,
+					authenticatedUserId,
+					character.id,
+					character.server,
+				);
+			}
 
-			return results;
+			return { results, erionPoints };
 		});
 
 		if (!updatedResults) {
@@ -138,7 +162,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			throw new Error('Invalid response data');
 		}
 
-		return createResponse<ApiResponse<Record<string, LevelUpResult>>>(
+		return createResponse<ApiResponse<updateCharacterAllDailyResponseBody>>(
 			{ success: true, message: 'Character updated successfully.', data: updatedResults },
 			200,
 		);

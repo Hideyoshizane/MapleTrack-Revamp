@@ -19,12 +19,13 @@ import type { LoginFormData } from '@sharedTypes/form';
 import type { JSX } from 'react';
 
 const LoginPageClient = (): JSX.Element => {
+	const router = useRouter();
+
 	const {
 		control,
 		handleSubmit,
 		formState: { isSubmitting, isSubmitted },
 	} = useForm<LoginFormData>({ mode: 'onBlur', defaultValues: { username: '', password: '' } });
-	const router = useRouter();
 
 	const { submitLogin } = useLogin(router);
 
@@ -70,7 +71,8 @@ const LoginPageClient = (): JSX.Element => {
 					loaderColor="#121212"
 					loaderSize={16}
 					loadingText="Loading..."
-					type="submit">
+					type="submit"
+				>
 					Login
 				</Button>
 

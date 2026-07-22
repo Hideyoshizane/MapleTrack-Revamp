@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 import LockIcon from '@assets/svg/lock.svg';
 import { DESTINY_MIN_LEVEL } from '@data/liberation/constant';
-import { getBossesByType } from '@data/liberation/liberationBosses';
+import { getBossesByType, createEmptyWeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
 import { getQuestsByType, getLiberationTotal } from '@data/liberation/liberationQuests';
 
 import { calculateQuestPoints, calculateCumulativePoints } from '../../lib/calculatePoints';
@@ -41,15 +41,18 @@ const totalPoints = getLiberationTotal(QUEST_TYPE);
 
 const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacterUpdate }: Props): JSX.Element => {
 	const destinyQuests = getQuestsByType(QUEST_TYPE);
-
-	if (!destinyQuests || !selectedCharacter) redirect('/error');
+	if (!destinyQuests || !selectedCharacter) {
+		redirect('/error');
+	}
 
 	const [selectedDate, setSelectedDate] = useState<Date>(currentDate);
 
-	const { selectedQuest, setSelectedQuest, determinationPoints, setDeterminationPoints } = useDestinyProgressionState({
-		selectedCharacter,
-		onCharacterUpdate,
-	});
+	const { selectedQuest, setSelectedQuest, determinationPoints, setDeterminationPoints } = useDestinyProgressionState(
+		{
+			selectedCharacter,
+			onCharacterUpdateAction: onCharacterUpdate,
+		},
+	);
 
 	const checkedBosses = useDestinyCheckedBosses({
 		characterId: selectedCharacter.characterId,
@@ -59,13 +62,9 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 		type: QUEST_TYPE,
 	});
 
-	const [weeklyMonthlyPoints, setWeeklyMonthlyPoints] = useState<WeeklyMonthlyPoints>({
-		thisWeekPoints: 0,
-		totalWeeklyPoints: 0,
-		thisMonthPoints: 0,
-		totalMonthlyPoints: 0,
-		bosses: {},
-	});
+	const [weeklyMonthlyPoints, setWeeklyMonthlyPoints] = useState<WeeklyMonthlyPoints>(
+		createEmptyWeeklyMonthlyPoints(),
+	);
 
 	const liberated = selectedCharacter.liberated;
 
@@ -87,8 +86,8 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 							<LockIcon height={56} width={56} />
 							<p className={styles.title}>Level Requirement Not Met</p>
 							<p className={styles.description}>
-								Destiny Liberation tracker is available only for characters level {DESTINY_MIN_LEVEL} or higher who
-								completed Genesis Liberation.
+								Destiny Liberation tracker is available only for characters level {DESTINY_MIN_LEVEL} or
+								higher who completed Genesis Liberation.
 							</p>
 						</div>
 					</div>
@@ -110,7 +109,11 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 
 						<div>
 							<p className={styles.inputTitle}>Current Determination</p>
-							<PointsInput onChangePoints={setDeterminationPoints} points={determinationPoints} />
+							<PointsInput
+								onChangePoints={setDeterminationPoints}
+								points={determinationPoints}
+								type={QUEST_TYPE}
+							/>
 						</div>
 					</div>
 
@@ -119,6 +122,7 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 						currentPoints={determinationPoints}
 						questPoints={questPoints}
 						totalPoints={totalPoints}
+						type={'destiny'}
 					/>
 				</div>
 			</div>
@@ -137,14 +141,12 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 						bosses={bosses}
 						checkedBosses={checkedBosses}
 						onChangeWeeklyTotals={setWeeklyMonthlyPoints}
-						type={QUEST_TYPE}
+						rawType={QUEST_TYPE}
 					/>
 				</div>
 
 				<div className={styles.column}>
 					<DestinySchedule
-						determinationPoints={determinationPoints}
-						disableProgress={!isDestinyAvaiable}
 						remainingCurrentDetermination={remainingCurrent}
 						remainingTotalDetermination={remainingTotal}
 						selectedDate={selectedDate}

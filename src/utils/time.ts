@@ -2,7 +2,7 @@ import { addMinutes, differenceInSeconds } from 'date-fns';
 
 export const nowInUtc = (): Date => new Date();
 
-const createUtcDate = (
+export const createUtcDate = (
 	year: number,
 	month: number,
 	day: number,
@@ -16,9 +16,8 @@ const createUtcDate = (
 
 const THURSDAY = 4;
 
-export const getNextMidnight = (date: Date): Date => {
-	return createUtcDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1);
-};
+export const getNextMidnight = (date: Date): Date =>
+	createUtcDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1);
 
 export const getNextWeeklyResetDate = (date: Date): Date => {
 	const currentUtcDay = date.getUTCDay();
@@ -28,17 +27,14 @@ export const getNextWeeklyResetDate = (date: Date): Date => {
 	return createUtcDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + daysUntilThursday);
 };
 
-export const getNextMonthFirstDay = (date: Date): Date => {
-	return createUtcDate(date.getUTCFullYear(), date.getUTCMonth() + 1, 1);
-};
+export const getNextMonthFirstDay = (date: Date): Date =>
+	createUtcDate(date.getUTCFullYear(), date.getUTCMonth() + 1, 1);
 
-const hasResetPassed = (nextResetDate: Date): boolean => {
-	return nowInUtc().getTime() >= nextResetDate.getTime();
-};
+const hasResetPassed = (nextResetDate: Date): boolean => nowInUtc().getTime() >= nextResetDate.getTime();
 
 export const hasDailyResetOccurred = (date: Date | null): boolean => {
 	if (!date) {
-		return true;
+		return false;
 	}
 
 	return hasResetPassed(getNextMidnight(date));
@@ -68,9 +64,7 @@ export const isSameDay = (date1: Date, date2: Date): boolean => {
 	);
 };
 
-export const addMinutesToDate = (date: Date, minutes: number): Date => {
-	return addMinutes(date, minutes);
-};
+export const addMinutesToDate = (date: Date, minutes: number): Date => addMinutes(date, minutes);
 
 export type remainingTime = {
 	days?: number;

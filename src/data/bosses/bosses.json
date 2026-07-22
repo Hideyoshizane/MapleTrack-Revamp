@@ -2,6 +2,7 @@
 	{
 		"name": "Zakum",
 		"img": "/assets/boss/zakum.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -26,6 +27,7 @@
 	{
 		"name": "Magnus",
 		"img": "/assets/boss/magnus.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -50,6 +52,7 @@
 	{
 		"name": "Hilla",
 		"img": "/assets/boss/hilla.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -68,6 +71,7 @@
 	{
 		"name": "OMNI-CLN",
 		"img": "/assets/boss/omni_cln.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -80,6 +84,7 @@
 	{
 		"name": "Papulatus",
 		"img": "/assets/boss/papulatus.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -104,6 +109,7 @@
 	{
 		"name": "Pierre",
 		"img": "/assets/boss/pierre.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -122,6 +128,7 @@
 	{
 		"name": "Von Bon",
 		"img": "/assets/boss/von_bon.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -140,6 +147,7 @@
 	{
 		"name": "Crimsom Queen",
 		"img": "/assets/boss/crimson_queen.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -158,6 +166,7 @@
 	{
 		"name": "Vellum",
 		"img": "/assets/boss/vellum.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -176,6 +185,7 @@
 	{
 		"name": "Von Leon",
 		"img": "/assets/boss/von_leon.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -200,6 +210,7 @@
 	{
 		"name": "Horntail",
 		"img": "/assets/boss/horntail.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -224,6 +235,7 @@
 	{
 		"name": "Arkarium",
 		"img": "/assets/boss/arkarium.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -242,6 +254,7 @@
 	{
 		"name": "Pink Bean",
 		"img": "/assets/boss/pink_bean.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -260,6 +273,7 @@
 	{
 		"name": "Ranmaru",
 		"img": "/assets/boss/ranmaru.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -278,6 +292,7 @@
 	{
 		"name": "Cygnus",
 		"img": "/assets/boss/cygnus.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -296,6 +311,7 @@
 	{
 		"name": "Princess No",
 		"img": "/assets/boss/princess_no.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -308,6 +324,7 @@
 	{
 		"name": "Akechi",
 		"img": "/assets/boss/akechi.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -320,6 +337,7 @@
 	{
 		"name": "Lotus",
 		"img": "/assets/boss/lotus.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -344,6 +362,7 @@
 	{
 		"name": "Damien",
 		"img": "/assets/boss/damien.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -362,6 +381,7 @@
 	{
 		"name": "Guardian Angel Slime",
 		"img": "/assets/boss/angel_smile.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -380,6 +400,7 @@
 	{
 		"name": "Lucid",
 		"img": "/assets/boss/lucid.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -404,6 +425,7 @@
 	{
 		"name": "Will",
 		"img": "/assets/boss/will.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -428,6 +450,7 @@
 	{
 		"name": "Gloom",
 		"img": "/assets/boss/gloom.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -446,6 +469,7 @@
 	{
 		"name": "Verus Hilla",
 		"img": "/assets/boss/verus_hilla.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -464,6 +488,7 @@
 	{
 		"name": "Darknell",
 		"img": "/assets/boss/darknell.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -482,6 +507,7 @@
 	{
 		"name": "Black Mage",
 		"img": "/assets/boss/black_mage.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Hard",
@@ -500,6 +526,7 @@
 	{
 		"name": "Seren",
 		"img": "/assets/boss/seren.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -524,6 +551,7 @@
 	{
 		"name": "Kalos",
 		"img": "/assets/boss/kalos.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -554,6 +582,7 @@
 	{
 		"name": "First Adversary",
 		"img": "/assets/boss/first_adversary.webp",
+		"maxPartySize": 3,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -584,6 +613,7 @@
 	{
 		"name": "Kaling",
 		"img": "/assets/boss/kaling.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -614,6 +644,7 @@
 	{
 		"name": "Malefic Star",
 		"img": "/assets/boss/malefic_star.webp",
+		"maxPartySize": 3,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -632,6 +663,7 @@
 	{
 		"name": "Limbo",
 		"img": "/assets/boss/limbo.webp",
+		"maxPartySize": 3,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -650,6 +682,7 @@
 	{
 		"name": "Baldrix",
 		"img": "/assets/boss/baldrix.webp",
+		"maxPartySize": 3,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -662,6 +695,25 @@
 				"value": 840000000,
 				"reset": "Weekly",
 				"minLevel": 290
+			}
+		]
+	},
+	{
+		"name": "Jupiter",
+		"img": "/assets/boss/jupiter.webp",
+		"maxPartySize": 3,
+		"difficulties": [
+			{
+				"name": "Normal",
+				"value": 593000000,
+				"reset": "Weekly",
+				"minLevel": 295
+			},
+			{
+				"name": "Hard",
+				"value": 1190600000,
+				"reset": "Weekly",
+				"minLevel": 295
 			}
 		]
 	}

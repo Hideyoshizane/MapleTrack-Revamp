@@ -58,7 +58,9 @@ const Button = ({
 			onClick={handleClick}
 			onKeyDown={handleKeyDown}
 			tabIndex={0}
-			{...props}>
+			type="button"
+			{...props}
+		>
 			{isLoading && (
 				<Loader borderWidth={loaderBorderWidth} color={loaderColor} height={loaderSize} width={loaderSize} />
 			)}

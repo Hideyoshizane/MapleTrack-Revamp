@@ -1,6 +1,6 @@
 'use client';
 import { produce } from 'immer';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import { useCharacterExternalQuery } from '@hooks/useCharacterExternalQuery';
 import { useCharacterQuery } from '@hooks/useCharacterQuery';
@@ -15,7 +15,6 @@ type Props = {
 	className: string;
 	nameOverride?: string;
 	syncEnabled: boolean;
-	setFirstLoad: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 type UseCharacterPageDataReturn = {
@@ -32,32 +31,26 @@ export const useCharacterPageData = ({
 	className,
 	nameOverride,
 	syncEnabled,
-	setFirstLoad,
 }: Props): UseCharacterPageDataReturn => {
 	// Main character data
 	const { data: serverCharacter, isLoading: characterLoading, error } = useCharacterQuery({ server, className });
-	const [editableCharacter, setEditableCharacter] = useState<getCharacterDataResponseBody | null>(
-		() => serverCharacter ?? null,
-	);
+	const [editableCharacter, setEditableCharacter] = useState<getCharacterDataResponseBody | null>(null);
 
-	useEffect(() => {
-		if (serverCharacter && serverCharacter !== editableCharacter) {
-			setEditableCharacter(serverCharacter);
-		}
-		setFirstLoad(false);
-	}, [serverCharacter]);
+	const character = editableCharacter ?? serverCharacter ?? null;
 
 	const updateCharacter = (recipe: (draft: getCharacterDataResponseBody) => void): void => {
-		setEditableCharacter((prev) => {
-			if (!prev) {
-				return prev;
+		setEditableCharacter((previous) => {
+			const currentCharacter = previous ?? serverCharacter;
+
+			if (!currentCharacter) {
+				return null;
 			}
 
-			return produce(prev, recipe);
+			return produce(currentCharacter, recipe);
 		});
 	};
 
-	const resolvedName: string | undefined = nameOverride ?? editableCharacter?.name;
+	const resolvedName = nameOverride ?? editableCharacter?.name ?? serverCharacter?.name;
 
 	// External API data
 	const {
@@ -67,7 +60,7 @@ export const useCharacterPageData = ({
 	} = useCharacterExternalQuery({ name: resolvedName, server, enabled: syncEnabled && !!resolvedName });
 
 	return {
-		character: editableCharacter,
+		character,
 		updateCharacter,
 		loading: characterLoading || extraLoading,
 		error: error instanceof Error ? error.message : undefined,

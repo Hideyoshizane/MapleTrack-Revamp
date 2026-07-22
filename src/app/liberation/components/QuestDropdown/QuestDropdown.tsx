@@ -9,28 +9,31 @@ import MenuIcon from '@assets/svg/menu.svg';
 
 import styles from './QuestDropdown.module.scss';
 
-import type { LiberationQuest } from '@data/liberation/liberationQuests';
+import type { LiberationQuest, AstraQuest } from '@data/liberation/liberationQuests';
 import type { JSX } from 'react';
 
 type Props = {
-	quest: LiberationQuest;
+	quest: LiberationQuest | AstraQuest;
 	selectedQuest: string | null;
 	onSelectBoss: (bossName: string) => void;
 	type: string;
 };
 
+const IMAGE_SIZE = 56;
+
 const QuestDropdown = ({ type, quest, selectedQuest, onSelectBoss }: Props): JSX.Element => {
-	const bosses = Object.entries(quest.bosses);
+	const bosses = Object.entries(quest.bosses) as Array<
+		[key: string, value: (typeof quest.bosses)[keyof typeof quest.bosses]]
+	>;
 
 	const defaultBossByType = type === 'Genesis' ? 'Von Leon' : 'Seren';
+
 	const bossExists = (bossName: string | null): bossName is string => {
 		return bossName !== null && bossName in quest.bosses;
 	};
 
 	const safeSelectedQuest = bossExists(selectedQuest) ? selectedQuest : defaultBossByType;
 	const selectedEntry = safeSelectedQuest ? quest.bosses[safeSelectedQuest] : null;
-
-	const IMAGE_SIZE = 56;
 
 	return (
 		<Select.Root
@@ -39,12 +42,19 @@ const QuestDropdown = ({ type, quest, selectedQuest, onSelectBoss }: Props): JSX
 					onSelectBoss(value);
 				}
 			}}
-			value={safeSelectedQuest ?? undefined}>
+			value={safeSelectedQuest ?? undefined}
+		>
 			<Select.Trigger className={styles.selectedBossWrapper}>
 				{selectedEntry && safeSelectedQuest && (
 					<>
 						<div className={styles.bossDiv}>
-							<Image alt={safeSelectedQuest} height={IMAGE_SIZE} priority src={selectedEntry.img} width={IMAGE_SIZE} />
+							<Image
+								alt={safeSelectedQuest}
+								height={IMAGE_SIZE}
+								priority
+								src={selectedEntry.img}
+								width={IMAGE_SIZE}
+							/>
 							<p className={styles.bossName}>{safeSelectedQuest}</p>
 						</div>
 
@@ -63,7 +73,12 @@ const QuestDropdown = ({ type, quest, selectedQuest, onSelectBoss }: Props): JSX
 								{bosses.map(([bossName, bossData]) => (
 									<Select.Item className={styles.bossItem} key={bossName} value={bossName}>
 										<div className={styles.itemContent}>
-											<Image alt={bossName} height={IMAGE_SIZE} src={bossData.img} width={IMAGE_SIZE} />
+											<Image
+												alt={bossName}
+												height={IMAGE_SIZE}
+												src={bossData.img}
+												width={IMAGE_SIZE}
+											/>
 											<p>{bossName}</p>
 											{safeSelectedQuest === bossName && (
 												<div className={styles.iconsDiv}>

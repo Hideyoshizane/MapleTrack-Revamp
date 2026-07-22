@@ -1,29 +1,31 @@
 import raw from './dailyExp.json';
 
-import type { SymbolCategory } from '@prisma/client';
+export const SYMBOL_CATEGORIES = ['arcane', 'sacred', 'grand'] as const;
 
-type RawContent = {
+export type SymbolCategory = (typeof SYMBOL_CATEGORIES)[number];
+
+export type SymbolContent = {
 	name: string;
 	value: number;
 	minLevel?: number;
 	type?: 'daily' | 'weekly';
 };
 
-type RawSymbol = {
+export type SymbolData = {
 	name: string;
 	category: SymbolCategory;
 	minLevel: number;
 	maxLevel: number;
-	contents: RawContent[];
+	contents: SymbolContent[];
 };
 
-type SymbolsJson = {
-	symbols: RawSymbol[];
-	weekly: {
-		value: number;
-	};
+export type SymbolsData = {
+	symbols: SymbolData[];
+	weekly: { value: number };
 };
 
-const symbolsData = raw as SymbolsJson;
+export const symbolsData = raw as SymbolsData;
 
 export const allSymbols = symbolsData.symbols;
+
+export type SymbolName = SymbolData['name'];

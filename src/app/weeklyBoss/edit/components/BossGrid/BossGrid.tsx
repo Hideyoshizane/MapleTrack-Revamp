@@ -18,6 +18,7 @@ type BossGridProps = {
 		difficulty: BossDifficultyName,
 		server: string,
 		reset: BossReset,
+		partySize: number,
 		dailyTotal?: number,
 	) => void;
 };

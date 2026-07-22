@@ -110,6 +110,13 @@
 			"minLevel": 290,
 			"maxLevel": 11,
 			"contents": [{ "name": "Daily Quest", "value": 10, "type": "daily" }]
+		},
+		{
+			"name": "Geardock",
+			"category": "grand",
+			"minLevel": 295,
+			"maxLevel": 11,
+			"contents": [{ "name": "Daily Quest", "value": 10, "type": "daily" }]
 		}
 	],
 	"weekly": {

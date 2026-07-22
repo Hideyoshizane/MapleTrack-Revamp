@@ -2,7 +2,12 @@ import { z } from 'zod';
 
 import { serverSchema, characterIdRawSchema } from '@features/character/schemas/character.schema';
 
-import { questTypeSchema, genesisBossNameSchema, destinyBossNameSchema } from './liberation.response.schema';
+import {
+	astraQuestNameSchema,
+	questTypeSchema,
+	genesisBossNameSchema,
+	destinyBossNameSchema,
+} from './liberation.response.schema';
 
 export const getLiberationListRequestSchema = z
 	.object({
@@ -29,10 +34,15 @@ export const updateLiberationCharacterRequestSchema = z
 
 		currentGenesisQuest: genesisBossNameSchema,
 		currentGenesisPoints: z.number().min(0),
-		currentDestinyQuest: destinyBossNameSchema,
-		currentDestinyPoints: z.number().min(0),
 		genesisPass: z.boolean(),
 		liberated: z.boolean(),
+
+		currentDestinyQuest: destinyBossNameSchema,
+		currentDestinyPoints: z.number().min(0),
+
+		currentAstraQuest: astraQuestNameSchema,
+		currentAstraVestigesPoints: z.number().min(0),
+		currentAstraTracesPoints: z.number().min(0),
 	})
 	.strict();
 

@@ -42,7 +42,13 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
 		await prisma.$transaction(async (tx) => {
 			const newUser = await tx.user.create({
-				data: { username, email, password: hashedPassword, version: LASTVERSION, liberationLastUpdate: nowInUtc() },
+				data: {
+					username,
+					email,
+					password: hashedPassword,
+					version: LASTVERSION,
+					liberationLastUpdate: nowInUtc(),
+				},
 				select: { id: true },
 			});
 

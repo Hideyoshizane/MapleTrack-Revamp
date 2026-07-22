@@ -75,8 +75,12 @@ const CharacterPage = ({ server, code }: Props): JSX.Element => {
 			return;
 		}
 		increaseAllMutation.mutate(undefined, {
-			onSuccess: (): void => {
+			onSuccess: (data): void => {
 				void queryClient.invalidateQueries({ queryKey: characterQueryKeys.detail(server, className) });
+
+				if (data?.erionPoints) {
+					toast.success(`${data.erionPoints} points added to Astra Liberation.`);
+				}
 			},
 			onSettled: (): void => {},
 		});

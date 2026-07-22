@@ -38,7 +38,15 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 								characterId: true,
 								character: { select: { name: true, class: true, level: true } },
 								totalIncome: true,
-								bosses: { select: { name: true, difficulty: true, reset: true, dailyTotal: true } },
+								bosses: {
+									select: {
+										name: true,
+										difficulty: true,
+										reset: true,
+										dailyTotal: true,
+										partySize: true,
+									},
+								},
 							},
 						},
 					},
@@ -60,7 +68,9 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				continue;
 			}
 
-			const bosses = new Array(characterEntry.bosses.length);
+			type Boss = getEditBossListResponseBody['characters'][number]['bosses'][number];
+
+			const bosses: Boss[] = Array.from({ length: characterEntry.bosses.length });
 
 			for (let index = 0; index < characterEntry.bosses.length; index += 1) {
 				const boss = characterEntry.bosses[index];
@@ -70,6 +80,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					difficulty: boss.difficulty,
 					reset: boss.reset,
 					dailyTotal: boss.dailyTotal ?? 0,
+					partySize: boss.partySize,
 				};
 			}
 

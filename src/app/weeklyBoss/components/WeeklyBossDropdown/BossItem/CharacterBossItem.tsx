@@ -4,6 +4,7 @@ import Image from 'next/image';
 
 import BossCheckedIcon from '@assets/svg/check-boss.svg';
 import CircleBossIcon from '@assets/svg/circle-boss.svg';
+import PartyIcon from '@assets/svg/user-round.svg';
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import { getBossImage, getBossDifficultyValue } from '@data/bosses/bosses';
 
@@ -28,7 +29,10 @@ const CharacterBossItem = ({ boss, server, isSelected, onClick }: Props): JSX.El
 	};
 
 	const bossImg = getBossImage(boss.name);
-	const bossValue = getBossDifficultyValue(boss.name, boss.difficulty, server)?.toLocaleString('de-DE');
+	const partySize = boss.partySize;
+	const bossValue = Math.round(getBossDifficultyValue(boss.name, boss.difficulty, server) / partySize).toLocaleString(
+		'de-DE',
+	);
 
 	return (
 		<div
@@ -37,7 +41,8 @@ const CharacterBossItem = ({ boss, server, isSelected, onClick }: Props): JSX.El
 			onClick={onClick}
 			onKeyDown={handleKey}
 			role="option"
-			tabIndex={0}>
+			tabIndex={0}
+		>
 			<Image
 				className={styles.bossIcon}
 				alt={`${boss.difficulty} ${boss.name}`}
@@ -51,7 +56,16 @@ const CharacterBossItem = ({ boss, server, isSelected, onClick }: Props): JSX.El
 					{boss.difficulty} {boss.name}
 				</ResponsiveText>
 
-				<p className={styles.bossValue}>{bossValue}</p>
+				<div className={styles.bossValue}>
+					<span>{bossValue}</span>
+
+					{partySize > 1 && (
+						<div className={styles.partySplit}>
+							<PartyIcon className={styles.partyIcon} />
+							<span>{partySize}</span>
+						</div>
+					)}
+				</div>
 			</div>
 
 			<div className={styles.iconsDiv}>

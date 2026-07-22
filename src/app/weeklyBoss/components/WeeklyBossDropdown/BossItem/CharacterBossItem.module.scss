@@ -29,9 +29,22 @@ $iconSize: 40px;
 		}
 
 		.bossValue {
+			display: flex;
+			gap: 16px;
 			font-size: 24px;
 			font-weight: 400;
 			color: var(--default-button-text);
+
+			.partySplit {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+
+				.partyIcon {
+					width: 24px;
+					height: 24px;
+				}
+			}
 		}
 	}
 

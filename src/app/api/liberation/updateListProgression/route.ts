@@ -1,5 +1,5 @@
-import { GENESIS_MIN_LEVEL, DESTINY_MIN_LEVEL } from '@data/liberation/constant';
-import { resolveNextLiberationState } from '@data/liberation/liberationQuests';
+import { GENESIS_MIN_LEVEL, DESTINY_MIN_LEVEL, ASTRA_MIN_LEVEL } from '@data/liberation/constant';
+import { resolveNextLiberationState, resolveNextAstraState } from '@data/liberation/liberationQuests';
 import { updateLiberationCharacterRequestSchema } from '@features/liberation/schemas/liberation.request.schema';
 import { updateLiberationCharacterResponseSchema } from '@features/liberation/schemas/liberation.response.schema';
 import { prisma } from '@lib/prisma';
@@ -28,6 +28,9 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			currentGenesisPoints: requestedGenesisPoints,
 			currentDestinyQuest: requestedDestinyQuest,
 			currentDestinyPoints: requestedDestinyPoints,
+			currentAstraQuest: requestedAstraQuest,
+			currentAstraTracesPoints: requestedAstraTraces,
+			currentAstraVestigesPoints: requestedAstraVestiges,
 			genesisPass,
 			liberated,
 		} = parseResult.data;
@@ -38,9 +41,15 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				id: true,
 				currentGenesisQuest: true,
 				currentGenesisPoints: true,
+				liberated: true,
+
 				currentDestinyQuest: true,
 				currentDestinyPoints: true,
-				liberated: true,
+
+				currentAstraQuest: true,
+				currentAstraTracesPoints: true,
+				currentAstraVestigesPoints: true,
+
 				character: { select: { level: true } },
 			},
 		});
@@ -55,9 +64,15 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const genesisChanged =
 			existingLiberation.currentGenesisQuest !== requestedGenesisQuest ||
 			existingLiberation.currentGenesisPoints !== requestedGenesisPoints;
+
 		const destinyChanged =
 			existingLiberation.currentDestinyQuest !== requestedDestinyQuest ||
 			existingLiberation.currentDestinyPoints !== requestedDestinyPoints;
+
+		const astraChanged =
+			existingLiberation.currentAstraQuest !== requestedAstraQuest ||
+			existingLiberation.currentAstraTracesPoints !== requestedAstraTraces ||
+			existingLiberation.currentAstraVestigesPoints !== requestedAstraVestiges;
 
 		if (genesisChanged && characterLevel < GENESIS_MIN_LEVEL) {
 			logApiFailure('Update blocked: insufficient level for Genesis.', { route });
@@ -71,14 +86,29 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			return createResponse<ApiResponse>({ success: false, message: 'Update Failed.' }, 200);
 		}
 
+		if (astraChanged && (!existingLiberation.liberated || characterLevel < ASTRA_MIN_LEVEL)) {
+			logApiFailure('Update blocked: insufficient level for Astra.', { route });
+
+			return createResponse<ApiResponse>({ success: false, message: 'Update Failed.' }, 200);
+		}
+
 		let nextGenesisQuest = existingLiberation.currentGenesisQuest;
 		let nextGenesisPoints = existingLiberation.currentGenesisPoints;
-		let nextDestinyQuest = existingLiberation.currentDestinyQuest;
-		let nextDestinyPoints = existingLiberation.currentDestinyPoints;
 		let nextLiberated = liberated;
 
+		let nextDestinyQuest = existingLiberation.currentDestinyQuest;
+		let nextDestinyPoints = existingLiberation.currentDestinyPoints;
+
+		let nextAstraQuest = existingLiberation.currentAstraQuest;
+		let nextAstraTraces = existingLiberation.currentAstraTracesPoints;
+		let nextAstraVestiges = existingLiberation.currentAstraVestigesPoints;
+
 		if (genesisChanged) {
-			const resolvedGenesisState = resolveNextLiberationState('Genesis', requestedGenesisQuest, requestedGenesisPoints);
+			const resolvedGenesisState = resolveNextLiberationState(
+				'Genesis',
+				requestedGenesisQuest,
+				requestedGenesisPoints,
+			);
 
 			nextGenesisQuest = resolvedGenesisState.questName;
 			nextGenesisPoints = resolvedGenesisState.points;
@@ -97,21 +127,43 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		}
 
 		if (destinyChanged) {
-			const resolvedDestinyState = resolveNextLiberationState('Destiny', requestedDestinyQuest, requestedDestinyPoints);
+			const resolvedDestinyState = resolveNextLiberationState(
+				'Destiny',
+				requestedDestinyQuest,
+				requestedDestinyPoints,
+			);
 
 			nextDestinyQuest = resolvedDestinyState.questName;
 
 			nextDestinyPoints = resolvedDestinyState.points;
 		}
 
+		if (astraChanged) {
+			const resolvedAstraState = resolveNextAstraState(
+				requestedAstraQuest,
+				requestedAstraVestiges,
+				requestedAstraTraces,
+			);
+
+			nextAstraQuest = resolvedAstraState.questName;
+			nextAstraVestiges = resolvedAstraState.vestiges;
+			nextAstraTraces = resolvedAstraState.traces;
+		}
+
 		const responsePayload: updateLiberationCharacterResponseBody = {
 			characterId,
+
 			currentGenesisQuest: nextGenesisQuest,
 			currentGenesisPoints: nextGenesisPoints,
-			currentDestinyQuest: nextDestinyQuest,
-			currentDestinyPoints: nextDestinyPoints,
 			liberated: nextLiberated,
 			genesisPass,
+
+			currentDestinyQuest: nextDestinyQuest,
+			currentDestinyPoints: nextDestinyPoints,
+
+			currentAstraQuest: nextAstraQuest,
+			currentAstraTracesPoints: nextAstraTraces,
+			currentAstraVestigesPoints: nextAstraVestiges,
 		};
 
 		const validation = updateLiberationCharacterResponseSchema.safeParse(responsePayload);
@@ -125,10 +177,15 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			data: {
 				currentGenesisQuest: nextGenesisQuest,
 				currentGenesisPoints: nextGenesisPoints,
-				currentDestinyQuest: nextDestinyQuest,
-				currentDestinyPoints: nextDestinyPoints,
 				genesisPass,
 				liberated: nextLiberated,
+
+				currentDestinyQuest: nextDestinyQuest,
+				currentDestinyPoints: nextDestinyPoints,
+
+				currentAstraQuest: nextAstraQuest,
+				currentAstraTracesPoints: nextAstraTraces,
+				currentAstraVestigesPoints: nextAstraVestiges,
 			},
 		});
 

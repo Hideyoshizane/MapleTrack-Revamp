@@ -1,0 +1,196 @@
+[
+	{
+		"name": "Seren",
+		"img": "/assets/boss/seren.webp",
+		"maxPartySize": 6,
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"erion": 0,
+				"battle": 6
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"erion": 0,
+				"battle": 15
+			},
+			{
+				"name": "Extreme",
+				"reset": "Weekly",
+				"erion": 30,
+				"battle": 180
+			}
+		]
+	},
+	{
+		"name": "Kalos",
+		"img": "/assets/boss/kalos.webp",
+		"maxPartySize": 6,
+		"difficulties": [
+			{
+				"name": "Easy",
+				"reset": "Weekly",
+				"erion": 0,
+				"battle": 6
+			},
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"erion": 0,
+				"battle": 30
+			},
+			{
+				"name": "Chaos",
+				"reset": "Weekly",
+				"erion": 0,
+				"battle": 100
+			},
+			{
+				"name": "Extreme",
+				"reset": "Weekly",
+				"erion": 180,
+				"battle": 500
+			}
+		]
+	},
+	{
+		"name": "First Adversary",
+		"img": "/assets/boss/first_adversary.webp",
+		"maxPartySize": 3,
+		"difficulties": [
+			{
+				"name": "Easy",
+				"reset": "Weekly",
+				"erion": 0,
+				"battle": 10
+			},
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"erion": 0,
+				"battle": 40
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"erion": 30,
+				"battle": 180
+			},
+			{
+				"name": "Extreme",
+				"reset": "Weekly",
+				"erion": 240,
+				"battle": 540
+			}
+		]
+	},
+	{
+		"name": "Kaling",
+		"img": "/assets/boss/kaling.webp",
+		"maxPartySize": 6,
+		"difficulties": [
+			{
+				"name": "Easy",
+				"reset": "Weekly",
+				"erion": 0,
+				"battle": 20
+			},
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"erion": 0,
+				"battle": 80
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"erion": 60,
+				"battle": 240
+			},
+			{
+				"name": "Extreme",
+				"reset": "Weekly",
+				"erion": 480,
+				"battle": 1440
+			}
+		]
+	},
+	{
+		"name": "Malefic Star",
+		"img": "/assets/boss/malefic_star.webp",
+		"maxPartySize": 3,
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"erion": 0,
+				"battle": 60
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"erion": 90,
+				"battle": 240
+			}
+		]
+	},
+	{
+		"name": "Limbo",
+		"img": "/assets/boss/limbo.webp",
+		"maxPartySize": 3,
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"erion": 0,
+				"battle": 80
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"erion": 60,
+				"battle": 240
+			}
+		]
+	},
+	{
+		"name": "Baldrix",
+		"img": "/assets/boss/baldrix.webp",
+		"maxPartySize": 3,
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"erion": 0,
+				"battle": 80
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"erion": 120,
+				"battle": 240
+			}
+		]
+	},
+	{
+		"name": "Jupiter",
+		"img": "/assets/boss/jupiter.webp",
+		"maxPartySize": 3,
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"erion": 45,
+				"battle": 210
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"erion": 360,
+				"battle": 630
+			}
+		]
+	}
+]

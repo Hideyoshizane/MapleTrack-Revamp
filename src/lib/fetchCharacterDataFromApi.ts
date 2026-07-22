@@ -47,10 +47,12 @@ export const fetchCharacterDataFromApi = async (
 		return { characterImgURL: character.characterImgURL, level: character.level };
 	} catch (error: unknown) {
 		if (axios.isAxiosError(error)) {
+			const requestParams: unknown = error.config?.params;
+
 			console.error('Nexon API request failed', {
 				status: error.response?.status,
 				url: error.config?.url,
-				params: error.config?.params,
+				params: requestParams,
 			});
 
 			throw new Error(`External API failed: ${error.response?.status ?? 'unknown'}`, {

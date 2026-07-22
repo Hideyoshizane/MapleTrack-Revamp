@@ -34,7 +34,10 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		if (!user) {
 			logApiFailure('User not found for forgot password', { route: route, additional: { email } });
 
-			return createResponse<ApiResponse>({ success: true, message: 'If the email exists, we sent a reset link.' }, 200);
+			return createResponse<ApiResponse>(
+				{ success: true, message: 'If the email exists, we sent a reset link.' },
+				200,
+			);
 		}
 
 		const rawToken = crypto.randomBytes(32).toString('hex');
@@ -60,10 +63,14 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 				route,
 				additional: { error: emailError instanceof Error ? emailError.message : String(emailError) },
 			});
+
 			return createResponse<ApiResponse>({ success: false, message: 'Failed to send reset email' }, 500);
 		}
 
-		return createResponse<ApiResponse>({ success: true, message: 'If the email exists, we sent a reset link.' }, 200);
+		return createResponse<ApiResponse>(
+			{ success: true, message: 'If the email exists, we sent a reset link.' },
+			200,
+		);
 	} catch (error) {
 		logError(error, { route: route });
 

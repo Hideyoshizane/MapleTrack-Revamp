@@ -130,9 +130,22 @@ $iconSize: 32px;
 	outline: none;
 }
 
-.points {
-	font-family: Roboto, sans-serif;
-	font-size: 16px;
+.selectedDifficultyDiv {
+	display: flex;
+	align-items: center;
+	gap: 24px;
+
+	.selectedDifficultyItem {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		width: 48px;
+	}
+
+	.points {
+		font-family: Roboto, sans-serif;
+		font-size: 16px;
+	}
 }
 
 .bossItem {

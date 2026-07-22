@@ -17,8 +17,9 @@ type Props = {
 };
 
 const ResponsiveText = ({ children, width, height, className, maxFontSize, minFontSize }: Props): JSX.Element => {
-	const ref = useRef<HTMLParagraphElement>(null);
 	const [fontSize, setFontSize] = useState<number>(maxFontSize);
+
+	const ref = useRef<HTMLParagraphElement>(null);
 
 	useEffect((): void => {
 		if (!ref.current) {
@@ -51,7 +52,8 @@ const ResponsiveText = ({ children, width, height, className, maxFontSize, minFo
 					WebkitLineClamp: 2,
 					WebkitBoxOrient: 'vertical',
 					overflow: 'hidden',
-				}}>
+				}}
+			>
 				{children}
 			</p>
 		</div>

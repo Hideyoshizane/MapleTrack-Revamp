@@ -61,7 +61,12 @@ const BossButton = ({
 
 	return (
 		<Tooltip content={content} enabled={locked}>
-			<button className={clsx(styles.button, difficultyClass, sizeClass)} disabled={locked} onClick={onSelect}>
+			<button
+				className={clsx(styles.button, difficultyClass, sizeClass)}
+				disabled={locked}
+				onClick={onSelect}
+				type="button"
+			>
 				<div className={styles.content}>
 					{locked ? (
 						<BanIcon className={styles.banIcon} height={24} width={24} />
@@ -71,7 +76,8 @@ const BossButton = ({
 							height={40}
 							maxFontSize={minTextSize}
 							minFontSize={minTextSize}
-							width={widthSize}>
+							width={widthSize}
+						>
 							{difficulty.name}
 						</ResponsiveText>
 					)}

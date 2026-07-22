@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import Image from 'next/image';
 
 import { calculatePointsSchedule, formatUTC } from '@/app/liberation/lib/calculateSchedule';
+
 import Tooltip from '@components/Tooltip/Tooltip';
 
 import styles from './GenesisSchedule.module.scss';
@@ -46,6 +47,7 @@ const GenesisSchedule = ({
 
 	const multiplier = genesisPass ? 3 : 1;
 	const weeklyValue = weeklyMonthlyPoints.totalWeeklyPoints * multiplier;
+	const MonthlyValue = weeklyMonthlyPoints.totalMonthlyPoints * multiplier;
 
 	return (
 		<div className={styles.mainDiv}>
@@ -67,13 +69,28 @@ const GenesisSchedule = ({
 			</div>
 
 			<div className={styles.line}>
-				<p>Total Traces Needed:</p>
-				<p>{remainingTotalTraces > 0 ? remainingTotalTraces : 0}</p>
+				<p>This Week Remaining Traces:</p>
+				<p>{weeklyMonthlyPoints.thisWeekPoints}</p>
 			</div>
 
 			<div className={styles.line}>
 				<p>Weekly Traces:</p>
 				<p>{weeklyValue}</p>
+			</div>
+
+			<div className={styles.line}>
+				<p>This Month Remaining Traces:</p>
+				<p>{weeklyMonthlyPoints.thisMonthPoints}</p>
+			</div>
+
+			<div className={styles.line}>
+				<p>Monthly Traces:</p>
+				<p>{MonthlyValue}</p>
+			</div>
+
+			<div className={styles.line}>
+				<p>Total Traces Needed:</p>
+				<p>{remainingTotalTraces > 0 ? remainingTotalTraces : 0}</p>
 			</div>
 
 			<div className={styles.line}>
@@ -88,7 +105,11 @@ const GenesisSchedule = ({
 
 			<div className={styles.completeLine}>
 				<p>Completion Date:</p>
-				<p>{!Number.isFinite(totalSchedule.weeksRequired) ? 'Impossible' : formatUTC(totalSchedule.completionDate)}</p>
+				<p>
+					{!Number.isFinite(totalSchedule.weeksRequired)
+						? 'Impossible'
+						: formatUTC(totalSchedule.completionDate)}
+				</p>
 			</div>
 
 			<hr className={styles.lineBreak} />

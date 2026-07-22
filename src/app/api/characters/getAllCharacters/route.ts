@@ -39,7 +39,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			},
 		});
 
-		const formattedCharacters: getAllCharactersResponseBody[] = new Array(characters.length);
+		const formattedCharacters: getAllCharactersResponseBody[] = Array.from({ length: characters.length });
 
 		for (let characterIndex = 0; characterIndex < characters.length; characterIndex += 1) {
 			const character = characters[characterIndex];

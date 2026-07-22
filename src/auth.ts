@@ -9,8 +9,6 @@ import { verifyPassword, DUMMY_HASH } from '@lib/security/password';
 
 import { updateMissingSymbolsForCharacters } from './features/character/characterUpdate';
 
-import type { DefaultSession } from 'next-auth';
-
 type AppUser = {
 	id: string;
 	username: string;
@@ -31,14 +29,6 @@ type AppJWT = {
 	username: string;
 	version: number;
 	[key: string]: unknown;
-};
-
-type AppSession = DefaultSession & {
-	user: {
-		id: string;
-		username: string;
-		version: number;
-	} & DefaultSession['user'];
 };
 
 export const { auth, handlers } = NextAuth({
@@ -123,8 +113,13 @@ export const { auth, handlers } = NextAuth({
 
 			return {
 				...session,
-				user: { ...session.user, id: tokenData.id, username: tokenData.username, version: tokenData.version ?? 0 },
-			} as AppSession;
+				user: {
+					...session.user,
+					id: tokenData.id,
+					username: tokenData.username,
+					version: tokenData.version ?? 0,
+				},
+			};
 		},
 		redirect: ({ url, baseUrl }) => {
 			if (url.startsWith('/')) {

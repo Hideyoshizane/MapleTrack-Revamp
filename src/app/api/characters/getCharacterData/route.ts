@@ -42,6 +42,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				linkSkill: true,
 				bossing: true,
 				syncing: true,
+				lastSymbolDaily: true,
 				symbols: {
 					select: {
 						id: true,
@@ -63,7 +64,10 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			if (!classData) {
 				logApiFailure('Class name not found', { route });
 
-				return createResponse<ApiResponse>({ success: false, message: `Class with name ${className} not found` }, 404);
+				return createResponse<ApiResponse>(
+					{ success: false, message: `Class with name ${className} not found` },
+					404,
+				);
 			}
 
 			responseData = generateCharacterObjectCharacterPage({
@@ -73,34 +77,23 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				linkSkill: classData.linkSkill,
 			});
 		} else {
-			const normalizedSymbols = new Array(character.symbols.length);
+			const normalizedSymbols = character.symbols.map((symbol) => {
+				const normalizedContents = symbol.contents.map((content) => ({
+					contentType: content.contentType,
+					checked: content.checked,
+					cleared: content.cleared,
+					tries: content.tries ?? undefined,
+				}));
 
-			for (let symbolIndex = 0; symbolIndex < character.symbols.length; symbolIndex += 1) {
-				const symbol = character.symbols[symbolIndex];
-
-				const normalizedContents = new Array(symbol.contents.length);
-
-				for (let contentIndex = 0; contentIndex < symbol.contents.length; contentIndex += 1) {
-					const content = symbol.contents[contentIndex];
-
-					normalizedContents[contentIndex] = {
-						contentType: content.contentType,
-						checked: content.checked,
-						cleared: content.cleared,
-						tries: content.tries ?? undefined,
-					};
-				}
-
-				normalizedSymbols[symbolIndex] = {
+				return {
 					id: symbol.id,
 					name: symbol.name,
 					level: symbol.level,
 					exp: symbol.exp,
 					category: symbol.category,
-
 					contents: sortSymbolContents(symbol.name, normalizedContents),
 				};
-			}
+			});
 
 			const sortedSymbols = sortSymbolsByMinLevel(normalizedSymbols);
 
@@ -117,7 +110,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				linkSkill: character.linkSkill,
 				bossing: character.bossing,
 				syncing: character.syncing,
-
+				lastSymbolDaily: character.lastSymbolDaily,
 				symbols: groupedSymbols,
 			};
 

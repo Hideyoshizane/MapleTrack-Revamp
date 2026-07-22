@@ -1,7 +1,8 @@
 'use client';
 
 import { calculatePointsSchedule, formatUTC } from '@/app/liberation/lib/calculateSchedule';
-import { getCumulativeLiberationPoints } from '@data/liberation/liberationQuests';
+
+import { getCumulativeLiberationPoints, isFirstDestinyLiberation } from '@data/liberation/liberationQuests';
 
 import styles from './DestinySchedule.module.scss';
 
@@ -9,11 +10,9 @@ import type { WeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
 import type { JSX } from 'react';
 
 type Props = {
-	disableProgress: boolean;
 	selectedDate: Date;
 	weeklyMonthlyPoints: WeeklyMonthlyPoints;
 	selectedQuest: string | null;
-	determinationPoints: number;
 	remainingTotalDetermination: number;
 	remainingCurrentDetermination: number;
 };
@@ -21,11 +20,13 @@ type Props = {
 const DestinySchedule = ({
 	weeklyMonthlyPoints,
 	selectedDate,
+	selectedQuest,
 	remainingTotalDetermination,
 	remainingCurrentDetermination,
 }: Props): JSX.Element => {
 	const firstLiberationPoints = getCumulativeLiberationPoints('Destiny', 'Kaling', true);
 	const secondLiberationPoints = getCumulativeLiberationPoints('Destiny', 'Baldrix', true);
+	const isFirstLiberation = isFirstDestinyLiberation(selectedQuest ?? '');
 
 	const currentMissionSchedule = calculatePointsSchedule({
 		selectedDate: selectedDate,
@@ -33,11 +34,13 @@ const DestinySchedule = ({
 		weeklyMonthlyPoints,
 	});
 
-	const firstLiberationSchedule = calculatePointsSchedule({
-		selectedDate: selectedDate,
-		remainingTotalPoints: firstLiberationPoints,
-		weeklyMonthlyPoints,
-	});
+	const firstLiberationSchedule = isFirstLiberation
+		? calculatePointsSchedule({
+				selectedDate,
+				remainingTotalPoints: firstLiberationPoints,
+				weeklyMonthlyPoints,
+			})
+		: null;
 
 	const secondLiberationSchedule = calculatePointsSchedule({
 		selectedDate: selectedDate,
@@ -54,6 +57,16 @@ const DestinySchedule = ({
 			<div className={styles.line}>
 				<p>Start Date:</p>
 				<div>{formatUTC(selectedDate)}</div>
+			</div>
+
+			<div className={styles.line}>
+				<p>This Week Remaining Determination:</p>
+				<p>{weeklyMonthlyPoints.thisWeekPoints}</p>
+			</div>
+
+			<div className={styles.line}>
+				<p>Weekly Determination:</p>
+				<p>{weeklyMonthlyPoints.totalWeeklyPoints}</p>
 			</div>
 
 			<hr className={styles.lineBreak} />
@@ -77,26 +90,30 @@ const DestinySchedule = ({
 				</p>
 			</div>
 
-			<hr className={styles.lineBreak} />
+			{isFirstLiberation && firstLiberationSchedule && (
+				<>
+					<hr className={styles.lineBreak} />
 
-			<div className={styles.line}>
-				<p>First Liberation Determination Needed:</p>
-				<p>{firstLiberationPoints}</p>
-			</div>
+					<div className={styles.line}>
+						<p>First Liberation Determination Needed:</p>
+						<p>{firstLiberationPoints}</p>
+					</div>
 
-			<div className={styles.line}>
-				<p>Weeks to Complete First Liberation:</p>
-				<p>{firstLiberationSchedule.weeksRequired}</p>
-			</div>
+					<div className={styles.line}>
+						<p>Weeks to Complete First Liberation:</p>
+						<p>{firstLiberationSchedule.weeksRequired}</p>
+					</div>
 
-			<div className={styles.completeLine}>
-				<p>Completion Date:</p>
-				<p>
-					{!Number.isFinite(firstLiberationSchedule.weeksRequired)
-						? 'Impossible'
-						: formatUTC(firstLiberationSchedule.completionDate)}
-				</p>
-			</div>
+					<div className={styles.completeLine}>
+						<p>Completion Date:</p>
+						<p>
+							{!Number.isFinite(firstLiberationSchedule.weeksRequired)
+								? 'Impossible'
+								: formatUTC(firstLiberationSchedule.completionDate)}
+						</p>
+					</div>
+				</>
+			)}
 
 			<hr className={styles.lineBreak} />
 

@@ -26,6 +26,7 @@ type Props = {
 
 const CharacterHeader = ({ character, extraData, router, onIncreaseAll }: Props): JSX.Element => {
 	const pathname = usePathname();
+
 	const characterImage = character.syncing ? (
 		extraData ? (
 			<Image
@@ -48,7 +49,8 @@ const CharacterHeader = ({ character, extraData, router, onIncreaseAll }: Props)
 					className={styles.increaseAllButton}
 					onClick={(): void => {
 						onIncreaseAll();
-					}}>
+					}}
+				>
 					Increase All
 				</Button>
 				<Button className={styles.editCharacterButton} onClick={(): void => router.push(`${pathname}/edit`)}>

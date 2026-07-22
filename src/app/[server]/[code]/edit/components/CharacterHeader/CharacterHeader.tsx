@@ -1,5 +1,6 @@
 'use client';
 import { useRouter, usePathname } from 'next/navigation';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 
 import Button from '@components/Button/Button';
@@ -17,20 +18,17 @@ type Props = {
 	character?: getEditCharacterDataResponseBody;
 	server: string;
 	nameError: string | null;
-	submitLoading: boolean;
-	setSubmitLoading: (value: boolean) => void;
-	onDiscard: () => void;
 };
-export const CharacterHeader = ({
-	character,
-	server,
-	nameError,
-	submitLoading,
-	setSubmitLoading,
-	onDiscard,
-}: Props): JSX.Element => {
+
+export const CharacterHeader = ({ character, server, nameError }: Props): JSX.Element => {
+	const [submitLoading, setSubmitLoading] = useState(false);
+
 	const router = useRouter();
 	const pathname = usePathname();
+
+	const handleDiscard = (): void => {
+		router.push(pathname.replace(/\/edit$/, ''));
+	};
 
 	const onSubmit = async (): Promise<void> => {
 		if (!character) {
@@ -58,7 +56,7 @@ export const CharacterHeader = ({
 
 	return (
 		<div className={styles.buttonLine}>
-			<Button className={styles.discardButton} onClick={onDiscard}>
+			<Button className={styles.discardButton} onClick={handleDiscard}>
 				Discard Changes
 			</Button>
 			<Tooltip content="Please input a valid character name." enabled={Boolean(nameError)} placement="bottom">
@@ -71,7 +69,8 @@ export const CharacterHeader = ({
 					loaderSize={16}
 					onClick={(): void => {
 						void onSubmit();
-					}}>
+					}}
+				>
 					Save Changes
 				</Button>
 			</Tooltip>

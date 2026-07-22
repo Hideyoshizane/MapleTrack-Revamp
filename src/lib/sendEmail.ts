@@ -24,6 +24,7 @@ export const sendEmail = async ({ to, subject, text, html }: SendEmailParams): P
 			text,
 			html,
 		});
+
 		return info;
 	} catch (error) {
 		console.error('Failed to send email:', error);

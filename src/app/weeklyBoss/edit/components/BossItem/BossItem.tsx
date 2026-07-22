@@ -1,6 +1,5 @@
 'use client';
 
-import NumberFlow from '@number-flow/react';
 import { clsx } from 'clsx';
 import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
@@ -18,6 +17,7 @@ import {
 import BossButton from '../BossButton/BossButton';
 import BossDropdownButton from '../BossDropdownButton/BossDropdownButton';
 
+import BossGoldPartySelectComponent from './BossGoldPartySelectComponent/BossGoldPartySelectComponent';
 import styles from './BossItem.module.scss';
 
 import type { BossName, BossDifficultyName, BossReset, Boss } from '@data/bosses/bosses';
@@ -34,6 +34,7 @@ type BossItemProps = {
 		difficulty: BossDifficultyName,
 		server: string,
 		reset: BossReset,
+		partySize: number,
 		dailyTotal?: number,
 	) => void;
 };
@@ -47,6 +48,8 @@ const BossItem = ({
 }: BossItemProps): JSX.Element => {
 	const isSmallButtons = boss.difficulties.length > 3;
 	const gapClass = isSmallButtons ? styles.smallGap : styles.largeGap;
+
+	const [partySize, setPartySize] = useState(1);
 
 	const selectionMap = new Map<string, getEditBossListBossResponseBody>();
 	for (const b of selectedBosses) {
@@ -87,11 +90,23 @@ const BossItem = ({
 		return total;
 	})();
 
+	const selectedBoss = selectedBosses.find((bossSelection) => {
+		const parsedBoss = parseBossName(boss.name);
+		const parsedDifficulty = parseBossDifficultyName(bossSelection.difficulty);
+
+		if (!parsedBoss || !parsedDifficulty) {
+			return false;
+		}
+
+		return isValidBossDifficulty(parsedBoss, parsedDifficulty);
+	});
+
 	const handleBossUpdate = (
 		serverCookie: string,
 		bossName: BossName,
 		difficulty: BossDifficultyName,
 		reset: BossReset,
+		partySize: number,
 		dailyTotal?: number,
 	): void => {
 		const parsedBoss = parseBossName(bossName);
@@ -101,10 +116,12 @@ const BossItem = ({
 			return;
 		}
 
-		onBossUpdate(parsedBoss, parsedDifficulty, serverCookie, reset, dailyTotal);
+		onBossUpdate(parsedBoss, parsedDifficulty, serverCookie, reset, partySize, dailyTotal);
 	};
 
-	const anySelected = boss.difficulties.some((d) => !!getSelection(d.name, d.reset));
+	const anySelected = boss.difficulties.some((difficulty) =>
+		Boolean(getSelection(difficulty.name, difficulty.reset)),
+	);
 
 	// Animation
 	const [parentWidthExpanded, setParentWidthExpanded] = useState(false);
@@ -143,18 +160,25 @@ const BossItem = ({
 				className={styles.bossSlotBody}
 				animate={{ width: parentWidthExpanded ? 720 : 576 }}
 				layout
-				transition={{ duration: 0.2, ease: 'easeInOut' }}>
+				transition={{ duration: 0.2, ease: 'easeInOut' }}
+			>
 				<div className={styles.bossSlotContent}>
 					<Image
 						className={styles.bossIcon}
 						alt={`${boss.name} portrait`}
 						height={64}
 						priority
-						src={getBossImage(boss.name as BossName)}
+						src={getBossImage(boss.name)}
 						width={64}
 					/>
 
-					<ResponsiveText className={styles.bossName} height={52} maxFontSize={28} minFontSize={20} width={120}>
+					<ResponsiveText
+						className={styles.bossName}
+						height={52}
+						maxFontSize={28}
+						minFontSize={20}
+						width={120}
+					>
 						{boss.name}
 					</ResponsiveText>
 
@@ -171,7 +195,14 @@ const BossItem = ({
 										key={difficulty.name}
 										locked={selectedCharacterLevel < difficulty.minLevel}
 										onSelectDifficulty={(diff, multiplier) => {
-											handleBossUpdate(serverCookie, boss.name, diff.name, 'Daily', multiplier);
+											handleBossUpdate(
+												serverCookie,
+												boss.name,
+												diff.name,
+												'Daily',
+												partySize,
+												multiplier,
+											);
 										}}
 										selected={isSelected}
 										value={selection?.dailyTotal ?? 0}
@@ -186,7 +217,13 @@ const BossItem = ({
 									isSmallButtons={isSmallButtons}
 									key={difficulty.name}
 									onSelect={() => {
-										handleBossUpdate(serverCookie, boss.name, difficulty.name, difficulty.reset);
+										handleBossUpdate(
+											serverCookie,
+											boss.name,
+											difficulty.name,
+											difficulty.reset,
+											partySize,
+										);
 									}}
 									selected={isSelected}
 								/>
@@ -208,15 +245,31 @@ const BossItem = ({
 										setClosing(false);
 									}
 								}}
-								transition={{ duration: 0.2 }}>
-								<NumberFlow
-									className={styles.goldText}
-									onAnimationsFinish={() => {
-										if (closing) {
-											setGoldOpacity(0);
-										}
+								transition={{ duration: 0.2 }}
+							>
+								<BossGoldPartySelectComponent
+									closing={closing}
+									maxPartySize={boss.maxPartySize}
+									onClosingAnimationFinish={() => {
+										setGoldOpacity(0);
 									}}
-									transformTiming={{ duration: 200 }}
+									onSelectPartySize={(newPartySize) => {
+										setPartySize(newPartySize);
+
+										if (!selectedBoss) {
+											return;
+										}
+
+										handleBossUpdate(
+											serverCookie,
+											boss.name,
+											selectedBoss.difficulty,
+											selectedBoss.reset,
+											newPartySize,
+											selectedBoss.dailyTotal,
+										);
+									}}
+									partySize={partySize}
 									value={numberFlowValue}
 								/>
 							</m.div>

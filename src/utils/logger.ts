@@ -32,11 +32,7 @@ const serializeError = (error: Error): SerializableError => {
 		stack: error.stack,
 		cause:
 			error.cause instanceof Error
-				? {
-						name: error.cause.name,
-						message: error.cause.message,
-						stack: error.cause.stack,
-					}
+				? { name: error.cause.name, message: error.cause.message, stack: error.cause.stack }
 				: error.cause,
 	};
 };

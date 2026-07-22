@@ -66,8 +66,7 @@ const createSymbolTemplates = (includeGrand: boolean): ReturnSymbolTemplate => {
 const createSymbolsWithIds = (includeGrand: boolean): ReturnSymbolWithId => {
 	const templates = createSymbolTemplates(includeGrand);
 
-	const withId = (t: SymbolTemplate): getCharacterDataSymbolsResponseBody =>
-		({ id: '', ...t }) as getCharacterDataSymbolsResponseBody;
+	const withId = (t: SymbolTemplate): getCharacterDataSymbolsResponseBody => ({ id: '', ...t });
 
 	return {
 		arcane: templates.arcane.map(withId),
@@ -94,6 +93,7 @@ export const generateCharacterObjectHomePage = (options: GenerateCharacterOption
 		jobType: options.jobType,
 		legion: options.legion,
 		linkSkill: options.linkSkill,
+		lastSymbolDaily: null,
 		bossing: false,
 		symbols: { arcane: templates.arcane, sacred: templates.sacred, grand: [] },
 	} as getAllCharactersResponseBody;
@@ -109,6 +109,7 @@ export function generateCharacterObjectCharacterPage(options: GenerateCharacterO
 		jobType: options.jobType,
 		legion: options.legion,
 		linkSkill: options.linkSkill,
+		lastSymbolDaily: null,
 		bossing: false,
 		syncing: false,
 		symbols: createSymbolsWithIds(true),
@@ -130,6 +131,7 @@ export function generateCharacterObjectEditCharacterPage(
 		bossing: false,
 		syncing: false,
 		symbols: createSymbolsWithIds(true),
+		lastSymbolDaily: null,
 	};
 }
 

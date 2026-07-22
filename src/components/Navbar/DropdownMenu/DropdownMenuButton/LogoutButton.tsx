@@ -28,7 +28,8 @@ const LogoutButton = (): JSX.Element => {
 		<DropdownMenu.Item
 			className={styles.dropdownItem}
 			aria-label="Logout"
-			onSelect={(): undefined => void handleLogout()}>
+			onSelect={(): undefined => void handleLogout()}
+		>
 			<LogOutIcon className={styles.icon} height={DROPDOWN_ICON_SIZE} width={DROPDOWN_ICON_SIZE} />
 
 			<span className={styles.text}>Logout</span>

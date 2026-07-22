@@ -9,7 +9,7 @@ type Classes = {
 	jobType: string;
 };
 
-export const JobClasses: Classes[] = classesJson as Classes[];
+export const JobClasses: Classes[] = classesJson;
 
 export const LINK_SKILL = JobClasses.map((classes): string => classes.linkSkill) as readonly string[];
 export const LEGION_TYPE = JobClasses.map((classes): string => classes.legionType) as readonly string[];
@@ -20,9 +20,7 @@ const jobClassesByName: ReadonlyMap<string, Classes> = new Map(
 	JobClasses.map((jobClass): [string, Classes] => [jobClass.className, jobClass]),
 );
 
-export const getClassByName = (className: string): Classes | null => {
-	return jobClassesByName.get(className) ?? null;
-};
+export const getClassByName = (className: string): Classes | null => jobClassesByName.get(className) ?? null;
 
 export const generateClassCode = (className: string): string => {
 	return className
@@ -37,9 +35,7 @@ const classCodeToNameMap: ReadonlyMap<string, string> = new Map(
 	JobClasses.map((jobClass): [string, string] => [generateClassCode(jobClass.className), jobClass.className]),
 );
 
-export const getClassNameByCode = (code: string): string | null => {
-	return classCodeToNameMap.get(code) ?? null;
-};
+export const getClassNameByCode = (code: string): string | null => classCodeToNameMap.get(code) ?? null;
 
 const options = {
 	keys: ['className'],

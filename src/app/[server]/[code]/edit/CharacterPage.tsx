@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { useRouter, usePathname, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 import ErrorPage from '@components/ErrorPage/ErrorPage';
@@ -28,9 +28,6 @@ type Props = {
 };
 
 const CharacterPage = ({ server, code }: Props): JSX.Element => {
-	const router = useRouter();
-	const pathname = usePathname();
-
 	const isServerValid = isValidServerName(server);
 
 	const className = getClassNameByCode(code);
@@ -40,10 +37,9 @@ const CharacterPage = ({ server, code }: Props): JSX.Element => {
 
 	const [committedName, setCommittedName] = useState<string>();
 	const [syncEnabled, setSyncEnabled] = useState(false);
-	const [firstLoad, setFirstLoad] = useState(true);
 
 	const { character, updateCharacter, loading, CharacterDataFromAPI, CharacterDataFromAPIFailed } =
-		useCharacterPageData({ server, className, nameOverride: committedName, syncEnabled, setFirstLoad });
+		useCharacterPageData({ server, className, nameOverride: committedName, syncEnabled });
 
 	useEffect(() => {
 		if (character?.syncing && !syncEnabled) {
@@ -62,9 +58,9 @@ const CharacterPage = ({ server, code }: Props): JSX.Element => {
 		handleLevelBlur,
 		handleTargetLevelBlur,
 		toggleSync,
-	} = useCharacterInputs({ character, updateCharacter, setSyncEnabled });
+	} = useCharacterInputs({ character, updateCharacterAction: updateCharacter, setSyncEnabledAction: setSyncEnabled });
 
-	if (loading && firstLoad) {
+	if (loading && !character) {
 		return (
 			<section className="mainContent">
 				<FullPageLoader />
@@ -101,14 +97,7 @@ const CharacterPage = ({ server, code }: Props): JSX.Element => {
 				/>
 
 				<div className={styles.characterContent}>
-					<CharacterHeader
-						character={character}
-						nameError={nameError}
-						onDiscard={(): void => router.push(pathname.replace(/\/edit$/, ''))}
-						server={server}
-						setSubmitLoading={(): void => {}}
-						submitLoading={false}
-					/>
+					<CharacterHeader character={character} nameError={nameError} server={server} />
 
 					<div className={styles.usernameLine}>
 						<CharacterImageAndSync
@@ -116,7 +105,7 @@ const CharacterPage = ({ server, code }: Props): JSX.Element => {
 							CharacterDataFromAPI={CharacterDataFromAPI}
 							CharacterDataFromAPIFailed={CharacterDataFromAPIFailed}
 							syncEnabled={syncEnabled}
-							toggleSync={toggleSync}
+							toggleSyncAction={toggleSync}
 						/>
 						<ValidatedInput
 							error={nameError}

@@ -28,7 +28,9 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			where: { userId: authenticatedUserId },
 			select: {
 				id: true,
-				servers: { select: { id: true, serverName: true, characters: { select: { id: true, characterId: true } } } },
+				servers: {
+					select: { id: true, serverName: true, characters: { select: { id: true, characterId: true } } },
+				},
 			},
 		});
 		if (!existingBossList) {
@@ -67,10 +69,12 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 				const existingBosses = await tx.boss.findMany({
 					where: { characterId: existingCharacter.id },
-					select: { id: true, name: true, difficulty: true, reset: true, dailyTotal: true },
+					select: { id: true, name: true, difficulty: true, reset: true, dailyTotal: true, partySize: true },
 				});
 
-				const existingBossMap = new Map(existingBosses.map((boss): [string, typeof boss] => [getBossKey(boss), boss]));
+				const existingBossMap = new Map(
+					existingBosses.map((boss): [string, typeof boss] => [getBossKey(boss), boss]),
+				);
 
 				const incomingBossMap = new Map(
 					incomingCharacter.bosses.map((boss): [string, typeof boss] => [getBossKey(boss), boss]),
@@ -79,7 +83,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				const bossIdsToDelete: string[] = [];
 				const bossesToCreate: Prisma.BossCreateManyInput[] = [];
 
-				const bossesToUpdate: { id: string; reset: BossReset; dailyTotal: number }[] = [];
+				const bossesToUpdate: { id: string; reset: BossReset; dailyTotal: number; partySize: number }[] = [];
 
 				for (const existingBoss of existingBosses) {
 					const bossKey = getBossKey(existingBoss);
@@ -100,6 +104,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 							difficulty: incomingBoss.difficulty,
 							reset: incomingBoss.reset,
 							dailyTotal: incomingBoss.dailyTotal,
+							partySize: incomingBoss.partySize,
 							characterId: existingCharacter.id,
 						});
 
@@ -107,13 +112,20 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					}
 
 					const hasChanged =
-						existingBoss.reset !== incomingBoss.reset || existingBoss.dailyTotal !== incomingBoss.dailyTotal;
+						existingBoss.reset !== incomingBoss.reset ||
+						existingBoss.dailyTotal !== incomingBoss.dailyTotal ||
+						existingBoss.partySize !== incomingBoss.partySize;
 
 					if (!hasChanged) {
 						continue;
 					}
 
-					bossesToUpdate.push({ id: existingBoss.id, reset: incomingBoss.reset, dailyTotal: incomingBoss.dailyTotal });
+					bossesToUpdate.push({
+						id: existingBoss.id,
+						reset: incomingBoss.reset,
+						dailyTotal: incomingBoss.dailyTotal,
+						partySize: incomingBoss.partySize,
+					});
 				}
 
 				if (bossIdsToDelete.length > 0) {
@@ -128,7 +140,11 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					transactionPromises.push(
 						tx.boss.update({
 							where: { id: bossToUpdate.id },
-							data: { reset: bossToUpdate.reset, dailyTotal: bossToUpdate.dailyTotal },
+							data: {
+								reset: bossToUpdate.reset,
+								dailyTotal: bossToUpdate.dailyTotal,
+								partySize: bossToUpdate.partySize,
+							},
 						}),
 					);
 				}

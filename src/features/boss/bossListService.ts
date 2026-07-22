@@ -87,6 +87,9 @@ export const characterToBossList = async (
 			liberated: false,
 			currentDestinyQuest: 'Seren',
 			currentDestinyPoints: 0,
+			currentAstraQuest: 'First',
+			currentAstraVestigesPoints: 0,
+			currentAstraTracesPoints: 0,
 		},
 	});
 
@@ -105,7 +108,10 @@ export const resetBossList = async (authenticatedUserId: string): Promise<void> 
 					weeklyBosses: true,
 					totalGains: true,
 					characters: {
-						select: { characterId: true, bosses: { select: { id: true, reset: true, cleared: true, locked: true } } },
+						select: {
+							characterId: true,
+							bosses: { select: { id: true, reset: true, cleared: true, locked: true } },
+						},
 					},
 				},
 			},
@@ -151,7 +157,8 @@ export const resetBossList = async (authenticatedUserId: string): Promise<void> 
 						}
 					}
 
-					const hasStateChanged = nextCleared !== (boss.cleared ?? false) || nextLocked !== (boss.locked ?? false);
+					const hasStateChanged =
+						nextCleared !== (boss.cleared ?? false) || nextLocked !== (boss.locked ?? false);
 
 					if (!hasStateChanged) {
 						continue;

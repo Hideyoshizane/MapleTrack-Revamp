@@ -14,7 +14,7 @@ type SerializedCharacter = string;
 
 type useLiberationSyncPayloadParams = {
 	liberationList: getLiberationListResponseBody | null;
-	onServerSync: (updatedCharacter: updateLiberationCharacterResponseBody) => void;
+	onServerSyncAction: (updatedCharacter: updateLiberationCharacterResponseBody) => void;
 };
 
 type useLiberationSyncPayloadReturn = {
@@ -24,7 +24,7 @@ type useLiberationSyncPayloadReturn = {
 
 export const useLiberationSyncPayload = ({
 	liberationList,
-	onServerSync,
+	onServerSyncAction,
 }: useLiberationSyncPayloadParams): useLiberationSyncPayloadReturn => {
 	const debounceMs = 1500;
 
@@ -36,29 +36,51 @@ export const useLiberationSyncPayload = ({
 	const pendingCharacterIdRef = useRef<string | null>(null);
 
 	const liberationListRef = useRef(liberationList);
-	const onServerSyncRef = useRef(onServerSync);
+	const onServerSyncRef = useRef(onServerSyncAction);
 
 	useEffect(() => {
 		liberationListRef.current = liberationList;
 	}, [liberationList]);
 
 	useEffect(() => {
-		onServerSyncRef.current = onServerSync;
-	}, [onServerSync]);
+		onServerSyncRef.current = onServerSyncAction;
+	}, [onServerSyncAction]);
 
-	const serializeCharacter = (character: getLiberationListResponseBody['characters'][number]): SerializedCharacter => {
+	const serializeCharacter = (
+		character: getLiberationListResponseBody['characters'][number],
+	): SerializedCharacter => {
 		return JSON.stringify({
 			currentGenesisQuest: character.currentGenesisQuest,
 			currentGenesisPoints: character.currentGenesisPoints,
+
 			genesisPass: character.genesisPass,
 			liberated: character.liberated,
+
 			currentDestinyQuest: character.currentDestinyQuest,
 			currentDestinyPoints: character.currentDestinyPoints,
+
+			currentAstraQuest: character.currentAstraQuest,
+			currentAstraTraces: character.currentAstraTracesPoints,
+			currentAstraVestiges: character.currentAstraVestigesPoints,
 		});
 	};
 
-	const isValidDestinyState = (character: getLiberationListResponseBody['characters'][number]): boolean =>
-		!!character && !!character.currentDestinyQuest && character.currentDestinyPoints >= 0;
+	const isValidLiberationState = (character: getLiberationListResponseBody['characters'][number]): boolean => {
+		if (!character) {
+			return false;
+		}
+
+		const hasValidGenesis = !!character.currentGenesisQuest && character.currentGenesisPoints >= 0;
+
+		const hasValidDestiny = !!character.currentDestinyQuest && character.currentDestinyPoints >= 0;
+
+		const hasValidAstra =
+			!!character.currentAstraQuest &&
+			character.currentAstraTracesPoints >= 0 &&
+			character.currentAstraVestigesPoints >= 0;
+
+		return hasValidGenesis && hasValidDestiny && hasValidAstra;
+	};
 
 	// Initialize cache on mount
 	useEffect(() => {
@@ -125,20 +147,26 @@ export const useLiberationSyncPayload = ({
 				setIsSyncing(true);
 
 				try {
-					if (!isValidDestinyState(latestCharacter)) {
-						toast.error('Invalid Destiny state blocked from sync');
+					if (!isValidLiberationState(latestCharacter)) {
+						toast.error('Invalid liberation state blocked from sync');
 
 						return;
 					}
 
 					const response = await liberationApi.updateListProgression({
 						characterId: latestCharacter.characterId,
+
 						currentGenesisQuest: latestCharacter.currentGenesisQuest,
 						currentGenesisPoints: latestCharacter.currentGenesisPoints,
 						genesisPass: latestCharacter.genesisPass,
 						liberated: latestCharacter.liberated,
+
 						currentDestinyQuest: latestCharacter.currentDestinyQuest,
 						currentDestinyPoints: latestCharacter.currentDestinyPoints,
+
+						currentAstraQuest: latestCharacter.currentAstraQuest,
+						currentAstraVestigesPoints: latestCharacter.currentAstraVestigesPoints,
+						currentAstraTracesPoints: latestCharacter.currentAstraTracesPoints,
 					});
 
 					if (response.success && response.data) {

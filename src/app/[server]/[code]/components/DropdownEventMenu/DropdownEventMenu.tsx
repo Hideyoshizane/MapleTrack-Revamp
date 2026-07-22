@@ -32,14 +32,20 @@ const DropdownEventMenu = (): JSX.Element => {
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
-				<button className={styles.menuOpener}>
+				<button className={styles.menuOpener} type="button">
 					Event Bonus
 					<MenuIcon className={styles.icon} height={ICON_SIZE} width={ICON_SIZE} />
 				</button>
 			</DropdownMenu.Trigger>
 
 			<DropdownMenu.Portal>
-				<DropdownMenu.Content className={styles.dropdownContent} align="center" forceMount side="bottom" sideOffset={5}>
+				<DropdownMenu.Content
+					className={styles.dropdownContent}
+					align="center"
+					forceMount
+					side="bottom"
+					sideOffset={5}
+				>
 					<div className={styles.gridContainer}>
 						<div className={`${styles.header} ${styles.leftColumn}`}>
 							<ArcaneIcon height={SYMBOL_SIZE} width={SYMBOL_SIZE} />
@@ -53,7 +59,9 @@ const DropdownEventMenu = (): JSX.Element => {
 						{rows.map(
 							(value): JSX.Element => (
 								<React.Fragment key={value}>
-									<div className={styles.leftColumn}>{renderBonusItem(value, arcaneBonus, setArcaneBonus)}</div>
+									<div className={styles.leftColumn}>
+										{renderBonusItem(value, arcaneBonus, setArcaneBonus)}
+									</div>
 									<div>{renderBonusItem(value, sacredBonus, setSacredBonus)}</div>
 								</React.Fragment>
 							),

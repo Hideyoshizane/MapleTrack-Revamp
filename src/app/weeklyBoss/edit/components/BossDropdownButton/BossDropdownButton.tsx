@@ -67,7 +67,7 @@ const BossDropdownButton = ({
 	if (locked) {
 		return (
 			<Tooltip content={tooltipContent} enabled={true}>
-				<button className={clsx(styles.menuOpener, difficultyClass, sizeClass)} disabled>
+				<button className={clsx(styles.menuOpener, difficultyClass, sizeClass)} disabled type="button">
 					<BanIcon className={styles.banIcon} height={24} width={24} />
 				</button>
 			</Tooltip>
@@ -77,13 +77,19 @@ const BossDropdownButton = ({
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
-				<button className={clsx(styles.menuOpener, difficultyClass, sizeClass)}>
+				<button className={clsx(styles.menuOpener, difficultyClass, sizeClass)} type="button">
 					{difficulty.name} {value}x
 				</button>
 			</DropdownMenu.Trigger>
 
 			<DropdownMenu.Portal>
-				<DropdownMenu.Content className={styles.dropdownContent} align="center" forceMount side="bottom" sideOffset={5}>
+				<DropdownMenu.Content
+					className={styles.dropdownContent}
+					align="center"
+					forceMount
+					side="bottom"
+					sideOffset={5}
+				>
 					<div className={styles.gridContainer}>
 						{rows.map((multiplier): JSX.Element => renderBossValueItem(multiplier))}
 					</div>

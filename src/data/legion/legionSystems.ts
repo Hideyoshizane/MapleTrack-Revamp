@@ -22,7 +22,7 @@ const DEFAULT_THRESHOLDS = [60, 100, 140, 200, 250] as const;
 
 const legionByName: Readonly<Record<string, LegionBonus>> = Object.fromEntries(
 	legionList.map((entry): [string, LegionBonus] => [entry.name, entry]),
-) as Readonly<Record<string, LegionBonus>>;
+);
 
 export const getLegionData = (name: string): LegionBonus | undefined => legionByName[name];
 

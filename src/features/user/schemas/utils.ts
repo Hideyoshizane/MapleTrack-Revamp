@@ -16,10 +16,6 @@ export const canonicalizeUsername = (value: string): string => {
 		.toLowerCase();
 };
 
-export const canonicalizeEmail = (value: string): string => {
-	return sanitizeInput(value).toLowerCase();
-};
+export const canonicalizeEmail = (value: string): string => sanitizeInput(value).toLowerCase();
 
-export const isReservedUsername = (value: string): boolean => {
-	return RESERVED_SET.has(value.toLowerCase());
-};
+export const isReservedUsername = (value: string): boolean => RESERVED_SET.has(value.toLowerCase());

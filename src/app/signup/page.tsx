@@ -59,7 +59,10 @@ const SignupPage = (): JSX.Element => {
 					id="confirmPassword"
 					label="Confirm Password"
 					type="password"
-					validators={[zodValidator(passwordFieldSchema), confirmPasswordValidator(() => getValues('password'))]}
+					validators={[
+						zodValidator(passwordFieldSchema),
+						confirmPasswordValidator(() => getValues('password')),
+					]}
 					{...commonInputProps}
 				/>
 
@@ -72,7 +75,8 @@ const SignupPage = (): JSX.Element => {
 					loaderColor="#121212"
 					loaderSize={16}
 					loadingText="Submitting..."
-					type="submit">
+					type="submit"
+				>
 					Sign Up
 				</Button>
 			</form>

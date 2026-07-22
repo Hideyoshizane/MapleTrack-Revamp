@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { auth } from '@/auth';
+
 import { LASTVERSION } from '@data/user/constants';
 import { isPublicPath } from '@lib/config/access';
 

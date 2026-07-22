@@ -16,6 +16,7 @@ const AlertDialogComponent = ({ open, onOpenChange, onConfirm }: Props): JSX.Ele
 	const handleConfirm = async (): Promise<void> => {
 		try {
 			await onConfirm();
+
 			onOpenChange(false);
 		} catch (error) {
 			console.error('Error on confirm:', error);
@@ -30,13 +31,15 @@ const AlertDialogComponent = ({ open, onOpenChange, onConfirm }: Props): JSX.Ele
 					<AlertDialog.Title className={styles.title}>Are you absolutely sure?</AlertDialog.Title>
 
 					<AlertDialog.Description className={styles.description}>
-						This action cannot be undone. This will permanently delete your account and remove your data from our
-						servers.
+						This action cannot be undone. This will permanently delete your account and remove your data
+						from our servers.
 					</AlertDialog.Description>
 
 					<div className={styles.buttonDiv}>
 						<AlertDialog.Cancel asChild>
-							<button className={styles.cancelButton}>Cancel</button>
+							<button className={styles.cancelButton} type="button">
+								Cancel
+							</button>
 						</AlertDialog.Cancel>
 
 						{/* Confirm button */}
@@ -45,7 +48,9 @@ const AlertDialogComponent = ({ open, onOpenChange, onConfirm }: Props): JSX.Ele
 								className={styles.dangerButton}
 								onClick={(): void => {
 									void handleConfirm();
-								}}>
+								}}
+								type="button"
+							>
 								Yes, delete account
 							</button>
 						</AlertDialog.Action>

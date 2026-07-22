@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { CHARACTER_MAX_LEVEL, DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 import { JOB_CLASSES, LINK_SKILL, JOB_TYPE, LEGION_TYPE } from '@data/classes/classes';
+import { ASTRA_DAILY_AREAS } from '@data/liberation/astraDaily';
 
 import {
 	characterNameRawSchema,
@@ -56,7 +57,7 @@ const getCharacterContentSchema = z
 export const getCharacterDataSymbolsResponseSchema = z
 	.object({
 		id: symbolIdRawSchema,
-		name: z.enum(symbolNames as unknown as [string, ...string[]]),
+		name: z.enum(symbolNames),
 		level: z.number().min(1),
 		exp: z.number().min(0),
 		category: symbolCategoriesSchema,
@@ -79,6 +80,8 @@ export const getCharacterDataResponseSchema = z
 		jobType: z.enum(JOB_TYPE),
 		legion: z.enum(LEGION_TYPE),
 		linkSkill: z.enum(LINK_SKILL),
+
+		lastSymbolDaily: z.enum(ASTRA_DAILY_AREAS).nullable(),
 
 		symbols: z.object({
 			arcane: z.array(getCharacterDataSymbolsResponseSchema),
@@ -130,6 +133,8 @@ export const getEditCharacterDataResponseSchema = z
 		legion: z.enum(LEGION_TYPE),
 		linkSkill: z.enum(LINK_SKILL),
 
+		lastSymbolDaily: z.enum(ASTRA_DAILY_AREAS).nullable(),
+
 		symbols: z.object({
 			arcane: z.array(getEditCharacterDataSymbolsResponseSchema),
 			sacred: z.array(getEditCharacterDataSymbolsResponseSchema),
@@ -158,6 +163,7 @@ export const updateCharacterDailyResponseSchema = z
 		id: symbolIdRawSchema,
 		currentExp: z.number().min(0),
 		currentLevel: z.number().min(0),
+		erionPoints: z.number().min(0).nullable(),
 	})
 	.strict();
 
@@ -182,7 +188,12 @@ const levelUpResultSchema = z.object({
 	currentExp: z.number().min(0),
 });
 
-export const updateCharacterAllDailyResponseSchema = z.record(z.string(), levelUpResultSchema).nullable();
+export const updateCharacterAllDailyResponseSchema = z
+	.object({
+		results: z.record(z.string(), levelUpResultSchema),
+		erionPoints: z.number().nullable(),
+	})
+	.nullable();
 
 export type updateCharacterAllDailyResponseBody = z.infer<typeof updateCharacterAllDailyResponseSchema>;
 

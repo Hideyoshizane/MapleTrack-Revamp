@@ -1,6 +1,7 @@
 import { getContentValue, calculateNewLevelFromExp, toSymbolName } from '@data/symbols/symbolMappings';
 import { updateCharacterDailyRequestSchema } from '@features/character/schemas/character.request.schema';
 import { updateCharacterDailyResponseSchema } from '@features/character/schemas/character.response.schema';
+import { addErionToLiberationDaily } from '@features/liberation/liberationService';
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
@@ -38,7 +39,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				exp: true,
 				category: true,
 				contents: true,
-				character: { select: { level: true } },
+				character: { select: { id: true, level: true, server: true } },
 			},
 		});
 		if (!symbol) {
@@ -83,18 +84,33 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const updatedExp = symbol.exp + dailyValue;
 		const newValues = calculateNewLevelFromExp(symbol.category, symbol.level, updatedExp);
 
-		await prisma.$transaction([
-			prisma.characterSymbol.update({
-				where: { id: symbol.id },
-				data: { level: newValues.currentLevel, exp: newValues.currentExp },
-			}),
-			prisma.characterContent.update({
-				where: { symbolId_contentType: { symbolId: symbol.id, contentType: dailyContent.contentType } },
-				data: { cleared: true, date: nowInUtc() },
-			}),
-		]);
+		const transactionData = await prisma.$transaction(async (tx) => {
+			await Promise.all([
+				tx.characterSymbol.update({
+					where: { id: symbol.id },
+					data: { level: newValues.currentLevel, exp: newValues.currentExp },
+				}),
+				tx.characterContent.update({
+					where: { symbolId_contentType: { symbolId: symbol.id, contentType: dailyContent.contentType } },
+					data: { cleared: true, date: nowInUtc() },
+				}),
+			]);
+			return addErionToLiberationDaily(
+				tx,
+				symbol.name,
+				authenticatedUserId,
+				symbol.character.id,
+				symbol.character.server,
+			);
+		});
 
-		const responseData = { id, currentExp: newValues.currentExp, currentLevel: newValues.currentLevel };
+		const responseData = {
+			id,
+			currentExp: newValues.currentExp,
+			currentLevel: newValues.currentLevel,
+			erionPoints: transactionData,
+		};
+
 		const validation = updateCharacterDailyResponseSchema.safeParse(responseData);
 		if (!validation.success) {
 			logZodError(validation.error, { route: route });

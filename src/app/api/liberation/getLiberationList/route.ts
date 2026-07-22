@@ -37,6 +37,9 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				liberated: true,
 				currentDestinyQuest: true,
 				currentDestinyPoints: true,
+				currentAstraQuest: true,
+				currentAstraTracesPoints: true,
+				currentAstraVestigesPoints: true,
 				character: { select: { name: true, class: true, level: true } },
 			},
 		});
@@ -52,7 +55,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			select: { liberationLastUpdate: true },
 		});
 
-		const characters: GetLiberationListCharacterResponseBody[] = new Array(liberationList.length);
+		const characters: GetLiberationListCharacterResponseBody[] = Array.from({ length: liberationList.length });
 
 		for (let liberationIndex = 0; liberationIndex < liberationList.length; liberationIndex += 1) {
 			const liberation = liberationList[liberationIndex];
@@ -62,10 +65,17 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				characterId: liberation.characterId,
 				currentGenesisQuest: liberation.currentGenesisQuest,
 				currentGenesisPoints: liberation.currentGenesisPoints,
+
 				genesisPass: liberation.genesisPass ?? undefined,
 				liberated: liberation.liberated ?? undefined,
+
 				currentDestinyQuest: liberation.currentDestinyQuest,
 				currentDestinyPoints: liberation.currentDestinyPoints,
+				currentAstraQuest: liberation.currentAstraQuest,
+
+				currentAstraTracesPoints: liberation.currentAstraTracesPoints,
+				currentAstraVestigesPoints: liberation.currentAstraVestigesPoints,
+
 				name: liberation.character.name,
 				class: liberation.character.class,
 				level: liberation.character.level,

@@ -17,13 +17,12 @@ import { getJob } from '@features/character/characterService';
 
 import styles from './ClassCard.module.scss';
 
-import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { SymbolName } from '@data/symbols/symbolMappings';
 import type { getAllCharactersResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
-// Map JobType to class for conditional styles
-const jobLevelClassMap: Record<JobType, string> = {
+type CharacterJobType = 'default' | 'mage' | 'warrior' | 'bowman' | 'thief' | 'xenon' | 'pirate' | 'complete';
+
+const jobLevelClassMap: Record<CharacterJobType, string> = {
 	default: styles.defaultLevel,
 	mage: styles.mageLevel,
 	warrior: styles.warriorLevel,
@@ -58,7 +57,7 @@ const SymbolGrid = ({ symbols, maxLevel, size = 16, characterLevel }: SymbolProp
 						alt={`${symbol.name} Icon`}
 						height={size}
 						loading="lazy"
-						src={getSymbolImagePath(symbol.name as SymbolName)}
+						src={getSymbolImagePath(symbol.name)}
 						width={size}
 					/>
 					<p className={styles.symbolLevel}>{displayLevel}</p>
@@ -93,6 +92,9 @@ type Props = {
 	serverCookie: string | undefined;
 };
 
+const SYMBOL_SIZE = 20;
+const BOSS_ICON_SIZE = 48;
+
 const ClassCard = ({ character, serverCookie }: Props): JSX.Element | null => {
 	const router = useRouter();
 
@@ -104,15 +106,12 @@ const ClassCard = ({ character, serverCookie }: Props): JSX.Element | null => {
 
 	const { jobType, legion, linkSkill: ls, level, name, bossing, targetLevel, class: className, symbols } = character;
 
-	const SYMBOL_SIZE = 20;
-	const BOSS_ICON_SIZE = 48;
-
 	const arcaneMaxLevel = getLastLevel('arcane');
 	const sacredMaxLevel = getLastLevel('sacred');
 
 	const linkSkill = ls ? (getLinkSkillByName(ls) ?? null) : null;
 
-	const jobKey: JobType = (jobType ?? 'default') as JobType;
+	const jobKey: CharacterJobType = jobType in jobLevelClassMap ? (jobType as CharacterJobType) : 'default';
 	const job: string = getJob(character.level);
 	const code: string = generateClassCode(character.class ?? '');
 
@@ -153,17 +152,23 @@ const ClassCard = ({ character, serverCookie }: Props): JSX.Element | null => {
 
 				{/* Bottom section: Link Skill, Legion, Boss, Name */}
 				<div className={styles.bottomPart}>
-					<IconSection character={{ linkSkill: ls ?? '', level, code, jobType, legion }} linkSkill={linkSkill} />
+					<IconSection
+						character={{ linkSkill: ls ?? '', level, code, jobType, legion }}
+						linkSkill={linkSkill}
+					/>
 
 					<div className={styles.bottomHalf}>
-						{bossing && <BossIcon className={styles.bossIcon} height={BOSS_ICON_SIZE} width={BOSS_ICON_SIZE} />}
+						{bossing && (
+							<BossIcon className={styles.bossIcon} height={BOSS_ICON_SIZE} width={BOSS_ICON_SIZE} />
+						)}
 						<div className={styles.characterNameJobDiv}>
 							<ResponsiveText
 								className={styles.characterName}
 								height={36}
 								maxFontSize={28}
 								minFontSize={12}
-								width={180}>
+								width={180}
+							>
 								{name}
 							</ResponsiveText>
 							<p className={styles.characterJob}>{job}</p>
@@ -173,7 +178,11 @@ const ClassCard = ({ character, serverCookie }: Props): JSX.Element | null => {
 
 				{/* Level and ProgressBar */}
 				<div className={styles.levelPart}>
-					<p className={clsx(styles.levelText, jobLevelClassMap[jobKey], { [styles.complete]: level >= targetLevel })}>
+					<p
+						className={clsx(styles.levelText, jobLevelClassMap[jobKey], {
+							[styles.complete]: level >= targetLevel,
+						})}
+					>
 						{level}/{targetLevel}
 					</p>
 					<ProgressBar height={24} jobType={jobKey} maxValue={targetLevel} value={level} width={486} />

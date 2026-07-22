@@ -13,9 +13,6 @@ import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { getEditCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
-const BOSS_ICON_SIZE = 90;
-const ICON_SIZE = 64;
-
 type Props = {
 	character: getEditCharacterDataResponseBody;
 	toggleBossing: () => void;
@@ -24,6 +21,9 @@ type Props = {
 	jobType: JobType;
 	legion: string;
 };
+
+const BOSS_ICON_SIZE = 90;
+const ICON_SIZE = 64;
 
 const CharacterBossLegion = ({ character, toggleBossing, linkSkill, code, jobType, legion }: Props): JSX.Element => (
 	<div className={styles.characterBossLinkLegion}>
@@ -39,7 +39,8 @@ const CharacterBossLegion = ({ character, toggleBossing, linkSkill, code, jobTyp
 					}}
 					role="button"
 					style={{ cursor: 'pointer' }}
-					tabIndex={0}>
+					tabIndex={0}
+				>
 					<BossIcon
 						className={clsx(styles.bossIcon, {
 							[styles.on]: character.bossing,
@@ -51,7 +52,12 @@ const CharacterBossLegion = ({ character, toggleBossing, linkSkill, code, jobTyp
 				</div>
 			</Tooltip>
 		</div>
-		<LinkSkillBlock characterLevel={character.level} characterLinkSkill={linkSkill} iconSize={ICON_SIZE} showTooltip />
+		<LinkSkillBlock
+			characterLevel={character.level}
+			characterLinkSkill={linkSkill}
+			iconSize={ICON_SIZE}
+			showTooltip
+		/>
 		<LegionBlock
 			characterCode={code}
 			characterJobType={jobType}

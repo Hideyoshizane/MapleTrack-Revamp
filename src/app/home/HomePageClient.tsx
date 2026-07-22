@@ -63,7 +63,11 @@ const HomePageClient = ({ initialServer }: Props): JSX.Element => {
 				<ServerDropdown server={server} setServerCookie={setServerCookie} />
 			</div>
 			<div className={styles.classFilter}>
-				<ClassFilter loading={loading} selectedClasses={selectedClasses} setSelectedClasses={setClasses} />
+				<ClassFilter
+					loading={loading}
+					selectedClasses={selectedClasses}
+					setSelectedClassesAction={setClasses}
+				/>
 			</div>
 			<ClassGrid selectedClasses={selectedClasses} selectedClassesLoading={loading} serverCookie={server} />
 		</section>

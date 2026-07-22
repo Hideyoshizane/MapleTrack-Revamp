@@ -12,6 +12,7 @@ type BossDifficulty = {
 export type Boss = {
 	name: string;
 	img: string;
+	maxPartySize: number;
 	difficulties: BossDifficulty[];
 };
 
@@ -46,17 +47,19 @@ type BossLookupEntry = {
 };
 
 const bossLookup: Record<BossCompositeKey, BossLookupEntry> = {};
-const bossImageLookup: Record<BossName, string> = {} as Record<BossName, string>;
-const bossDifficultySet: Record<BossName, Set<BossDifficultyName>> = {} as Record<BossName, Set<BossDifficultyName>>;
+const bossImageLookup: Record<BossName, string> = {};
+const bossMaxPartySizeLookup: Record<BossName, number> = {};
+const bossDifficultySet: Record<BossName, Set<BossDifficultyName>> = {};
 
 for (const boss of bosses) {
-	bossImageLookup[boss.name as BossName] = boss.img;
+	bossImageLookup[boss.name] = boss.img;
+	bossMaxPartySizeLookup[boss.name] = boss.maxPartySize;
 
 	const difficultyNames = new Set<BossDifficultyName>();
-	bossDifficultySet[boss.name as BossName] = difficultyNames;
+	bossDifficultySet[boss.name] = difficultyNames;
 
 	for (const diff of boss.difficulties) {
-		difficultyNames.add(diff.name as BossDifficultyName);
+		difficultyNames.add(diff.name);
 
 		const key: BossCompositeKey = `${boss.name}|${diff.name}`;
 		bossLookup[key] = { value: diff.value, reset: diff.reset };
@@ -66,21 +69,14 @@ for (const boss of bosses) {
 const bossNameRuntimeSet: Set<string> = new Set(BOSS_NAMES_ENUM);
 const difficultyRuntimeSet: Set<string> = new Set(BOSS_DIFFICULTY_ENUM);
 
-const isBossName = (value: string): value is BossName => {
-	return bossNameRuntimeSet.has(value);
-};
+const isBossName = (value: string): value is BossName => bossNameRuntimeSet.has(value);
 
-const isBossDifficultyName = (value: string): value is BossDifficultyName => {
-	return difficultyRuntimeSet.has(value);
-};
+const isBossDifficultyName = (value: string): value is BossDifficultyName => difficultyRuntimeSet.has(value);
 
-export const parseBossName = (value: string): BossName | null => {
-	return isBossName(value) ? value : null;
-};
+export const parseBossName = (value: string): BossName | null => (isBossName(value) ? value : null);
 
-export const parseBossDifficultyName = (value: string): BossDifficultyName | null => {
-	return isBossDifficultyName(value) ? value : null;
-};
+export const parseBossDifficultyName = (value: string): BossDifficultyName | null =>
+	isBossDifficultyName(value) ? value : null;
 
 export const getBossDifficultyValue = (
 	bossName: BossName,
@@ -96,10 +92,9 @@ export const getBossDifficultyValue = (
 	return isRebootServer(serverName) ? entry.value * 5 : entry.value;
 };
 
-export const isValidBossDifficulty = (bossName: BossName, difficultyName: BossDifficultyName): boolean => {
-	return bossDifficultySet[bossName]?.has(difficultyName) ?? false;
-};
+export const isValidBossDifficulty = (bossName: BossName, difficultyName: BossDifficultyName): boolean =>
+	bossDifficultySet[bossName]?.has(difficultyName) ?? false;
 
-export const getBossImage = (bossName: BossName): string => {
-	return bossImageLookup[bossName] ?? '/assets/boss/error.webp';
-};
+export const getBossImage = (bossName: BossName): string => bossImageLookup[bossName] ?? '/assets/boss/error.webp';
+
+export const getBossMaxPartySize = (bossName: BossName): number => bossMaxPartySizeLookup[bossName] ?? 1;

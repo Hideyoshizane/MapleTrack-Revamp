@@ -5,19 +5,21 @@ import { ToastContainer, Bounce } from 'react-toastify';
 import type { JSX } from 'react';
 import type { ToastContainerProps } from 'react-toastify';
 
-import 'react-toastify/dist/ReactToastify.css';
+import './CustomToaster.scss';
 
 const ClientToaster = (props: ToastContainerProps): JSX.Element => {
 	return (
 		<ToastContainer
 			{...props}
+			className="toasterContainer"
 			autoClose={4000}
 			closeOnClick
 			draggable
 			hideProgressBar={false}
-			newestOnTop={false}
+			newestOnTop
 			pauseOnFocusLoss={false}
 			pauseOnHover
+			toastClassName="toaster"
 			transition={Bounce}
 		/>
 	);

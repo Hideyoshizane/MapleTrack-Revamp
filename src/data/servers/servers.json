@@ -1,32 +1,32 @@
 [
-  {
-    "name": "Bera",
-    "img": "/assets/icons/servers/bera.webp",
-    "Reboot": false
-  },
-  {
-    "name": "Scania",
-    "img": "/assets/icons/servers/scania.webp",
-    "Reboot": false
-  },
-  {
-    "name": "Hyperion",
-    "img": "/assets/icons/servers/hyperion.webp",
-    "Reboot": true
-  },
-  {
-    "name": "Kronos",
-    "img": "/assets/icons/servers/kronos.webp",
-    "Reboot": true
-  },
-  {
-    "name": "Luna",
-    "img": "/assets/icons/servers/luna.webp",
-    "Reboot": false
-  },
-  {
-    "name": "Solis",
-    "img": "/assets/icons/servers/solis.webp",
-    "Reboot": true
-  }
+	{
+		"name": "Bera",
+		"img": "/assets/icons/servers/bera.webp",
+		"Reboot": false
+	},
+	{
+		"name": "Scania",
+		"img": "/assets/icons/servers/scania.webp",
+		"Reboot": false
+	},
+	{
+		"name": "Hyperion",
+		"img": "/assets/icons/servers/hyperion.webp",
+		"Reboot": true
+	},
+	{
+		"name": "Kronos",
+		"img": "/assets/icons/servers/kronos.webp",
+		"Reboot": true
+	},
+	{
+		"name": "Luna",
+		"img": "/assets/icons/servers/luna.webp",
+		"Reboot": false
+	},
+	{
+		"name": "Solis",
+		"img": "/assets/icons/servers/solis.webp",
+		"Reboot": true
+	}
 ]

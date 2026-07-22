@@ -66,7 +66,8 @@ const ForgotPasswordPage = (): JSX.Element => {
 					loaderColor="#121212"
 					loaderSize={16}
 					loadingText="Submitting..."
-					type="submit">
+					type="submit"
+				>
 					Send Reset Link
 				</Button>
 

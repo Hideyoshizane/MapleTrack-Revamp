@@ -24,6 +24,8 @@ type Props = {
 	initialServer: ServerName;
 };
 
+const BOSS_ICON_SIZE = 96;
+
 const WeeklyPageClient = ({ initialServer }: Props): JSX.Element => {
 	const pathname = usePathname();
 	const router = useRouter();
@@ -31,8 +33,6 @@ const WeeklyPageClient = ({ initialServer }: Props): JSX.Element => {
 	const { server, setServerCookie } = useServerCookie(initialServer);
 
 	const { loading, hasCharacters, weeklyBosses, totalGains, characters, toggleBoss } = useWeeklyBossList(server);
-
-	const BOSS_ICON_SIZE = 96;
 
 	if (loading) {
 		return (
@@ -100,7 +100,8 @@ const WeeklyPageClient = ({ initialServer }: Props): JSX.Element => {
 				<Button
 					className={styles.editCharacterButton}
 					disabled={!hasCharacters}
-					onClick={(): void => router.push(`${pathname}/edit`)}>
+					onClick={(): void => router.push(`${pathname}/edit`)}
+				>
 					Edit Bosses
 				</Button>
 			</div>
@@ -124,7 +125,9 @@ const WeeklyPageClient = ({ initialServer }: Props): JSX.Element => {
 
 						<p className={styles.text}>You haven&apos;t marked any characters as Boss Slayer yet.</p>
 
-						<p className={styles.text}>Go to your desired character and set it as a Boss Slayer to see them here.</p>
+						<p className={styles.text}>
+							Go to your desired character and set it as a Boss Slayer to see them here.
+						</p>
 					</div>
 				</div>
 			)}

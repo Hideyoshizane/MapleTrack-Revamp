@@ -26,7 +26,8 @@ const Switch = ({ title, checked, tooltipMessage, onCheckedChange, disabled }: P
 					className={styles.root}
 					checked={checked}
 					disabled={disabled}
-					onCheckedChange={onCheckedChange}>
+					onCheckedChange={onCheckedChange}
+				>
 					<SwitchPrimitive.Thumb className={styles.thumb} />
 				</SwitchPrimitive.Root>
 			</div>

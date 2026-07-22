@@ -3,11 +3,12 @@ import { z } from 'zod';
 import { CHARACTER_MAX_LEVEL } from '@data/character/constants';
 import { JOB_CLASSES } from '@data/classes/classes';
 import {
+	getBossMaxPartySize,
 	bossNamesPoints,
 	bossDifficultyWithSkip,
 	isValidBossDifficultyOrSkip,
 } from '@data/liberation/liberationBosses';
-import { questTypes, genesisBosses, destinyBosses } from '@data/liberation/liberationQuests';
+import { questTypes, genesisBosses, destinyBosses, astraQuests } from '@data/liberation/liberationQuests';
 import { characterIdRawSchema, characterNameRawSchema } from '@features/character/schemas/character.schema';
 
 const IdRawSchema = z
@@ -18,6 +19,7 @@ const IdRawSchema = z
 export const questTypeSchema = z.enum(questTypes);
 export const genesisBossNameSchema = z.enum(genesisBosses);
 export const destinyBossNameSchema = z.enum(destinyBosses);
+export const astraQuestNameSchema = z.enum(astraQuests);
 
 const getLiberationListCharacterResponseSchema = z
 	.object({
@@ -29,10 +31,15 @@ const getLiberationListCharacterResponseSchema = z
 
 		currentGenesisQuest: genesisBossNameSchema,
 		currentGenesisPoints: z.number().min(0),
-		currentDestinyQuest: destinyBossNameSchema,
-		currentDestinyPoints: z.number().min(0),
 		genesisPass: z.boolean(),
 		liberated: z.boolean(),
+
+		currentDestinyQuest: destinyBossNameSchema,
+		currentDestinyPoints: z.number().min(0),
+
+		currentAstraQuest: astraQuestNameSchema,
+		currentAstraVestigesPoints: z.number().min(0),
+		currentAstraTracesPoints: z.number().min(0),
 	})
 	.strict();
 
@@ -51,10 +58,22 @@ export const checkedBossSchema = z
 	.object({
 		name: z.enum(bossNamesPoints),
 		type: z.enum(bossDifficultyWithSkip),
+		cleared: z.boolean(),
+		partySize: z.number().int().min(1),
 	})
 	.superRefine((data, ctx): void => {
 		if (!isValidBossDifficultyOrSkip(data.name, data.type)) {
 			ctx.addIssue({ code: 'custom', message: 'Invalid difficulty.', path: ['difficulty'] });
+		}
+
+		const maxPartySize = getBossMaxPartySize(data.name);
+
+		if (data.partySize > maxPartySize) {
+			ctx.addIssue({
+				code: 'custom',
+				path: ['partySize'],
+				message: `Party size cannot exceed ${maxPartySize} for ${data.name}.`,
+			});
 		}
 	})
 	.strict();
@@ -71,10 +90,15 @@ export const updateLiberationCharacterResponseSchema = z
 
 		currentGenesisQuest: genesisBossNameSchema,
 		currentGenesisPoints: z.number().min(0),
-		currentDestinyQuest: destinyBossNameSchema,
-		currentDestinyPoints: z.number().min(0),
 		genesisPass: z.boolean(),
 		liberated: z.boolean(),
+
+		currentDestinyQuest: destinyBossNameSchema,
+		currentDestinyPoints: z.number().min(0),
+
+		currentAstraQuest: astraQuestNameSchema,
+		currentAstraVestigesPoints: z.number().min(0),
+		currentAstraTracesPoints: z.number().min(0),
 	})
 	.strict();
 

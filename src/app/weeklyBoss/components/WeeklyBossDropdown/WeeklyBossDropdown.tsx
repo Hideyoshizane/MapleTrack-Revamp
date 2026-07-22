@@ -42,7 +42,8 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX
 					aria-label={`Selected character: ${character.name}`}
 					data-cleared={isCleared && !isDisabled}
 					data-disabled={isDisabled}
-					role="button">
+					role="button"
+				>
 					<div className={styles.nameDiv}>
 						<p className={styles.characterName}>{character.name}</p>
 						<p className={styles.characterClass}>{character.class}</p>
@@ -58,7 +59,11 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX
 								{clearedBosses}/{totalBosses}
 							</p>
 						)}
-						{isDisabled ? <NoBossIcon className={styles.iconClear} /> : <MenuIcon className={styles.icon} />}
+						{isDisabled ? (
+							<NoBossIcon className={styles.iconClear} />
+						) : (
+							<MenuIcon className={styles.icon} />
+						)}
 					</div>
 
 					<Image
@@ -85,7 +90,8 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX
 										data-locked={boss.locked}
 										onSelect={(event): void => {
 											event.preventDefault();
-										}}>
+										}}
+									>
 										<CharacterBossItem
 											boss={boss}
 											isSelected={boss.locked || boss.cleared}

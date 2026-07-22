@@ -5,11 +5,16 @@ import ClientToaster from '@components/CustomToaster/CustomToaster';
 
 import Providers from '../context/Providers';
 
-export { metadata } from './metadata';
-
+import type { Metadata } from 'next';
 import type { JSX } from 'react';
 
 import '../styles/Globals.scss';
+
+export const metadata: Metadata = {
+	title: 'MapleTrack',
+	icons: { icon: '/favicon.ico', apple: '/apple-icon.png', shortcut: '/favicon.ico' },
+	manifest: '/manifest.json',
+};
 
 const roboto = Roboto({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700'], display: 'swap' });
 

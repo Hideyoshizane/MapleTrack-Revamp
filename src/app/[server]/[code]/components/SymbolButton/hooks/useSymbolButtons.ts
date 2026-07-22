@@ -1,7 +1,6 @@
-'use client';
-
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 import { getClassNameByCode } from '@data/classes/classes';
@@ -66,9 +65,12 @@ export const useSymbolButtons = ({
 			const { server, className } = getContext();
 
 			const result = await updateDaily({ server, className, id: symbol.id, bonus });
-
 			if (!result.success || !result.data) {
 				return;
+			}
+
+			if (result.data.erionPoints) {
+				toast.success(`${result.data.erionPoints} points added to Astra Liberation.`);
 			}
 
 			const updatedContents = symbol.contents.map((c, i) => (i === 0 ? { ...c, cleared: true } : c));
@@ -97,7 +99,12 @@ export const useSymbolButtons = ({
 							}
 
 							updated = true;
-							return { ...s, exp: result.data.currentExp, level: result.data.currentLevel, contents: updatedContents };
+							return {
+								...s,
+								exp: result.data.currentExp,
+								level: result.data.currentLevel,
+								contents: updatedContents,
+							};
 						});
 
 						return { updated, next };
@@ -146,7 +153,9 @@ export const useSymbolButtons = ({
 			const current = optimisticWeeklyTries ?? DEFAULT_WEEKLY_TRIES;
 			const next = Math.max(current - 1, 0);
 
-			const updatedContents = symbol.contents.map((c, i) => (i !== 1 ? c : { ...c, tries: next, cleared: next === 0 }));
+			const updatedContents = symbol.contents.map((c, i) =>
+				i !== 1 ? c : { ...c, tries: next, cleared: next === 0 },
+			);
 
 			onValueChange?.({
 				currentExp: result.data.currentExp,
@@ -172,7 +181,12 @@ export const useSymbolButtons = ({
 							}
 
 							updated = true;
-							return { ...s, exp: result.data.currentExp, level: result.data.currentLevel, contents: updatedContents };
+							return {
+								...s,
+								exp: result.data.currentExp,
+								level: result.data.currentLevel,
+								contents: updatedContents,
+							};
 						});
 
 						return { updated, next };

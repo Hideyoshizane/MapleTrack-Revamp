@@ -1,9 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
+import { normalizeBossType } from '@data/liberation/liberationBosses';
 
 import BossesDifficultySelector from './BossesDifficultySelector/BossesDifficultySelector';
 import styles from './BossesSelectionComponent.module.scss';
@@ -16,7 +17,7 @@ import type { checkedBossResponseBody } from '@features/liberation/schemas/liber
 import type { JSX } from 'react';
 
 type Props = {
-	type: string;
+	rawType: string;
 	bosses: Boss[];
 	checkedBosses: checkedBossResponseBody[];
 	onChangeWeeklyTotals: (data: WeeklyMonthlyPoints) => void;
@@ -42,36 +43,46 @@ const buildCheckedMap = (checkedBosses: checkedBossResponseBody[]): Record<strin
 	return map;
 };
 
-const BossesSelectionComponent = ({ type, bosses, checkedBosses, onChangeWeeklyTotals }: Props): JSX.Element => {
-	const [state, setState] = useState<BossSelectionState>({});
+const createBossSelectionState = (bosses: Boss[], checkedBosses: checkedBossResponseBody[]): BossSelectionState => {
+	const checkedMap = buildCheckedMap(checkedBosses);
+
+	return bosses.reduce<BossSelectionState>((state, boss) => {
+		const matched = checkedMap[boss.name];
+		const isLocked = Boolean(matched?.cleared);
+
+		const difficulty =
+			matched && matched.type !== 'Skip'
+				? (boss.difficulties.find((difficulty) => difficulty.name === matched.type) ?? null)
+				: null;
+
+		state[boss.name] = {
+			difficulty,
+			partySize: matched?.partySize ?? 1,
+			excludedWeek: isLocked,
+			excludedMonth: isLocked,
+		};
+
+		return state;
+	}, {});
+};
+
+const BossesSelectionComponent = ({ rawType, bosses, checkedBosses, onChangeWeeklyTotals }: Props): JSX.Element => {
+	const [state, setState] = useState<BossSelectionState>(() => createBossSelectionState(bosses, checkedBosses));
+
+	const [prevBosses, setPrevBosses] = useState(bosses);
+	const [prevCheckedBosses, setPrevCheckedBosses] = useState(checkedBosses);
+
+	if (bosses !== prevBosses || checkedBosses !== prevCheckedBosses) {
+		setPrevBosses(bosses);
+		setPrevCheckedBosses(checkedBosses);
+		setState(createBossSelectionState(bosses, checkedBosses));
+	}
+
+	const type = normalizeBossType(rawType);
 
 	const checkedMap = buildCheckedMap(checkedBosses);
 
-	useEffect(() => {
-		const next: BossSelectionState = {};
-
-		for (const boss of bosses) {
-			const matched = checkedMap[boss.name];
-			const isLocked = Boolean(matched && matched.type !== 'Skip');
-
-			let difficulty: BossDifficulty | null = null;
-
-			if (matched && matched.type !== 'Skip') {
-				difficulty = boss.difficulties.find((d) => d.name === matched.type) ?? null;
-			}
-
-			next[boss.name] = { difficulty, partySize: 1, excludedWeek: isLocked, excludedMonth: isLocked };
-		}
-
-		setState(next);
-	}, [bosses, checkedBosses]);
-
-	useBossesWeeklyMonthlyPoints({
-		bosses,
-		state,
-		checkedBosses,
-		onChange: onChangeWeeklyTotals,
-	});
+	useBossesWeeklyMonthlyPoints({ bosses, state, checkedBosses, onChangeAction: onChangeWeeklyTotals });
 
 	const handleSelectDifficulty = (bossName: string, difficulty: BossDifficulty): void => {
 		setState((prev) => {
@@ -103,7 +114,7 @@ const BossesSelectionComponent = ({ type, bosses, checkedBosses, onChangeWeeklyT
 			}
 
 			const matched = checkedMap[bossName];
-			const isLocked = Boolean(matched && matched.type !== 'Skip');
+			const isLocked = Boolean(matched?.cleared);
 
 			if (isLocked) {
 				return prev;
@@ -137,12 +148,13 @@ const BossesSelectionComponent = ({ type, bosses, checkedBosses, onChangeWeeklyT
 					const selectedPartySize = entry?.partySize ?? 1;
 
 					const matched = checkedBosses.find((b) => b.name === boss.name);
-					const isLocked = Boolean(matched && matched.type !== 'Skip');
+					const isLocked = Boolean(matched?.cleared);
 
 					const isSkip = !selectedDifficulty;
 					const isDisabled = isLocked || isSkip;
 
-					const isExcluded = selectedDifficulty?.reset === 'Weekly' ? entry?.excludedWeek : entry?.excludedMonth;
+					const isExcluded =
+						selectedDifficulty?.reset === 'Weekly' ? entry?.excludedWeek : entry?.excludedMonth;
 
 					return (
 						<div className={styles.bossCard} key={boss.name}>
@@ -162,10 +174,11 @@ const BossesSelectionComponent = ({ type, bosses, checkedBosses, onChangeWeeklyT
 							<PartySizeSelector
 								onChangePartySize={(v): void => handleSelectPartySize(boss.name, v)}
 								selectedPartySize={selectedPartySize}
+								maxPartySize={boss.maxPartySize}
 							/>
 
 							<CheckedIcon
-								checkedBoss={matched?.type}
+								cleared={matched?.cleared ?? false}
 								disabled={isDisabled}
 								isIncluded={!isExcluded}
 								isSkip={isSkip}

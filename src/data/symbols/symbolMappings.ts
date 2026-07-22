@@ -1,8 +1,9 @@
 import { getRemainingExp, getExpForLevel, getLastLevel } from '@data/symbols/exp/expTable';
+import { nowInUtc, getNextMidnight } from '@utils/time';
 
 import { allSymbols } from './dailyExp';
 
-import type { SymbolCategory } from '@prisma/client';
+import type { SymbolCategory, SymbolName } from './dailyExp';
 
 type CharacterSymbol = {
 	name: string;
@@ -11,30 +12,14 @@ type CharacterSymbol = {
 	category: SymbolCategory;
 };
 
-export type SymbolName = (typeof allSymbols)[number]['name'];
-
 type SymbolContent = (typeof allSymbols)[number]['contents'][number];
 
 type SymbolInfo = {
 	category: SymbolCategory;
-	file: string;
 	minLevel: number;
 	maxLevel: number;
-	contents: SymbolContent[];
+	contents: readonly SymbolContent[];
 };
-
-export const SYMBOL_MAP: Record<SymbolName, SymbolInfo> = Object.fromEntries(
-	allSymbols.map((symbol) => [
-		symbol.name,
-		{
-			category: symbol.category,
-			file: symbol.name.toLowerCase().replace(/ /g, '_'),
-			minLevel: symbol.minLevel,
-			maxLevel: symbol.maxLevel,
-			contents: symbol.contents,
-		},
-	]),
-) as Record<SymbolName, SymbolInfo>;
 
 const SYMBOL_CATEGORY_FOLDER_MAP: Record<SymbolCategory, string> = {
 	arcane: 'arcaneforce',
@@ -42,73 +27,83 @@ const SYMBOL_CATEGORY_FOLDER_MAP: Record<SymbolCategory, string> = {
 	grand: 'grandsacredforce',
 };
 
+export const SYMBOL_MAP = Object.fromEntries(
+	allSymbols.map((symbol) => [
+		symbol.name,
+		{
+			category: symbol.category,
+			minLevel: symbol.minLevel,
+			maxLevel: symbol.maxLevel,
+			contents: symbol.contents,
+		},
+	]),
+) as Record<string, SymbolInfo>;
+
 export const isSymbolName = (value: string): value is SymbolName => value in SYMBOL_MAP;
 
 export const toSymbolName = (value: string): SymbolName | null => (isSymbolName(value) ? value : null);
 
+const getSymbolInfo = (name: string): SymbolInfo | null => (isSymbolName(name) ? SYMBOL_MAP[name] : null);
+
+const hasRequiredLevel = (minLevel: number | undefined, characterLevel: number): boolean =>
+	minLevel === undefined || characterLevel >= minLevel;
+
+const findSymbolContent = (
+	symbolName: SymbolName,
+	contentName: string,
+	characterLevel: number,
+): SymbolContent | undefined =>
+	SYMBOL_MAP[symbolName].contents.find(
+		(content) => content.name === contentName && hasRequiredLevel(content.minLevel, characterLevel),
+	);
+
 export const getSymbolImagePath = (name: SymbolName): string => {
-	const info = SYMBOL_MAP[name];
-	const folder = SYMBOL_CATEGORY_FOLDER_MAP[info.category];
+	const symbol = SYMBOL_MAP[name];
+	const fileName = name.toLowerCase().replaceAll(' ', '_');
 
-	return `/assets/${folder}/${info.file}.webp`;
+	return `/assets/${SYMBOL_CATEGORY_FOLDER_MAP[symbol.category]}/${fileName}.webp`;
 };
 
-export const canUseSymbol = (level: number, name: SymbolName): boolean => {
-	return level >= SYMBOL_MAP[name].minLevel;
-};
+export const canUseSymbol = (level: number, name: SymbolName): boolean => level >= SYMBOL_MAP[name].minLevel;
 
 export const getSymbolMinLevel = (name: SymbolName): number => SYMBOL_MAP[name].minLevel;
 
-export const getSymbolMaxLevel = (input: SymbolCategory | SymbolName): number => {
-	if (isSymbolName(input)) {
-		return SYMBOL_MAP[input].maxLevel;
-	}
+export const getSymbolMaxLevelByName = (name: SymbolName): number => SYMBOL_MAP[name].maxLevel;
 
-	const symbols = allSymbols.filter((s) => s.category === input);
-	return Math.max(...symbols.map((s) => s.maxLevel));
-};
-
+export const getSymbolMaxLevelByCategory = (category: SymbolCategory): number =>
+	Math.max(...allSymbols.filter((symbol) => symbol.category === category).map((symbol) => symbol.maxLevel));
 export const getContentValue = (symbolName: SymbolName | null, contentType: string, characterLevel: number): number => {
 	if (!symbolName) {
 		return 0;
 	}
 
-	const symbol = SYMBOL_MAP[symbolName];
-	if (!symbol?.contents?.length) {
+	const symbol = getSymbolInfo(symbolName);
+
+	if (!symbol) {
 		return 0;
 	}
 
 	if (contentType === 'Weekly') {
-		const weeklyContent = symbol.contents.find((content) => {
-			const isWeekly = content.type === 'weekly';
-			const matchesLevel = content.minLevel ? characterLevel >= content.minLevel : true;
-
-			return isWeekly && matchesLevel;
-		});
-
-		return weeklyContent?.value ?? 0;
+		return (
+			symbol.contents.find(
+				(content) => content.type === 'weekly' && hasRequiredLevel(content.minLevel, characterLevel),
+			)?.value ?? 0
+		);
 	}
 
-	const matchedContent = symbol.contents.find((content) => {
-		const matchesName = content.name === contentType;
-		const matchesLevel = content.minLevel ? characterLevel >= content.minLevel : true;
-
-		return matchesName && matchesLevel;
-	});
-
-	return matchedContent?.value ?? 0;
+	return findSymbolContent(symbolName, contentType, characterLevel)?.value ?? 0;
 };
 
 export const sortSymbolsByMinLevel = <TSymbol extends { name: string }>(symbols: TSymbol[]): TSymbol[] => {
-	return [...symbols].sort((leftSymbol, rightSymbol) => {
-		const leftSymbolName = toSymbolName(leftSymbol.name);
-		const rightSymbolName = toSymbolName(rightSymbol.name);
+	return [...symbols].sort((left, right) => {
+		const leftSymbol = toSymbolName(left.name);
+		const rightSymbol = toSymbolName(right.name);
 
-		if (!leftSymbolName || !rightSymbolName) {
+		if (!leftSymbol || !rightSymbol) {
 			return 0;
 		}
 
-		return getSymbolMinLevel(leftSymbolName) - getSymbolMinLevel(rightSymbolName);
+		return getSymbolMinLevel(leftSymbol) - getSymbolMinLevel(rightSymbol);
 	});
 };
 
@@ -116,29 +111,25 @@ type SortableContent = {
 	contentType: string;
 };
 
-const getContentOrder = (symbolName: SymbolName, contentType: string): number => {
-	const symbol = SYMBOL_MAP[symbolName];
-
-	const index = symbol.contents.findIndex((content) => content.name === contentType);
-
-	return index === -1 ? Number.MAX_SAFE_INTEGER : index;
-};
-
 export const sortSymbolContents = <TContent extends SortableContent>(
 	symbolName: string,
 	contents: TContent[],
 ): TContent[] => {
-	const parsedSymbolName = toSymbolName(symbolName);
-	if (!parsedSymbolName) {
+	const symbol = getSymbolInfo(symbolName);
+
+	if (!symbol) {
 		return contents;
 	}
 
-	return [...contents].sort((leftContent, rightContent) => {
-		const leftOrder = getContentOrder(parsedSymbolName, leftContent.contentType);
+	return [...contents].sort((left, right) => {
+		const leftIndex = symbol.contents.findIndex((content) => content.name === left.contentType);
 
-		const rightOrder = getContentOrder(parsedSymbolName, rightContent.contentType);
+		const rightIndex = symbol.contents.findIndex((content) => content.name === right.contentType);
 
-		return leftOrder - rightOrder;
+		return (
+			(leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex) -
+			(rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex)
+		);
 	});
 };
 
@@ -155,40 +146,33 @@ export const computeDailyWeeklyValues = (
 	characterLevel: number,
 ): { dailyValue: number; weeklyValue: number } => {
 	const symbolName = toSymbolName(symbol.name);
+
 	if (!symbolName) {
 		return { dailyValue: 0, weeklyValue: 0 };
 	}
 
-	const symbolInfo = SYMBOL_MAP[symbolName];
+	return content.reduce(
+		(result, currentContent) => {
+			if (!currentContent.checked) {
+				return result;
+			}
 
-	let dailyValue = 0;
-	let weeklyValue = 0;
+			const matchedContent = findSymbolContent(symbolName, currentContent.contentType, characterLevel);
 
-	for (const c of content) {
-		if (!c.checked) {
-			continue;
-		}
+			if (!matchedContent) {
+				return result;
+			}
 
-		const matchedContent = symbolInfo.contents.find((item) => {
-			const matchesName = item.name === c.contentType;
-			const matchesLevel = item.minLevel ? characterLevel >= item.minLevel : true;
+			if (matchedContent.type === 'weekly') {
+				result.weeklyValue += matchedContent.value;
+			} else {
+				result.dailyValue += matchedContent.value;
+			}
 
-			return matchesName && matchesLevel;
-		});
-
-		if (!matchedContent) {
-			continue;
-		}
-
-		if (matchedContent.type === 'weekly') {
-			weeklyValue += matchedContent.value;
-			continue;
-		}
-
-		dailyValue += matchedContent.value;
-	}
-
-	return { dailyValue, weeklyValue };
+			return result;
+		},
+		{ dailyValue: 0, weeklyValue: 0 },
+	);
 };
 
 export const calculateDaysToCompleteSymbol = (
@@ -197,10 +181,12 @@ export const calculateDaysToCompleteSymbol = (
 	type: SymbolCategory,
 	symbolLevel: number,
 	symbolExp: number,
+	remainingWeeklyTries: number,
+	dailyCleared: boolean,
 ): number => {
-	let remaining = getRemainingExp(type, symbolLevel, symbolExp);
+	let remainingExp = getRemainingExp(type, symbolLevel, symbolExp);
 
-	if (remaining <= 0) {
+	if (remainingExp <= 0) {
 		return 0;
 	}
 
@@ -208,28 +194,46 @@ export const calculateDaysToCompleteSymbol = (
 		return Infinity;
 	}
 
-	const weeklyTotal = weekly * 3;
-	const dailyPerWeek = daily * 7;
-	const totalPerWeek = dailyPerWeek + weeklyTotal;
+	let currentDate = nowInUtc();
+	let daysElapsed = 0;
+	let weeklyTries = remainingWeeklyTries;
+	let canDoDailyToday = !dailyCleared;
 
-	const weeks = Math.floor(remaining / totalPerWeek);
-	remaining -= weeks * totalPerWeek;
+	while (remainingExp > 0) {
+		if (canDoDailyToday && daily > 0) {
+			remainingExp -= daily;
 
-	let remainingDays = 0;
-
-	while (remaining > 0) {
-		remainingDays++;
-		remaining -= daily;
-
-		if (remainingDays % 7 === 0) {
-			remaining -= weeklyTotal;
+			if (remainingExp <= 0) {
+				break;
+			}
 		}
+
+		while (weekly > 0 && weeklyTries > 0 && remainingExp > 0) {
+			remainingExp -= weekly;
+			weeklyTries--;
+		}
+
+		if (remainingExp <= 0) {
+			break;
+		}
+
+		currentDate = getNextMidnight(currentDate);
+		daysElapsed++;
+
+		if (currentDate.getUTCDay() === 4) {
+			weeklyTries = 3;
+		}
+
+		canDoDailyToday = true;
 	}
 
-	return weeks * 7 + remainingDays;
+	return daysElapsed;
 };
 
-export type LevelUpResult = { currentLevel: number; currentExp: number };
+export type LevelUpResult = {
+	currentLevel: number;
+	currentExp: number;
+};
 
 export const calculateNewLevelFromExp = (
 	type: SymbolCategory,
@@ -252,7 +256,5 @@ export const calculateNewLevelFromExp = (
 		level++;
 	}
 
-	level = type === 'arcane' ? Math.min(level, 20) : Math.min(level, 11);
-
-	return { currentLevel: level, currentExp: exp };
+	return { currentLevel: Math.min(level, type === 'arcane' ? 20 : 11), currentExp: exp };
 };

@@ -14,19 +14,18 @@ import type { JSX } from 'react';
 type Props = {
 	target: 'daily' | 'weekly';
 };
+const computeTimeLeft = (resetType: 'daily' | 'weekly'): remainingTime => {
+	const now = nowInUtc();
+
+	const targetDate = resetType === 'daily' ? getNextMidnight(now) : getNextWeeklyResetDate(now);
+
+	const remaining = getRemainingTime(targetDate, now);
+
+	return { ...remaining, days: resetType === 'weekly' ? remaining.days : undefined };
+};
 
 const Timer = ({ target }: Props): JSX.Element => {
 	const [timeLeft, setTimeLeft] = useState<remainingTime | null>(null);
-
-	const computeTimeLeft = (resetType: 'daily' | 'weekly'): remainingTime => {
-		const now = nowInUtc();
-
-		const targetDate = resetType === 'daily' ? getNextMidnight(now) : getNextWeeklyResetDate(now);
-
-		const remaining = getRemainingTime(targetDate, now);
-
-		return { ...remaining, days: resetType === 'weekly' ? remaining.days : undefined };
-	};
 
 	useEffect(() => {
 		queueMicrotask(() => {

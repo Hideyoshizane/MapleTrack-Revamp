@@ -12,15 +12,15 @@ import styles from './CheckedIcon.module.scss';
 import type { JSX } from 'react';
 
 type Props = {
-	checkedBoss: string | undefined;
+	cleared: boolean;
 	isSkip: boolean;
 	isIncluded: boolean;
 	disabled: boolean;
 	onToggle: () => void;
 };
 
-const CheckedIcon = ({ checkedBoss, isSkip, isIncluded, disabled, onToggle }: Props): JSX.Element => {
-	const isLocked = checkedBoss !== 'Skip';
+const CheckedIcon = ({ cleared, isSkip, isIncluded, disabled, onToggle }: Props): JSX.Element => {
+	const isLocked = cleared;
 
 	let IconComponent;
 

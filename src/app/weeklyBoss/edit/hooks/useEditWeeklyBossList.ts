@@ -35,6 +35,7 @@ type UseEditWeeklyBossListReturn = {
 		difficulty: BossDifficultyName,
 		server: string,
 		reset: BossReset,
+		partySize: number,
 		dailyTotal?: number,
 	) => void;
 	handleSaveChanges: (pathname: string) => Promise<void>;
@@ -49,16 +50,13 @@ export const useEditWeeklyBossList = (server: ServerName): UseEditWeeklyBossList
 
 	const [totalBosses, setTotalBosses] = useState<number>(0);
 	const [totalGains, setTotalGains] = useState<number>(0);
-	const [characterWeeklyIncome, setCharacterWeeklyIncome] = useState<number>(0);
-	const [characterWeeklyBossAmount, setCharacterWeeklyBossAmount] = useState<number>(0);
-	const [characterMonthlyBossAmount, setCharacterMonthlyBossAmount] = useState<number>(0);
 
 	useEffect((): void => {
 		const fetchBossList = async (): Promise<void> => {
 			setLoading(true);
+
 			try {
-				const payload = { server };
-				const response = await bossListApi.getEditBossList(payload);
+				const response = await bossListApi.getEditBossList({ server });
 
 				if (response.success && response.data) {
 					const responseData = response.data;
@@ -69,9 +67,6 @@ export const useEditWeeklyBossList = (server: ServerName): UseEditWeeklyBossList
 					setTotalBosses(countServerBosses(responseData));
 
 					if (firstCharacter) {
-						setCharacterWeeklyIncome(firstCharacter.totalIncome);
-						setCharacterWeeklyBossAmount(countCharacterBosses(firstCharacter));
-						setCharacterMonthlyBossAmount(countMonthlyBosses(firstCharacter));
 						setTotalGains(countServerGains(responseData, server));
 					}
 				}
@@ -84,56 +79,47 @@ export const useEditWeeklyBossList = (server: ServerName): UseEditWeeklyBossList
 	}, [server]);
 
 	useEffect((): void => {
-		if (!serverData || !selectedCharacter) {
-			return;
-		}
-
-		const fresh = serverData.characters.find((c) => c.name === selectedCharacter.name);
-
-		if (fresh && fresh !== selectedCharacter) {
-			setSelectedCharacter(fresh);
-		}
-	}, [serverData]);
-
-	useEffect((): void => {
-		if (!selectedCharacter) {
-			return;
-		}
-
-		setCharacterWeeklyIncome(selectedCharacter.totalIncome);
-		setCharacterWeeklyBossAmount(countCharacterBosses(selectedCharacter));
-		setCharacterMonthlyBossAmount(countMonthlyBosses(selectedCharacter));
-	}, [selectedCharacter]);
-
-	useEffect((): void => {
 		if (!loading && !serverData) {
 			router.replace('/home?missingBossList=1');
 		}
 	}, [loading, serverData, router]);
+
+	const characterWeeklyIncome = selectedCharacter?.totalIncome ?? 0;
+	const characterWeeklyBossAmount = selectedCharacter ? countCharacterBosses(selectedCharacter) : 0;
+	const characterMonthlyBossAmount = selectedCharacter ? countMonthlyBosses(selectedCharacter) : 0;
 
 	const handleBossUpdate = (
 		bossName: BossName,
 		difficulty: BossDifficultyName,
 		serverName: string,
 		reset: BossReset,
+		partySize: number,
 		dailyTotal?: number,
 	): void => {
 		if (!serverData || !selectedCharacter) {
 			return;
 		}
 
-		const updated = updateCharacterBoss(serverData, {
+		const updatedServerData = updateCharacterBoss(serverData, {
 			characterName: selectedCharacter.name,
 			bossName,
 			difficulty,
 			reset,
 			dailyTotal,
 			server: serverName,
+			partySize: partySize,
 		});
 
-		setServerData(updated);
-		setTotalBosses(countServerBosses(updated));
-		setTotalGains(countServerGains(updated, serverName));
+		const updatedCharacter = updatedServerData.characters.find(
+			(character) => character.name === selectedCharacter.name,
+		);
+		setServerData(updatedServerData);
+		if (updatedCharacter) {
+			setSelectedCharacter(updatedCharacter);
+		}
+
+		setTotalBosses(countServerBosses(updatedServerData));
+		setTotalGains(countServerGains(updatedServerData, serverName));
 	};
 
 	const handleSaveChanges = async (pathname: string): Promise<void> => {

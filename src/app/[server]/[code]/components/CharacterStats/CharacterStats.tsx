@@ -28,7 +28,9 @@ const CharacterStats = ({ character, job, jobType }: Props): JSX.Element => {
 			<div className={styles.bigBlock}>
 				<div className={styles.characterBossLinkLegion}>
 					<div className={styles.bossSlot}>
-						{bossing && <BossIcon className={styles.bossIcon} height={BOSS_ICON_SIZE} width={BOSS_ICON_SIZE} />}
+						{bossing && (
+							<BossIcon className={styles.bossIcon} height={BOSS_ICON_SIZE} width={BOSS_ICON_SIZE} />
+						)}
 					</div>
 
 					<LinkSkillBlock

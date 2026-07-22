@@ -7,7 +7,7 @@ import type { Dispatch, SetStateAction } from 'react';
 
 type Props = {
 	selectedCharacter: GetLiberationListCharacterResponseBody;
-	onCharacterUpdate?: (updatedCharacter: Partial<GetLiberationListCharacterResponseBody>) => void;
+	onCharacterUpdateAction?: (updatedCharacter: Partial<GetLiberationListCharacterResponseBody>) => void;
 };
 
 type Snapshot = {
@@ -17,7 +17,7 @@ type Snapshot = {
 
 export const useGenesisProgressionState = ({
 	selectedCharacter,
-	onCharacterUpdate,
+	onCharacterUpdateAction,
 }: Props): {
 	selectedQuest: string | null;
 	setSelectedQuest: Dispatch<SetStateAction<string | null>>;
@@ -40,36 +40,54 @@ export const useGenesisProgressionState = ({
 	const prevQuestRef = useRef(selectedCharacter.currentGenesisQuest);
 	const prevPointsRef = useRef(selectedCharacter.currentGenesisPoints);
 	const prevPassRef = useRef(Boolean(selectedCharacter.genesisPass));
+	const prevLiberatedRef = useRef(Boolean(selectedCharacter.liberated));
 
 	useEffect(() => {
 		const questChanged = prevQuestRef.current !== selectedCharacter.currentGenesisQuest;
 		const pointsChanged = prevPointsRef.current !== selectedCharacter.currentGenesisPoints;
 		const passChanged = prevPassRef.current !== Boolean(selectedCharacter.genesisPass);
+		const liberatedChanged = prevLiberatedRef.current !== Boolean(selectedCharacter.liberated);
 
-		if (!questChanged && !pointsChanged && !passChanged) {
+		if (!questChanged && !pointsChanged && !passChanged && !liberatedChanged) {
 			return;
 		}
 
 		isBackendSyncRef.current = true;
 
-		if (questChanged) setSelectedQuest(selectedCharacter.currentGenesisQuest);
-		if (pointsChanged) setTracesPoints(selectedCharacter.currentGenesisPoints);
-		if (passChanged) setGenesisPass(Boolean(selectedCharacter.genesisPass));
+		if (questChanged) {
+			setSelectedQuest(selectedCharacter.currentGenesisQuest);
+		}
+		if (pointsChanged) {
+			setTracesPoints(selectedCharacter.currentGenesisPoints);
+		}
+		if (passChanged) {
+			setGenesisPass(Boolean(selectedCharacter.genesisPass));
+		}
+
+		if (liberatedChanged) {
+			setLiberated(Boolean(selectedCharacter.liberated));
+		}
 
 		prevQuestRef.current = selectedCharacter.currentGenesisQuest;
 		prevPointsRef.current = selectedCharacter.currentGenesisPoints;
 		prevPassRef.current = Boolean(selectedCharacter.genesisPass);
+		prevLiberatedRef.current = Boolean(selectedCharacter.liberated);
 
 		setTimeout(() => {
 			isBackendSyncRef.current = false;
 		}, 100);
-	}, [selectedCharacter.currentGenesisQuest, selectedCharacter.currentGenesisPoints, selectedCharacter.genesisPass]);
+	}, [
+		selectedCharacter.currentGenesisQuest,
+		selectedCharacter.currentGenesisPoints,
+		selectedCharacter.genesisPass,
+		selectedCharacter.liberated,
+	]);
 
 	useEffect(() => {
 		if (isBackendSyncRef.current) {
 			return;
 		}
-		if (!onCharacterUpdate) {
+		if (!onCharacterUpdateAction) {
 			return;
 		}
 
@@ -82,13 +100,13 @@ export const useGenesisProgressionState = ({
 			return;
 		}
 
-		onCharacterUpdate({
+		onCharacterUpdateAction({
 			currentGenesisQuest: selectedQuest ?? undefined,
 			currentGenesisPoints: tracesPoints,
 			genesisPass,
 			liberated,
 		});
-	}, [selectedQuest, tracesPoints, genesisPass, liberated, selectedCharacter, onCharacterUpdate]);
+	}, [selectedQuest, tracesPoints, genesisPass, liberated, selectedCharacter, onCharacterUpdateAction]);
 
 	const handleLiberatedToggle = (): void => {
 		setLiberated((prev) => {

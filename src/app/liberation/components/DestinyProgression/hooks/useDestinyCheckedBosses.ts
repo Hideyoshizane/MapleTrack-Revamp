@@ -35,9 +35,10 @@ export const useDestinyCheckedBosses = ({
 	const cacheRef = useRef<CacheEntry | null>(null);
 	const requestRef = useRef<string | null>(null);
 
+	const isCurrentDay = isSameDay(selectedDate, currentDate);
+
 	useEffect(() => {
-		if (!isSameDay(selectedDate, currentDate)) {
-			setCheckedBosses(createNormalizedEmptyBossList(type) ?? []);
+		if (!isCurrentDay) {
 			return;
 		}
 
@@ -59,7 +60,9 @@ export const useDestinyCheckedBosses = ({
 					requestDate: currentDate,
 				});
 
-				if (requestRef.current !== requestKey) return;
+				if (requestRef.current !== requestKey) {
+					return;
+				}
 
 				const data = response.data ?? [];
 
@@ -71,7 +74,11 @@ export const useDestinyCheckedBosses = ({
 		};
 
 		void run();
-	}, [characterId, server, currentDate, selectedDate, type]);
+	}, [characterId, server, currentDate, isCurrentDay]);
+
+	if (!isCurrentDay) {
+		return createNormalizedEmptyBossList(type) ?? [];
+	}
 
 	return checkedBosses;
 };

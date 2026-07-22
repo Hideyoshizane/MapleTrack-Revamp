@@ -1,0 +1,109 @@
+.currentProgressWrapper {
+	position: relative;
+	width: auto;
+}
+
+.disabledOverlay {
+	position: absolute;
+	z-index: 10;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	border-radius: 25px;
+
+	background: rgb(0 0 0 / 90%);
+
+	text-align: center;
+	color: var(--default-white);
+
+	cursor: not-allowed;
+
+	backdrop-filter: blur(4px);
+	inset: 0;
+
+	.overlayContent {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
+		gap: 16px;
+
+		.title {
+			font-size: 32px;
+			font-weight: 600;
+
+			margin-bottom: 8px;
+		}
+
+		.description {
+			width: 550px;
+
+			font-size: 24px;
+		}
+	}
+}
+
+.currentProgress {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	width: 1536px;
+
+	border-radius: 25px;
+	background-color: var(--background-white);
+	color: var(--default-button-text);
+
+	&.disabled {
+		filter: grayscale(1);
+		opacity: 0.6;
+
+		pointer-events: none;
+	}
+
+	.title {
+		font-size: 32px;
+		font-weight: 500;
+
+		margin-top: 16px;
+	}
+
+	.progressInput {
+		display: flex;
+		justify-content: space-around;
+
+		width: 100%;
+		height: 126px;
+
+		margin-top: 24px;
+		padding-left: 24px;
+		padding-right: 24px;
+
+		.inputTitle {
+			font-size: 32px;
+			text-align: center;
+
+			margin-bottom: 8px;
+		}
+	}
+}
+
+.grid {
+	display: flex;
+
+	gap: 48px;
+
+	margin-top: 24px;
+
+	.column {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+
+		gap: 24px;
+	}
+}

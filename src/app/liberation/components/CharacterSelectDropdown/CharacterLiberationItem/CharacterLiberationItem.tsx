@@ -33,7 +33,8 @@ const CharacterLiberationItem = ({ character, isSelected, onClick }: Props): JSX
 			onClick={onClick}
 			onKeyDown={handleKey}
 			role="option"
-			tabIndex={0}>
+			tabIndex={0}
+		>
 			<Image
 				className={styles.classIcon}
 				alt={character.name}

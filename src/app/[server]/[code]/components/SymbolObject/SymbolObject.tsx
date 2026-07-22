@@ -8,7 +8,7 @@ import { getExpForLevel } from '@data/symbols/exp/expTable';
 import {
 	getSymbolImagePath,
 	canUseSymbol,
-	getSymbolMaxLevel,
+	getSymbolMaxLevelByCategory,
 	getSymbolMinLevel,
 	calculateDaysToCompleteSymbol,
 	computeDailyWeeklyValues,
@@ -20,7 +20,6 @@ import SymbolButtons from '../SymbolButton/SymbolButtons';
 import styles from './SymbolObject.module.scss';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { SymbolName } from '@data/symbols/symbolMappings';
 import type { getCharacterDataSymbolsResponseBody } from '@features/character/schemas/character.response.schema';
 import type { SymbolCategory, CharacterContent } from '@prisma/client';
 import type { JSX } from 'react';
@@ -29,10 +28,6 @@ const SYMBOL_SIZE_DEFAULT = 24;
 
 type CharacterContentUI = CharacterContent & {
 	type: 'daily' | 'weekly';
-};
-const getExpDisplay = (type: SymbolCategory, level: number, exp: number): string => {
-	const maxExp = getExpForLevel(type, level);
-	return maxExp === 0 ? 'EXP: MAX' : `EXP: ${exp}/${maxExp}`;
 };
 
 type Props = {
@@ -44,6 +39,11 @@ type Props = {
 	isBulkUpdating?: boolean;
 };
 
+const getExpDisplay = (type: SymbolCategory, level: number, exp: number): string => {
+	const maxExp = getExpForLevel(type, level);
+	return maxExp === 0 ? 'EXP: MAX' : `EXP: ${exp}/${maxExp}`;
+};
+
 const SymbolObject = ({
 	type,
 	symbol,
@@ -53,14 +53,13 @@ const SymbolObject = ({
 	isBulkUpdating = false,
 }: Props): JSX.Element => {
 	const { level, exp } = symbol;
-	const name = symbol.name as SymbolName;
+	const name = symbol.name;
 
-	// Bonuses
 	const { arcaneBonus, sacredBonus } = useBonusContext();
 	const bonus = type === 'arcane' ? arcaneBonus : sacredBonus;
 
 	const { dailyValue: baseDaily, weeklyValue } = computeDailyWeeklyValues(
-		{ name: symbol.name, level: symbol.level, exp: symbol.exp, category: symbol.category as SymbolCategory },
+		{ name: symbol.name, level: symbol.level, exp: symbol.exp, category: symbol.category },
 		symbol.contents as CharacterContentUI[],
 		characterLevel,
 	);
@@ -80,13 +79,21 @@ const SymbolObject = ({
 	const effectiveWeeklyTries = optimisticWeeklyTries ?? symbol.contents.at(-1)?.tries;
 
 	const usable = canUseSymbol(characterLevel, name);
-	const maxLevel = getSymbolMaxLevel(type);
+	const maxLevel = getSymbolMaxLevelByCategory(type);
 	const isMaxed = effectiveLevel === maxLevel;
 
 	const src = getSymbolImagePath(name);
 	const maxExpForLevel = getExpForLevel(type, effectiveLevel);
 
-	const daysToLevel = calculateDaysToCompleteSymbol(dailyValue, weeklyValue, type, effectiveLevel, effectiveExp);
+	const daysToLevel = calculateDaysToCompleteSymbol(
+		dailyValue,
+		weeklyValue,
+		type,
+		effectiveLevel,
+		effectiveExp,
+		effectiveWeeklyTries || 0,
+		effectiveDailyCleared || false,
+	);
 
 	const jobType: JobType = isMaxed ? 'complete' : (characterJobType as JobType);
 
@@ -106,6 +113,7 @@ const SymbolObject = ({
 			setOptimisticWeeklyTries(data.weeklyTries);
 		}
 	};
+
 	return (
 		<div className={styles.symbolContainer}>
 			<div className={styles.imageContainer}>

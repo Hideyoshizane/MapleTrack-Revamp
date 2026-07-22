@@ -19,7 +19,7 @@ type Props = {
 	CharacterDataFromAPI: getCharacterDataFromAPIResponseBody | null;
 	CharacterDataFromAPIFailed: boolean;
 	syncEnabled: boolean;
-	toggleSync: () => void;
+	toggleSyncAction: () => void;
 	CHARACTER_IMG_SIZE?: number;
 };
 
@@ -28,7 +28,7 @@ export const CharacterImageAndSync = ({
 	CharacterDataFromAPI,
 	CharacterDataFromAPIFailed,
 	syncEnabled,
-	toggleSync,
+	toggleSyncAction,
 	CHARACTER_IMG_SIZE = 80,
 }: Props): JSX.Element => {
 	const syncing = character?.syncing ?? false;
@@ -37,7 +37,7 @@ export const CharacterImageAndSync = ({
 		if (!character) {
 			return;
 		}
-		toggleSync();
+		toggleSyncAction();
 	};
 
 	const characterImage = (): JSX.Element => {
@@ -64,7 +64,12 @@ export const CharacterImageAndSync = ({
 			);
 		}
 		return (
-			<SkeletonWrapper color="light" height={CHARACTER_IMG_SIZE} variant="rectangular" width={CHARACTER_IMG_SIZE} />
+			<SkeletonWrapper
+				color="light"
+				height={CHARACTER_IMG_SIZE}
+				variant="rectangular"
+				width={CHARACTER_IMG_SIZE}
+			/>
 		);
 	};
 

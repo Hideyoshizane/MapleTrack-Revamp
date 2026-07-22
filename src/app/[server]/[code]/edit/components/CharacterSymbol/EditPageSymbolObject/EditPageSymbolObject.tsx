@@ -11,7 +11,7 @@ import { getExpForLevel } from '@data/symbols/exp/expTable';
 import {
 	getSymbolImagePath,
 	canUseSymbol,
-	getSymbolMaxLevel,
+	getSymbolMaxLevelByCategory,
 	getSymbolMinLevel,
 	getContentValue,
 	computeDailyWeeklyValues,
@@ -21,7 +21,6 @@ import {
 import styles from './EditPageSymbolObject.module.scss';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
-import type { SymbolName } from '@data/symbols/symbolMappings';
 import type {
 	getEditCharacterDataSymbolsResponseBody,
 	getEditCharacterDataResponseBody,
@@ -29,15 +28,6 @@ import type {
 } from '@features/character/schemas/character.response.schema';
 import type { CharacterContent, SymbolCategory } from '@prisma/client';
 import type { JSX } from 'react';
-
-type SymbolUpdatePayload =
-	| { type: 'level'; value: number; category: SymbolCategory; name: string }
-	| { type: 'exp'; value: number; category: SymbolCategory; name: string }
-	| { type: 'content'; index: number; checked: boolean; category: SymbolCategory; name: string };
-
-type CharacterContentUI = CharacterContent & {
-	type: 'daily' | 'weekly';
-};
 
 type LevelExpInputProps = {
 	level: number;
@@ -113,7 +103,8 @@ function ContentCheckbox({ content, index, characterLevel, onToggle, symbolName 
 				className={styles.checkboxRoot}
 				checked={isDisabled ? true : content.checked}
 				disabled={isDisabled}
-				onCheckedChange={(checked) => onToggle(index, checked === true)}>
+				onCheckedChange={(checked) => onToggle(index, checked === true)}
+			>
 				<Checkbox.Indicator className={styles.checkboxIndicator}>
 					{isDisabled ? <CrossIcon /> : <CheckIcon />}
 				</Checkbox.Indicator>
@@ -132,6 +123,15 @@ type Props = {
 	updateCharacter: (recipe: (draft: getEditCharacterDataResponseBody) => void) => void;
 };
 
+type SymbolUpdatePayload =
+	| { type: 'level'; value: number; category: SymbolCategory; name: string }
+	| { type: 'exp'; value: number; category: SymbolCategory; name: string }
+	| { type: 'content'; index: number; checked: boolean; category: SymbolCategory; name: string };
+
+type CharacterContentUI = CharacterContent & {
+	type: 'daily' | 'weekly';
+};
+
 function EditPageSymbolObject({
 	type,
 	symbol,
@@ -140,19 +140,27 @@ function EditPageSymbolObject({
 	size = 24,
 	updateCharacter,
 }: Props): JSX.Element {
-	const isSymbolUsable = canUseSymbol(characterLevel, symbol.name as SymbolName);
-	const maxLevel = getSymbolMaxLevel(type);
-	const src = getSymbolImagePath(symbol.name as SymbolName);
+	const isSymbolUsable = canUseSymbol(characterLevel, symbol.name);
+	const maxLevel = getSymbolMaxLevelByCategory(type);
+	const src = getSymbolImagePath(symbol.name);
 
 	const expRequired = getExpForLevel(type, symbol.level);
 
 	const { dailyValue, weeklyValue } = computeDailyWeeklyValues(
-		{ name: symbol.name, level: symbol.level, exp: symbol.exp, category: symbol.category as SymbolCategory },
+		{ name: symbol.name, level: symbol.level, exp: symbol.exp, category: symbol.category },
 		symbol.contents as CharacterContentUI[],
 		characterLevel,
 	);
 
-	const computedValue = calculateDaysToCompleteSymbol(dailyValue, weeklyValue, type, symbol.level, symbol.exp);
+	const computedValue = calculateDaysToCompleteSymbol(
+		dailyValue,
+		weeklyValue,
+		type,
+		symbol.level,
+		symbol.exp,
+		symbol.contents.at(-1)?.tries || 0,
+		symbol.contents[0].cleared || false,
+	);
 
 	const jobType: JobType = symbol.level >= maxLevel ? 'complete' : ((characterJobType ?? 'default') as JobType);
 
@@ -189,8 +197,15 @@ function EditPageSymbolObject({
 			<div className={styles.symbolContainer}>
 				<SymbolImage computedValue={computedValue} size={size} src={src} usable={false} />
 				<div className={styles.symbolOff}>
-					<ProgressBar forceFull={false} height={8} jobType={jobType} maxValue={expRequired} value={0} width={231} />
-					<p className={styles.unlockLevel}>Unlock at Level {getSymbolMinLevel(symbol.name as SymbolName)}</p>
+					<ProgressBar
+						forceFull={false}
+						height={8}
+						jobType={jobType}
+						maxValue={expRequired}
+						value={0}
+						width={231}
+					/>
+					<p className={styles.unlockLevel}>Unlock at Level {getSymbolMinLevel(symbol.name)}</p>
 				</div>
 			</div>
 		);

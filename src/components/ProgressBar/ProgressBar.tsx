@@ -7,7 +7,20 @@ import styles from './ProgressBar.module.scss';
 
 import type { JSX } from 'react';
 
-export type JobType = 'default' | 'mage' | 'warrior' | 'bowman' | 'thief' | 'xenon' | 'pirate' | 'complete';
+export type JobType =
+	| 'default'
+	| 'mage'
+	| 'warrior'
+	| 'bowman'
+	| 'thief'
+	| 'xenon'
+	| 'pirate'
+	| 'genesis'
+	| 'astra_erion'
+	| 'astra_battle'
+	| 'astra_overall'
+	| 'destiny'
+	| 'complete';
 
 const jobTypeClassMap: Record<JobType, string> = {
 	default: styles.default,
@@ -17,6 +30,11 @@ const jobTypeClassMap: Record<JobType, string> = {
 	thief: styles.thief,
 	xenon: styles.xenon,
 	pirate: styles.pirate,
+	genesis: styles.genesis,
+	astra_erion: styles.astraErion,
+	astra_battle: styles.astraBattle,
+	astra_overall: styles.astraOverall,
+	destiny: styles.destiny,
 	complete: styles.complete,
 };
 
@@ -47,6 +65,7 @@ const ProgressBar = ({
 		percentage = 100;
 	} else if (maxValue > 0 && value > 0 && !disabled) {
 		const rawPercent = (value / maxValue) * 100;
+
 		percentage = Math.min(Math.max(rawPercent, 5.35), 100);
 	}
 

@@ -33,52 +33,12 @@
 	--boss-dropdown-color: #add2eb;
 	--boss-dropdown-color-disabled: #adadad;
 	--liberation-tab-color: #b1bde2;
+	--liberation-genesis: #cd9ae5;
+	--liberation-erion: #9abbe5;
+	--liberation-battle: #e5b89a;
+	--liberation-astra-mixed: #b4a0a6;
+	--liberation-destiny: #9adae5;
 }
-
-/* stylelint-disable selector-class-pattern */
-.Toastify__toast-container--top-right {
-	top: 136px;
-}
-
-.Toastify__toast {
-	width: 320px;
-	border-radius: 6px;
-	background-color: var(--default-button-text);
-	font-family: Roboto, sans-serif;
-	font-size: 1rem;
-	font-weight: 500;
-	color: var(--default-white);
-}
-
-.toast--large {
-	width: 500px;
-}
-
-.Toastify__toast-body {
-	white-space: pre-line;
-}
-
-/* Success toast progress bar */
-.Toastify__toast--success .Toastify__progress-bar {
-	background: var(--icon-cta-color);
-}
-
-/* Success icon */
-.Toastify__toast--success .Toastify__toast-icon svg {
-	fill: var(--icon-cta-color);
-}
-
-/* Error toast progress bar */
-.Toastify__toast--error .Toastify__progress-bar {
-	background: var(--icon-danger-color);
-}
-
-/* Error icon */
-.Toastify__toast--error .Toastify__toast-icon svg {
-	fill: var(--icon-danger-color);
-}
-
-/* stylelint-enable selector-class-pattern */
 
 :root[data-theme='light'] {
 	--background: var(--background-white);
@@ -138,6 +98,8 @@ a {
 }
 
 input[type='number'] {
+	font-family: Roboto, sans-serif;
+	font-weight: 500;
 	appearance: textfield;
 }
 

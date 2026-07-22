@@ -23,8 +23,14 @@ const CustomDropdownMenu = ({ username }: Props): JSX.Element => {
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
-				<button className={styles.menuOpener} aria-label={`Open menu for ${username}`}>
-					<ResponsiveText className={styles.usernameText} height={40} maxFontSize={32} minFontSize={12} width={200}>
+				<button className={styles.menuOpener} aria-label={`Open menu for ${username}`} type="button">
+					<ResponsiveText
+						className={styles.usernameText}
+						height={40}
+						maxFontSize={32}
+						minFontSize={12}
+						width={200}
+					>
 						{username}
 					</ResponsiveText>
 

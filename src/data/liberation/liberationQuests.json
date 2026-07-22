@@ -34,6 +34,25 @@
 			"points": 1000
 		}
 	},
+	"Astra": {
+		"totalVestiges": 10000,
+		"totalTraces": 2000,
+		"First": {
+			"img": "/assets/icons/liberation/quests/first.webp",
+			"vestiges": 3000,
+			"traces": 600
+		},
+		"Second": {
+			"img": "/assets/icons/liberation/quests/second.webp",
+			"vestiges": 3000,
+			"traces": 600
+		},
+		"Third": {
+			"img": "/assets/icons/liberation/quests/third.webp",
+			"vestiges": 4000,
+			"traces": 800
+		}
+	},
 	"Destiny": {
 		"total": 45000,
 		"Seren": {

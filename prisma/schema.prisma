@@ -29,23 +29,24 @@ model User {
 }
 
 model Character {
-  id             String            @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
-  level          Int
-  targetLevel    Int
-  class          String
-  jobType        String
-  legion         String
-  linkSkill      String
-  server         String
-  lastUpdate     DateTime
-  bossing        Boolean           @default(false)
-  syncing        Boolean           @default(false)
-  userId         String            @db.ObjectId
-  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  symbols        CharacterSymbol[]
-  bossCharacters BossCharacter[]
-  liberations    Liberation[]
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  level           Int
+  targetLevel     Int
+  class           String
+  jobType         String
+  legion          String
+  linkSkill       String
+  server          String
+  lastUpdate      DateTime
+  lastSymbolDaily String?
+  bossing         Boolean           @default(false)
+  syncing         Boolean           @default(false)
+  userId          String            @db.ObjectId
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  symbols         CharacterSymbol[]
+  bossCharacters  BossCharacter[]
+  liberations     Liberation[]
 
   @@unique([userId, server, class])
   @@index([userId, name])
@@ -125,6 +126,7 @@ model Boss {
   name        String
   difficulty  String
   reset       BossReset
+  partySize   Int           @default(1)
   dailyTotal  Int?          @default(0)
   cleared     Boolean       @default(false)
   locked      Boolean?      @default(false)
@@ -133,18 +135,21 @@ model Boss {
 }
 
 model Liberation {
-  id                   String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId               String    @db.ObjectId
-  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  characterId          String    @db.ObjectId
-  character            Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  server               String
-  currentGenesisQuest  String
-  currentGenesisPoints Int       @default(0)
-  genesisPass          Boolean   @default(false)
-  liberated            Boolean   @default(false)
-  currentDestinyQuest  String
-  currentDestinyPoints Int       @default(0)
+  id                         String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId                     String    @db.ObjectId
+  user                       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  characterId                String    @db.ObjectId
+  character                  Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  server                     String
+  currentGenesisQuest        String
+  currentGenesisPoints       Int       @default(0)
+  genesisPass                Boolean   @default(false)
+  liberated                  Boolean   @default(false)
+  currentAstraQuest          String
+  currentAstraVestigesPoints Int       @default(0)
+  currentAstraTracesPoints   Int       @default(0)
+  currentDestinyQuest        String
+  currentDestinyPoints       Int       @default(0)
 
   @@unique([userId, characterId])
   @@index([userId])

@@ -81,7 +81,8 @@ const SymbolButtons = ({
 				isLoading={dailyShowLoading}
 				loaderBorderWidth={2}
 				loaderColor={'#121212'}
-				onClick={(): void => void handleDailyUpdate()}>
+				onClick={(): void => void handleDailyUpdate()}
+			>
 				{dailyButtonLabel}
 			</Button>
 
@@ -93,7 +94,8 @@ const SymbolButtons = ({
 						isLoading={isWeeklyLoading}
 						loaderBorderWidth={2}
 						loaderColor={'#121212'}
-						onClick={(): void => void handleWeeklyUpdate()}>
+						onClick={(): void => void handleWeeklyUpdate()}
+					>
 						{weeklyButtonLabel}
 					</Button>
 				)}

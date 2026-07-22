@@ -3,7 +3,7 @@ $symbolInfoWidth: 231px;
 $fontSizeLarge: 20px;
 $fontWeightRegular: 300;
 $gapSmall: 4px;
-$checkboxSize: 17px;
+$checkboxSize: 16px;
 
 .symbolContainer {
 	display: flex;
@@ -105,9 +105,6 @@ $checkboxSize: 17px;
 				font-size: 14px;
 
 				.checkboxRoot {
-					display: flex;
-					justify-content: center;
-
 					width: $checkboxSize;
 					height: $checkboxSize;
 
@@ -115,7 +112,7 @@ $checkboxSize: 17px;
 					border-radius: 4px;
 					background: transparent;
 
-					&[data-state='checked'] {
+					&[data-state="checked"] {
 						background: var(--default-button-text);
 						border-color: var(--default-button-text);
 					}
@@ -129,6 +126,9 @@ $checkboxSize: 17px;
 					}
 
 					.checkboxIndicator {
+						display: flex;
+						align-items: center;
+						justify-content: center;
 						color: var(--default-white);
 					}
 				}

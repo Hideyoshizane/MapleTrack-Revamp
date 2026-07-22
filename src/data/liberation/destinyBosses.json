@@ -1,0 +1,153 @@
+[
+	{
+		"name": "Seren",
+		"img": "/assets/boss/seren.webp",
+		"maxPartySize": 6,
+		"difficulties": [
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 6
+			},
+			{
+				"name": "Extreme",
+				"reset": "Weekly",
+				"points": 80
+			}
+		]
+	},
+	{
+		"name": "Kalos",
+		"img": "/assets/boss/kalos.webp",
+		"maxPartySize": 6,
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 10
+			},
+			{
+				"name": "Chaos",
+				"reset": "Weekly",
+				"points": 70
+			},
+			{
+				"name": "Extreme",
+				"reset": "Weekly",
+				"points": 400
+			}
+		]
+	},
+	{
+		"name": "First Adversary",
+		"img": "/assets/boss/first_adversary.webp",
+		"maxPartySize": 3,
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 20
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 120
+			},
+			{
+				"name": "Extreme",
+				"reset": "Weekly",
+				"points": 500
+			}
+		]
+	},
+	{
+		"name": "Kaling",
+		"img": "/assets/boss/kaling.webp",
+		"maxPartySize": 6,
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 20
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 160
+			},
+			{
+				"name": "Extreme",
+				"reset": "Weekly",
+				"points": 1200
+			}
+		]
+	},
+	{
+		"name": "Malefic Star",
+		"img": "/assets/boss/malefic_star.webp",
+		"maxPartySize": 3,
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 20
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 380
+			}
+		]
+	},
+	{
+		"name": "Limbo",
+		"img": "/assets/boss/limbo.webp",
+		"maxPartySize": 3,
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 120
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 360
+			}
+		]
+	},
+	{
+		"name": "Baldrix",
+		"img": "/assets/boss/baldrix.webp",
+		"maxPartySize": 3,
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 150
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 450
+			}
+		]
+	},
+	{
+		"name": "Jupiter",
+		"img": "/assets/boss/jupiter.webp",
+		"maxPartySize": 3,
+		"difficulties": [
+			{
+				"name": "Normal",
+				"reset": "Weekly",
+				"points": 160
+			},
+			{
+				"name": "Hard",
+				"reset": "Weekly",
+				"points": 500
+			}
+		]
+	}
+]

@@ -2,6 +2,8 @@ import axios from 'axios';
 
 import type { AxiosInstance } from 'axios';
 
+type ApiErrorResponse = unknown;
+
 const axiosInstance: AxiosInstance = axios.create({
 	baseURL: '/api',
 	withCredentials: true,
@@ -12,7 +14,7 @@ const axiosInstance: AxiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
 	(response) => response,
 	(error: unknown): never => {
-		if (axios.isAxiosError(error)) {
+		if (axios.isAxiosError<ApiErrorResponse>(error)) {
 			if (error.code === 'ECONNABORTED') {
 				console.error('[Axios] Request timeout', { method: error.config?.method, url: error.config?.url });
 			} else if (!error.response) {

@@ -1,6 +1,7 @@
-import { differenceInWeeks, format } from 'date-fns';
+import { differenceInWeeks } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 
-import { getNextWeeklyResetDate, getNextMonthFirstDay } from '@utils/time';
+import { getNextWeeklyResetDate, getNextMonthFirstDay, getNextMidnight, createUtcDate } from '@utils/time';
 
 import type { WeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
 
@@ -17,8 +18,12 @@ type CalculatePointsScheduleParams = {
 };
 
 const normalizeDate = (value: Date | string): Date => {
-	return value instanceof Date ? value : new Date(value);
+	const date = value instanceof Date ? value : new Date(value);
+
+	return createUtcDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
 };
+
+export const formatUTC = (date: Date): string => formatInTimeZone(date, 'UTC', "MMMM d, yyyy '(UTC)'");
 
 export const calculatePointsSchedule = ({
 	selectedDate,
@@ -80,4 +85,63 @@ export const calculatePointsSchedule = ({
 	return { weeksRequired: Math.ceil(differenceInWeeks(completionDate, normalizedDate)), completionDate };
 };
 
-export const formatUTC = (date: Date): string => format(date, "MMMM d, yyyy '(UTC)'");
+type CalculateAstraScheduleParams = {
+	selectedDate: Date;
+	remainingErion: number;
+	remainingBattle: number;
+	dailyValues: number;
+	weeklyMonthlyPoints: WeeklyMonthlyPoints;
+};
+
+export const calculateAstraSchedule = ({
+	selectedDate,
+	remainingErion,
+	remainingBattle,
+	dailyValues,
+	weeklyMonthlyPoints,
+}: CalculateAstraScheduleParams): ScheduleResult => {
+	const normalizedDate = normalizeDate(selectedDate);
+
+	if (remainingErion <= 0 && remainingBattle <= 0) {
+		return { weeksRequired: 0, completionDate: normalizedDate };
+	}
+
+	const { totalWeeklyErion, totalWeeklyBattle, thisWeekErion, thisWeekBattle } = weeklyMonthlyPoints;
+
+	if ((totalWeeklyErion <= 0 && dailyValues <= 0) || totalWeeklyBattle <= 0) {
+		return { weeksRequired: Number.POSITIVE_INFINITY, completionDate: normalizedDate };
+	}
+
+	let currentDate = normalizedDate;
+
+	let remainingErionRequired = remainingErion;
+	let remainingBattleRequired = remainingBattle;
+
+	let weeklyErionGrant = thisWeekErion;
+	let weeklyBattleGrant = thisWeekBattle;
+	let isFirstWeek = true;
+
+	while (remainingErionRequired > 0 || remainingBattleRequired > 0) {
+		if (dailyValues > 0) {
+			remainingErionRequired -= dailyValues;
+
+			if (remainingErionRequired <= 0 && remainingBattleRequired <= 0) {
+				break;
+			}
+		}
+
+		currentDate = getNextMidnight(currentDate);
+
+		if (currentDate.getUTCDay() === 4) {
+			remainingErionRequired -= weeklyErionGrant;
+			remainingBattleRequired -= weeklyBattleGrant;
+
+			if (isFirstWeek) {
+				weeklyErionGrant = totalWeeklyErion;
+				weeklyBattleGrant = totalWeeklyBattle;
+				isFirstWeek = false;
+			}
+		}
+	}
+	return { weeksRequired: Math.ceil(differenceInWeeks(currentDate, normalizedDate)), completionDate: currentDate };
+};

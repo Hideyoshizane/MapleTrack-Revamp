@@ -41,7 +41,15 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 								characterId: true,
 								character: { select: { name: true, class: true, level: true } },
 								bosses: {
-									select: { id: true, name: true, difficulty: true, reset: true, cleared: true, locked: true },
+									select: {
+										id: true,
+										name: true,
+										difficulty: true,
+										partySize: true,
+										reset: true,
+										cleared: true,
+										locked: true,
+									},
 								},
 							},
 						},
@@ -66,7 +74,9 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				continue;
 			}
 
-			const bosses = new Array(characterEntry.bosses.length);
+			type Boss = getBossListResponseBody['characters'][number]['bosses'][number];
+
+			const bosses: Boss[] = Array.from({ length: characterEntry.bosses.length });
 
 			for (let index = 0; index < characterEntry.bosses.length; index += 1) {
 				const boss = characterEntry.bosses[index];
@@ -78,6 +88,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					reset: boss.reset,
 					cleared: boss.cleared ?? false,
 					locked: boss.locked ?? false,
+					partySize: boss.partySize,
 				};
 			}
 

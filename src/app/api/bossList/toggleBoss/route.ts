@@ -33,6 +33,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				difficulty: true,
 				cleared: true,
 				locked: true,
+				partySize: true,
 				character: {
 					select: {
 						characterId: true,
@@ -70,7 +71,13 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const sign = willBeCleared ? 1 : -1;
 
 		const bossValue = getBossDifficultyValue(bossData.name, bossData.difficulty, server.serverName);
-		const bossValueWithSign = bossValue * sign;
+		if (bossValue === null) {
+			logApiFailure('Boss value not found', { route });
+
+			return createResponse<ApiResponse>({ success: false, message: 'Boss value not found' }, 404);
+		}
+		const adjustedBossValue = Math.round(bossValue / bossData.partySize);
+		const bossValueWithSign = adjustedBossValue * sign;
 
 		const responseData = await prisma.$transaction(async (tx) => {
 			await Promise.all([
@@ -88,6 +95,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				tx,
 				bossData.name,
 				bossData.difficulty,
+				bossData.partySize,
 				sign,
 				authenticatedUserId,
 				bossData.character.characterId,
@@ -99,6 +107,8 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				totalGainUpdate: bossValueWithSign,
 				bossType: liberationPoints.bossType,
 				liberationPoints: liberationPoints.points,
+				astraVestigesPoints: liberationPoints.astra?.vestiges ?? null,
+				astraTracesPoints: liberationPoints.astra?.traces ?? null,
 			};
 		});
 

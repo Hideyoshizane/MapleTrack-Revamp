@@ -19,6 +19,7 @@ const ServerItem = ({ server, isSelected, onSelect }: Props): JSX.Element => {
 	const handleKey = (event: KeyboardEvent<HTMLDivElement>): void => {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();
+
 			onSelect(server);
 		}
 	};
@@ -30,7 +31,8 @@ const ServerItem = ({ server, isSelected, onSelect }: Props): JSX.Element => {
 			onClick={(): void => onSelect(server)}
 			onKeyDown={handleKey}
 			role="option"
-			tabIndex={0}>
+			tabIndex={0}
+		>
 			<div className={styles.iconWrapper}>
 				<Image alt={`${server.name} server icon`} height={48} priority src={server.img} width={48} />
 			</div>

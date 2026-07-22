@@ -14,40 +14,42 @@ type PartySize = {
 	multiplier: number;
 };
 
-const PARTY_SIZES: PartySize[] = [
-	{ label: 'Solo', multiplier: 1 },
-	{ label: '2x', multiplier: 2 },
-	{ label: '3x', multiplier: 3 },
-	{ label: '4x', multiplier: 4 },
-	{ label: '5x', multiplier: 5 },
-	{ label: '6x', multiplier: 6 },
-];
+const buildPartySizes = (maxPartySize: number): PartySize[] =>
+	Array.from({ length: maxPartySize }, (_, index): PartySize => {
+		const multiplier = index + 1;
+		return { label: multiplier === 1 ? 'Solo' : `${multiplier}x`, multiplier };
+	});
 
-const PARTY_SIZE_MAP: Record<number, PartySize> = (() => {
+const buildPartySizeMap = (partySizes: PartySize[]): Record<number, PartySize> => {
 	const map: Record<number, PartySize> = {};
-	for (const entry of PARTY_SIZES) {
+	for (const entry of partySizes) {
 		map[entry.multiplier] = entry;
 	}
 	return map;
-})();
-
-const DEFAULT_MULTIPLIER = 1;
+};
 
 type Props = {
 	selectedPartySize: number | null;
 	onChangePartySize: (partySize: number) => void;
+	maxPartySize: number;
 };
 
-const PartySizeSelector = ({ selectedPartySize, onChangePartySize }: Props): JSX.Element => {
+const DEFAULT_MULTIPLIER = 1;
+
+const PartySizeSelector = ({ selectedPartySize, onChangePartySize, maxPartySize }: Props): JSX.Element => {
+	const partySizes = buildPartySizes(maxPartySize);
+	const partySizeMap = buildPartySizeMap(partySizes);
+
 	const multiplier = selectedPartySize ?? DEFAULT_MULTIPLIER;
-	const selectedEntry = PARTY_SIZE_MAP[multiplier] ?? PARTY_SIZE_MAP[DEFAULT_MULTIPLIER];
+	const selectedEntry = partySizeMap[multiplier] ?? partySizeMap[DEFAULT_MULTIPLIER];
 
 	return (
 		<Select.Root
 			onValueChange={(value): void => {
 				onChangePartySize(Number(value));
 			}}
-			value={String(multiplier)}>
+			value={String(multiplier)}
+		>
 			<Select.Trigger className={styles.selectedBossWrapper}>
 				<div className={styles.bossDiv}>
 					<p className={styles.partySize}>{selectedEntry.label}</p>
@@ -63,9 +65,13 @@ const PartySizeSelector = ({ selectedPartySize, onChangePartySize }: Props): JSX
 					<ScrollArea.Root className={styles.scrollAreaRoot} type="auto">
 						<ScrollArea.Viewport className={styles.scrollAreaViewport}>
 							<Select.Viewport>
-								{PARTY_SIZES.map(
+								{partySizes.map(
 									(entry): JSX.Element => (
-										<Select.Item className={styles.bossItem} key={entry.multiplier} value={String(entry.multiplier)}>
+										<Select.Item
+											className={styles.bossItem}
+											key={entry.multiplier}
+											value={String(entry.multiplier)}
+										>
 											<div className={styles.itemContent}>
 												<p className={styles.partySize}>{entry.label}</p>
 											</div>

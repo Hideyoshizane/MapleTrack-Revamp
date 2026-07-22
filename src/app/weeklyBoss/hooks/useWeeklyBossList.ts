@@ -83,15 +83,35 @@ export const useWeeklyBossList = (server: ServerName): UseWeeklyBossListReturn =
 			const responseData = response.data;
 
 			if (responseData.bossType) {
-				const questType = responseData.bossType == 'genesis' ? 'Genesis' : 'Destiny';
-				if (responseData.liberationPoints !== null) {
-					const absolutePoints = Math.abs(responseData.liberationPoints);
+				const questTypeLabel = responseData.bossType === 'genesis' ? 'Genesis' : 'Destiny';
 
-					if (responseData.liberationPoints > 0) {
-						toast.success(`${absolutePoints} points added to ${questType} Liberation.`);
-					} else if (responseData.liberationPoints < 0) {
-						toast.success(`${absolutePoints} points removed from ${questType} Liberation.`);
+				const messages: string[] = [];
+
+				if (responseData.liberationPoints !== null && responseData.liberationPoints !== 0) {
+					const absolutePoints = Math.abs(responseData.liberationPoints);
+					const action = responseData.liberationPoints > 0 ? 'added to' : 'removed from';
+					messages.push(`${absolutePoints} points ${action} ${questTypeLabel} Liberation`);
+				}
+
+				const astraVestiges = responseData.astraVestigesPoints ?? 0;
+				const astraTraces = responseData.astraTracesPoints ?? 0;
+
+				if (astraVestiges !== 0 || astraTraces !== 0) {
+					const action = astraVestiges > 0 || astraTraces > 0 ? 'added to' : 'removed from';
+
+					const parts: string[] = [];
+					if (astraVestiges !== 0) {
+						parts.push(`${Math.abs(astraVestiges)} Vestiges of Erion`);
 					}
+					if (astraTraces !== 0) {
+						parts.push(`${Math.abs(astraTraces)} Traces of Battle`);
+					}
+
+					messages.push(`${parts.join(' and ')} ${action} Astra Liberation`);
+				}
+
+				if (messages.length > 0) {
+					toast.success(messages.map((message) => `• ${message}`).join('\n'));
 				}
 			}
 

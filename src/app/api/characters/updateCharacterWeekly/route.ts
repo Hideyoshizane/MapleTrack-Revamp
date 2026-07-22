@@ -56,7 +56,10 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		if (!weeklyContent) {
 			logApiFailure('Weekly not found', { route });
 
-			return createResponse<ApiResponse>({ success: false, message: 'Weekly content not found for symbol.' }, 404);
+			return createResponse<ApiResponse>(
+				{ success: false, message: 'Weekly content not found for symbol.' },
+				404,
+			);
 		}
 		if (weeklyContent.cleared) {
 			logApiFailure('Weekly already cleared', { route });

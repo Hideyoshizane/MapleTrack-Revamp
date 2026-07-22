@@ -65,7 +65,10 @@ const AccountPageClient = (): JSX.Element => {
 					id="confirmPassword"
 					label="Confirm password"
 					type="password"
-					validators={[zodValidator(passwordFieldSchema), confirmPasswordValidator(() => getValues('newPassword'))]}
+					validators={[
+						zodValidator(passwordFieldSchema),
+						confirmPasswordValidator(() => getValues('newPassword')),
+					]}
 					{...commonInputProps}
 					isLightmode={true}
 				/>
@@ -79,7 +82,8 @@ const AccountPageClient = (): JSX.Element => {
 					loaderColor="#121212"
 					loaderSize={16}
 					loadingText="Submitting..."
-					type="submit">
+					type="submit"
+				>
 					Change Password
 				</Button>
 			</form>

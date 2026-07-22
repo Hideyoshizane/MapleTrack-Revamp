@@ -6,7 +6,7 @@ export type Server = {
 	Reboot: boolean;
 };
 
-export const servers: Server[] = serversJson as Server[];
+export const servers: Server[] = serversJson;
 
 export const SERVER_NAMES = servers.map((server): string => server.name) as readonly string[];
 
@@ -34,9 +34,8 @@ export const getServerImageByName = (serverName: string | undefined): string => 
 	return serversMap.get(serverName.toLowerCase())?.img ?? '';
 };
 
-export const isRebootServer = (serverName: string): boolean => {
-	return serversMap.get(serverName.toLowerCase())?.Reboot ?? false;
-};
+export const isRebootServer = (serverName: string): boolean =>
+	serversMap.get(serverName.toLowerCase())?.Reboot ?? false;
 
 export const isValidServerName = (serverName: string | undefined): boolean => {
 	if (!serverName) {

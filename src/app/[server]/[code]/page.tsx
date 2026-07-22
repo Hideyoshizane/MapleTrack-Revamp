@@ -1,8 +1,7 @@
-export const dynamic = 'force-dynamic';
-
 import { redirect } from 'next/navigation';
 
 import { auth } from '@/auth';
+
 import Navbar from '@components/Navbar/Navbar';
 
 import { BonusProvider } from './BonusContext';

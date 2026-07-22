@@ -26,6 +26,8 @@ type Props = {
 	initialServer: ServerName;
 };
 
+const BOSS_ICON_SIZE = 96;
+
 const EditWeeklyPageClient = ({ initialServer }: Props): JSX.Element => {
 	const pathname = usePathname();
 	const router = useRouter();
@@ -45,8 +47,6 @@ const EditWeeklyPageClient = ({ initialServer }: Props): JSX.Element => {
 		handleBossUpdate,
 		handleSaveChanges,
 	} = useEditWeeklyBossList(server);
-
-	const BOSS_ICON_SIZE = 96;
 
 	if (loading || !serverData || !selectedCharacter) {
 		return (
@@ -103,7 +103,8 @@ const EditWeeklyPageClient = ({ initialServer }: Props): JSX.Element => {
 				</div>
 				<Button
 					className={styles.discardChangesButton}
-					onClick={(): void => router.push(pathname.replace(/\/edit$/, ''))}>
+					onClick={(): void => router.push(pathname.replace(/\/edit$/, ''))}
+				>
 					Discard Changes
 				</Button>
 				<Button className={styles.saveChangesButton} onClick={(): void => void handleSaveChanges(pathname)}>

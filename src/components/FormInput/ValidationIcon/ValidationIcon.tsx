@@ -12,8 +12,8 @@ import styles from './ValidationIcon.module.scss';
 import type { FC, SVGProps, JSX } from 'react';
 
 const ICONS: Record<'invalid' | 'info', FC<SVGProps<SVGSVGElement>>> = {
-	invalid: ErrorIcon as FC<SVGProps<SVGSVGElement>>,
-	info: InfoIcon as FC<SVGProps<SVGSVGElement>>,
+	invalid: ErrorIcon,
+	info: InfoIcon,
 };
 
 type Props = {

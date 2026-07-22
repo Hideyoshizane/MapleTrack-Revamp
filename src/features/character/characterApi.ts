@@ -18,8 +18,8 @@ import type {
 	updateCharacterWeeklyResponseBody,
 	getCharacterDataFromAPIResponseBody,
 	searchCharacterResponseBody,
+	updateCharacterAllDailyResponseBody,
 } from './schemas/character.response.schema';
-import type { LevelUpResult } from '@data/symbols/symbolMappings';
 import type { ApiResponse } from '@sharedTypes/api';
 
 export const characterApi = {
@@ -28,7 +28,9 @@ export const characterApi = {
 	): Promise<ApiResponse<getAllCharactersResponseBody[]>> =>
 		requestApi('/characters/getAllCharacters', 'POST', payload),
 
-	getCharacterData: async (payload: getCharacterDataRequestBody): Promise<ApiResponse<getCharacterDataResponseBody>> =>
+	getCharacterData: async (
+		payload: getCharacterDataRequestBody,
+	): Promise<ApiResponse<getCharacterDataResponseBody>> =>
 		requestApi('/characters/getCharacterData', 'POST', payload),
 
 	getEditCharacterData: async (
@@ -44,7 +46,9 @@ export const characterApi = {
 	updateCharacterData: async (payload: updateCharacterRequestBody): Promise<ApiResponse> =>
 		requestApi('/characters/updateCharacter', 'PATCH', payload),
 
-	updateAllDaily: async (payload: updateCharacterAllDailyRequestBody): Promise<Record<string, LevelUpResult>> =>
+	updateAllDaily: async (
+		payload: updateCharacterAllDailyRequestBody,
+	): Promise<ApiResponse<updateCharacterAllDailyResponseBody>> =>
 		requestApi('/characters/updateAllDaily', 'POST', payload),
 
 	updateCharacterDaily: async (

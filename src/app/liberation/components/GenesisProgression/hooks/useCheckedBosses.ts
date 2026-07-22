@@ -1,4 +1,5 @@
 'use client';
+
 import { isSameDay } from 'date-fns';
 import { useEffect, useRef, useState } from 'react';
 
@@ -34,10 +35,10 @@ export const useCheckedBosses = ({
 	const cacheRef = useRef<CacheEntry | null>(null);
 	const requestRef = useRef<string | null>(null);
 
-	useEffect(() => {
-		if (!isSameDay(selectedDate, currentDate)) {
-			setCheckedBosses(createNormalizedEmptyBossList(type) ?? []);
+	const isCurrentDay = isSameDay(selectedDate, currentDate);
 
+	useEffect(() => {
+		if (!isCurrentDay) {
 			return;
 		}
 
@@ -74,7 +75,10 @@ export const useCheckedBosses = ({
 		};
 
 		void run();
-	}, [characterId, server, currentDate, selectedDate, type]);
+	}, [characterId, server, currentDate, isCurrentDay]);
 
+	if (!isCurrentDay) {
+		return createNormalizedEmptyBossList(type) ?? [];
+	}
 	return checkedBosses;
 };

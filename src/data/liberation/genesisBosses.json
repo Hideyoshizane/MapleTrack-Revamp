@@ -1,8 +1,8 @@
 [
 	{
 		"name": "Lotus",
-		"type": "genesis",
 		"img": "/assets/boss/lotus.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -23,8 +23,8 @@
 	},
 	{
 		"name": "Damien",
-		"type": "genesis",
 		"img": "/assets/boss/damien.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -40,8 +40,8 @@
 	},
 	{
 		"name": "Lucid",
-		"type": "genesis",
 		"img": "/assets/boss/lucid.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -62,8 +62,8 @@
 	},
 	{
 		"name": "Will",
-		"type": "genesis",
 		"img": "/assets/boss/will.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Easy",
@@ -84,8 +84,8 @@
 	},
 	{
 		"name": "Gloom",
-		"type": "genesis",
 		"img": "/assets/boss/gloom.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -101,8 +101,8 @@
 	},
 	{
 		"name": "Verus Hilla",
-		"type": "genesis",
 		"img": "/assets/boss/verus_hilla.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -118,8 +118,8 @@
 	},
 	{
 		"name": "Darknell",
-		"type": "genesis",
 		"img": "/assets/boss/darknell.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Normal",
@@ -135,8 +135,8 @@
 	},
 	{
 		"name": "Black Mage",
-		"type": "genesis",
 		"img": "/assets/boss/black_mage.webp",
+		"maxPartySize": 6,
 		"difficulties": [
 			{
 				"name": "Hard",
@@ -147,123 +147,6 @@
 				"name": "Extreme",
 				"reset": "Monthly",
 				"points": 600
-			}
-		]
-	},
-	{
-		"name": "Seren",
-		"type": "destiny",
-		"img": "/assets/boss/seren.webp",
-		"difficulties": [
-			{
-				"name": "Hard",
-				"reset": "Weekly",
-				"points": 6
-			},
-			{
-				"name": "Extreme",
-				"reset": "Weekly",
-				"points": 80
-			}
-		]
-	},
-	{
-		"name": "Kalos",
-		"type": "destiny",
-		"img": "/assets/boss/kalos.webp",
-		"difficulties": [
-			{
-				"name": "Normal",
-				"reset": "Weekly",
-				"points": 10
-			},
-			{
-				"name": "Chaos",
-				"reset": "Weekly",
-				"points": 70
-			},
-			{
-				"name": "Extreme",
-				"reset": "Weekly",
-				"points": 400
-			}
-		]
-	},
-	{
-		"name": "First Adversary",
-		"type": "destiny",
-		"img": "/assets/boss/first_adversary.webp",
-		"difficulties": [
-			{
-				"name": "Normal",
-				"reset": "Weekly",
-				"points": 20
-			},
-			{
-				"name": "Hard",
-				"reset": "Weekly",
-				"points": 120
-			},
-			{
-				"name": "Extreme",
-				"reset": "Weekly",
-				"points": 500
-			}
-		]
-	},
-	{
-		"name": "Kaling",
-		"type": "destiny",
-		"img": "/assets/boss/kaling.webp",
-		"difficulties": [
-			{
-				"name": "Normal",
-				"reset": "Weekly",
-				"points": 20
-			},
-			{
-				"name": "Hard",
-				"reset": "Weekly",
-				"points": 160
-			},
-			{
-				"name": "Extreme",
-				"reset": "Weekly",
-				"points": 1200
-			}
-		]
-	},
-	{
-		"name": "Limbo",
-		"type": "destiny",
-		"img": "/assets/boss/limbo.webp",
-		"difficulties": [
-			{
-				"name": "Normal",
-				"reset": "Weekly",
-				"points": 120
-			},
-			{
-				"name": "Hard",
-				"reset": "Weekly",
-				"points": 360
-			}
-		]
-	},
-	{
-		"name": "Baldrix",
-		"type": "destiny",
-		"img": "/assets/boss/baldrix.webp",
-		"difficulties": [
-			{
-				"name": "Normal",
-				"reset": "Weekly",
-				"points": 150
-			},
-			{
-				"name": "Hard",
-				"reset": "Weekly",
-				"points": 450
 			}
 		]
 	}

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { MIN_VALUE_BONUS_COOKIE, MAX_VALUE_BONUS_COOKIE } from '@constants/cookiesConstants';
 import { CHARACTER_MAX_LEVEL } from '@data/character/constants';
 import { JOB_CLASSES, LINK_SKILL, JOB_TYPE, LEGION_TYPE } from '@data/classes/classes';
+import { ASTRA_DAILY_AREAS } from '@data/liberation/astraDaily';
 
 import { getCharacterDataSymbolsResponseSchema } from './character.response.schema';
 import {
@@ -58,6 +59,8 @@ export const updateCharacterRequestSchema = z
 		legion: z.enum(LEGION_TYPE),
 		linkSkill: z.enum(LINK_SKILL),
 
+		lastSymbolDaily: z.enum(ASTRA_DAILY_AREAS).nullable(),
+
 		symbols: z.object({
 			arcane: z.array(getCharacterDataSymbolsResponseSchema),
 			sacred: z.array(getCharacterDataSymbolsResponseSchema),
@@ -93,7 +96,7 @@ export const updateCharacterWeeklyRequestSchema = z
 
 export type updateCharacterWeeklyRequestBody = z.infer<typeof updateCharacterWeeklyRequestSchema>;
 
-// Update All Daily WIP
+// Update All Daily
 
 export const updateCharacterAllDailyRequestSchema = z
 	.object({

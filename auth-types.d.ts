@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
 import type { DefaultSession, DefaultUser } from 'next-auth';
 
 declare module 'next-auth' {

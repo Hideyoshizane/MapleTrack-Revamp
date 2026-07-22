@@ -58,7 +58,7 @@ export const syncCharacterInfo = async ({
 
 	const character = await prisma.character.findFirst({
 		where: { userId: cleanUserId, server: cleanServer, class: cleanCode },
-		select: { id: true, name: true, level: true, syncing: true },
+		select: { id: true, name: true, level: true, syncing: true, lastSymbolDaily: true },
 	});
 	if (!character) {
 		return;
@@ -76,11 +76,13 @@ export const syncCharacterInfo = async ({
 
 		const dailyQuestIdsToReset: string[] = [];
 		const weeklyQuestIdsToReset: string[] = [];
+		let shouldResetLastSymbolDaily = false;
 
 		for (const symbol of symbolData) {
 			for (const content of symbol.contents) {
 				if (content.contentType === 'Daily Quest' && hasDailyResetOccurred(content.date)) {
 					dailyQuestIdsToReset.push(content.id);
+					shouldResetLastSymbolDaily = true;
 				}
 
 				if (content.tries != null && hasWeeklyResetOccurred(content.date)) {
@@ -93,7 +95,16 @@ export const syncCharacterInfo = async ({
 
 		if (dailyQuestIdsToReset.length > 0) {
 			transactionPromises.push(
-				tx.characterContent.updateMany({ where: { id: { in: dailyQuestIdsToReset } }, data: { cleared: false } }),
+				tx.characterContent.updateMany({
+					where: { id: { in: dailyQuestIdsToReset } },
+					data: { cleared: false },
+				}),
+			);
+		}
+
+		if (shouldResetLastSymbolDaily) {
+			transactionPromises.push(
+				tx.character.update({ where: { id: character.id }, data: { lastSymbolDaily: null } }),
 			);
 		}
 
@@ -106,7 +117,10 @@ export const syncCharacterInfo = async ({
 			);
 		}
 
-		const externalData = externalDataPromise ? await externalDataPromise : null;
+		let externalData: getCharacterDataFromAPIResponseBody | null = null;
+		if (externalDataPromise !== null) {
+			externalData = await externalDataPromise;
+		}
 
 		if (externalData && externalData.level > character.level) {
 			transactionPromises.push(

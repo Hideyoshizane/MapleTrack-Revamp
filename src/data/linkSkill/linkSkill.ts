@@ -11,7 +11,7 @@ type LinkSkill = {
 	levels: LinkSkillLevel[];
 };
 
-const linkSkills: LinkSkill[] = linkSkillsData as LinkSkill[];
+const linkSkills: LinkSkill[] = linkSkillsData;
 
 const linkSkillsByName: ReadonlyMap<string, LinkSkill> = new Map(
 	linkSkills.map((skill): [string, LinkSkill] => [skill.name, skill]),

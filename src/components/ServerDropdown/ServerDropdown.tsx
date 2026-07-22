@@ -29,10 +29,14 @@ const ServerDropdown = ({ server, setServerCookie }: Props): JSX.Element => {
 	return (
 		<Select.Root
 			onValueChange={(value: string): void => {
-				setServerCookie?.(value as ServerName);
+				setServerCookie?.(value);
 			}}
-			value={selectedServer.name}>
-			<Select.Trigger className={styles.selectedServerWrapper} aria-label={`Selected server: ${selectedServer.name}`}>
+			value={selectedServer.name}
+		>
+			<Select.Trigger
+				className={styles.selectedServerWrapper}
+				aria-label={`Selected server: ${selectedServer.name}`}
+			>
 				<div className={styles.iconWrapper}>
 					<Image alt={selectedServer.name} height={48} priority src={selectedServer.img} width={48} />
 				</div>
@@ -49,7 +53,11 @@ const ServerDropdown = ({ server, setServerCookie }: Props): JSX.Element => {
 							<Select.Viewport>
 								{servers.map(
 									(serverItem: Server): JSX.Element => (
-										<Select.Item className={styles.serverItem} key={serverItem.name} value={serverItem.name}>
+										<Select.Item
+											className={styles.serverItem}
+											key={serverItem.name}
+											value={serverItem.name}
+										>
 											<ServerItem
 												isSelected={serverItem.name === selectedServer.name}
 												onSelect={() => {

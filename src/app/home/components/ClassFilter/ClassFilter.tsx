@@ -10,13 +10,13 @@ import type { JSX } from 'react';
 
 type Props = {
 	selectedClasses: ClassFilterOption[];
-	setSelectedClasses: (values: ClassFilterOption[]) => void;
+	setSelectedClassesAction: (values: ClassFilterOption[]) => void;
 	loading?: boolean;
 };
 
 const toCapitalCase = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
-export const ClassFilter = ({ selectedClasses, setSelectedClasses, loading = false }: Props): JSX.Element => {
+export const ClassFilter = ({ selectedClasses, setSelectedClassesAction, loading = false }: Props): JSX.Element => {
 	const toggleClass = (className: ClassFilterOption): void => {
 		const lowerName = className.toLowerCase() as ClassFilterOption;
 
@@ -24,7 +24,7 @@ export const ClassFilter = ({ selectedClasses, setSelectedClasses, loading = fal
 			? selectedClasses.filter((c): boolean => c !== lowerName)
 			: [...selectedClasses, lowerName];
 
-		setSelectedClasses(updated);
+		setSelectedClassesAction(updated);
 	};
 
 	if (loading) {
@@ -46,7 +46,8 @@ export const ClassFilter = ({ selectedClasses, setSelectedClasses, loading = fal
 							<button
 								className={`${styles.option} ${selectedClasses.includes(lowerName) ? styles.active : ''}`}
 								onClick={(): void => toggleClass(lowerName)}
-								type="button">
+								type="button"
+							>
 								{toCapitalCase(lowerName)}
 							</button>
 							{index < arr.length - 1 && <span className={styles.separator} />}

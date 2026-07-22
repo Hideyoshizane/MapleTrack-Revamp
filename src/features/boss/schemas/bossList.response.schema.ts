@@ -1,6 +1,12 @@
 import { z } from 'zod';
 
-import { BOSS_DIFFICULTY_ENUM, BOSS_RESET_ENUM, BOSS_NAMES_ENUM, isValidBossDifficulty } from '@data/bosses/bosses';
+import {
+	BOSS_DIFFICULTY_ENUM,
+	BOSS_RESET_ENUM,
+	BOSS_NAMES_ENUM,
+	isValidBossDifficulty,
+	getBossMaxPartySize,
+} from '@data/bosses/bosses';
 import { CHARACTER_MAX_LEVEL } from '@data/character/constants';
 import { JOB_CLASSES } from '@data/classes/classes';
 import { characterIdRawSchema, characterNameRawSchema } from '@features/character/schemas/character.schema';
@@ -18,17 +24,31 @@ const getBossListBossesSchema = z
 		name: z.enum(BOSS_NAMES_ENUM),
 		difficulty: z.enum(BOSS_DIFFICULTY_ENUM),
 		reset: z.enum(BOSS_RESET_ENUM),
+		partySize: z.number().int().min(1),
 
 		cleared: z.boolean().default(false),
 		locked: z.boolean().default(false).optional(),
 	})
 	.superRefine((data, ctx): void => {
 		if (!isValidBossDifficulty(data.name, data.difficulty)) {
-			ctx.addIssue({ code: 'custom', message: 'Invalid difficulty.', path: ['difficulty'] });
+			ctx.addIssue({
+				code: 'custom',
+				path: ['difficulty'],
+				message: 'Invalid difficulty.',
+			});
+		}
+
+		const maxPartySize = getBossMaxPartySize(data.name);
+
+		if (data.partySize > maxPartySize) {
+			ctx.addIssue({
+				code: 'custom',
+				path: ['partySize'],
+				message: `Party size cannot exceed ${maxPartySize} for ${data.name}.`,
+			});
 		}
 	})
 	.strict();
-
 export type getBossListBossResponseBody = z.infer<typeof getBossListBossesSchema>;
 
 const getBossListCharactersSchema = z
@@ -62,10 +82,22 @@ const getEditBossListBossesSchema = z
 		name: z.enum(BOSS_NAMES_ENUM),
 		difficulty: z.enum(BOSS_DIFFICULTY_ENUM),
 		reset: z.enum(BOSS_RESET_ENUM),
+		partySize: z.number().int().min(1),
 
 		dailyTotal: z.number().min(0).max(7),
 	})
-	.strict();
+	.strict()
+	.superRefine((boss, context) => {
+		const maxPartySize = getBossMaxPartySize(boss.name);
+
+		if (boss.partySize > maxPartySize) {
+			context.addIssue({
+				code: 'custom',
+				path: ['partySize'],
+				message: `Party size cannot exceed ${maxPartySize} for ${boss.name}.`,
+			});
+		}
+	});
 
 export type getEditBossListBossResponseBody = z.infer<typeof getEditBossListBossesSchema>;
 
@@ -99,8 +131,12 @@ export const toggleBossListResponseSchema = z
 	.object({
 		weeklyBossesUpdate: z.number(),
 		totalGainUpdate: z.number(),
+
 		bossType: z.string().nullable(),
+
 		liberationPoints: z.number().nullable(),
+		astraVestigesPoints: z.number().nullable(),
+		astraTracesPoints: z.number().nullable(),
 	})
 	.strict();
 

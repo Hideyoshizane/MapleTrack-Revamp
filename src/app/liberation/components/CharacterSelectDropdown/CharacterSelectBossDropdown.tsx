@@ -38,7 +38,8 @@ const CharacterSelectLiberationDropdown = ({
 					setSelectedCharacter(found);
 				}
 			}}
-			value={selectedCharacter.class}>
+			value={selectedCharacter.class}
+		>
 			<Select.Trigger className={styles.selectedCharacterWrapper}>
 				<div className={styles.nameDiv}>
 					<p className={styles.characterName}>{selectedCharacter.name}</p>
@@ -64,7 +65,11 @@ const CharacterSelectLiberationDropdown = ({
 						<ScrollArea.Viewport className={styles.scrollAreaViewport}>
 							<Select.Viewport>
 								{characters.map((character) => (
-									<Select.Item className={styles.characterItem} key={character.class} value={character.class}>
+									<Select.Item
+										className={styles.characterItem}
+										key={character.class}
+										value={character.class}
+									>
 										<CharacterLiberationItem
 											character={character}
 											isSelected={character.class === selectedCharacter.class}

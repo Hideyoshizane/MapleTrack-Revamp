@@ -46,7 +46,8 @@ const SearchBar = (): JSX.Element => {
 			<Popover.Content
 				onCloseAutoFocus={(event): void => event.preventDefault()}
 				onOpenAutoFocus={(event): void => event.preventDefault()}
-				sideOffset={4}>
+				sideOffset={4}
+			>
 				<div id="async-select-list" role="listbox">
 					{isLoading && (
 						<div className={styles.searching}>
@@ -54,28 +55,29 @@ const SearchBar = (): JSX.Element => {
 						</div>
 					)}
 
-					{!isLoading && hasSearched && results.length === 0 && <div className={styles.notFound}>No results</div>}
+					{!isLoading && hasSearched && results.length === 0 && (
+						<div className={styles.notFound}>No results</div>
+					)}
 
 					{!isLoading && results.length > 0 && (
 						<div className={styles.results}>
 							{results.map((character): JSX.Element => {
-								const imageSrc = getServerImageByName(character.server) ?? '/assets/icons/servers/default.webp';
+								const imageSrc =
+									getServerImageByName(character.server) ?? '/assets/icons/servers/default.webp';
 
 								return (
 									<Link
+										className={styles.resultItem}
 										href={`/${character.server}/${generateClassCode(character.class)}`}
 										key={`${character.server}-${character.name}`}
-										prefetch={false}>
-										<div
-											className={styles.resultItem}
-											onMouseDown={(event): void => event.preventDefault()}
-											role="option">
-											<Image alt={`${character.server} Icon`} height={48} src={imageSrc} width={48} />
+										onMouseDown={(event): void => event.preventDefault()}
+										prefetch={false}
+									>
+										<Image alt={`${character.server} Icon`} height={48} src={imageSrc} width={48} />
 
-											<span>
-												{character.server}: {character.name} - {character.class}
-											</span>
-										</div>
+										<span>
+											{character.server}: {character.name} - {character.class}
+										</span>
 									</Link>
 								);
 							})}
