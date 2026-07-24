@@ -1,4 +1,9 @@
 .trigger {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-end;
+	width: 136px;
 	border: none;
 	background-color: transparent;
 
@@ -6,9 +11,7 @@
 		display: flex;
 
 		align-items: center;
-		justify-content: flex-end;
 
-		width: 136px;
 		height: 40px;
 
 		font-size: 18px;
@@ -17,6 +20,14 @@
 		color: var(--default-button-text);
 
 		cursor: pointer;
+	}
+
+	.teste {
+		display: flex;
+
+		width: 16px;
+		height: 16px;
+		color: var(--default-button-text);
 	}
 }
 

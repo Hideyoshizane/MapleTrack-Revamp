@@ -40,11 +40,11 @@
 	--liberation-destiny: #9adae5;
 }
 
-:root[data-theme='light'] {
+:root[data-theme="light"] {
 	--background: var(--background-white);
 }
 
-:root[data-theme='dark'] {
+:root[data-theme="dark"] {
 	--background: var(--default-black);
 }
 
@@ -88,23 +88,19 @@ body {
 	scrollbar-width: thin;
 }
 
-*::-webkit-scrollbar {
-	width: 6px;
-}
-
 a {
 	color: inherit;
 	text-decoration: none;
 }
 
-input[type='number'] {
+input[type="number"] {
 	font-family: Roboto, sans-serif;
 	font-weight: 500;
 	appearance: textfield;
 }
 
-input[type='number']::-webkit-outer-spin-button,
-input[type='number']::-webkit-inner-spin-button {
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
 	margin: 0;
 	appearance: none;
 }

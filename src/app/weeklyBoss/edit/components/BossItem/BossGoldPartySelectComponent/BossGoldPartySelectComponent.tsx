@@ -4,6 +4,7 @@ import NumberFlow from '@number-flow/react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 
 import CheckIcon from '@assets/svg/check.svg';
+import ChevronIcon from '@assets/svg/chevron-down.svg';
 
 import styles from './BossGoldPartySelectComponent.module.scss';
 
@@ -50,6 +51,7 @@ const BossGoldPartySelectComponent = ({
 						transformTiming={{ duration: 200 }}
 						value={Math.round(value / partySize)}
 					/>
+					<ChevronIcon className={styles.teste} />
 				</button>
 			</DropdownMenu.Trigger>
 
