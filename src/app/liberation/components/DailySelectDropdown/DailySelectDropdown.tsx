@@ -1,6 +1,5 @@
 'use client';
 
-import * as ScrollArea from '@radix-ui/react-scroll-area';
 import * as Select from '@radix-ui/react-select';
 import Image from 'next/image';
 
@@ -86,79 +85,63 @@ const DailySelectDropdown = ({ selectedDailyPreview, onSelectArea }: Props): JSX
 					</div>
 				</Select.Trigger>
 
-				<Select.Portal>
-					<Select.Content className={styles.areaList} position="popper">
-						<ScrollArea.Root className={styles.scrollAreaRoot} type="auto">
-							<ScrollArea.Viewport className={styles.scrollAreaViewport}>
-								<Select.Viewport>
-									<Select.Item className={styles.areaItem} value="0">
-										<div className={styles.itemContent}>
-											<NoIcon className={styles.noArea} height={IMAGE_SIZE} width={IMAGE_SIZE} />
-											<p className={styles.itemName}>Skip</p>
+				<Select.Content className={styles.areaList} position="popper">
+					<div className={styles.scrollContainer}>
+						<Select.Viewport>
+							<Select.Item className={styles.areaItem} value="0">
+								<div className={styles.itemContent}>
+									<NoIcon className={styles.noArea} height={IMAGE_SIZE} width={IMAGE_SIZE} />
 
-											<div className={styles.erionText}>
-												<Image
-													alt="Erion"
-													height={ERION_SIZE}
-													src={weaponQuestsImagesSrc.astra_erion}
-													width={ERION_SIZE}
-												/>
+									<p className={styles.itemName}>Skip</p>
 
-												<p>0</p>
-											</div>
+									<div className={styles.erionText}>
+										<Image
+											alt="Erion"
+											height={ERION_SIZE}
+											src={weaponQuestsImagesSrc.astra_erion}
+											width={ERION_SIZE}
+										/>
 
-											{selectedDailyPreview === 0 && (
-												<div className={styles.iconsDiv}>
-													<CheckIcon className={styles.icon} />
-												</div>
-											)}
+										<p>0</p>
+									</div>
+
+									{selectedDailyPreview === 0 && (
+										<div className={styles.iconsDiv}>
+											<CheckIcon className={styles.icon} />
 										</div>
-									</Select.Item>
+									)}
+								</div>
+							</Select.Item>
 
-									{areas.map((area) => (
-										<Select.Item
-											className={styles.areaItem}
-											key={area.name}
-											value={area.erion.toString()}
-										>
-											<div className={styles.itemContent}>
-												<Image
-													alt={area.name}
-													height={IMAGE_SIZE}
-													src={area.img}
-													width={IMAGE_SIZE}
-												/>
+							{areas.map((area) => (
+								<Select.Item className={styles.areaItem} key={area.name} value={area.erion.toString()}>
+									<div className={styles.itemContent}>
+										<Image alt={area.name} height={IMAGE_SIZE} src={area.img} width={IMAGE_SIZE} />
 
-												<p className={styles.itemName}>{area.name}</p>
+										<p className={styles.itemName}>{area.name}</p>
 
-												<div className={styles.erionText}>
-													<Image
-														alt="Erion"
-														height={ERION_SIZE}
-														src={weaponQuestsImagesSrc.astra_erion}
-														width={ERION_SIZE}
-													/>
+										<div className={styles.erionText}>
+											<Image
+												alt="Erion"
+												height={ERION_SIZE}
+												src={weaponQuestsImagesSrc.astra_erion}
+												width={ERION_SIZE}
+											/>
 
-													<p>{area.erion}</p>
-												</div>
+											<p>{area.erion}</p>
+										</div>
 
-												{selectedDailyPreview === area.erion && (
-													<div className={styles.iconsDiv}>
-														<CheckIcon className={styles.icon} />
-													</div>
-												)}
+										{selectedDailyPreview === area.erion && (
+											<div className={styles.iconsDiv}>
+												<CheckIcon className={styles.icon} />
 											</div>
-										</Select.Item>
-									))}
-								</Select.Viewport>
-							</ScrollArea.Viewport>
-
-							<ScrollArea.Scrollbar className={styles.scrollAreaScrollbar} orientation="vertical">
-								<ScrollArea.Thumb className={styles.scrollAreaThumb} />
-							</ScrollArea.Scrollbar>
-						</ScrollArea.Root>
-					</Select.Content>
-				</Select.Portal>
+										)}
+									</div>
+								</Select.Item>
+							))}
+						</Select.Viewport>
+					</div>
+				</Select.Content>
 			</Select.Root>
 		</div>
 	);

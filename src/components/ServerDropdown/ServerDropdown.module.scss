@@ -61,3 +61,9 @@ $spacingMedium: 8px;
 .serverItem:focus-visible {
 	outline: none;
 }
+
+.scrollContainer {
+	width: 100%;
+
+	overflow-y: auto;
+}

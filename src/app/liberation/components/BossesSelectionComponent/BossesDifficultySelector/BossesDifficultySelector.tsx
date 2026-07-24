@@ -1,6 +1,5 @@
 'use client';
 
-import * as ScrollArea from '@radix-ui/react-scroll-area';
 import * as Select from '@radix-ui/react-select';
 import { clsx } from 'clsx';
 import Image from 'next/image';
@@ -124,43 +123,33 @@ const BossesDifficultySelector = ({
 
 			<Select.Portal>
 				<Select.Content className={styles.bossList} position="popper">
-					<ScrollArea.Root className={styles.scrollAreaRoot} type="auto">
-						<ScrollArea.Viewport className={styles.scrollAreaViewport}>
-							<Select.Viewport>
-								{normalizedDifficulties.map(
-									(difficulty): JSX.Element => (
-										<Select.Item
-											className={styles.bossItem}
-											key={difficulty.name}
-											value={difficulty.name}
-										>
-											<div className={styles.itemContent}>
-												<p
-													className={clsx(
-														styles.button,
-														styles[difficulty.name.toLowerCase()],
-													)}
-												>
-													{difficulty.name}
-												</p>
-												<DifficultyValue difficulty={difficulty} type={type} />
+					<div className={styles.scrollContainer}>
+						<Select.Viewport>
+							{normalizedDifficulties.map(
+								(difficulty): JSX.Element => (
+									<Select.Item
+										className={styles.bossItem}
+										key={difficulty.name}
+										value={difficulty.name}
+									>
+										<div className={styles.itemContent}>
+											<p className={clsx(styles.button, styles[difficulty.name.toLowerCase()])}>
+												{difficulty.name}
+											</p>
 
-												{selectedEntry.name === difficulty.name && (
-													<div className={styles.iconsDiv}>
-														<CheckIcon className={styles.icon} />
-													</div>
-												)}
-											</div>
-										</Select.Item>
-									),
-								)}
-							</Select.Viewport>
-						</ScrollArea.Viewport>
+											<DifficultyValue difficulty={difficulty} type={type} />
 
-						<ScrollArea.Scrollbar className={styles.scrollAreaScrollbar} orientation="vertical">
-							<ScrollArea.Thumb className={styles.scrollAreaThumb} />
-						</ScrollArea.Scrollbar>
-					</ScrollArea.Root>
+											{selectedEntry.name === difficulty.name && (
+												<div className={styles.iconsDiv}>
+													<CheckIcon className={styles.icon} />
+												</div>
+											)}
+										</div>
+									</Select.Item>
+								),
+							)}
+						</Select.Viewport>
+					</div>
 				</Select.Content>
 			</Select.Portal>
 		</Select.Root>

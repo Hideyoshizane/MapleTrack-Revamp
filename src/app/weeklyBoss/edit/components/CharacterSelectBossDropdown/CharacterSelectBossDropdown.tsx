@@ -1,6 +1,5 @@
 'use client';
 
-import * as ScrollArea from '@radix-ui/react-scroll-area';
 import * as Select from '@radix-ui/react-select';
 import Image from 'next/image';
 
@@ -57,29 +56,23 @@ const CharacterSelectBossDropdown = ({ setSelectedCharacter, selectedCharacter, 
 
 			<Select.Portal>
 				<Select.Content className={styles.characterList} position="popper">
-					<ScrollArea.Root className={styles.scrollAreaRoot} type="auto">
-						<ScrollArea.Viewport className={styles.scrollAreaViewport}>
-							<Select.Viewport>
-								{characters.map((character) => (
-									<Select.Item
-										className={styles.characterItem}
-										key={character.class}
-										value={character.class}
-									>
-										<CharacterBossItem
-											character={character}
-											isSelected={character.class === selectedCharacter.class}
-											onClick={() => setSelectedCharacter(character)}
-										/>
-									</Select.Item>
-								))}
-							</Select.Viewport>
-						</ScrollArea.Viewport>
-
-						<ScrollArea.Scrollbar className={styles.scrollAreaScrollbar} orientation="vertical">
-							<ScrollArea.Thumb className={styles.scrollAreaThumb} />
-						</ScrollArea.Scrollbar>
-					</ScrollArea.Root>
+					<div className={styles.scrollContainer}>
+						<Select.Viewport>
+							{characters.map((character) => (
+								<Select.Item
+									className={styles.characterItem}
+									key={character.class}
+									value={character.class}
+								>
+									<CharacterBossItem
+										character={character}
+										isSelected={character.class === selectedCharacter.class}
+										onClick={() => setSelectedCharacter(character)}
+									/>
+								</Select.Item>
+							))}
+						</Select.Viewport>
+					</div>
 				</Select.Content>
 			</Select.Portal>
 		</Select.Root>

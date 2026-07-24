@@ -26,7 +26,11 @@ $iconSize: 40px;
 	outline: none;
 
 	&:hover {
-		background-color: color-mix(in srgb, var(--background-white) 90%, black);
+		background-color: color-mix(
+			in srgb,
+			var(--background-white) 90%,
+			black
+		);
 	}
 
 	.bossDiv {
@@ -92,7 +96,11 @@ $iconSize: 40px;
 	}
 
 	&:hover {
-		background-color: color-mix(in srgb, var(--background-white) 90%, black);
+		background-color: color-mix(
+			in srgb,
+			var(--background-white) 90%,
+			black
+		);
 	}
 
 	&:not(:last-child) {
@@ -131,42 +139,8 @@ $iconSize: 40px;
 	}
 }
 
-.scrollAreaRoot {
-	max-height: $dropdownOpenHeight;
-}
+.scrollContainer {
+	width: 100%;
 
-.scrollAreaViewport {
-	max-height: inherit;
-
-	overflow: auto;
-
-	overscroll-behavior: contain;
-}
-
-.scrollAreaScrollbar {
-	display: flex;
-
-	width: 6px;
-
-	padding: 2px;
-
-	user-select: none;
-
-	padding-bottom: $scrollbarLimit;
-	padding-top: $scrollbarLimit;
-
-	touch-action: none;
-
-	&[data-orientation='vertical'] {
-		width: 6px;
-	}
-}
-
-.scrollAreaThumb {
-	position: relative;
-	flex: 1;
-
-	border-radius: 999px;
-
-	background: var(--default-black);
+	overflow-y: auto;
 }

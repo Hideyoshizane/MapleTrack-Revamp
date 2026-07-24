@@ -1,7 +1,6 @@
 'use client';
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import * as ScrollArea from '@radix-ui/react-scroll-area';
 import Image from 'next/image';
 import { Fragment } from 'react';
 import { toast } from 'react-toastify';
@@ -79,41 +78,35 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX
 
 			<DropdownMenu.Portal>
 				<DropdownMenu.Content className={styles.characterList} align="start" side="bottom" sideOffset={4}>
-					<ScrollArea.Root className={styles.scrollAreaRoot}>
-						<ScrollArea.Viewport className={styles.scrollAreaViewport}>
-							{character.bosses.map((boss) => (
-								<Fragment key={`${boss.name}-${boss.difficulty}`}>
-									<DropdownMenu.CheckboxItem
-										className={styles.characterItem}
-										checked={boss.cleared}
-										data-checked={boss.cleared}
-										data-locked={boss.locked}
-										onSelect={(event): void => {
-											event.preventDefault();
-										}}
-									>
-										<CharacterBossItem
-											boss={boss}
-											isSelected={boss.locked || boss.cleared}
-											onClick={() => {
-												if (boss.locked) {
-													toast.info('This boss has already been cleared this month.');
-													return;
-												}
-												const bossMonsterId = boss.id;
-												void handleBossToggle(bossMonsterId);
-											}}
-											server={server}
-										/>
-									</DropdownMenu.CheckboxItem>
-								</Fragment>
-							))}
-						</ScrollArea.Viewport>
+					<div className={styles.scrollContainer}>
+						{character.bosses.map((boss) => (
+							<Fragment key={`${boss.name}-${boss.difficulty}`}>
+								<DropdownMenu.CheckboxItem
+									className={styles.characterItem}
+									checked={boss.cleared}
+									data-checked={boss.cleared}
+									data-locked={boss.locked}
+									onSelect={(event): void => {
+										event.preventDefault();
+									}}
+								>
+									<CharacterBossItem
+										boss={boss}
+										isSelected={boss.locked || boss.cleared}
+										onClick={() => {
+											if (boss.locked) {
+												toast.info('This boss has already been cleared this month.');
+												return;
+											}
 
-						<ScrollArea.Scrollbar className={styles.scrollAreaScrollbar} orientation="vertical">
-							<ScrollArea.Thumb className={styles.scrollAreaThumb} />
-						</ScrollArea.Scrollbar>
-					</ScrollArea.Root>
+											void handleBossToggle(boss.id);
+										}}
+										server={server}
+									/>
+								</DropdownMenu.CheckboxItem>
+							</Fragment>
+						))}
+					</div>
 				</DropdownMenu.Content>
 			</DropdownMenu.Portal>
 		</DropdownMenu.Root>

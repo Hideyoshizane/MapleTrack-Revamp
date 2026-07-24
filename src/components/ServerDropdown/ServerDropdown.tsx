@@ -1,6 +1,5 @@
 'use client';
 
-import * as ScrollArea from '@radix-ui/react-scroll-area';
 import * as Select from '@radix-ui/react-select';
 import Image from 'next/image';
 
@@ -48,33 +47,27 @@ const ServerDropdown = ({ server, setServerCookie }: Props): JSX.Element => {
 
 			<Select.Portal>
 				<Select.Content className={styles.serversList} position="popper">
-					<ScrollArea.Root className={styles.scrollAreaRoot} type="auto">
-						<ScrollArea.Viewport className={styles.scrollAreaViewport}>
-							<Select.Viewport>
-								{servers.map(
-									(serverItem: Server): JSX.Element => (
-										<Select.Item
-											className={styles.serverItem}
-											key={serverItem.name}
-											value={serverItem.name}
-										>
-											<ServerItem
-												isSelected={serverItem.name === selectedServer.name}
-												onSelect={() => {
-													setServerCookie?.(serverItem.name);
-												}}
-												server={serverItem}
-											/>
-										</Select.Item>
-									),
-								)}
-							</Select.Viewport>
-						</ScrollArea.Viewport>
-
-						<ScrollArea.Scrollbar className={styles.scrollAreaScrollbar} orientation="vertical">
-							<ScrollArea.Thumb className={styles.scrollAreaThumb} />
-						</ScrollArea.Scrollbar>
-					</ScrollArea.Root>
+					<div className={styles.scrollContainer}>
+						<Select.Viewport>
+							{servers.map(
+								(serverItem: Server): JSX.Element => (
+									<Select.Item
+										className={styles.serverItem}
+										key={serverItem.name}
+										value={serverItem.name}
+									>
+										<ServerItem
+											isSelected={serverItem.name === selectedServer.name}
+											onSelect={() => {
+												setServerCookie?.(serverItem.name);
+											}}
+											server={serverItem}
+										/>
+									</Select.Item>
+								),
+							)}
+						</Select.Viewport>
+					</div>
 				</Select.Content>
 			</Select.Portal>
 		</Select.Root>

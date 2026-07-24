@@ -1,6 +1,5 @@
 'use client';
 
-import * as ScrollArea from '@radix-ui/react-scroll-area';
 import * as Select from '@radix-ui/react-select';
 import Image from 'next/image';
 
@@ -67,34 +66,30 @@ const QuestDropdown = ({ type, quest, selectedQuest, onSelectBoss }: Props): JSX
 
 			<Select.Portal>
 				<Select.Content className={styles.bossList} position="popper">
-					<ScrollArea.Root className={styles.scrollAreaRoot} type="auto">
-						<ScrollArea.Viewport className={styles.scrollAreaViewport}>
-							<Select.Viewport>
-								{bosses.map(([bossName, bossData]) => (
-									<Select.Item className={styles.bossItem} key={bossName} value={bossName}>
-										<div className={styles.itemContent}>
-											<Image
-												alt={bossName}
-												height={IMAGE_SIZE}
-												src={bossData.img}
-												width={IMAGE_SIZE}
-											/>
-											<p>{bossName}</p>
-											{safeSelectedQuest === bossName && (
-												<div className={styles.iconsDiv}>
-													<CheckIcon className={styles.icon} />
-												</div>
-											)}
-										</div>
-									</Select.Item>
-								))}
-							</Select.Viewport>
-						</ScrollArea.Viewport>
+					<div className={styles.scrollContainer}>
+						<Select.Viewport>
+							{bosses.map(([bossName, bossData]) => (
+								<Select.Item className={styles.bossItem} key={bossName} value={bossName}>
+									<div className={styles.itemContent}>
+										<Image
+											alt={bossName}
+											height={IMAGE_SIZE}
+											src={bossData.img}
+											width={IMAGE_SIZE}
+										/>
 
-						<ScrollArea.Scrollbar className={styles.scrollAreaScrollbar} orientation="vertical">
-							<ScrollArea.Thumb className={styles.scrollAreaThumb} />
-						</ScrollArea.Scrollbar>
-					</ScrollArea.Root>
+										<p>{bossName}</p>
+
+										{safeSelectedQuest === bossName && (
+											<div className={styles.iconsDiv}>
+												<CheckIcon className={styles.icon} />
+											</div>
+										)}
+									</div>
+								</Select.Item>
+							))}
+						</Select.Viewport>
+					</div>
 				</Select.Content>
 			</Select.Portal>
 		</Select.Root>

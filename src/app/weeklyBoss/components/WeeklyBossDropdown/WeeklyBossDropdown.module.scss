@@ -2,7 +2,6 @@ $dropdownHeight: 80px;
 $dropdownMaxHeight: 408px;
 $iconSize: 32px;
 $chevronIconSize: 40px;
-$scrollbarLimit: 16px;
 $borderRadius: 15px;
 $dropdownWidth: 480px;
 $hoverColor: 80%;
@@ -25,13 +24,13 @@ $hoverColor: 80%;
 
 	cursor: pointer;
 
-	&[data-disabled='true'] {
+	&[data-disabled="true"] {
 		background-color: var(--boss-dropdown-color-disabled);
 
 		cursor: not-allowed;
 	}
 
-	&[data-cleared='true'] {
+	&[data-cleared="true"] {
 		background-color: var(--bar-default);
 	}
 
@@ -115,23 +114,35 @@ $hoverColor: 80%;
 	cursor: pointer;
 
 	&:hover {
-		background-color: color-mix(in srgb, var(--boss-dropdown-color) $hoverColor, black);
+		background-color: color-mix(
+			in srgb,
+			var(--boss-dropdown-color) $hoverColor,
+			black
+		);
 	}
 
-	&[data-checked='true'] {
+	&[data-checked="true"] {
 		background-color: var(--bar-default);
 	}
 
-	&[data-locked='true'] {
+	&[data-locked="true"] {
 		background-color: var(--disabled);
 	}
 
-	&[data-checked='true']:hover {
-		background-color: color-mix(in srgb, var(--bar-default) $hoverColor, black);
+	&[data-checked="true"]:hover {
+		background-color: color-mix(
+			in srgb,
+			var(--bar-default) $hoverColor,
+			black
+		);
 	}
 
-	&[data-locked='true']:hover {
-		background-color: color-mix(in srgb, var(--disabled) $hoverColor, black);
+	&[data-locked="true"]:hover {
+		background-color: color-mix(
+			in srgb,
+			var(--disabled) $hoverColor,
+			black
+		);
 	}
 
 	&:focus-visible {
@@ -143,42 +154,9 @@ $hoverColor: 80%;
 	}
 }
 
-.scrollAreaRoot {
+.scrollContainer {
+	width: 100%;
 	max-height: $dropdownMaxHeight;
-}
 
-.scrollAreaViewport {
-	max-height: inherit;
-
-	overflow: auto;
-
-	overscroll-behavior: contain;
-}
-
-.scrollAreaScrollbar {
-	display: flex;
-
-	width: 6px;
-
-	padding: 2px;
-
-	user-select: none;
-
-	padding-bottom: $scrollbarLimit;
-	padding-top: $scrollbarLimit;
-
-	touch-action: none;
-
-	&[data-orientation='vertical'] {
-		width: 6px;
-	}
-}
-
-.scrollAreaThumb {
-	position: relative;
-	flex: 1;
-
-	border-radius: 999px;
-
-	background: var(--default-black);
+	overflow-y: auto;
 }

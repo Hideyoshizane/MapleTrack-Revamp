@@ -1,6 +1,5 @@
 'use client';
 
-import * as ScrollArea from '@radix-ui/react-scroll-area';
 import * as Select from '@radix-ui/react-select';
 
 import MenuIcon from '@assets/svg/menu.svg';
@@ -22,9 +21,11 @@ const buildPartySizes = (maxPartySize: number): PartySize[] =>
 
 const buildPartySizeMap = (partySizes: PartySize[]): Record<number, PartySize> => {
 	const map: Record<number, PartySize> = {};
+
 	for (const entry of partySizes) {
 		map[entry.multiplier] = entry;
 	}
+
 	return map;
 };
 
@@ -62,29 +63,23 @@ const PartySizeSelector = ({ selectedPartySize, onChangePartySize, maxPartySize 
 
 			<Select.Portal>
 				<Select.Content className={styles.bossList} position="popper">
-					<ScrollArea.Root className={styles.scrollAreaRoot} type="auto">
-						<ScrollArea.Viewport className={styles.scrollAreaViewport}>
-							<Select.Viewport>
-								{partySizes.map(
-									(entry): JSX.Element => (
-										<Select.Item
-											className={styles.bossItem}
-											key={entry.multiplier}
-											value={String(entry.multiplier)}
-										>
-											<div className={styles.itemContent}>
-												<p className={styles.partySize}>{entry.label}</p>
-											</div>
-										</Select.Item>
-									),
-								)}
-							</Select.Viewport>
-						</ScrollArea.Viewport>
-
-						<ScrollArea.Scrollbar className={styles.scrollAreaScrollbar} orientation="vertical">
-							<ScrollArea.Thumb className={styles.scrollAreaThumb} />
-						</ScrollArea.Scrollbar>
-					</ScrollArea.Root>
+					<div className={styles.scrollContainer}>
+						<Select.Viewport>
+							{partySizes.map(
+								(entry): JSX.Element => (
+									<Select.Item
+										className={styles.bossItem}
+										key={entry.multiplier}
+										value={String(entry.multiplier)}
+									>
+										<div className={styles.itemContent}>
+											<p className={styles.partySize}>{entry.label}</p>
+										</div>
+									</Select.Item>
+								),
+							)}
+						</Select.Viewport>
+					</div>
 				</Select.Content>
 			</Select.Portal>
 		</Select.Root>
