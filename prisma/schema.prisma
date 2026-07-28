@@ -127,7 +127,7 @@ model Boss {
   difficulty  String
   reset       BossReset
   partySize   Int           @default(1)
-  dailyTotal  Int?          @default(0)
+  dailyTotal  Int?          @default(1)
   cleared     Boolean       @default(false)
   locked      Boolean?      @default(false)
   characterId String        @db.ObjectId

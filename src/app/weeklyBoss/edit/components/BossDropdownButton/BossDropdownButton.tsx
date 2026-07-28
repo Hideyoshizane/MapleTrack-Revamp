@@ -45,6 +45,10 @@ const BossDropdownButton = ({
 	const rows = Array.from({ length: 8 }, (_, index): number => index);
 
 	const handleSelect = (multiplier: number): void => {
+		if (multiplier === 0 && value === 0) {
+			return;
+		}
+
 		try {
 			onSelectDifficulty?.(difficulty, multiplier);
 		} catch (error: unknown) {

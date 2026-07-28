@@ -49,7 +49,17 @@ const BossItem = ({
 	const isSmallButtons = boss.difficulties.length > 3;
 	const gapClass = isSmallButtons ? styles.smallGap : styles.largeGap;
 
-	const [partySize, setPartySize] = useState(1);
+	const partySize =
+		selectedBosses.find((bossSelection) => {
+			const parsedBoss = parseBossName(boss.name);
+			const parsedDifficulty = parseBossDifficultyName(bossSelection.difficulty);
+
+			if (!parsedBoss || !parsedDifficulty) {
+				return false;
+			}
+
+			return isValidBossDifficulty(parsedBoss, parsedDifficulty);
+		})?.partySize ?? 1;
 
 	const selectionMap = new Map<string, getEditBossListBossResponseBody>();
 	for (const b of selectedBosses) {
@@ -62,7 +72,6 @@ const BossItem = ({
 
 	const totalGold: number = (() => {
 		const bossNameParsed = parseBossName(boss.name);
-
 		if (!bossNameParsed) {
 			return 0;
 		}
@@ -254,8 +263,6 @@ const BossItem = ({
 										setGoldOpacity(0);
 									}}
 									onSelectPartySize={(newPartySize) => {
-										setPartySize(newPartySize);
-
 										if (!selectedBoss) {
 											return;
 										}

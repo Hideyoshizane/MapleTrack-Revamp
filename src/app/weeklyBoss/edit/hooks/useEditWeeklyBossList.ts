@@ -8,6 +8,7 @@ import { bossListApi } from '@features/boss/bossListApi';
 import {
 	updateCharacterBoss,
 	countCharacterBosses,
+	countCharacterIncome,
 	countMonthlyBosses,
 	countServerBosses,
 	countServerGains,
@@ -64,7 +65,7 @@ export const useEditWeeklyBossList = (server: ServerName): UseEditWeeklyBossList
 
 					setServerData(responseData);
 					setSelectedCharacter(firstCharacter);
-					setTotalBosses(countServerBosses(responseData));
+					setTotalBosses(countServerBosses(responseData, true));
 
 					if (firstCharacter) {
 						setTotalGains(countServerGains(responseData, server));
@@ -84,8 +85,9 @@ export const useEditWeeklyBossList = (server: ServerName): UseEditWeeklyBossList
 		}
 	}, [loading, serverData, router]);
 
-	const characterWeeklyIncome = selectedCharacter?.totalIncome ?? 0;
-	const characterWeeklyBossAmount = selectedCharacter ? countCharacterBosses(selectedCharacter) : 0;
+	const characterWeeklyIncome = selectedCharacter ? countCharacterIncome(selectedCharacter, server) : 0;
+
+	const characterWeeklyBossAmount = selectedCharacter ? countCharacterBosses(selectedCharacter, false) : 0;
 	const characterMonthlyBossAmount = selectedCharacter ? countMonthlyBosses(selectedCharacter) : 0;
 
 	const handleBossUpdate = (
@@ -118,7 +120,7 @@ export const useEditWeeklyBossList = (server: ServerName): UseEditWeeklyBossList
 			setSelectedCharacter(updatedCharacter);
 		}
 
-		setTotalBosses(countServerBosses(updatedServerData));
+		setTotalBosses(countServerBosses(updatedServerData, true));
 		setTotalGains(countServerGains(updatedServerData, serverName));
 	};
 

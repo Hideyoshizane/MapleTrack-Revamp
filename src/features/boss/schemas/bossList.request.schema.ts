@@ -35,7 +35,7 @@ const updateBossListBossesSchema = z
 		difficulty: z.enum(BOSS_DIFFICULTY_ENUM),
 		reset: z.enum(BOSS_RESET_ENUM),
 		partySize: z.number().int().min(1),
-		dailyTotal: z.number().min(0).max(7),
+		dailyTotal: z.number().min(1).max(7),
 	})
 	.strict()
 	.superRefine((boss, context) => {

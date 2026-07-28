@@ -104,31 +104,44 @@ export const updateCharacterBoss = (
 	});
 };
 
-export const countCharacterBosses = (character: getEditBossListCharacterResponseBody): number => {
+export const countCharacterBosses = (character: getEditBossListCharacterResponseBody, countDaily: boolean): number => {
 	let totalBosses = 0;
 
 	for (const boss of character.bosses) {
 		if (boss.reset === 'Daily') {
+			totalBosses += countDaily ? boss.dailyTotal : 0;
 			continue;
 		}
 
-		totalBosses += 1;
+		totalBosses++;
 	}
 
 	return totalBosses;
 };
 
-export const countMonthlyBosses = (character: getEditBossListCharacterResponseBody): number => {
-	return character.bosses.reduce<number>((total, boss) => {
-		return boss.reset === 'Monthly' ? total + 1 : total;
-	}, 0);
+export const countCharacterIncome = (character: getEditBossListCharacterResponseBody, serverName: string): number => {
+	let totalIncome = 0;
+
+	for (const boss of character.bosses) {
+		const bossValue = getBossDifficultyValue(boss.name, boss.difficulty, serverName);
+
+		const bossIncome = (bossValue / boss.partySize) * (boss.reset === 'Daily' ? boss.dailyTotal : 1);
+
+		totalIncome += bossIncome;
+	}
+
+	return totalIncome;
 };
 
-export const countServerBosses = (serverData: getEditBossListResponseBody): number => {
-	return serverData.characters.reduce<number>((total, character) => {
-		return total + countCharacterBosses(character);
+export const countMonthlyBosses = (character: getEditBossListCharacterResponseBody): number =>
+	character.bosses.reduce<number>((total, boss) => {
+		return boss.reset === 'Monthly' ? total + 1 : total;
 	}, 0);
-};
+
+export const countServerBosses = (serverData: getEditBossListResponseBody, countDaily: boolean): number =>
+	serverData.characters.reduce<number>((total, character) => {
+		return total + countCharacterBosses(character, countDaily);
+	}, 0);
 
 export const countServerGains = (serverData: getEditBossListResponseBody, serverName: string): number => {
 	let total = 0;

@@ -1,7 +1,7 @@
 {
 	"$schema": "https://biomejs.dev/schemas/latest/schema.json",
 
-	"files": { "maxSize": 2097152, "includes": ["**", "!**/.next", "!**/.next/**"] },
+	"files": { "maxSize": 2097152, "includes": ["**", "!**/.next", "!**/.next/**", "!next-env.d.ts"] },
 
 	"formatter": {
 		"enabled": true,
