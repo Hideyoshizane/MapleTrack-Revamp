@@ -79,7 +79,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					name: boss.name,
 					difficulty: boss.difficulty,
 					reset: boss.reset,
-					dailyTotal: boss.dailyTotal ?? 0,
+					dailyTotal: boss.dailyTotal ?? undefined,
 					partySize: boss.partySize,
 				};
 			}

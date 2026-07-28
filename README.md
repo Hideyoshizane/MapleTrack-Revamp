@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/static/v1?label=nextJS&message=16.2.11&color=blue&style=for-the-badge&logo=nextdotjs"/>
   <img src="https://img.shields.io/static/v1?label=react&message=19.2.8&color=blue&style=for-the-badge&logo=react"/>
   <img src="https://img.shields.io/static/v1?label=node.JS&message=24.15.0&color=blue&style=for-the-badge&logo=nodedotjs"/>
-  <img src="https://img.shields.io/static/v1?label=release&message=2.2.4&color=darkgreen&style=for-the-badge"/>
+  <img src="https://img.shields.io/static/v1?label=release&message=2.2.5&color=darkgreen&style=for-the-badge"/>
 </p>
 
 ## Status
