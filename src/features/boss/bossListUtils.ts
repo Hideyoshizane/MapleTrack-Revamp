@@ -109,7 +109,7 @@ export const countCharacterBosses = (character: getEditBossListCharacterResponse
 
 	for (const boss of character.bosses) {
 		if (boss.reset === 'Daily') {
-			totalBosses += countDaily ? boss.dailyTotal : 0;
+			totalBosses += countDaily ? (boss.dailyTotal ?? 0) : 0;
 			continue;
 		}
 
@@ -125,7 +125,7 @@ export const countCharacterIncome = (character: getEditBossListCharacterResponse
 	for (const boss of character.bosses) {
 		const bossValue = getBossDifficultyValue(boss.name, boss.difficulty, serverName);
 
-		const bossIncome = (bossValue / boss.partySize) * (boss.reset === 'Daily' ? boss.dailyTotal : 1);
+		const bossIncome = (bossValue / boss.partySize) * (boss.reset === 'Daily' ? (boss.dailyTotal ?? 0) : 1);
 
 		totalIncome += bossIncome;
 	}

@@ -56,7 +56,7 @@ const getBossListCharactersSchema = z
 		characterId: characterIdRawSchema,
 		name: characterNameRawSchema,
 		class: z.enum(JOB_CLASSES),
-		level: z.number().min(0).max(CHARACTER_MAX_LEVEL),
+		level: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
 
 		bosses: z.array(getBossListBossesSchema),
 	})
@@ -67,8 +67,8 @@ export type getBossListCharacterResponseBody = z.infer<typeof getBossListCharact
 export const getBossListResponseSchema = z
 	.object({
 		id: IdRawSchema,
-		weeklyBosses: z.number().min(0),
-		totalGains: z.number().min(0),
+		weeklyBosses: z.number().int().min(0),
+		totalGains: z.number().int().min(0),
 		characters: z.array(getBossListCharactersSchema),
 	})
 	.strict();
@@ -84,7 +84,7 @@ const getEditBossListBossesSchema = z
 		reset: z.enum(BOSS_RESET_ENUM),
 		partySize: z.number().int().min(1),
 
-		dailyTotal: z.number().min(1).max(7),
+		dailyTotal: z.number().int().min(1).max(7).optional(),
 	})
 	.strict()
 	.superRefine((boss, context) => {
@@ -106,8 +106,8 @@ const getEditBossListCharactersSchema = z
 		characterId: characterIdRawSchema,
 		name: characterNameRawSchema,
 		class: z.enum(JOB_CLASSES),
-		level: z.number().min(0).max(CHARACTER_MAX_LEVEL),
-		totalIncome: z.number().min(0),
+		level: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
+		totalIncome: z.number().int().min(0),
 
 		bosses: z.array(getEditBossListBossesSchema).default([]),
 	})
@@ -118,7 +118,7 @@ export type getEditBossListCharacterResponseBody = z.infer<typeof getEditBossLis
 export const getEditBossListResponseSchema = z
 	.object({
 		id: IdRawSchema,
-		weeklyBosses: z.number().min(0),
+		weeklyBosses: z.number().int().min(0),
 		characters: z.array(getEditBossListCharactersSchema).default([]),
 	})
 	.strict();
@@ -129,14 +129,15 @@ export type getEditBossListResponseBody = z.infer<typeof getEditBossListResponse
 
 export const toggleBossListResponseSchema = z
 	.object({
-		weeklyBossesUpdate: z.number(),
-		totalGainUpdate: z.number(),
+		weeklyBossesUpdate: z.number().int(),
+		totalGainUpdate: z.number().int(),
 
 		bossType: z.string().nullable(),
 
-		liberationPoints: z.number().nullable(),
-		astraVestigesPoints: z.number().nullable(),
-		astraTracesPoints: z.number().nullable(),
+		liberationPoints: z.number().int().nullable(),
+
+		astraVestigesPoints: z.number().int().nullable(),
+		astraTracesPoints: z.number().int().nullable(),
 	})
 	.strict();
 

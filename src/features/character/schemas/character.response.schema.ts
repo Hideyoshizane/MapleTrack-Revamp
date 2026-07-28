@@ -18,15 +18,15 @@ import {
 // Home Page
 const getAllCharactersSymbolsResponseSchema = z.object({
 	name: symbolNameSchema,
-	level: z.number().min(1),
+	level: z.number().int().min(1),
 	category: symbolCategoriesSchema,
 });
 
 export const getAllCharactersResponseSchema = z
 	.object({
 		name: characterNameRawSchema,
-		level: z.number().min(0).max(CHARACTER_MAX_LEVEL),
-		targetLevel: z.number().min(0).max(CHARACTER_MAX_LEVEL),
+		level: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
+		targetLevel: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
 		bossing: z.boolean().default(false),
 
 		class: z.enum(JOB_CLASSES),
@@ -50,7 +50,7 @@ const getCharacterContentSchema = z
 		contentType: z.enum(CONTENT_TYPES),
 		checked: z.boolean().optional(),
 		cleared: z.boolean().optional(),
-		tries: z.number().min(0).max(DEFAULT_WEEKLY_TRIES).optional(),
+		tries: z.number().int().min(0).max(DEFAULT_WEEKLY_TRIES).optional(),
 	})
 	.strict();
 
@@ -58,8 +58,8 @@ export const getCharacterDataSymbolsResponseSchema = z
 	.object({
 		id: symbolIdRawSchema,
 		name: z.enum(symbolNames),
-		level: z.number().min(1),
-		exp: z.number().min(0),
+		level: z.number().int().min(1),
+		exp: z.number().int().min(0),
 		category: symbolCategoriesSchema,
 		contents: z.array(getCharacterContentSchema),
 	})
@@ -71,8 +71,8 @@ export const getCharacterDataResponseSchema = z
 	.object({
 		id: characterIdRawSchema,
 		name: characterNameRawSchema,
-		level: z.number().min(0).max(CHARACTER_MAX_LEVEL),
-		targetLevel: z.number().min(0).max(CHARACTER_MAX_LEVEL),
+		level: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
+		targetLevel: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
 		bossing: z.boolean().default(false),
 		syncing: z.boolean().default(false),
 
@@ -100,7 +100,7 @@ export const getEditCharacterContentSchema = z
 		contentType: z.enum(CONTENT_TYPES),
 		checked: z.boolean().optional(),
 		cleared: z.boolean().optional(),
-		tries: z.number().min(0).max(DEFAULT_WEEKLY_TRIES).optional(),
+		tries: z.number().int().min(0).max(DEFAULT_WEEKLY_TRIES).optional(),
 	})
 	.strict();
 
@@ -110,8 +110,8 @@ export const getEditCharacterDataSymbolsResponseSchema = z
 	.object({
 		id: symbolIdRawSchema,
 		name: symbolNameSchema,
-		level: z.number().min(1),
-		exp: z.number().min(0),
+		level: z.number().int().min(1),
+		exp: z.number().int().min(0),
 		category: symbolCategoriesSchema,
 		contents: z.array(getEditCharacterContentSchema),
 	})
@@ -123,8 +123,8 @@ export const getEditCharacterDataResponseSchema = z
 	.object({
 		id: characterIdRawSchema,
 		name: characterNameRawSchema,
-		level: z.number().min(0).max(CHARACTER_MAX_LEVEL),
-		targetLevel: z.number().min(0).max(CHARACTER_MAX_LEVEL),
+		level: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
+		targetLevel: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
 		bossing: z.boolean().default(false),
 		syncing: z.boolean().default(false),
 
@@ -149,7 +149,7 @@ export type getEditCharacterDataResponseBody = z.infer<typeof getEditCharacterDa
 
 export const getCharacterDataFromAPIResponseSchema = z
 	.object({
-		level: z.number().min(0),
+		level: z.number().int().min(0),
 		characterImgURL: z.url(),
 	})
 	.strict();
@@ -161,9 +161,9 @@ export type getCharacterDataFromAPIResponseBody = z.infer<typeof getCharacterDat
 export const updateCharacterDailyResponseSchema = z
 	.object({
 		id: symbolIdRawSchema,
-		currentExp: z.number().min(0),
-		currentLevel: z.number().min(0),
-		erionPoints: z.number().min(0).nullable(),
+		currentExp: z.number().int().min(0),
+		currentLevel: z.number().int().min(0),
+		erionPoints: z.number().int().min(0).nullable(),
 	})
 	.strict();
 
@@ -174,8 +174,8 @@ export type updateCharacterDailyResponseBody = z.infer<typeof updateCharacterDai
 export const updateCharacterWeeklyResponseSchema = z
 	.object({
 		id: symbolIdRawSchema,
-		currentExp: z.number().min(0),
-		currentLevel: z.number().min(0),
+		currentExp: z.number().int().min(0),
+		currentLevel: z.number().int().min(0),
 	})
 	.strict();
 
@@ -184,14 +184,14 @@ export type updateCharacterWeeklyResponseBody = z.infer<typeof updateCharacterWe
 //Update All Daily
 
 const levelUpResultSchema = z.object({
-	currentLevel: z.number().min(0),
-	currentExp: z.number().min(0),
+	currentLevel: z.number().int().min(0),
+	currentExp: z.number().int().min(0),
 });
 
 export const updateCharacterAllDailyResponseSchema = z
 	.object({
 		results: z.record(z.string(), levelUpResultSchema),
-		erionPoints: z.number().nullable(),
+		erionPoints: z.number().int().nullable(),
 	})
 	.nullable();
 

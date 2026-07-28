@@ -27,19 +27,19 @@ const getLiberationListCharacterResponseSchema = z
 		characterId: characterIdRawSchema,
 		name: characterNameRawSchema,
 		class: z.enum(JOB_CLASSES),
-		level: z.number().min(0).max(CHARACTER_MAX_LEVEL),
+		level: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
 
 		currentGenesisQuest: genesisBossNameSchema,
-		currentGenesisPoints: z.number().min(0),
+		currentGenesisPoints: z.number().int().min(0),
 		genesisPass: z.boolean(),
 		liberated: z.boolean(),
 
 		currentDestinyQuest: destinyBossNameSchema,
-		currentDestinyPoints: z.number().min(0),
+		currentDestinyPoints: z.number().int().min(0),
 
 		currentAstraQuest: astraQuestNameSchema,
-		currentAstraVestigesPoints: z.number().min(0),
-		currentAstraTracesPoints: z.number().min(0),
+		currentAstraVestigesPoints: z.number().int().min(0),
+		currentAstraTracesPoints: z.number().int().min(0),
 	})
 	.strict();
 
@@ -89,16 +89,16 @@ export const updateLiberationCharacterResponseSchema = z
 		characterId: characterIdRawSchema,
 
 		currentGenesisQuest: genesisBossNameSchema,
-		currentGenesisPoints: z.number().min(0),
+		currentGenesisPoints: z.number().int().min(0),
 		genesisPass: z.boolean(),
 		liberated: z.boolean(),
 
 		currentDestinyQuest: destinyBossNameSchema,
-		currentDestinyPoints: z.number().min(0),
+		currentDestinyPoints: z.number().int().min(0),
 
 		currentAstraQuest: astraQuestNameSchema,
-		currentAstraVestigesPoints: z.number().min(0),
-		currentAstraTracesPoints: z.number().min(0),
+		currentAstraVestigesPoints: z.number().int().min(0),
+		currentAstraTracesPoints: z.number().int().min(0),
 	})
 	.strict();
 

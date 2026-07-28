@@ -35,7 +35,7 @@ const updateBossListBossesSchema = z
 		difficulty: z.enum(BOSS_DIFFICULTY_ENUM),
 		reset: z.enum(BOSS_RESET_ENUM),
 		partySize: z.number().int().min(1),
-		dailyTotal: z.number().min(1).max(7),
+		dailyTotal: z.number().int().min(1).max(7).optional(),
 	})
 	.strict()
 	.superRefine((boss, context) => {
@@ -55,8 +55,8 @@ const updateBossListCharactersSchema = z
 		characterId: characterIdRawSchema,
 		name: characterNameRawSchema,
 		class: z.enum(JOB_CLASSES),
-		level: z.number().min(0).max(CHARACTER_MAX_LEVEL),
-		totalIncome: z.number().min(0),
+		level: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
+		totalIncome: z.number().int().min(0),
 
 		bosses: z.array(updateBossListBossesSchema).default([]),
 	})
@@ -65,7 +65,7 @@ const updateBossListCharactersSchema = z
 export const updateBossListRequestSchema = z
 	.object({
 		id: IdRawSchema,
-		weeklyBosses: z.number().min(0),
+		weeklyBosses: z.number().int().min(0),
 		characters: z.array(updateBossListCharactersSchema).default([]),
 	})
 	.strict();

@@ -49,8 +49,8 @@ export const updateCharacterRequestSchema = z
 		id: characterIdRawSchema,
 		name: characterNameRawSchema,
 		server: serverSchema,
-		level: z.number().min(0).max(CHARACTER_MAX_LEVEL),
-		targetLevel: z.number().min(0).max(CHARACTER_MAX_LEVEL),
+		level: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
+		targetLevel: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
 		bossing: z.boolean().default(false),
 		syncing: z.boolean().default(false),
 
@@ -78,7 +78,7 @@ export const updateCharacterDailyRequestSchema = z
 		server: serverSchema,
 		className: z.enum(JOB_CLASSES),
 		id: symbolIdRawSchema,
-		bonus: z.number().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
+		bonus: z.number().int().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
 	})
 	.strict();
 
@@ -103,8 +103,8 @@ export const updateCharacterAllDailyRequestSchema = z
 		server: serverSchema,
 		className: z.enum(JOB_CLASSES),
 		id: symbolIdRawSchema,
-		arcaneBonus: z.number().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
-		sacredBonus: z.number().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
+		arcaneBonus: z.number().int().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
+		sacredBonus: z.number().int().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
 	})
 	.strict();
 

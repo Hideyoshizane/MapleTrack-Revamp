@@ -33,16 +33,16 @@ export const updateLiberationCharacterRequestSchema = z
 		characterId: characterIdRawSchema,
 
 		currentGenesisQuest: genesisBossNameSchema,
-		currentGenesisPoints: z.number().min(0),
+		currentGenesisPoints: z.number().int().min(0),
 		genesisPass: z.boolean(),
 		liberated: z.boolean(),
 
 		currentDestinyQuest: destinyBossNameSchema,
-		currentDestinyPoints: z.number().min(0),
+		currentDestinyPoints: z.number().int().min(0),
 
 		currentAstraQuest: astraQuestNameSchema,
-		currentAstraVestigesPoints: z.number().min(0),
-		currentAstraTracesPoints: z.number().min(0),
+		currentAstraVestigesPoints: z.number().int().min(0),
+		currentAstraTracesPoints: z.number().int().min(0),
 	})
 	.strict();
 

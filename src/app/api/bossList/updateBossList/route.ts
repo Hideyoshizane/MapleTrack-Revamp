@@ -83,7 +83,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				const bossIdsToDelete: string[] = [];
 				const bossesToCreate: Prisma.BossCreateManyInput[] = [];
 
-				const bossesToUpdate: { id: string; reset: BossReset; dailyTotal: number; partySize: number }[] = [];
+				const bossesToUpdate: { id: string; reset: BossReset; dailyTotal?: number; partySize: number }[] = [];
 
 				for (const existingBoss of existingBosses) {
 					const bossKey = getBossKey(existingBoss);
