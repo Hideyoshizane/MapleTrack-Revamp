@@ -19,7 +19,7 @@ $iconSize: 40px;
 
 	.classIcon {
 		position: absolute;
-		opacity: 0.25;
+		opacity: 0.35;
 	}
 
 	.nameDiv {
@@ -70,7 +70,7 @@ $iconSize: 40px;
 }
 
 .characterItem:not(:last-child) {
-	border-bottom: 1px solid #143952;
+	border-bottom: 1px solid #171c27;
 }
 
 .scrollContainer {

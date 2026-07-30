@@ -46,25 +46,53 @@ type BossLookupEntry = {
 	reset: BossDifficulty['reset'];
 };
 
+type BossOrderLookup = Record<BossName, number>;
+type BossDifficultyOrderLookup = Record<BossName, Record<BossDifficultyName, number>>;
+
 const bossLookup: Record<BossCompositeKey, BossLookupEntry> = {};
 const bossImageLookup: Record<BossName, string> = {};
 const bossMaxPartySizeLookup: Record<BossName, number> = {};
 const bossDifficultySet: Record<BossName, Set<BossDifficultyName>> = {};
+const bossOrderLookup: BossOrderLookup = {};
+const bossDifficultyOrderLookup: BossDifficultyOrderLookup = {};
 
-for (const boss of bosses) {
+for (const [bossIndex, boss] of bosses.entries()) {
 	bossImageLookup[boss.name] = boss.img;
 	bossMaxPartySizeLookup[boss.name] = boss.maxPartySize;
+	bossOrderLookup[boss.name] = bossIndex;
 
 	const difficultyNames = new Set<BossDifficultyName>();
-	bossDifficultySet[boss.name] = difficultyNames;
+	const difficultyOrder = {} as Record<BossDifficultyName, number>;
 
-	for (const diff of boss.difficulties) {
+	bossDifficultySet[boss.name] = difficultyNames;
+	bossDifficultyOrderLookup[boss.name] = difficultyOrder;
+
+	for (const [difficultyIndex, diff] of boss.difficulties.entries()) {
 		difficultyNames.add(diff.name);
+		difficultyOrder[diff.name] = difficultyIndex;
 
 		const key: BossCompositeKey = `${boss.name}|${diff.name}`;
 		bossLookup[key] = { value: diff.value, reset: diff.reset };
 	}
 }
+
+type BossSortable = {
+	name: BossName;
+	difficulty: BossDifficultyName;
+};
+
+export const compareBossOrder = (leftBoss: BossSortable, rightBoss: BossSortable): number => {
+	const bossOrderDifference = bossOrderLookup[leftBoss.name] - bossOrderLookup[rightBoss.name];
+
+	if (bossOrderDifference !== 0) {
+		return bossOrderDifference;
+	}
+
+	return (
+		bossDifficultyOrderLookup[leftBoss.name][leftBoss.difficulty] -
+		bossDifficultyOrderLookup[rightBoss.name][rightBoss.difficulty]
+	);
+};
 
 const bossNameRuntimeSet: Set<string> = new Set(BOSS_NAMES_ENUM);
 const difficultyRuntimeSet: Set<string> = new Set(BOSS_DIFFICULTY_ENUM);

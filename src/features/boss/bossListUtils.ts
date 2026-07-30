@@ -42,8 +42,8 @@ export const updateCharacterBoss = (
 				name: params.bossName,
 				difficulty: params.difficulty,
 				reset: params.reset,
-				dailyTotal: isDaily ? (params.dailyTotal ?? 0) : 0,
 				partySize: params.partySize,
+				...(isDaily && { dailyTotal: params.dailyTotal ?? 0 }),
 			});
 
 			character.totalIncome += Math.round((newValue * multiplier) / params.partySize);

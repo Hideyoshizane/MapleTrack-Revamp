@@ -2,6 +2,36 @@ $spacingSmall: 4px;
 $spacingMedium: 8px;
 $iconSize: 40px;
 
+@use "sass:map";
+
+$difficulties: (
+	"easy": (
+		bg: var(--boss-easy),
+		text: var(--default-white),
+		icon: var(--default-white),
+	),
+	"normal": (
+		bg: var(--boss-normal),
+		text: var(--default-button-text),
+		icon: var(--default-button-text),
+	),
+	"hard": (
+		bg: var(--boss-hard),
+		text: var(--default-button-text),
+		icon: var(--default-button-text),
+	),
+	"chaos": (
+		bg: var(--boss-chaos),
+		text: var(--boss-chaos-secondary),
+		border: var(--boss-chaos-secondary),
+	),
+	"extreme": (
+		bg: var(--boss-extreme),
+		text: var(--boss-extreme-secondary),
+		border: var(--boss-extreme-secondary),
+	),
+);
+
 .wrapper {
 	display: flex;
 	align-items: center;
@@ -23,7 +53,11 @@ $iconSize: 40px;
 
 		margin-left: 24px;
 
-		.bossName {
+		.nameTextDiv {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			gap: 8px;
 			font-weight: 500;
 			color: var(--default-button-text);
 		}
@@ -43,6 +77,30 @@ $iconSize: 40px;
 				.partyIcon {
 					width: 24px;
 					height: 24px;
+				}
+			}
+		}
+	}
+
+	.difficulty {
+		width: 88px;
+		height: 28px;
+		border-radius: 25px;
+		font-size: 18px;
+		text-align: center;
+		align-content: center;
+
+		@each $name, $colors in $difficulties {
+			&.#{$name} {
+				background-color: map.get($colors, bg);
+				color: map.get($colors, text);
+
+				@if map.has-key($colors, border) {
+					border: solid 2px map.get($colors, border);
+				}
+
+				.icon {
+					color: map.get($colors, icon);
 				}
 			}
 		}

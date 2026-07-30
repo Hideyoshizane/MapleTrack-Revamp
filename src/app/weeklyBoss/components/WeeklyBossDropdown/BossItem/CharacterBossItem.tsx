@@ -1,5 +1,6 @@
 'use client';
 
+import { clsx } from 'clsx';
 import Image from 'next/image';
 
 import BossCheckedIcon from '@assets/svg/check-boss.svg';
@@ -52,9 +53,14 @@ const CharacterBossItem = ({ boss, server, isSelected, onClick }: Props): JSX.El
 				width={64}
 			/>
 			<div className={styles.nameDiv}>
-				<ResponsiveText className={styles.bossName} height={34} maxFontSize={28} minFontSize={20} width={284}>
-					{boss.difficulty} {boss.name}
-				</ResponsiveText>
+				<div className={styles.nameTextDiv}>
+					<p className={clsx(styles.difficulty, styles[boss.difficulty.toLowerCase().replace(/\s+/g, '')])}>
+						{boss.difficulty}
+					</p>
+					<ResponsiveText height={34} maxFontSize={28} minFontSize={20} width={188}>
+						{boss.name}
+					</ResponsiveText>
+				</div>
 
 				<div className={styles.bossValue}>
 					<span>{bossValue}</span>

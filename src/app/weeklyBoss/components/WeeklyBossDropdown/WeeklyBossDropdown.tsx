@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import BossCheckedIcon from '@assets/svg/check-boss.svg';
 import NoBossIcon from '@assets/svg/circle-x.svg';
 import MenuIcon from '@assets/svg/menu.svg';
+import { compareBossOrder } from '@data/bosses/bosses';
 import { generateClassCode } from '@data/classes/classes';
 
 import CharacterBossItem from './BossItem/CharacterBossItem';
@@ -32,6 +33,7 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX
 	const isCleared = clearedBosses === totalBosses;
 
 	const code = generateClassCode(character.class);
+	const sortedBosses = [...character.bosses].sort(compareBossOrder);
 
 	return (
 		<DropdownMenu.Root>
@@ -79,7 +81,7 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX
 			<DropdownMenu.Portal>
 				<DropdownMenu.Content className={styles.characterList} align="start" side="bottom" sideOffset={4}>
 					<div className={styles.scrollContainer}>
-						{character.bosses.map((boss) => (
+						{sortedBosses.map((boss) => (
 							<Fragment key={`${boss.name}-${boss.difficulty}`}>
 								<DropdownMenu.CheckboxItem
 									className={styles.characterItem}
