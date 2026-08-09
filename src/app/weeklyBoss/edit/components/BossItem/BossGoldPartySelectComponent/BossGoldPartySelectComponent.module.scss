@@ -1,3 +1,5 @@
+$fontSize: 16px;
+
 .trigger {
 	display: flex;
 	flex-direction: row;
@@ -6,6 +8,7 @@
 	width: 136px;
 	border: none;
 	background-color: transparent;
+	outline: none;
 
 	.goldText {
 		display: flex;
@@ -22,7 +25,7 @@
 		cursor: pointer;
 	}
 
-	.teste {
+	.checkIcon {
 		display: flex;
 
 		width: 16px;
@@ -30,8 +33,6 @@
 		color: var(--default-button-text);
 	}
 }
-
-$fontSize: 16px;
 
 .menuOpener {
 	display: flex;
@@ -57,7 +58,6 @@ $fontSize: 16px;
 }
 
 .dropdownContent {
-	min-width: 130px;
 	padding: 8px;
 	border-radius: 6px;
 	background-color: var(--default-black);
@@ -98,9 +98,34 @@ $fontSize: 16px;
 }
 
 .gridContainer {
+	display: grid;
+	gap: 8px;
+	grid-template-columns: repeat(auto-fit, 136px);
+}
+
+.columns1 {
+	grid-template-columns: repeat(1, 1fr);
+}
+
+.columns2 {
+	grid-template-columns: repeat(2, 1fr);
+}
+
+.columns3 {
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.column {
 	display: flex;
 	flex-direction: column;
-	gap: 8px;
+}
+
+.columnTitle {
+	padding: 6px 8px;
+	font-size: 16px;
+	font-weight: 500;
+	text-align: center;
+	color: var(--default-white);
 }
 
 .menuItem {
@@ -108,6 +133,7 @@ $fontSize: 16px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	width: 136px;
 	padding: 6px 8px;
 	border-radius: 4px;
 	font-size: 14px;

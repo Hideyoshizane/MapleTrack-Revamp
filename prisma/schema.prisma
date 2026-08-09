@@ -111,7 +111,6 @@ model BossServer {
 
 model BossCharacter {
   id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  totalIncome Int        @default(0)
   characterId String     @db.ObjectId
   character   Character  @relation(fields: [characterId], references: [id], onDelete: Cascade)
   serverId    String     @db.ObjectId
@@ -122,16 +121,17 @@ model BossCharacter {
 }
 
 model Boss {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  difficulty  String
-  reset       BossReset
-  partySize   Int           @default(1)
-  dailyTotal  Int?          @default(1)
-  cleared     Boolean       @default(false)
-  locked      Boolean?      @default(false)
-  characterId String        @db.ObjectId
-  character   BossCharacter @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  difficulty   String
+  reset        BossReset
+  partySize    Int           @default(1)
+  dailyTotal   Int?          @default(1)
+  dailyCleared Int?          @default(0)
+  cleared      Boolean       @default(false)
+  locked       Boolean?      @default(false)
+  characterId  String        @db.ObjectId
+  character    BossCharacter @relation(fields: [characterId], references: [id], onDelete: Cascade)
 }
 
 model Liberation {

@@ -37,7 +37,6 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 							select: {
 								characterId: true,
 								character: { select: { name: true, class: true, level: true } },
-								totalIncome: true,
 								bosses: {
 									select: {
 										name: true,
@@ -89,7 +88,6 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				name: characterData.name,
 				class: characterData.class,
 				level: characterData.level,
-				totalIncome: characterEntry.totalIncome,
 				bosses,
 			});
 		}

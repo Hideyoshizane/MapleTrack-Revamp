@@ -46,6 +46,8 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 										name: true,
 										difficulty: true,
 										partySize: true,
+										dailyTotal: true,
+										dailyCleared: true,
 										reset: true,
 										cleared: true,
 										locked: true,
@@ -89,6 +91,8 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					cleared: boss.cleared ?? false,
 					locked: boss.locked ?? false,
 					partySize: boss.partySize,
+					dailyTotal: boss.dailyTotal ?? undefined,
+					dailyCleared: boss.dailyCleared ?? undefined,
 				};
 			}
 

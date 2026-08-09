@@ -71,7 +71,7 @@ export const characterToBossList = async (
 	await tx.bossCharacter.upsert({
 		where: { serverId_characterId: { serverId, characterId } },
 		update: {},
-		create: { characterId, serverId, totalIncome: 0 },
+		create: { characterId, serverId },
 	});
 
 	await tx.liberation.upsert({
@@ -110,7 +110,16 @@ export const resetBossList = async (authenticatedUserId: string): Promise<void> 
 					characters: {
 						select: {
 							characterId: true,
-							bosses: { select: { id: true, reset: true, cleared: true, locked: true } },
+							bosses: {
+								select: {
+									id: true,
+									reset: true,
+									cleared: true,
+									dailyCleared: true,
+									dailyTotal: true,
+									locked: true,
+								},
+							},
 						},
 					},
 				},
@@ -137,9 +146,19 @@ export const resetBossList = async (authenticatedUserId: string): Promise<void> 
 				for (const boss of character.bosses) {
 					let nextCleared = boss.cleared ?? false;
 					let nextLocked = boss.locked ?? false;
+					let nextDailyCleared = boss.dailyCleared ?? 0;
 
 					if (isDailyReset && boss.reset === 'Daily') {
 						nextCleared = false;
+
+						if (boss.reset === 'Daily') {
+							nextLocked = (boss.dailyCleared ?? 0) >= (boss.dailyTotal ?? 0);
+						}
+					}
+
+					if (isWeeklyReset && boss.reset === 'Daily') {
+						nextDailyCleared = 0;
+						nextLocked = false;
 					}
 
 					if (isWeeklyReset && boss.reset === 'Weekly') {
@@ -158,14 +177,19 @@ export const resetBossList = async (authenticatedUserId: string): Promise<void> 
 					}
 
 					const hasStateChanged =
-						nextCleared !== (boss.cleared ?? false) || nextLocked !== (boss.locked ?? false);
+						nextCleared !== (boss.cleared ?? false) ||
+						nextLocked !== (boss.locked ?? false) ||
+						nextDailyCleared !== (boss.dailyCleared ?? 0);
 
 					if (!hasStateChanged) {
 						continue;
 					}
 
 					bossUpdatePromises.push(
-						tx.boss.update({ where: { id: boss.id }, data: { cleared: nextCleared, locked: nextLocked } }),
+						tx.boss.update({
+							where: { id: boss.id },
+							data: { cleared: nextCleared, locked: nextLocked, dailyCleared: nextDailyCleared },
+						}),
 					);
 				}
 			}

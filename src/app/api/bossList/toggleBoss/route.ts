@@ -31,9 +31,12 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				id: true,
 				name: true,
 				difficulty: true,
+				reset: true,
 				cleared: true,
 				locked: true,
 				partySize: true,
+				dailyTotal: true,
+				dailyCleared: true,
 				character: {
 					select: {
 						characterId: true,
@@ -42,7 +45,6 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				},
 			},
 		});
-
 		if (!bossData) {
 			logApiFailure('Boss Data not found', { route });
 
@@ -70,6 +72,18 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const willBeCleared = !bossData.cleared;
 		const sign = willBeCleared ? 1 : -1;
 
+		let updatedDailyCleared: number = bossData.dailyCleared ?? 0;
+
+		if (bossData.reset === 'Daily') {
+			updatedDailyCleared += sign;
+
+			if (updatedDailyCleared > (bossData.dailyTotal ?? 0)) {
+				logApiFailure('Daily boss clear limit exceeded', { route });
+
+				return createResponse<ApiResponse>({ success: false, message: 'Daily boss clear limit exceeded' }, 400);
+			}
+		}
+
 		const bossValue = getBossDifficultyValue(bossData.name, bossData.difficulty, server.serverName);
 		if (bossValue === null) {
 			logApiFailure('Boss value not found', { route });
@@ -81,7 +95,13 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		const responseData = await prisma.$transaction(async (tx) => {
 			await Promise.all([
-				tx.boss.update({ where: { id: bossMonsterId }, data: { cleared: willBeCleared } }),
+				tx.boss.update({
+					where: { id: bossMonsterId },
+					data: {
+						cleared: willBeCleared,
+						...(bossData.reset === 'Daily' && { dailyCleared: updatedDailyCleared }),
+					},
+				}),
 
 				tx.bossServer.update({
 					where: { id: server.id },

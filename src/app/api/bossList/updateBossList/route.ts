@@ -60,16 +60,18 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					continue;
 				}
 
-				transactionPromises.push(
-					tx.bossCharacter.update({
-						where: { id: existingCharacter.id },
-						data: { totalIncome: incomingCharacter.totalIncome },
-					}),
-				);
-
 				const existingBosses = await tx.boss.findMany({
 					where: { characterId: existingCharacter.id },
-					select: { id: true, name: true, difficulty: true, reset: true, dailyTotal: true, partySize: true },
+					select: {
+						id: true,
+						name: true,
+						difficulty: true,
+						reset: true,
+						dailyTotal: true,
+						dailyCleared: true,
+						locked: true,
+						partySize: true,
+					},
 				});
 
 				const existingBossMap = new Map(
@@ -83,7 +85,14 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				const bossIdsToDelete: string[] = [];
 				const bossesToCreate: Prisma.BossCreateManyInput[] = [];
 
-				const bossesToUpdate: { id: string; reset: BossReset; dailyTotal?: number; partySize: number }[] = [];
+				const bossesToUpdate: {
+					id: string;
+					reset: BossReset;
+					dailyTotal: number | undefined;
+					dailyCleared: number | undefined;
+					locked: boolean;
+					partySize: number;
+				}[] = [];
 
 				for (const existingBoss of existingBosses) {
 					const bossKey = getBossKey(existingBoss);
@@ -120,10 +129,20 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 						continue;
 					}
 
+					const newLocked =
+						incomingBoss.dailyTotal === null ||
+						incomingBoss.dailyTotal === undefined ||
+						existingBoss.dailyCleared === null ||
+						existingBoss.dailyCleared === undefined
+							? (existingBoss.locked ?? false)
+							: incomingBoss.dailyTotal <= existingBoss.dailyCleared;
+
 					bossesToUpdate.push({
 						id: existingBoss.id,
 						reset: incomingBoss.reset,
 						dailyTotal: incomingBoss.dailyTotal,
+						dailyCleared: incomingBoss.dailyCleared,
+						locked: newLocked,
 						partySize: incomingBoss.partySize,
 					});
 				}
@@ -143,6 +162,8 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 							data: {
 								reset: bossToUpdate.reset,
 								dailyTotal: bossToUpdate.dailyTotal,
+								dailyCleared: bossToUpdate.dailyCleared,
+								locked: bossToUpdate.locked,
 								partySize: bossToUpdate.partySize,
 							},
 						}),

@@ -2,40 +2,75 @@
 
 import NumberFlow from '@number-flow/react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { clsx } from 'clsx';
 
 import CheckIcon from '@assets/svg/check.svg';
 import ChevronIcon from '@assets/svg/chevron-down.svg';
 
 import styles from './BossGoldPartySelectComponent.module.scss';
 
+import type { selectedBossesResetAndParty } from '../BossItem';
 import type { JSX } from 'react';
 
 type BossGoldPartySelectComponentProps = {
 	value: number;
+	bossesResetAndType: selectedBossesResetAndParty;
+	selectedReset: keyof selectedBossesResetAndParty['partySizes'];
 	closing: boolean;
 	maxPartySize: number;
-	partySize: number;
-	onSelectPartySize: (partySize: number) => void;
+	onSelectPartySize: (reset: keyof selectedBossesResetAndParty['partySizes'], partySize: number) => void;
 	onClosingAnimationFinish: () => void;
+};
+
+const resetTitles: Record<keyof selectedBossesResetAndParty['resets'], string> = {
+	Daily: 'Daily',
+	Weekly: 'Weekly',
+	Monthly: 'Monthly',
 };
 
 const BossGoldPartySelectComponent = ({
 	value,
 	closing,
+	bossesResetAndType,
 	maxPartySize,
-	partySize,
 	onSelectPartySize,
 	onClosingAnimationFinish,
 }: BossGoldPartySelectComponentProps): JSX.Element => {
 	const partySizes = Array.from({ length: maxPartySize }, (_, index) => index + 1);
 
-	const handlePartySizeSelect = (selectedPartySize: number): void => {
+	const partyColumns = (
+		Object.keys(bossesResetAndType.resets) as Array<keyof selectedBossesResetAndParty['resets']>
+	).filter((reset) => bossesResetAndType.resets[reset]);
+
+	const handlePartySizeSelect = (
+		reset: keyof selectedBossesResetAndParty['partySizes'],
+		selectedPartySize: number,
+	): void => {
 		try {
-			onSelectPartySize(selectedPartySize);
+			onSelectPartySize(reset, selectedPartySize);
 		} catch (error: unknown) {
 			console.error('Failed to select party size:', error);
 		}
 	};
+
+	const renderPartySizeItem = (
+		selectedPartySize: number,
+		column: keyof selectedBossesResetAndParty['partySizes'],
+	): JSX.Element => (
+		<DropdownMenu.Item
+			className={styles.menuItem}
+			key={`${column}-${selectedPartySize}`}
+			onSelect={() => handlePartySizeSelect(column, selectedPartySize)}
+		>
+			<span className={styles.menuText}>
+				{selectedPartySize === 1 ? 'Solo Party' : `${selectedPartySize} Players`}
+			</span>
+
+			{bossesResetAndType.partySizes[column] === selectedPartySize && (
+				<CheckIcon className={styles.checkIcon} height={16} width={16} />
+			)}
+		</DropdownMenu.Item>
+	);
 
 	return (
 		<DropdownMenu.Root>
@@ -49,9 +84,10 @@ const BossGoldPartySelectComponent = ({
 							}
 						}}
 						transformTiming={{ duration: 200 }}
-						value={Math.round(value / partySize)}
+						value={Math.round(value)}
 					/>
-					<ChevronIcon className={styles.teste} />
+
+					<ChevronIcon className={styles.checkIcon} />
 				</button>
 			</DropdownMenu.Trigger>
 
@@ -63,21 +99,13 @@ const BossGoldPartySelectComponent = ({
 					side="bottom"
 					sideOffset={5}
 				>
-					<div className={styles.gridContainer}>
-						{partySizes.map((selectedPartySize) => (
-							<DropdownMenu.Item
-								className={styles.menuItem}
-								key={selectedPartySize}
-								onSelect={() => handlePartySizeSelect(selectedPartySize)}
-							>
-								<span className={styles.menuText}>
-									{selectedPartySize === 1 ? 'Solo Party' : `${selectedPartySize} Players`}
-								</span>
+					<div className={clsx(styles.gridContainer, styles[`columns${partyColumns.length}`])}>
+						{partyColumns.map((column) => (
+							<div className={styles.column} key={column}>
+								<div className={styles.columnTitle}>{resetTitles[column]}</div>
 
-								{partySize === selectedPartySize && (
-									<CheckIcon className={styles.checkIcon} height={16} width={16} />
-								)}
-							</DropdownMenu.Item>
+								{partySizes.map((partySize) => renderPartySizeItem(partySize, column))}
+							</div>
 						))}
 					</div>
 

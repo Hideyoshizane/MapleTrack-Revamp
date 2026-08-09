@@ -24,6 +24,47 @@ import type { BossName, BossDifficultyName, BossReset, Boss } from '@data/bosses
 import type { getEditBossListBossResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX } from 'react';
 
+export type selectedBossesResetAndParty = {
+	resets: {
+		Daily: boolean;
+		Weekly: boolean;
+		Monthly: boolean;
+	};
+	partySizes: {
+		Daily: number;
+		Weekly: number;
+		Monthly: number;
+	};
+	value: {
+		Daily: number;
+		Weekly: number;
+		Monthly: number;
+	};
+};
+
+const getBossesResetAndParty = (
+	selectedBosses: getEditBossListBossResponseBody[],
+	server: string,
+): selectedBossesResetAndParty => {
+	const selection: selectedBossesResetAndParty = {
+		resets: { Daily: false, Weekly: false, Monthly: false },
+		partySizes: { Daily: 1, Weekly: 1, Monthly: 1 },
+		value: { Daily: 0, Weekly: 0, Monthly: 0 },
+	};
+
+	for (const selectedBoss of selectedBosses) {
+		selection.resets[selectedBoss.reset] = true;
+		selection.partySizes[selectedBoss.reset] = selectedBoss.partySize;
+
+		const value = getBossDifficultyValue(selectedBoss.name, selectedBoss.difficulty, server);
+
+		selection.value[selectedBoss.reset] =
+			selectedBoss.reset === 'Daily' ? value * (selectedBoss.dailyTotal ?? 0) : value;
+	}
+
+	return selection;
+};
+
 type BossItemProps = {
 	serverCookie: string;
 	boss: Boss;
@@ -49,17 +90,12 @@ const BossItem = ({
 	const isSmallButtons = boss.difficulties.length > 3;
 	const gapClass = isSmallButtons ? styles.smallGap : styles.largeGap;
 
-	const partySize =
-		selectedBosses.find((bossSelection) => {
-			const parsedBoss = parseBossName(boss.name);
-			const parsedDifficulty = parseBossDifficultyName(bossSelection.difficulty);
+	const bossesResetAndType = getBossesResetAndParty(selectedBosses, serverCookie);
 
-			if (!parsedBoss || !parsedDifficulty) {
-				return false;
-			}
-
-			return isValidBossDifficulty(parsedBoss, parsedDifficulty);
-		})?.partySize ?? 1;
+	const totalGoldByPartySize =
+		bossesResetAndType.value.Daily / bossesResetAndType.partySizes.Daily +
+		bossesResetAndType.value.Weekly / bossesResetAndType.partySizes.Weekly +
+		bossesResetAndType.value.Monthly / bossesResetAndType.partySizes.Monthly;
 
 	const selectionMap = new Map<string, getEditBossListBossResponseBody>();
 	for (const b of selectedBosses) {
@@ -70,39 +106,9 @@ const BossItem = ({
 		return selectionMap.get(`${diffName}|${reset}`);
 	};
 
-	const totalGold: number = (() => {
-		const bossNameParsed = parseBossName(boss.name);
-		if (!bossNameParsed) {
-			return 0;
-		}
-
-		let total = 0;
-
-		for (const progress of selectedBosses) {
-			const difficultyParsed = parseBossDifficultyName(progress.difficulty);
-			if (!difficultyParsed) {
-				continue;
-			}
-
-			if (!isValidBossDifficulty(bossNameParsed, difficultyParsed)) {
-				continue;
-			}
-
-			const value = getBossDifficultyValue(bossNameParsed, difficultyParsed, serverCookie);
-			if (!value) {
-				continue;
-			}
-
-			total += progress.reset === 'Daily' ? value * (progress.dailyTotal ?? 0) : value;
-		}
-
-		return total;
-	})();
-
 	const selectedBoss = selectedBosses.find((bossSelection) => {
 		const parsedBoss = parseBossName(boss.name);
 		const parsedDifficulty = parseBossDifficultyName(bossSelection.difficulty);
-
 		if (!parsedBoss || !parsedDifficulty) {
 			return false;
 		}
@@ -153,7 +159,7 @@ const BossItem = ({
 			});
 
 			setTimeout(() => setGoldOpacity(1), 100);
-			setTimeout(() => setNumberFlowValue(totalGold), 150);
+			setTimeout(() => setNumberFlowValue(totalGoldByPartySize), 150);
 		} else if (!anySelected && showGoldContainer) {
 			// CLOSING
 			queueMicrotask(() => {
@@ -161,7 +167,7 @@ const BossItem = ({
 				setNumberFlowValue(0);
 			});
 		}
-	}, [anySelected, totalGold, showGoldContainer]);
+	}, [anySelected, totalGoldByPartySize, showGoldContainer]);
 
 	return (
 		<LazyMotion features={domAnimation} strict>
@@ -209,7 +215,7 @@ const BossItem = ({
 												boss.name,
 												diff.name,
 												'Daily',
-												partySize,
+												bossesResetAndType.partySizes['Daily'] ?? 1,
 												multiplier,
 											);
 										}}
@@ -231,7 +237,7 @@ const BossItem = ({
 											boss.name,
 											difficulty.name,
 											difficulty.reset,
-											partySize,
+											bossesResetAndType.partySizes[difficulty.reset] ?? 1,
 										);
 									}}
 									selected={isSelected}
@@ -258,25 +264,30 @@ const BossItem = ({
 							>
 								<BossGoldPartySelectComponent
 									closing={closing}
+									bossesResetAndType={bossesResetAndType}
+									selectedReset={selectedBoss?.reset ?? 'Daily'}
 									maxPartySize={boss.maxPartySize}
 									onClosingAnimationFinish={() => {
 										setGoldOpacity(0);
 									}}
-									onSelectPartySize={(newPartySize) => {
-										if (!selectedBoss) {
+									onSelectPartySize={(reset, newPartySize) => {
+										const selectedResetBoss = selectedBosses.find(
+											(bossSelection) => bossSelection.reset === reset,
+										);
+
+										if (!selectedResetBoss) {
 											return;
 										}
 
 										handleBossUpdate(
 											serverCookie,
 											boss.name,
-											selectedBoss.difficulty,
-											selectedBoss.reset,
+											selectedResetBoss.difficulty,
+											reset,
 											newPartySize,
-											selectedBoss.dailyTotal,
+											selectedResetBoss.dailyTotal,
 										);
 									}}
-									partySize={partySize}
 									value={numberFlowValue}
 								/>
 							</m.div>

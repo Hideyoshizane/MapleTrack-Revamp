@@ -25,6 +25,8 @@ const getBossListBossesSchema = z
 		difficulty: z.enum(BOSS_DIFFICULTY_ENUM),
 		reset: z.enum(BOSS_RESET_ENUM),
 		partySize: z.number().int().min(1),
+		dailyTotal: z.number().int().min(1).max(7).optional(),
+		dailyCleared: z.number().int().min(0).max(7).optional(),
 
 		cleared: z.boolean().default(false),
 		locked: z.boolean().default(false).optional(),
@@ -107,7 +109,6 @@ const getEditBossListCharactersSchema = z
 		name: characterNameRawSchema,
 		class: z.enum(JOB_CLASSES),
 		level: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
-		totalIncome: z.number().int().min(0),
 
 		bosses: z.array(getEditBossListBossesSchema).default([]),
 	})

@@ -26,7 +26,7 @@ type Props = {
 };
 
 const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX.Element => {
-	const totalBosses = character.bosses.filter((boss) => !boss.locked).length;
+	const totalBosses = character.bosses.length;
 	const isDisabled = totalBosses === 0;
 
 	const clearedBosses = character.bosses.filter((boss) => boss.cleared).length;
@@ -97,8 +97,17 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX
 										isSelected={boss.locked || boss.cleared}
 										onClick={() => {
 											if (boss.locked) {
-												toast.info('This boss has already been cleared this month.');
-												return;
+												const message =
+													boss.reset === 'Monthly'
+														? 'This boss has already been cleared this month.'
+														: boss.reset === 'Daily'
+															? 'All daily clears completed for this week.'
+															: null;
+
+												if (message) {
+													toast.info(message);
+													return;
+												}
 											}
 
 											void handleBossToggle(boss.id);

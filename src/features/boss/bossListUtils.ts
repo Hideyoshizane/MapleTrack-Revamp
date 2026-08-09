@@ -36,8 +36,6 @@ export const updateCharacterBoss = (
 		}
 
 		if (bossIndex === -1) {
-			const multiplier = isDaily ? (params.dailyTotal ?? 0) : 1;
-
 			character.bosses.push({
 				name: params.bossName,
 				difficulty: params.difficulty,
@@ -45,8 +43,6 @@ export const updateCharacterBoss = (
 				partySize: params.partySize,
 				...(isDaily && { dailyTotal: params.dailyTotal ?? 0 }),
 			});
-
-			character.totalIncome += Math.round((newValue * multiplier) / params.partySize);
 
 			return;
 		}
@@ -58,7 +54,6 @@ export const updateCharacterBoss = (
 			return;
 		}
 
-		const oldMultiplier = existingBoss.reset === 'Daily' ? (existingBoss.dailyTotal ?? 0) : 1;
 		const oldDailyTotal = existingBoss.dailyTotal ?? 0;
 
 		const isSameDifficulty = existingBoss.difficulty === params.difficulty;
@@ -66,11 +61,7 @@ export const updateCharacterBoss = (
 			existingBoss.difficulty === params.difficulty && existingBoss.partySize !== params.partySize;
 
 		if (isOnlyPartySizeChange) {
-			const oldValue = getBossDifficultyValue(existingBoss.name, existingBoss.difficulty, params.server);
-			const oldPartySize = existingBoss.partySize;
-
 			existingBoss.partySize = params.partySize;
-			character.totalIncome -= Math.round(oldValue / oldPartySize) - Math.round(oldValue / params.partySize);
 
 			return;
 		}
@@ -78,13 +69,8 @@ export const updateCharacterBoss = (
 		if (!isDaily && isSameDifficulty) {
 			character.bosses.splice(bossIndex, 1);
 
-			character.totalIncome -= Math.round((oldValue * oldMultiplier) / existingBoss.partySize);
-
 			return;
 		}
-
-		character.totalIncome -= Math.round((oldValue * oldMultiplier) / existingBoss.partySize);
-
 		if (isDaily && params.dailyTotal === 0) {
 			character.bosses.splice(bossIndex, 1);
 
@@ -97,10 +83,6 @@ export const updateCharacterBoss = (
 		if (isDaily) {
 			existingBoss.dailyTotal = params.dailyTotal ?? oldDailyTotal;
 		}
-
-		const newMultiplier = isDaily ? (params.dailyTotal ?? existingBoss.dailyTotal ?? 0) : 1;
-
-		character.totalIncome += Math.round((newValue * newMultiplier) / params.partySize);
 	});
 };
 
@@ -156,7 +138,7 @@ export const countServerGains = (serverData: getEditBossListResponseBody, server
 
 			const multiplier = boss.reset === 'Daily' ? (boss.dailyTotal ?? 0) : 1;
 
-			total += Math.round(value / boss.partySize) * multiplier;
+			total += (value / boss.partySize) * multiplier;
 		}
 	}
 

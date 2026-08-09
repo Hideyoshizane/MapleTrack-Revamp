@@ -2,9 +2,11 @@
 
 import { clsx } from 'clsx';
 import Image from 'next/image';
+import { useRef, useState, useEffect } from 'react';
 
 import BossCheckedIcon from '@assets/svg/check-boss.svg';
 import CircleBossIcon from '@assets/svg/circle-boss.svg';
+import SwordIcon from '@assets/svg/sword.svg';
 import PartyIcon from '@assets/svg/user-round.svg';
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import { getBossImage, getBossDifficultyValue } from '@data/bosses/bosses';
@@ -29,11 +31,22 @@ const CharacterBossItem = ({ boss, server, isSelected, onClick }: Props): JSX.El
 		}
 	};
 
+	const previousSelected = useRef(isSelected);
+	const [displayDailyCleared, setDisplayDailyCleared] = useState(boss.dailyCleared ?? 0);
+
 	const bossImg = getBossImage(boss.name);
 	const partySize = boss.partySize;
 	const bossValue = Math.round(getBossDifficultyValue(boss.name, boss.difficulty, server) / partySize).toLocaleString(
 		'de-DE',
 	);
+
+	useEffect(() => {
+		if (previousSelected.current !== isSelected) {
+			setDisplayDailyCleared((currentValue) => (isSelected ? currentValue + 1 : currentValue - 1));
+
+			previousSelected.current = isSelected;
+		}
+	}, [isSelected]);
 
 	return (
 		<div
@@ -69,6 +82,14 @@ const CharacterBossItem = ({ boss, server, isSelected, onClick }: Props): JSX.El
 						<div className={styles.partySplit}>
 							<PartyIcon className={styles.partyIcon} />
 							<span>{partySize}</span>
+						</div>
+					)}
+					{boss.reset === 'Daily' && (
+						<div className={styles.partySplit}>
+							<SwordIcon className={styles.partyIcon} />
+							<span>
+								{displayDailyCleared}/{boss.dailyTotal}
+							</span>
 						</div>
 					)}
 				</div>
