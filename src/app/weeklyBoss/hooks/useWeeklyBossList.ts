@@ -128,7 +128,17 @@ export const useWeeklyBossList = (server: ServerName): UseWeeklyBossListReturn =
 						const boss = character.bosses.find((b) => b.id === bossMonsterId);
 
 						if (boss) {
+							const wasCleared = boss.cleared;
 							boss.cleared = !boss.cleared;
+
+							if (boss.reset === 'Daily') {
+								const currentDaily = boss.dailyCleared ?? 0;
+								const dailyTotal = boss.dailyTotal ?? 0;
+
+								boss.dailyCleared = wasCleared
+									? Math.max(0, currentDaily - 1)
+									: Math.min(dailyTotal, currentDaily + 1);
+							}
 
 							break;
 						}
