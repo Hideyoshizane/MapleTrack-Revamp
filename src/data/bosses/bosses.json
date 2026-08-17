@@ -145,7 +145,7 @@
 		]
 	},
 	{
-		"name": "Crimsom Queen",
+		"name": "Crimson Queen",
 		"img": "/assets/boss/crimson_queen.webp",
 		"maxPartySize": 6,
 		"difficulties": [
