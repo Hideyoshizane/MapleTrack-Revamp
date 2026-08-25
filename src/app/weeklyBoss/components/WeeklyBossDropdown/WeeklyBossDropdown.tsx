@@ -29,8 +29,8 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX
 	const totalBosses = character.bosses.length;
 	const isDisabled = totalBosses === 0;
 
-	const clearedBosses = character.bosses.filter((boss) => boss.cleared).length;
-	const isCleared = clearedBosses === totalBosses;
+	const completedBosses = character.bosses.filter((boss) => boss.cleared || boss.locked).length;
+	const isCleared = completedBosses === totalBosses;
 
 	const code = generateClassCode(character.class);
 	const sortedBosses = [...character.bosses].sort(compareBossOrder);
@@ -57,7 +57,7 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX
 							<BossCheckedIcon className={styles.iconClear} />
 						) : (
 							<p className={styles.bossNumber}>
-								{clearedBosses}/{totalBosses}
+								{completedBosses}/{totalBosses}
 							</p>
 						)}
 						{isDisabled ? (
