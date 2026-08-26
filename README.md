@@ -84,7 +84,6 @@ Built with the following tools:
 - [Framer Motion](https://github.com/motiondivision/motion)
 - [Fuse.js](https://www.fusejs.io/)
 - [Immer](https://immerjs.github.io/immer/)
-- [Isomorphic DOMPurify](https://github.com/kkomelin/isomorphic-dompurify)
 - [NextAuth.js](https://next-auth.js.org/)
 - [Nodemailer](https://nodemailer.com/)
 - [Prisma](https://www.prisma.io/orm)
