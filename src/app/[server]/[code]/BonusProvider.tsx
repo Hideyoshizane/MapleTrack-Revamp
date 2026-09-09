@@ -1,26 +1,18 @@
 'use client';
 
-import { createContext, useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { arcaneBonusCookie, sacredBonusCookie } from '@utils/bonusCookie';
 
-import type React from 'react';
+import { BonusContext } from './BonusContext';
+
 import type { ReactNode, JSX } from 'react';
-
-export type BonusContextType = {
-	arcaneBonus: number;
-	sacredBonus: number;
-	setArcaneBonus: (value: number) => void;
-	setSacredBonus: (value: number) => void;
-};
-
-const BonusContext = createContext<BonusContextType | undefined>(undefined);
 
 type BonusProviderProps = {
 	children: ReactNode;
 };
 
-export const BonusProvider: React.FC<BonusProviderProps> = ({ children }): JSX.Element => {
+export const BonusProvider = ({ children }: BonusProviderProps): JSX.Element => {
 	const [arcaneBonus, setArcaneBonusState] = useState<number>(0);
 	const [sacredBonus, setSacredBonusState] = useState<number>(0);
 
@@ -53,5 +45,3 @@ export const BonusProvider: React.FC<BonusProviderProps> = ({ children }): JSX.E
 		</BonusContext.Provider>
 	);
 };
-
-export { BonusContext };

@@ -4,7 +4,7 @@ import { auth } from '@/auth';
 
 import Navbar from '@components/Navbar/Navbar';
 
-import { BonusProvider } from './BonusContext';
+import { BonusProvider } from './BonusProvider';
 import CharacterPage from './CharacterPage';
 
 import type { JSX } from 'react';

@@ -1,16 +1,11 @@
 'use client';
 
-import { createContext, useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
+import { ThemeContext } from './ThemeContext';
 
 import type { Theme } from '@sharedTypes/theme';
 import type { JSX, ReactNode } from 'react';
-
-type Props = {
-	theme: Theme;
-	setTheme: (value: Theme) => void;
-};
-
-const ThemeContext = createContext<Props | null>(null);
 
 const getInitialTheme = (): Theme => {
 	if (typeof window === 'undefined') {
@@ -18,11 +13,13 @@ const getInitialTheme = (): Theme => {
 	}
 
 	const stored = localStorage.getItem('theme') as Theme | null;
+
 	if (stored) {
 		return stored;
 	}
 
 	const domTheme = document.documentElement.dataset.theme as Theme | undefined;
+
 	if (domTheme) {
 		return domTheme;
 	}
@@ -40,5 +37,3 @@ export const ThemeProvider = ({ children }: { children: ReactNode }): JSX.Elemen
 
 	return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 };
-
-export { ThemeContext };
