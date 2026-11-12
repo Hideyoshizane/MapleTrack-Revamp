@@ -1,10 +1,10 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
+import { AnimatePresence, motion } from 'motion/react';
 import { useState, useEffect } from 'react';
 
+import Image from '@components/Image/Image';
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import {
 	parseBossName,
@@ -25,21 +25,9 @@ import type { getEditBossListBossResponseBody } from '@features/boss/schemas/bos
 import type { JSX } from 'react';
 
 export type selectedBossesResetAndParty = {
-	resets: {
-		Daily: boolean;
-		Weekly: boolean;
-		Monthly: boolean;
-	};
-	partySizes: {
-		Daily: number;
-		Weekly: number;
-		Monthly: number;
-	};
-	value: {
-		Daily: number;
-		Weekly: number;
-		Monthly: number;
-	};
+	resets: { Daily: boolean; Weekly: boolean; Monthly: boolean };
+	partySizes: { Daily: number; Weekly: number; Monthly: number };
+	value: { Daily: number; Weekly: number; Monthly: number };
 };
 
 const getBossesResetAndParty = (
@@ -98,6 +86,7 @@ const BossItem = ({
 		bossesResetAndType.value.Monthly / bossesResetAndType.partySizes.Monthly;
 
 	const selectionMap = new Map<string, getEditBossListBossResponseBody>();
+
 	for (const b of selectedBosses) {
 		selectionMap.set(`${b.difficulty}|${b.reset}`, b);
 	}
@@ -109,6 +98,7 @@ const BossItem = ({
 	const selectedBoss = selectedBosses.find((bossSelection) => {
 		const parsedBoss = parseBossName(boss.name);
 		const parsedDifficulty = parseBossDifficultyName(bossSelection.difficulty);
+
 		if (!parsedBoss || !parsedDifficulty) {
 			return false;
 		}
@@ -138,7 +128,7 @@ const BossItem = ({
 		Boolean(getSelection(difficulty.name, difficulty.reset)),
 	);
 
-	// Animation
+	// Animation state
 	const [parentWidthExpanded, setParentWidthExpanded] = useState(false);
 	const [showGoldContainer, setShowGoldContainer] = useState(false);
 	const [goldOpacity, setGoldOpacity] = useState(0);
@@ -147,8 +137,9 @@ const BossItem = ({
 
 	useEffect(() => {
 		if (anySelected) {
-			// OPENING
+			// Opening animation
 			queueMicrotask(() => setParentWidthExpanded(true));
+
 			queueMicrotask(() => {
 				setShowGoldContainer(true);
 
@@ -160,142 +151,138 @@ const BossItem = ({
 
 			setTimeout(() => setGoldOpacity(1), 100);
 			setTimeout(() => setNumberFlowValue(totalGoldByPartySize), 150);
-		} else if (!anySelected && showGoldContainer) {
-			// CLOSING
-			queueMicrotask(() => {
-				setClosing(true);
-				setNumberFlowValue(0);
-			});
+			return;
 		}
+
+		if (!showGoldContainer) {
+			return;
+		}
+
+		// Closing animation
+		queueMicrotask(() => {
+			setClosing(true);
+			setNumberFlowValue(0);
+		});
 	}, [anySelected, totalGoldByPartySize, showGoldContainer]);
 
 	return (
-		<LazyMotion features={domAnimation} strict>
-			<m.div
-				className={styles.bossSlotBody}
-				animate={{ width: parentWidthExpanded ? 720 : 576 }}
-				layout
-				transition={{ duration: 0.2, ease: 'easeInOut' }}
-			>
-				<div className={styles.bossSlotContent}>
-					<Image
-						className={styles.bossIcon}
-						alt={`${boss.name} portrait`}
-						height={64}
-						priority
-						src={getBossImage(boss.name)}
-						width={64}
-					/>
+		<motion.div
+			className={styles.bossSlotBody}
+			animate={{ width: parentWidthExpanded ? 720 : 576 }}
+			layout
+			transition={{ duration: 0.2, ease: 'easeInOut' }}
+		>
+			<div className={styles.bossSlotContent}>
+				<Image
+					className={styles.bossIcon}
+					alt={`${boss.name} portrait`}
+					height={64}
+					src={getBossImage(boss.name)}
+					width={64}
+				/>
 
-					<ResponsiveText
-						className={styles.bossName}
-						height={52}
-						maxFontSize={28}
-						minFontSize={20}
-						width={120}
-					>
-						{boss.name}
-					</ResponsiveText>
+				<ResponsiveText className={styles.bossName} height={52} maxFontSize={28} minFontSize={20} width={120}>
+					{boss.name}
+				</ResponsiveText>
 
-					<div className={clsx(styles.bossButtons, gapClass)}>
-						{boss.difficulties.map((difficulty) => {
-							const selection = getSelection(difficulty.name, difficulty.reset);
-							const isSelected = !!selection;
+				<div className={clsx(styles.bossButtons, gapClass)}>
+					{boss.difficulties.map((difficulty) => {
+						const selection = getSelection(difficulty.name, difficulty.reset);
+						const isSelected = !!selection;
 
-							if (difficulty.reset === 'Daily') {
-								return (
-									<BossDropdownButton
-										difficulty={difficulty}
-										isSmallButtons={isSmallButtons}
-										key={difficulty.name}
-										locked={selectedCharacterLevel < difficulty.minLevel}
-										onSelectDifficulty={(diff, multiplier) => {
-											handleBossUpdate(
-												serverCookie,
-												boss.name,
-												diff.name,
-												'Daily',
-												bossesResetAndType.partySizes['Daily'] ?? 1,
-												multiplier,
-											);
-										}}
-										selected={isSelected}
-										value={selection?.dailyTotal ?? 0}
-									/>
-								);
-							}
-
+						if (difficulty.reset === 'Daily') {
 							return (
-								<BossButton
-									characterLevel={selectedCharacterLevel}
+								<BossDropdownButton
 									difficulty={difficulty}
 									isSmallButtons={isSmallButtons}
 									key={difficulty.name}
-									onSelect={() => {
+									locked={selectedCharacterLevel < difficulty.minLevel}
+									onSelectDifficulty={(diff, multiplier) => {
 										handleBossUpdate(
 											serverCookie,
 											boss.name,
-											difficulty.name,
-											difficulty.reset,
-											bossesResetAndType.partySizes[difficulty.reset] ?? 1,
+											diff.name,
+											'Daily',
+											bossesResetAndType.partySizes.Daily,
+											multiplier,
 										);
 									}}
 									selected={isSelected}
+									value={selection?.dailyTotal ?? 0}
 								/>
 							);
-						})}
-					</div>
+						}
 
-					<AnimatePresence>
-						{showGoldContainer && (
-							<m.div
-								className={styles.goldValue}
-								animate={{ opacity: goldOpacity }}
-								exit={{ opacity: 0 }}
-								initial={{ opacity: 0 }}
-								onAnimationComplete={() => {
-									if (closing && goldOpacity === 0) {
-										setParentWidthExpanded(false);
-										setShowGoldContainer(false);
-										setClosing(false);
-									}
+						return (
+							<BossButton
+								characterLevel={selectedCharacterLevel}
+								difficulty={difficulty}
+								isSmallButtons={isSmallButtons}
+								key={difficulty.name}
+								onSelect={() => {
+									handleBossUpdate(
+										serverCookie,
+										boss.name,
+										difficulty.name,
+										difficulty.reset,
+										bossesResetAndType.partySizes[difficulty.reset],
+									);
 								}}
-								transition={{ duration: 0.2 }}
-							>
-								<BossGoldPartySelectComponent
-									closing={closing}
-									bossesResetAndType={bossesResetAndType}
-									selectedReset={selectedBoss?.reset ?? 'Daily'}
-									maxPartySize={boss.maxPartySize}
-									onClosingAnimationFinish={() => {
-										setGoldOpacity(0);
-									}}
-									onSelectPartySize={(reset, newPartySize) => {
-										const selectedResetBoss = selectedBosses.find(
-											(bossSelection) => bossSelection.reset === reset,
-										);
-
-										if (!selectedResetBoss) {
-											return;
-										}
-
-										handleBossUpdate(
-											serverCookie,
-											boss.name,
-											selectedResetBoss.difficulty,
-											reset,
-											newPartySize,
-											selectedResetBoss.dailyTotal,
-										);
-									}}
-									value={numberFlowValue}
-								/>
-							</m.div>
-						)}
-					</AnimatePresence>
+								selected={isSelected}
+							/>
+						);
+					})}
 				</div>
-			</m.div>
-		</LazyMotion>
+
+				<AnimatePresence>
+					{showGoldContainer && (
+						<motion.div
+							className={styles.goldValue}
+							animate={{ opacity: goldOpacity }}
+							exit={{ opacity: 0 }}
+							initial={{ opacity: 0 }}
+							onAnimationComplete={() => {
+								if (closing && goldOpacity === 0) {
+									setParentWidthExpanded(false);
+									setShowGoldContainer(false);
+									setClosing(false);
+								}
+							}}
+							transition={{ duration: 0.2 }}
+						>
+							<BossGoldPartySelectComponent
+								closing={closing}
+								bossesResetAndType={bossesResetAndType}
+								selectedReset={selectedBoss?.reset ?? 'Daily'}
+								maxPartySize={boss.maxPartySize}
+								onClosingAnimationFinish={() => {
+									setGoldOpacity(0);
+								}}
+								onSelectPartySize={(reset, newPartySize) => {
+									const selectedResetBoss = selectedBosses.find(
+										(bossSelection) => bossSelection.reset === reset,
+									);
+
+									if (!selectedResetBoss) {
+										return;
+									}
+
+									handleBossUpdate(
+										serverCookie,
+										boss.name,
+										selectedResetBoss.difficulty,
+										reset,
+										newPartySize,
+										selectedResetBoss.dailyTotal,
+									);
+								}}
+								value={numberFlowValue}
+							/>
+						</motion.div>
+					)}
+				</AnimatePresence>
+			</div>
+		</motion.div>
 	);
 };
 

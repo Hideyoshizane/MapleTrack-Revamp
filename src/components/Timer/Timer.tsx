@@ -11,9 +11,7 @@ import styles from './Timer.module.scss';
 import type { remainingTime } from '@utils/time';
 import type { JSX } from 'react';
 
-type Props = {
-	target: 'daily' | 'weekly';
-};
+type Props = { target: 'daily' | 'weekly' };
 const computeTimeLeft = (resetType: 'daily' | 'weekly'): remainingTime => {
 	const now = nowInUtc();
 

@@ -1,15 +1,8 @@
 import linkSkillsData from './linkSkill.json';
 
-type LinkSkillLevel = {
-	level: number;
-	description: string;
-};
+type LinkSkillLevel = { level: number; description: string };
 
-type LinkSkill = {
-	name: string;
-	image: string;
-	levels: LinkSkillLevel[];
-};
+type LinkSkill = { name: string; image: string; levels: LinkSkillLevel[] };
 
 const linkSkills: LinkSkill[] = linkSkillsData;
 

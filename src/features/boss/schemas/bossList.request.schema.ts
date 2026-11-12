@@ -11,19 +11,11 @@ import {
 
 import { IdRawSchema } from './bossList.response.schema';
 
-export const getBossListRequestSchema = z
-	.object({
-		server: serverSchema,
-	})
-	.strict();
+export const getBossListRequestSchema = z.object({ server: serverSchema }).strict();
 
 export type getBossListRequestBody = z.infer<typeof getBossListRequestSchema>;
 
-export const getEditBossListRequestSchema = z
-	.object({
-		server: serverSchema,
-	})
-	.strict();
+export const getEditBossListRequestSchema = z.object({ server: serverSchema }).strict();
 
 export type getEditBossListRequestBody = z.infer<typeof getEditBossListRequestSchema>;
 
@@ -74,11 +66,6 @@ export type updateBossListRequestBody = z.infer<typeof updateBossListRequestSche
 
 // Toggle boss
 
-export const toggleBossListRequestSchema = z
-	.object({
-		bossListId: IdRawSchema,
-		bossMonsterId: IdRawSchema,
-	})
-	.strict();
+export const toggleBossListRequestSchema = z.object({ bossListId: IdRawSchema, bossMonsterId: IdRawSchema }).strict();
 
 export type toggleBossListRequestBody = z.infer<typeof toggleBossListRequestSchema>;

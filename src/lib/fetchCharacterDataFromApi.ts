@@ -5,9 +5,7 @@ import axiosInstance from '@lib/axios/axios';
 
 import type { getCharacterDataFromAPIResponseBody } from '@features/character/schemas/character.response.schema';
 
-type NexonRankingResponse = {
-	ranks: getCharacterDataFromAPIResponseBody[];
-};
+type NexonRankingResponse = { ranks: getCharacterDataFromAPIResponseBody[] };
 
 export const fetchCharacterDataFromApi = async (
 	characterName: string,
@@ -41,7 +39,7 @@ export const fetchCharacterDataFromApi = async (
 		// Extract first ranked character
 		const character = data.ranks?.[0];
 		if (!character) {
-			throw new Error(`Character "${characterName}" not found`);
+			return { characterImgURL: '', level: 0 };
 		}
 
 		return { characterImgURL: character.characterImgURL, level: character.level };
@@ -55,9 +53,7 @@ export const fetchCharacterDataFromApi = async (
 				params: requestParams,
 			});
 
-			throw new Error(`External API failed: ${error.response?.status ?? 'unknown'}`, {
-				cause: error,
-			});
+			throw new Error(`External API failed: ${error.response?.status ?? 'unknown'}`, { cause: error });
 		}
 
 		throw error;

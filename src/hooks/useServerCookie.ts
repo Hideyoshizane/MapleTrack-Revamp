@@ -8,10 +8,7 @@ import type { ServerName } from '@data/servers/servers';
 
 export const useServerCookie = (
 	initialServer: ServerName,
-): {
-	server: ServerName;
-	setServerCookie: (name: ServerName) => void;
-} => {
+): { server: ServerName; setServerCookie: (name: ServerName) => void } => {
 	const [server, setServer] = useState<ServerName>(initialServer);
 
 	useEffect((): void => {

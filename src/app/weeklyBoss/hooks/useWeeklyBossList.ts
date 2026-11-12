@@ -3,7 +3,7 @@
 import { produce } from 'immer';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 import { bossListApi } from '@features/boss/bossListApi';
 

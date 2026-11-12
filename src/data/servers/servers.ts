@@ -1,10 +1,6 @@
 import serversJson from './servers.json';
 
-export type Server = {
-	name: string;
-	img: string;
-	Reboot: boolean;
-};
+export type Server = { name: string; img: string; Reboot: boolean };
 
 export const servers: Server[] = serversJson;
 

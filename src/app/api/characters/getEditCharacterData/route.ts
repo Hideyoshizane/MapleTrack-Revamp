@@ -50,13 +50,11 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 						level: true,
 						exp: true,
 						category: true,
-						contents: { select: { contentType: true, checked: true, cleared: true, tries: true } },
+						contents: { select: { contentType: true, checked: true, cleared: true } },
 					},
 				},
 			},
 		});
-
-		let responseData: getEditCharacterDataResponseBody;
 
 		//if not in database, return a generic object.
 		if (!character) {
@@ -70,57 +68,57 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				);
 			}
 
-			responseData = generateCharacterObjectEditCharacterPage({
+			const responseData = generateCharacterObjectEditCharacterPage({
 				jobClassName: classData.className,
 				jobType: classData.jobType,
 				legion: classData.legionType,
 				linkSkill: classData.linkSkill,
 			});
-		} else {
-			const normalizedSymbols = character.symbols.map((symbol) => {
-				const normalizedContents = symbol.contents.map((content) => ({
+
+			return createResponse<ApiResponse<getEditCharacterDataResponseBody>>(
+				{ success: true, message: 'Request processed.', data: responseData },
+				200,
+			);
+		}
+		const normalizedSymbols = character.symbols.map((symbol) => ({
+			id: symbol.id,
+			name: symbol.name,
+			level: symbol.level,
+			exp: symbol.exp,
+			category: symbol.category,
+			contents: sortSymbolContents(
+				symbol.name,
+				symbol.contents.map((content) => ({
 					contentType: content.contentType,
 					checked: content.checked,
 					cleared: content.cleared,
-					tries: content.tries ?? undefined,
-				}));
+				})),
+			),
+		}));
 
-				return {
-					id: symbol.id,
-					name: symbol.name,
-					level: symbol.level,
-					exp: symbol.exp,
-					category: symbol.category,
-					contents: sortSymbolContents(symbol.name, normalizedContents),
-				};
-			});
+		const sortedSymbols = sortSymbolsByMinLevel(normalizedSymbols);
+		const groupedSymbols = groupSymbolsByCategory(sortedSymbols);
 
-			const sortedSymbols = sortSymbolsByMinLevel(normalizedSymbols);
+		const responseData: getEditCharacterDataResponseBody = {
+			id: character.id,
+			name: character.name,
+			level: character.level,
+			targetLevel: character.targetLevel,
+			class: character.class,
+			jobType: character.jobType,
+			legion: character.legion,
+			linkSkill: character.linkSkill,
+			bossing: character.bossing,
+			syncing: character.syncing,
+			symbols: groupedSymbols,
+			lastSymbolDaily: character.lastSymbolDaily,
+		};
 
-			const groupedSymbols = groupSymbolsByCategory(sortedSymbols);
+		const validation = getEditCharacterDataResponseSchema.safeParse(responseData);
+		if (!validation.success) {
+			logZodError(validation.error, { route });
 
-			responseData = {
-				id: character.id,
-				name: character.name,
-				level: character.level,
-				targetLevel: character.targetLevel,
-				class: character.class,
-				jobType: character.jobType,
-				legion: character.legion,
-				linkSkill: character.linkSkill,
-				bossing: character.bossing,
-				syncing: character.syncing,
-				symbols: groupedSymbols,
-				lastSymbolDaily: character.lastSymbolDaily,
-			};
-
-			const validation = getEditCharacterDataResponseSchema.safeParse(responseData);
-
-			if (!validation.success) {
-				logZodError(validation.error, { route });
-
-				return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
-			}
+			return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 		}
 
 		return createResponse<ApiResponse<getEditCharacterDataResponseBody>>(
@@ -128,7 +126,8 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			200,
 		);
 	} catch (error) {
-		logError(error, { route: route });
+		logError(error, { route });
+
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

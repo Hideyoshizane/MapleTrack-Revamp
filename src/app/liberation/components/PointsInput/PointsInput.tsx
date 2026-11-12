@@ -1,9 +1,9 @@
 'use client';
 
-import Image from 'next/image';
 import { useState } from 'react';
 
 import InfoIcon from '@assets/svg/info.svg';
+import Image from '@components/Image/Image';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { weaponQuestsImagesSrc } from '@data/liberation/liberationQuests';
 
@@ -11,11 +11,7 @@ import styles from './PointsInput.module.scss';
 
 import type { ChangeEvent, JSX } from 'react';
 
-type Props = {
-	type: string;
-	points: number;
-	onChangePoints: (value: number) => void;
-};
+type Props = { type: string; points: number; onChangePoints: (value: number) => void };
 
 const IMAGE_SIZE = 48;
 
@@ -51,7 +47,7 @@ const PointsInput = ({ type, points, onChangePoints }: Props): JSX.Element => {
 
 	return (
 		<div className={styles.inputDiv}>
-			<Image alt="Currency icon" height={IMAGE_SIZE} priority src={iconSrc} width={IMAGE_SIZE} />
+			<Image alt="Currency icon" height={IMAGE_SIZE} src={iconSrc} width={IMAGE_SIZE} />
 
 			<input
 				className={styles.input}

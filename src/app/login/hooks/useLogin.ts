@@ -1,7 +1,6 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 import { credentialsSchema } from '@features/user/schemas/user.schema';
 
@@ -12,25 +11,29 @@ export const useLogin = (router: AppRouterInstance): { submitLogin: (data: Login
 	const submitLogin = async (data: LoginFormData): Promise<void> => {
 		try {
 			const parsed = credentialsSchema.safeParse(data);
+			if (!parsed.success) {
+				toast.error('Invalid name or password');
+				return;
+			}
 
-			const username = parsed.success ? parsed.data.username : data.username;
-			const password = parsed.success ? parsed.data.password : data.password;
-
-			const response = (await signIn('credentials', { redirect: false, username, password })) as
-				| { ok: boolean; error?: string | null }
-				| undefined;
-
-			if (!response || response.error) {
-				toast.error('Invalid username or password');
-
+			// Authentication endpoint that accepts name(username)
+			const response = await fetch('/api/auth/signin', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(parsed.data),
+			});
+			if (!response.ok) {
+				toast.error('Invalid name or password');
 				return;
 			}
 
 			toast.success('Login successful!');
 			void router.push('/home');
-		} catch (err: unknown) {
-			toast.error('Invalid username or password');
-			console.error('Login error:', err);
+
+			router.refresh();
+		} catch (error: unknown) {
+			toast.error('Invalid name or password');
+			console.error('Login error:', error);
 		}
 	};
 

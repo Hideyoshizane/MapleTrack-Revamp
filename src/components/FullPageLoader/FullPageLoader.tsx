@@ -6,12 +6,7 @@ import styles from './FullPageLoader.module.scss';
 
 import type { JSX } from 'react';
 
-type Props = {
-	width?: number;
-	height?: number;
-	color?: string;
-	borderWidth?: number;
-};
+type Props = { width?: number; height?: number; color?: string; borderWidth?: number };
 
 const FullPageLoader = ({
 	width = 120,

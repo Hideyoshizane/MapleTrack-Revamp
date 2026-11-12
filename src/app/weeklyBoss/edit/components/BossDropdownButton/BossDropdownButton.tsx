@@ -11,12 +11,7 @@ import styles from './BossDropdownButton.module.scss';
 
 import type { JSX } from 'react';
 
-type Difficulty = {
-	minLevel: number;
-	name: string;
-	reset: string;
-	value: number;
-};
+type Difficulty = { minLevel: number; name: string; reset: string; value: number };
 
 type BossDropdownButtonProps = {
 	selected: boolean;

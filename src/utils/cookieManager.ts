@@ -20,15 +20,9 @@ const setCookie = (key: string, value: string, maxAge: number): void => {
 	document.cookie = `${key}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; samesite=lax`;
 };
 
-type StringCookieManager<T extends string> = {
-	get: () => T[] | undefined;
-	set: (values: T[]) => void;
-};
+type StringCookieManager<T extends string> = { get: () => T[] | undefined; set: (values: T[]) => void };
 
-type NumericCookieManager = {
-	get: () => number | undefined;
-	set: (value: number) => void;
-};
+type NumericCookieManager = { get: () => number | undefined; set: (value: number) => void };
 
 // Generic typed cookie helper for enums or fixed option sets.
 export const createCookieManager = <T extends string>(

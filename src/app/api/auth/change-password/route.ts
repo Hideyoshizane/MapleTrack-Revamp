@@ -17,33 +17,35 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			logZodError(parseResult.error, { route });
 
 			const message = parseResult.error.issues[0]?.message ?? 'Validation failed';
-
 			return createResponse<ApiResponse>({ success: false, message }, 200);
 		}
 
 		const { currentPassword, newPassword } = parseResult.data;
 
-		// Find user by id
-		const user = await prisma.user.findUnique({
-			where: { id: authenticatedUserId },
+		// Find the user's credential account
+		const account = await prisma.account.findFirst({
+			where: { userId: authenticatedUserId, providerId: 'credential' },
 			select: { id: true, password: true },
 		});
-		if (!user) {
-			logApiFailure('User not found', { route: route });
 
-			return createResponse<ApiResponse>({ success: false, message: 'Invalid username' }, 404);
+		if (!account?.password) {
+			logApiFailure('Credential account not found', { route });
+
+			return createResponse<ApiResponse>({ success: false, message: 'Credential account not found.' }, 404);
 		}
 
-		const isCurrentPasswordCorrect = await verifyPassword(user.password, currentPassword);
+		// Verify current password
+		const isCurrentPasswordCorrect = await verifyPassword(account.password, currentPassword);
 		if (!isCurrentPasswordCorrect) {
-			logApiFailure('Password error', { route: route });
+			logApiFailure('Password error', { route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'Current password is incorrect.' }, 200);
 		}
 
-		const isSamePassword = await verifyPassword(user.password, newPassword);
+		// Prevent reusing the current password
+		const isSamePassword = await verifyPassword(account.password, newPassword);
 		if (isSamePassword) {
-			logApiFailure('Password error', { route: route });
+			logApiFailure('Password error', { route });
 
 			return createResponse<ApiResponse>(
 				{ success: false, message: 'New password must be different from the current password.' },
@@ -51,13 +53,14 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			);
 		}
 
-		// Update user password
+		// Update credential account password
 		const hashedPassword = await hashPassword(newPassword);
-		await prisma.user.update({ where: { id: user.id }, data: { password: hashedPassword } });
+
+		await prisma.account.update({ where: { id: account.id }, data: { password: hashedPassword } });
 
 		return createResponse<ApiResponse>({ success: true, message: 'Password changed.' }, 200);
 	} catch (error) {
-		logError(error, { route: route });
+		logError(error, { route });
 
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}

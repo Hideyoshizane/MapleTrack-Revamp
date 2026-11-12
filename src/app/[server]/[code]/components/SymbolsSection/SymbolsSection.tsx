@@ -7,10 +7,7 @@ import styles from './SymbolsSection.module.scss';
 import type { getCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
-type Props = {
-	character: getCharacterDataResponseBody;
-	isBulkUpdating?: boolean;
-};
+type Props = { character: getCharacterDataResponseBody; isBulkUpdating?: boolean };
 
 const CATEGORY_TITLES: Record<keyof getCharacterDataResponseBody['symbols'], string> = {
 	arcane: 'Arcane Symbols',

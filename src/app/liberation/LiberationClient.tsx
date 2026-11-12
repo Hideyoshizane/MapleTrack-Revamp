@@ -20,9 +20,7 @@ import styles from './Page.module.scss';
 import type { ServerName } from '@data/servers/servers';
 import type { JSX } from 'react';
 
-type Props = {
-	initialServer: ServerName;
-};
+type Props = { initialServer: ServerName };
 
 const BOSS_ICON_SIZE = 96;
 const ICON_SIZE = 32;

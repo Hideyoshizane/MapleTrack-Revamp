@@ -60,11 +60,7 @@ $iconSize: 40px;
 	outline: none;
 
 	&:hover {
-		background-color: color-mix(
-			in srgb,
-			var(--background-white) 90%,
-			black
-		);
+		background-color: color-mix(in srgb, var(--background-white) 90%, black);
 	}
 
 	.iconsDiv {
@@ -130,11 +126,7 @@ $iconSize: 40px;
 	}
 
 	&:hover {
-		background-color: color-mix(
-			in srgb,
-			var(--background-white) 90%,
-			black
-		);
+		background-color: color-mix(in srgb, var(--background-white) 90%, black);
 	}
 
 	&:not(:last-child) {

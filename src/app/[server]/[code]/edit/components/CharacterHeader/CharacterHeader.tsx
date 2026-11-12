@@ -1,7 +1,7 @@
 'use client';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 import Button from '@components/Button/Button';
 import Tooltip from '@components/Tooltip/Tooltip';
@@ -14,11 +14,7 @@ import type { updateCharacterRequestBody } from '@features/character/schemas/cha
 import type { getEditCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
-type Props = {
-	character?: getEditCharacterDataResponseBody;
-	server: string;
-	nameError: string | null;
-};
+type Props = { character?: getEditCharacterDataResponseBody; server: string; nameError: string | null };
 
 export const CharacterHeader = ({ character, server, nameError }: Props): JSX.Element => {
 	const [submitLoading, setSubmitLoading] = useState(false);
@@ -40,12 +36,13 @@ export const CharacterHeader = ({ character, server, nameError }: Props): JSX.El
 			const payload: updateCharacterRequestBody = { ...character, server: sanitizeInput(server) };
 			const result = await characterApi.updateCharacterData(payload);
 
-			if (result.success) {
-				const basePath = pathname.replace(/\/edit$/, '');
-				router.push(`${basePath}?success=1`);
-			} else {
+			if (!result.success) {
 				toast.error(result.message || 'Failed to update the character');
+				return;
 			}
+
+			const basePath = pathname.replace(/\/edit$/, '');
+			router.push(`${basePath}?success=1`);
 		} catch (err) {
 			console.error(err);
 			toast.error('Unexpected error occurred');

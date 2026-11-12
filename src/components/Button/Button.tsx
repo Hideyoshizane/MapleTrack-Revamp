@@ -51,9 +51,7 @@ const Button = ({
 
 	return (
 		<button
-			className={clsx(styles.button, className, {
-				[styles.disabled]: isActuallyDisabled,
-			})}
+			className={clsx(styles.button, className, { [styles.disabled]: isActuallyDisabled })}
 			aria-disabled={isActuallyDisabled}
 			onClick={handleClick}
 			onKeyDown={handleKeyDown}

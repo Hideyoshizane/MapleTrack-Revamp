@@ -71,7 +71,6 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		for (const characterEntry of serverDataRaw.characters) {
 			const characterData = characterEntry.character;
-
 			if (!characterData) {
 				continue;
 			}

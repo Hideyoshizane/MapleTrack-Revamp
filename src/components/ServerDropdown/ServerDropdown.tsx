@@ -1,9 +1,9 @@
 'use client';
 
 import * as Select from '@radix-ui/react-select';
-import Image from 'next/image';
 
 import MenuIcon from '@assets/svg/menu.svg';
+import Image from '@components/Image/Image';
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 import { servers } from '@data/servers/servers';
 
@@ -13,10 +13,7 @@ import ServerItem from './ServerItem/ServerItem';
 import type { Server, ServerName } from '@data/servers/servers';
 import type { JSX } from 'react';
 
-type Props = {
-	server: ServerName;
-	setServerCookie?: (value: ServerName) => void;
-};
+type Props = { server: ServerName; setServerCookie?: (value: ServerName) => void };
 
 const ServerDropdown = ({ server, setServerCookie }: Props): JSX.Element => {
 	const selectedServer = servers.find((s: Server): boolean => s.name === server);
@@ -37,7 +34,7 @@ const ServerDropdown = ({ server, setServerCookie }: Props): JSX.Element => {
 				aria-label={`Selected server: ${selectedServer.name}`}
 			>
 				<div className={styles.iconWrapper}>
-					<Image alt={selectedServer.name} height={48} priority src={selectedServer.img} width={48} />
+					<Image alt={selectedServer.name} height={48} src={selectedServer.img} width={48} />
 				</div>
 
 				<p className={styles.serverName}>{selectedServer.name}</p>
@@ -49,23 +46,21 @@ const ServerDropdown = ({ server, setServerCookie }: Props): JSX.Element => {
 				<Select.Content className={styles.serversList} position="popper">
 					<div className={styles.scrollContainer}>
 						<Select.Viewport>
-							{servers.map(
-								(serverItem: Server): JSX.Element => (
-									<Select.Item
-										className={styles.serverItem}
-										key={serverItem.name}
-										value={serverItem.name}
-									>
-										<ServerItem
-											isSelected={serverItem.name === selectedServer.name}
-											onSelect={() => {
-												setServerCookie?.(serverItem.name);
-											}}
-											server={serverItem}
-										/>
-									</Select.Item>
-								),
-							)}
+							{servers.map((serverItem: Server): JSX.Element => (
+								<Select.Item
+									className={styles.serverItem}
+									key={serverItem.name}
+									value={serverItem.name}
+								>
+									<ServerItem
+										isSelected={serverItem.name === selectedServer.name}
+										onSelect={() => {
+											setServerCookie?.(serverItem.name);
+										}}
+										server={serverItem}
+									/>
+								</Select.Item>
+							))}
 						</Select.Viewport>
 					</div>
 				</Select.Content>

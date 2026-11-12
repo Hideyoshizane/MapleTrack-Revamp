@@ -2,30 +2,30 @@ $spacingSmall: 4px;
 $spacingMedium: 8px;
 $iconSize: 40px;
 
-@use "sass:map";
+@use 'sass:map';
 
 $difficulties: (
-	"easy": (
+	'easy': (
 		bg: var(--boss-easy),
 		text: var(--default-white),
 		icon: var(--default-white),
 	),
-	"normal": (
+	'normal': (
 		bg: var(--boss-normal),
 		text: var(--default-button-text),
 		icon: var(--default-button-text),
 	),
-	"hard": (
+	'hard': (
 		bg: var(--boss-hard),
 		text: var(--default-button-text),
 		icon: var(--default-button-text),
 	),
-	"chaos": (
+	'chaos': (
 		bg: var(--boss-chaos),
 		text: var(--boss-chaos-secondary),
 		border: var(--boss-chaos-secondary),
 	),
-	"extreme": (
+	'extreme': (
 		bg: var(--boss-extreme),
 		text: var(--boss-extreme-secondary),
 		border: var(--boss-extreme-secondary),

@@ -48,10 +48,7 @@ const DestinyProgression = ({ selectedCharacter, currentDate, server, onCharacte
 	const [selectedDate, setSelectedDate] = useState<Date>(currentDate);
 
 	const { selectedQuest, setSelectedQuest, determinationPoints, setDeterminationPoints } = useDestinyProgressionState(
-		{
-			selectedCharacter,
-			onCharacterUpdateAction: onCharacterUpdate,
-		},
+		{ selectedCharacter, onCharacterUpdateAction: onCharacterUpdate },
 	);
 
 	const checkedBosses = useDestinyCheckedBosses({

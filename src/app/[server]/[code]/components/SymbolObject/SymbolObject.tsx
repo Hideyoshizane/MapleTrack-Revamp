@@ -1,8 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import { useState } from 'react';
 
+import Image from '@components/Image/Image';
 import ProgressBar from '@components/ProgressBar/ProgressBar';
 import { getExpForLevel } from '@data/symbols/exp/expTable';
 import {
@@ -21,14 +21,12 @@ import styles from './SymbolObject.module.scss';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { getCharacterDataSymbolsResponseBody } from '@features/character/schemas/character.response.schema';
-import type { SymbolCategory, CharacterContent } from '@prisma/client';
+import type { SymbolCategory, CharacterContent } from '@generated/prisma/client';
 import type { JSX } from 'react';
 
 const SYMBOL_SIZE_DEFAULT = 24;
 
-type CharacterContentUI = CharacterContent & {
-	type: 'daily' | 'weekly';
-};
+type CharacterContentUI = CharacterContent & { type: 'daily' | 'weekly' };
 
 type Props = {
 	type: SymbolCategory;
@@ -38,6 +36,8 @@ type Props = {
 	size?: number;
 	isBulkUpdating?: boolean;
 };
+
+type SymbolValueChange = { currentExp: number; currentLevel: number; dailyCleared?: boolean; weeklyCleared?: boolean };
 
 const getExpDisplay = (type: SymbolCategory, level: number, exp: number): string => {
 	const maxExp = getExpForLevel(type, level);
@@ -52,14 +52,13 @@ const SymbolObject = ({
 	size = SYMBOL_SIZE_DEFAULT,
 	isBulkUpdating = false,
 }: Props): JSX.Element => {
-	const { level, exp } = symbol;
-	const name = symbol.name;
+	const { level, exp, name } = symbol;
 
 	const { arcaneBonus, sacredBonus } = useBonusContext();
 	const bonus = type === 'arcane' ? arcaneBonus : sacredBonus;
 
 	const { dailyValue: baseDaily, weeklyValue } = computeDailyWeeklyValues(
-		{ name: symbol.name, level: symbol.level, exp: symbol.exp, category: symbol.category },
+		{ name, level, exp, category: symbol.category },
 		symbol.contents as CharacterContentUI[],
 		characterLevel,
 	);
@@ -68,15 +67,14 @@ const SymbolObject = ({
 
 	const [optimisticExp, setOptimisticExp] = useState<number | null>(null);
 	const [optimisticLevel, setOptimisticLevel] = useState<number | null>(null);
-
 	const [optimisticDailyCleared, setOptimisticDailyCleared] = useState<boolean | null>(null);
-	const [optimisticWeeklyTries, setOptimisticWeeklyTries] = useState<number | null>(null);
+	const [optimisticWeeklyCleared, setOptimisticWeeklyCleared] = useState<boolean | null>(null);
 
 	const effectiveExp = optimisticExp ?? exp;
 	const effectiveLevel = optimisticLevel ?? level;
 
-	const effectiveDailyCleared = optimisticDailyCleared ?? symbol.contents[0]?.cleared;
-	const effectiveWeeklyTries = optimisticWeeklyTries ?? symbol.contents.at(-1)?.tries;
+	const effectiveDailyCleared = optimisticDailyCleared ?? symbol.contents[0]?.cleared ?? false;
+	const effectiveWeeklyCleared = optimisticWeeklyCleared ?? symbol.contents.at(-1)?.cleared ?? false;
 
 	const usable = canUseSymbol(characterLevel, name);
 	const maxLevel = getSymbolMaxLevelByCategory(type);
@@ -91,26 +89,22 @@ const SymbolObject = ({
 		type,
 		effectiveLevel,
 		effectiveExp,
-		effectiveWeeklyTries || 0,
-		effectiveDailyCleared || false,
+		effectiveWeeklyCleared,
+		effectiveDailyCleared,
 	);
 
 	const jobType: JobType = isMaxed ? 'complete' : (characterJobType as JobType);
 
-	const handleSymbolChange = (data: {
-		currentExp: number;
-		currentLevel: number;
-		dailyCleared?: boolean;
-		weeklyTries?: number;
-	}): void => {
+	const handleSymbolChange = (data: SymbolValueChange): void => {
 		setOptimisticExp(data.currentExp);
 		setOptimisticLevel(data.currentLevel);
 
 		if (data.dailyCleared !== undefined) {
 			setOptimisticDailyCleared(data.dailyCleared);
 		}
-		if (data.weeklyTries !== undefined) {
-			setOptimisticWeeklyTries(data.weeklyTries);
+
+		if (data.weeklyCleared !== undefined) {
+			setOptimisticWeeklyCleared(data.weeklyCleared);
 		}
 	};
 
@@ -147,18 +141,21 @@ const SymbolObject = ({
 
 				{usable && !isMaxed && (
 					<>
-						<p className={styles.daysTo}>
-							Days to level {maxLevel}: {daysToLevel}
-						</p>
+						{daysToLevel !== Infinity && (
+							<p className={styles.daysTo}>
+								Days to level {maxLevel}: {daysToLevel}
+							</p>
+						)}
 
 						<div className={styles.buttonLines}>
 							<SymbolButtons
 								bonus={bonus}
 								dailyValue={dailyValue}
+								weeklyValue={weeklyValue}
 								isBulkUpdating={isBulkUpdating}
 								onValueChange={handleSymbolChange}
 								optimisticDailyCleared={effectiveDailyCleared}
-								optimisticWeeklyTries={effectiveWeeklyTries}
+								optimisticWeeklyCleared={effectiveWeeklyCleared}
 								symbol={symbol}
 							/>
 						</div>

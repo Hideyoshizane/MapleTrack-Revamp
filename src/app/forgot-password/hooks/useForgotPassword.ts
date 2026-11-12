@@ -1,15 +1,13 @@
 'use client';
 
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 import { forgotPasswordRequestSchema } from '@features/user/schemas/user.schema';
 import { userApi } from '@features/user/userApi';
 
 import type { ForgotPasswordFormData } from '@sharedTypes/form';
 
-export const useForgotPassword = (): {
-	submitForgotPassword: (data: ForgotPasswordFormData) => Promise<void>;
-} => {
+export const useForgotPassword = (): { submitForgotPassword: (data: ForgotPasswordFormData) => Promise<void> } => {
 	const submitForgotPassword = async (data: ForgotPasswordFormData): Promise<void> => {
 		try {
 			const parsedResult = forgotPasswordRequestSchema.safeParse(data);

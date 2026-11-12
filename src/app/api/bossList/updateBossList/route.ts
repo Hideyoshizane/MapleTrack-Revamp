@@ -4,7 +4,7 @@ import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
 import { logZodError, logApiFailure, logError } from '@utils/logger';
 
-import type { Prisma, BossReset } from '@prisma/client';
+import type { Prisma } from '@generated/prisma/client';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
@@ -14,10 +14,10 @@ const route = 'api/bossList/updateBossList';
 
 const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
 	try {
-		// Validate request body using Zod
 		const parseResult = updateBossListRequestSchema.safeParse(await request.json());
+
 		if (!parseResult.success) {
-			logZodError(parseResult.error, { route: route });
+			logZodError(parseResult.error, { route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
@@ -27,7 +27,6 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const existingBossList = await prisma.bossList.findUnique({
 			where: { userId: authenticatedUserId },
 			select: {
-				id: true,
 				servers: {
 					select: { id: true, serverName: true, characters: { select: { id: true, characterId: true } } },
 				},
@@ -47,21 +46,23 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		}
 
 		const existingCharacterMap = new Map(
-			targetServer.characters.map((character): [string, typeof character] => [character.characterId, character]),
+			targetServer.characters.map((bossCharacter): [string, typeof bossCharacter] => [
+				bossCharacter.characterId,
+				bossCharacter,
+			]),
 		);
 
 		await prisma.$transaction(async (tx) => {
 			const transactionPromises: Promise<unknown>[] = [];
 
 			for (const incomingCharacter of data.characters) {
-				const existingCharacter = existingCharacterMap.get(incomingCharacter.characterId);
-
-				if (!existingCharacter) {
+				const existingBossCharacter = existingCharacterMap.get(incomingCharacter.characterId);
+				if (!existingBossCharacter) {
 					continue;
 				}
 
 				const existingBosses = await tx.boss.findMany({
-					where: { characterId: existingCharacter.id },
+					where: { bossCharacterId: existingBossCharacter.id },
 					select: {
 						id: true,
 						name: true,
@@ -84,15 +85,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 				const bossIdsToDelete: string[] = [];
 				const bossesToCreate: Prisma.BossCreateManyInput[] = [];
-
-				const bossesToUpdate: {
-					id: string;
-					reset: BossReset;
-					dailyTotal: number | undefined;
-					dailyCleared: number | undefined;
-					locked: boolean;
-					partySize: number;
-				}[] = [];
+				const bossesToUpdate: { id: string; data: Prisma.BossUpdateInput }[] = [];
 
 				for (const existingBoss of existingBosses) {
 					const bossKey = getBossKey(existingBoss);
@@ -106,7 +99,6 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 					const bossKey = getBossKey(incomingBoss);
 
 					const existingBoss = existingBossMap.get(bossKey);
-
 					if (!existingBoss) {
 						bossesToCreate.push({
 							name: incomingBoss.name,
@@ -114,7 +106,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 							reset: incomingBoss.reset,
 							dailyTotal: incomingBoss.dailyTotal,
 							partySize: incomingBoss.partySize,
-							characterId: existingCharacter.id,
+							bossCharacterId: existingBossCharacter.id,
 						});
 
 						continue;
@@ -139,11 +131,13 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 					bossesToUpdate.push({
 						id: existingBoss.id,
-						reset: incomingBoss.reset,
-						dailyTotal: incomingBoss.dailyTotal,
-						dailyCleared: incomingBoss.dailyCleared,
-						locked: newLocked,
-						partySize: incomingBoss.partySize,
+						data: {
+							reset: incomingBoss.reset,
+							dailyTotal: incomingBoss.dailyTotal,
+							dailyCleared: incomingBoss.dailyCleared,
+							locked: newLocked,
+							partySize: incomingBoss.partySize,
+						},
 					});
 				}
 
@@ -157,29 +151,17 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 				for (const bossToUpdate of bossesToUpdate) {
 					transactionPromises.push(
-						tx.boss.update({
-							where: { id: bossToUpdate.id },
-							data: {
-								reset: bossToUpdate.reset,
-								dailyTotal: bossToUpdate.dailyTotal,
-								dailyCleared: bossToUpdate.dailyCleared,
-								locked: bossToUpdate.locked,
-								partySize: bossToUpdate.partySize,
-							},
-						}),
+						tx.boss.update({ where: { id: bossToUpdate.id }, data: bossToUpdate.data }),
 					);
 				}
 			}
 
-			if (transactionPromises.length > 0) {
-				await Promise.all(transactionPromises);
-			}
+			await Promise.all(transactionPromises);
 		});
 
-		// Success response
 		return createResponse<ApiResponse>({ success: true, message: 'Boss list updated successfully' }, 200);
 	} catch (error) {
-		logError(error, { route: route });
+		logError(error, { route });
 
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}

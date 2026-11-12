@@ -1,26 +1,25 @@
 'use client';
 
-import { ToastContainer, Bounce } from 'react-toastify';
+import { Toaster } from 'sonner';
 
 import type { JSX } from 'react';
-import type { ToastContainerProps } from 'react-toastify';
+import type { ToasterProps } from 'sonner';
 
 import './CustomToaster.scss';
 
-const ClientToaster = (props: ToastContainerProps): JSX.Element => {
+const ClientToaster = (props: ToasterProps): JSX.Element => {
 	return (
-		<ToastContainer
+		<Toaster
 			{...props}
 			className="toasterContainer"
-			autoClose={4000}
-			closeOnClick
-			draggable
-			hideProgressBar={false}
-			newestOnTop
-			pauseOnFocusLoss={false}
-			pauseOnHover
-			toastClassName="toaster"
-			transition={Bounce}
+			closeButton={true}
+			expand={false}
+			duration={2500}
+			position="bottom-right"
+			toastOptions={{
+				...props.toastOptions,
+				classNames: { ...props.toastOptions?.classNames, toast: 'toaster' },
+			}}
 		/>
 	);
 };

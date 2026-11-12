@@ -1,10 +1,10 @@
 'use client';
 
 import { clsx } from 'clsx';
-import Image from 'next/image';
 
 import { calculatePointsSchedule, formatUTC } from '@/app/liberation/lib/calculateSchedule';
 
+import Image from '@components/Image/Image';
 import Tooltip from '@components/Tooltip/Tooltip';
 
 import styles from './GenesisSchedule.module.scss';

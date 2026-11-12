@@ -1,13 +1,13 @@
 'use client';
 
 import NumberFlow from '@number-flow/react';
-import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 
 import BossIcon from '@assets/svg/boss_slayer.svg';
 import ErrorIcon from '@assets/svg/octagon-x.svg';
 import Button from '@components/Button/Button';
 import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
+import Image from '@components/Image/Image';
 import ProgressBar from '@components/ProgressBar/ProgressBar';
 import ServerDropdown from '@components/ServerDropdown/ServerDropdown';
 import { WEEKLY_BOSSES_TOTAL } from '@constants/bossConstants';
@@ -20,9 +20,7 @@ import styles from './Page.module.scss';
 import type { ServerName } from '@data/servers/servers';
 import type { JSX } from 'react';
 
-type Props = {
-	initialServer: ServerName;
-};
+type Props = { initialServer: ServerName };
 
 const BOSS_ICON_SIZE = 96;
 
@@ -55,7 +53,6 @@ const WeeklyPageClient = ({ initialServer }: Props): JSX.Element => {
 						className={styles.icon}
 						alt="Boss Crystal Icon"
 						height={72}
-						priority
 						quality={100}
 						src="/assets/icons/menu/crystal.webp"
 						width={64}
@@ -82,7 +79,6 @@ const WeeklyPageClient = ({ initialServer }: Props): JSX.Element => {
 						className={styles.icon}
 						alt="Gold Stash Icon"
 						height={80}
-						priority
 						quality={100}
 						src="/assets/icons/menu/stash.webp"
 						width={80}

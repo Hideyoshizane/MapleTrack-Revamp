@@ -1,11 +1,11 @@
 'use client';
 
 import * as Popover from '@radix-ui/react-popover';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 
 import SearchIcon from '@assets/svg/search.svg';
+import Image from '@components/Image/Image';
 import Loader from '@components/Loader/Loader';
 import { generateClassCode } from '@data/classes/classes';
 import { getServerImageByName } from '@data/servers/servers';

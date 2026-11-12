@@ -40,11 +40,7 @@ export const useBossesWeeklyMonthlyPoints = ({ bosses, state, checkedBosses, onC
 	const previousResultRef = useRef<WeeklyMonthlyPoints | null>(null);
 
 	useEffect(() => {
-		const checkedMap: Record<string, checkedBossResponseBody> = {};
-
-		for (const boss of checkedBosses) {
-			checkedMap[boss.name] = boss;
-		}
+		const checkedMap = Object.fromEntries(checkedBosses.map((boss) => [boss.name, boss]));
 
 		const result = createEmptyTotals();
 
@@ -58,28 +54,25 @@ export const useBossesWeeklyMonthlyPoints = ({ bosses, state, checkedBosses, onC
 			const { reset } = difficulty;
 			const isWeekly = reset === 'Weekly';
 
-			const matched = checkedMap[boss.name];
-			const isLocked = Boolean(matched?.cleared);
+			const isLocked = Boolean(checkedMap[boss.name]?.cleared);
 			const isIncludedInCurrentPeriod = !isLocked && (isWeekly ? !entry.excludedWeek : !entry.excludedMonth);
 
 			if (isAstraDifficulty(difficulty)) {
 				const erionValue = roundToTwoDecimals(difficulty.erion / partySize);
 				const battleValue = roundToTwoDecimals(difficulty.battle / partySize);
 
-				result.bosses[boss.name] = {
-					erion: erionValue,
-					battle: battleValue,
-					reset,
-				};
+				result.bosses[boss.name] = { erion: erionValue, battle: battleValue, reset };
 
-				if (isWeekly) {
-					result.totalWeeklyErion += erionValue;
-					result.totalWeeklyBattle += battleValue;
+				if (!isWeekly) {
+					continue;
+				}
 
-					if (isIncludedInCurrentPeriod) {
-						result.thisWeekErion += erionValue;
-						result.thisWeekBattle += battleValue;
-					}
+				result.totalWeeklyErion += erionValue;
+				result.totalWeeklyBattle += battleValue;
+
+				if (isIncludedInCurrentPeriod) {
+					result.thisWeekErion += erionValue;
+					result.thisWeekBattle += battleValue;
 				}
 
 				continue;
@@ -87,10 +80,7 @@ export const useBossesWeeklyMonthlyPoints = ({ bosses, state, checkedBosses, onC
 
 			const pointsValue = roundToTwoDecimals(difficulty.points / partySize);
 
-			result.bosses[boss.name] = {
-				points: pointsValue,
-				reset,
-			};
+			result.bosses[boss.name] = { points: pointsValue, reset };
 
 			if (isWeekly) {
 				result.totalWeeklyPoints += pointsValue;
@@ -98,12 +88,14 @@ export const useBossesWeeklyMonthlyPoints = ({ bosses, state, checkedBosses, onC
 				if (isIncludedInCurrentPeriod) {
 					result.thisWeekPoints += pointsValue;
 				}
-			} else {
-				result.totalMonthlyPoints += pointsValue;
 
-				if (isIncludedInCurrentPeriod) {
-					result.thisMonthPoints += pointsValue;
-				}
+				continue;
+			}
+
+			result.totalMonthlyPoints += pointsValue;
+
+			if (isIncludedInCurrentPeriod) {
+				result.thisMonthPoints += pointsValue;
 			}
 		}
 

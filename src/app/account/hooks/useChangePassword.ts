@@ -1,18 +1,19 @@
-import { signOut } from 'next-auth/react';
-import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 import { changePasswordRequestSchema } from '@features/user/schemas/user.schema';
 import { userApi } from '@features/user/userApi';
+import { authClient } from '@lib/authClient';
 
 import type { ApiResponse } from '@sharedTypes/api';
 import type { ChangePasswordFormData } from '@sharedTypes/form';
 import type { AxiosError } from 'axios';
 
-type UseChangePasswordReturn = {
-	onSubmit: (data: ChangePasswordFormData) => Promise<void>;
-};
+type UseChangePasswordReturn = { onSubmit: (data: ChangePasswordFormData) => Promise<void> };
 
 export const useChangePassword = (): UseChangePasswordReturn => {
+	const router = useRouter();
+
 	const onSubmit = async (data: ChangePasswordFormData): Promise<void> => {
 		try {
 			const parsedResult = changePasswordRequestSchema.safeParse(data);
@@ -24,7 +25,13 @@ export const useChangePassword = (): UseChangePasswordReturn => {
 
 			const result = await userApi.changePassword(payload);
 			if (result.success) {
-				await signOut({ callbackUrl: '/login?reset=1' });
+				await authClient.signOut({
+					fetchOptions: {
+						onSuccess: () => {
+							router.push('/login?reset=1');
+						},
+					},
+				});
 
 				return;
 			}
@@ -33,7 +40,6 @@ export const useChangePassword = (): UseChangePasswordReturn => {
 		} catch (error: unknown) {
 			const axiosError = error as AxiosError<ApiResponse>;
 			const isTimeout = axiosError.code === 'ECONNABORTED';
-
 			toast.error(isTimeout ? 'Request timed out. Please try again.' : 'Unexpected error occurred');
 
 			if (!isTimeout) {

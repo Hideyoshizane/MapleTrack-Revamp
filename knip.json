@@ -5,19 +5,10 @@
 	"ignore": [],
 	"ignoreDependencies": ["eslint-config-next", "@svgr/webpack", "baseline-browser-mapping"],
 	"ignoreBinaries": [],
-	"ignoreExportsUsedInFile": {
-		"interface": true,
-		"type": true,
-		"enum": true
-	},
+	"ignoreExportsUsedInFile": { "interface": true, "type": true, "enum": true },
 	"includeEntryExports": true,
-	"eslint": {
-		"config": ["eslint.config.js"],
-		"entry": ["eslint.config.js"]
-	},
-	"typescript": {
-		"config": ["tsconfig.json"]
-	},
+	"eslint": { "config": ["eslint.config.js"], "entry": ["eslint.config.js"] },
+	"typescript": { "config": ["tsconfig.json"] },
 	"rules": {
 		"files": "error",
 		"dependencies": "error",

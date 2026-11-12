@@ -16,47 +16,49 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
 		const parseResult = resetPasswordRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
-			logZodError(parseResult.error, { route: route });
-
+			logZodError(parseResult.error, { route });
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
 
 		const { token, password } = parseResult.data;
 		const hashedToken = crypto.createHash('sha256').update(token.trim()).digest('hex');
-		const now = nowInUtc();
 
 		const result = await prisma.$transaction(async (tx) => {
 			const user = await tx.user.findFirst({
-				where: { resetPasswordToken: hashedToken, resetPasswordExpires: { gt: now } },
-				select: { id: true, password: true },
-			});
-			if (!user) {
-				return { status: 'invalid' };
-			}
-
-			const isSamePassword = await verifyPassword(user.password, password);
-			if (isSamePassword) {
-				return { status: 'same_password' as const };
-			}
-
-			const hashedPassword = await hashPassword(password);
-			await tx.user.update({
-				where: { id: user.id, resetPasswordToken: hashedToken, resetPasswordExpires: { gt: now } },
-				data: { password: hashedPassword, resetPasswordToken: null, resetPasswordExpires: null },
+				where: { resetPasswordToken: hashedToken, resetPasswordExpires: { gt: nowInUtc() } },
+				select: {
+					id: true,
+					accounts: { where: { providerId: 'credential' }, select: { id: true, password: true }, take: 1 },
+				},
 			});
 
-			return { status: 'success' as const };
+			const account = user?.accounts[0];
+			if (!user || !account?.password) {
+				return 'invalid' as const;
+			}
+
+			if (await verifyPassword(account.password, password)) return 'same_password' as const;
+
+			const update = await tx.user.updateMany({
+				where: { id: user.id, resetPasswordToken: hashedToken, resetPasswordExpires: { gt: nowInUtc() } },
+				data: { resetPasswordToken: null, resetPasswordExpires: null },
+			});
+			if (update.count !== 1) {
+				return 'invalid' as const;
+			}
+
+			await tx.account.update({ where: { id: account.id }, data: { password: await hashPassword(password) } });
+
+			return 'success' as const;
 		});
 
-		if (result.status === 'invalid') {
-			logApiFailure('Invalid or expired token', { route: route });
-
+		if (result === 'invalid') {
+			logApiFailure('Invalid or expired token', { route });
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid or expired token' }, 404);
 		}
 
-		if (result.status === 'same_password') {
-			logApiFailure('New password same as current', { route: route });
-
+		if (result === 'same_password') {
+			logApiFailure('New password same as current', { route });
 			return createResponse<ApiResponse>(
 				{ success: false, message: 'New password must be different from the current password' },
 				400,
@@ -65,8 +67,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
 		return createResponse<ApiResponse>({ success: true, message: 'Password reset successfully.' }, 200);
 	} catch (error) {
-		logError(error, { route: route });
-
+		logError(error, { route });
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}
 };

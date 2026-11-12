@@ -2,19 +2,9 @@ import { isRebootServer } from '../servers/servers';
 
 import bossesJson from './bosses.json';
 
-type BossDifficulty = {
-	name: string;
-	value: number;
-	reset: 'Daily' | 'Weekly' | 'Monthly';
-	minLevel: number;
-};
+type BossDifficulty = { name: string; value: number; reset: 'Daily' | 'Weekly' | 'Monthly'; minLevel: number };
 
-export type Boss = {
-	name: string;
-	img: string;
-	maxPartySize: number;
-	difficulties: BossDifficulty[];
-};
+export type Boss = { name: string; img: string; maxPartySize: number; difficulties: BossDifficulty[] };
 
 export const bosses: Boss[] = bossesJson as Boss[];
 
@@ -41,10 +31,7 @@ export type BossReset = (typeof BOSS_RESET_ENUM)[number];
 
 type BossCompositeKey = `${string}|${string}`;
 
-type BossLookupEntry = {
-	value: number;
-	reset: BossDifficulty['reset'];
-};
+type BossLookupEntry = { value: number; reset: BossDifficulty['reset'] };
 
 type BossOrderLookup = Record<BossName, number>;
 type BossDifficultyOrderLookup = Record<BossName, Record<BossDifficultyName, number>>;
@@ -76,10 +63,7 @@ for (const [bossIndex, boss] of bosses.entries()) {
 	}
 }
 
-type BossSortable = {
-	name: BossName;
-	difficulty: BossDifficultyName;
-};
+type BossSortable = { name: BossName; difficulty: BossDifficultyName };
 
 export const compareBossOrder = (leftBoss: BossSortable, rightBoss: BossSortable): number => {
 	const bossOrderDifference = bossOrderLookup[leftBoss.name] - bossOrderLookup[rightBoss.name];

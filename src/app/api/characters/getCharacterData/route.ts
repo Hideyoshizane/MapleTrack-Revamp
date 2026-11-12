@@ -50,13 +50,11 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 						level: true,
 						exp: true,
 						category: true,
-						contents: { select: { contentType: true, checked: true, cleared: true, tries: true } },
+						contents: { select: { contentType: true, checked: true, cleared: true } },
 					},
 				},
 			},
 		});
-
-		let responseData: getCharacterDataResponseBody;
 
 		//if not in database, return a generic object.
 		if (!character) {
@@ -70,56 +68,51 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				);
 			}
 
-			responseData = generateCharacterObjectCharacterPage({
+			const responseData = generateCharacterObjectCharacterPage({
 				jobClassName: classData.className,
 				jobType: classData.jobType,
 				legion: classData.legionType,
 				linkSkill: classData.linkSkill,
 			});
-		} else {
-			const normalizedSymbols = character.symbols.map((symbol) => {
-				const normalizedContents = symbol.contents.map((content) => ({
-					contentType: content.contentType,
-					checked: content.checked,
-					cleared: content.cleared,
-					tries: content.tries ?? undefined,
-				}));
 
-				return {
-					id: symbol.id,
-					name: symbol.name,
-					level: symbol.level,
-					exp: symbol.exp,
-					category: symbol.category,
-					contents: sortSymbolContents(symbol.name, normalizedContents),
-				};
-			});
+			return createResponse<ApiResponse<getCharacterDataResponseBody>>(
+				{ success: true, message: 'Request processed.', data: responseData },
+				200,
+			);
+		}
 
-			const sortedSymbols = sortSymbolsByMinLevel(normalizedSymbols);
+		const normalizedSymbols = character.symbols.map((symbol) => ({
+			id: symbol.id,
+			name: symbol.name,
+			level: symbol.level,
+			exp: symbol.exp,
+			category: symbol.category,
+			contents: sortSymbolContents(symbol.name, symbol.contents),
+		}));
 
-			const groupedSymbols = groupSymbolsByCategory(sortedSymbols);
+		const sortedSymbols = sortSymbolsByMinLevel(normalizedSymbols);
+		const groupedSymbols = groupSymbolsByCategory(sortedSymbols);
 
-			responseData = {
-				id: character.id,
-				name: character.name,
-				level: character.level,
-				targetLevel: character.targetLevel,
-				class: character.class,
-				jobType: character.jobType,
-				legion: character.legion,
-				linkSkill: character.linkSkill,
-				bossing: character.bossing,
-				syncing: character.syncing,
-				lastSymbolDaily: character.lastSymbolDaily,
-				symbols: groupedSymbols,
-			};
+		const responseData: getCharacterDataResponseBody = {
+			id: character.id,
+			name: character.name,
+			level: character.level,
+			targetLevel: character.targetLevel,
+			class: character.class,
+			jobType: character.jobType,
+			legion: character.legion,
+			linkSkill: character.linkSkill,
+			bossing: character.bossing,
+			syncing: character.syncing,
+			lastSymbolDaily: character.lastSymbolDaily,
+			symbols: groupedSymbols,
+		};
 
-			const validation = getCharacterDataResponseSchema.safeParse(responseData);
-			if (!validation.success) {
-				logZodError(validation.error, { route });
+		const validation = getCharacterDataResponseSchema.safeParse(responseData);
+		if (!validation.success) {
+			logZodError(validation.error, { route });
 
-				throw new Error('Invalid character data');
-			}
+			throw new Error('Invalid character data');
 		}
 
 		return createResponse<ApiResponse<getCharacterDataResponseBody>>(
@@ -127,7 +120,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			200,
 		);
 	} catch (error) {
-		logError(error, { route: route });
+		logError(error, { route });
 
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}

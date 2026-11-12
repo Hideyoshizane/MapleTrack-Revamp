@@ -6,13 +6,9 @@ import type {
 	getCharacterDataSymbolsResponseBody,
 	getCharacterDataResponseBody,
 } from './schemas/character.response.schema';
-import type { SymbolCategory } from '@prisma/client';
+import type { SymbolCategory } from '@generated/prisma/client';
 
-type SymbolContent = {
-	contentType: string;
-	checked: boolean;
-	cleared: boolean;
-};
+type SymbolContent = { contentType: string; checked: boolean; cleared: boolean };
 
 type SymbolData = {
 	id: string;
@@ -75,12 +71,7 @@ const createSymbolsWithIds = (includeGrand: boolean): ReturnSymbolWithId => {
 	};
 };
 
-type GenerateCharacterOptions = {
-	jobClassName: string;
-	jobType: string;
-	legion: string;
-	linkSkill: string;
-};
+type GenerateCharacterOptions = { jobClassName: string; jobType: string; legion: string; linkSkill: string };
 
 export const generateCharacterObjectHomePage = (options: GenerateCharacterOptions): getAllCharactersResponseBody => {
 	const templates = createSymbolTemplates(false);

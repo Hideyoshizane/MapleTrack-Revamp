@@ -25,9 +25,7 @@ const MENU_CONFIG = {
 
 type DropdownMenuKey = keyof typeof MENU_CONFIG;
 
-type Props = {
-	text: DropdownMenuKey;
-};
+type Props = { text: DropdownMenuKey };
 
 const DropdownMenuButton = ({ text }: Props): JSX.Element => {
 	const { href, label, Icon } = MENU_CONFIG[text];

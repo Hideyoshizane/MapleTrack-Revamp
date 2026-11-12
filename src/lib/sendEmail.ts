@@ -1,5 +1,7 @@
 import nodemailer from 'nodemailer';
 
+import type { SentMessageInfo } from 'nodemailer';
+
 // Create transporter using Gmail service
 const transporter = nodemailer.createTransport({
 	service: 'gmail',
@@ -8,22 +10,11 @@ const transporter = nodemailer.createTransport({
 
 const FROM_EMAIL = `"MapleTrack" <${process.env.GMAIL_USER}>`;
 
-type SendEmailParams = {
-	to: string;
-	subject: string;
-	text?: string;
-	html?: string;
-};
+type SendEmailParams = { to: string; subject: string; text?: string; html?: string };
 
-export const sendEmail = async ({ to, subject, text, html }: SendEmailParams): Promise<nodemailer.SentMessageInfo> => {
+export const sendEmail = async ({ to, subject, text, html }: SendEmailParams): Promise<SentMessageInfo> => {
 	try {
-		const info = await transporter.sendMail({
-			from: FROM_EMAIL,
-			to,
-			subject,
-			text,
-			html,
-		});
+		const info = await transporter.sendMail({ from: FROM_EMAIL, to, subject, text, html });
 
 		return info;
 	} catch (error) {

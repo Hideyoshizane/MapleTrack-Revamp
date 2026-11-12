@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 import ServerDropdown from '@components/ServerDropdown/ServerDropdown';
 import { useServerCookie } from '@hooks/useServerCookie';
@@ -15,10 +15,7 @@ import styles from './Page.module.scss';
 import type { ServerName } from '@data/servers/servers';
 import type { JSX } from 'react';
 
-type Props = {
-	searchParams: { [key: string]: string | string[] | undefined };
-	initialServer: ServerName;
-};
+type Props = { searchParams: { [key: string]: string | string[] | undefined }; initialServer: ServerName };
 
 const HomePageClient = ({ initialServer }: Props): JSX.Element => {
 	const { server, setServerCookie } = useServerCookie(initialServer);
@@ -27,7 +24,6 @@ const HomePageClient = ({ initialServer }: Props): JSX.Element => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
-	// Ref to avoid duplicate toasts
 	const hasShownToast = useRef(false);
 
 	useEffect((): void => {
@@ -39,11 +35,17 @@ const HomePageClient = ({ initialServer }: Props): JSX.Element => {
 			toast.success('Redirected, user already authenticated.');
 			hasShownToast.current = true;
 			router.replace('/home');
-		} else if (searchParams?.get('unauthorized') === '1') {
+			return;
+		}
+
+		if (searchParams?.get('unauthorized') === '1') {
 			toast.error('Unauthorized access');
 			hasShownToast.current = true;
 			router.replace('/home');
-		} else if (searchParams?.get('missingBossList') === '1') {
+			return;
+		}
+
+		if (searchParams?.get('missingBossList') === '1') {
 			toast.error(
 				<div>
 					No characters are configured for bossing.
@@ -52,6 +54,7 @@ const HomePageClient = ({ initialServer }: Props): JSX.Element => {
 				</div>,
 				{ className: 'toast--large' },
 			);
+
 			hasShownToast.current = true;
 			router.replace('/home');
 		}

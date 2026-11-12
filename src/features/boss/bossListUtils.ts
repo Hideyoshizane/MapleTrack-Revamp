@@ -86,7 +86,7 @@ export const updateCharacterBoss = (
 	});
 };
 
-export const countCharacterBosses = (character: getEditBossListCharacterResponseBody, countDaily: boolean): number => {
+const countCharacterBosses = (character: getEditBossListCharacterResponseBody, countDaily: boolean): number => {
 	let totalBosses = 0;
 
 	for (const boss of character.bosses) {
@@ -115,6 +115,11 @@ export const countCharacterIncome = (character: getEditBossListCharacterResponse
 	return totalIncome;
 };
 
+export const countWeeklyBosses = (character: getEditBossListCharacterResponseBody): number =>
+	character.bosses.reduce<number>((total, boss) => {
+		return boss.reset === 'Weekly' ? total + 1 : total;
+	}, 0);
+
 export const countMonthlyBosses = (character: getEditBossListCharacterResponseBody): number =>
 	character.bosses.reduce<number>((total, boss) => {
 		return boss.reset === 'Monthly' ? total + 1 : total;
@@ -131,7 +136,6 @@ export const countServerGains = (serverData: getEditBossListResponseBody, server
 	for (const character of serverData.characters) {
 		for (const boss of character.bosses) {
 			const value = getBossDifficultyValue(boss.name, boss.difficulty, serverName);
-
 			if (value === null) {
 				continue;
 			}

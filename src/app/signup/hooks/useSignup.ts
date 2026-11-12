@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useForm, type Control, type UseFormHandleSubmit, type UseFormGetValues } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 import { signupRequestSchema } from '@features/user/schemas/user.schema';
 import { userApi } from '@features/user/userApi';
@@ -53,19 +53,23 @@ export const useSignup = (): UseSignupReturn => {
 				return;
 			}
 
-			if (typeof result.message === 'string') {
-				toast.error(result.message);
-			} else {
-				toast.error('Signup failed');
+			const message = result.message;
+			if (typeof message === 'string') {
+				toast.error(message);
+				return;
 			}
 
-			if (result.message && typeof result.message === 'object') {
-				for (const [field, msg] of Object.entries(result.message)) {
-					setError(field as keyof SignupFormData, {
-						type: 'manual',
-						message: typeof msg === 'string' ? msg : 'Invalid input',
-					});
-				}
+			toast.error('Signup failed');
+
+			if (!message || typeof message !== 'object') {
+				return;
+			}
+
+			for (const [field, msg] of Object.entries(message)) {
+				setError(field as keyof SignupFormData, {
+					type: 'manual',
+					message: typeof msg === 'string' ? msg : 'Invalid input',
+				});
 			}
 		} catch (error: unknown) {
 			if (axios.isAxiosError<ApiResponse>(error)) {

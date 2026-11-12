@@ -11,10 +11,7 @@ import {
 import { questTypes, genesisBosses, destinyBosses, astraQuests } from '@data/liberation/liberationQuests';
 import { characterIdRawSchema, characterNameRawSchema } from '@features/character/schemas/character.schema';
 
-const IdRawSchema = z
-	.string()
-	.regex(/^[a-fA-F0-9]{24}$/, 'Invalid MongoDB ObjectId')
-	.or(z.literal(''));
+const IdRawSchema = z.uuid();
 
 export const questTypeSchema = z.enum(questTypes);
 export const genesisBossNameSchema = z.enum(genesisBosses);
@@ -46,10 +43,7 @@ const getLiberationListCharacterResponseSchema = z
 export type GetLiberationListCharacterResponseBody = z.infer<typeof getLiberationListCharacterResponseSchema>;
 
 export const getLiberationListResponseSchema = z
-	.object({
-		liberationLastUpdate: z.date(),
-		characters: z.array(getLiberationListCharacterResponseSchema),
-	})
+	.object({ liberationLastUpdate: z.date(), characters: z.array(getLiberationListCharacterResponseSchema) })
 	.strict();
 
 export type getLiberationListResponseBody = z.infer<typeof getLiberationListResponseSchema>;

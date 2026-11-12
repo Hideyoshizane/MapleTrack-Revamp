@@ -2,10 +2,10 @@
 
 import * as Select from '@radix-ui/react-select';
 import { clsx } from 'clsx';
-import Image from 'next/image';
 
 import CheckIcon from '@assets/svg/check.svg';
 import MenuIcon from '@assets/svg/menu.svg';
+import Image from '@components/Image/Image';
 import { isAstraDifficulty } from '@data/liberation/liberationBosses';
 import { weaponQuestsImagesSrc } from '@data/liberation/liberationQuests';
 
@@ -36,7 +36,6 @@ const DifficultyValue = ({ difficulty, type }: { difficulty: BossDifficulty; typ
 					<Image
 						alt={'Currency icon'}
 						height={IMAGE_SIZE}
-						priority
 						src={weaponQuestsImagesSrc['astra_erion']}
 						width={IMAGE_SIZE}
 					/>
@@ -47,7 +46,6 @@ const DifficultyValue = ({ difficulty, type }: { difficulty: BossDifficulty; typ
 					<Image
 						alt={'Currency icon'}
 						height={IMAGE_SIZE}
-						priority
 						src={weaponQuestsImagesSrc['astra_battle']}
 						width={IMAGE_SIZE}
 					/>
@@ -62,7 +60,6 @@ const DifficultyValue = ({ difficulty, type }: { difficulty: BossDifficulty; typ
 			<Image
 				alt={'Currency icon'}
 				height={IMAGE_SIZE}
-				priority
 				src={weaponQuestsImagesSrc[type.toLocaleLowerCase()]}
 				width={IMAGE_SIZE}
 			/>
@@ -125,29 +122,23 @@ const BossesDifficultySelector = ({
 				<Select.Content className={styles.bossList} position="popper">
 					<div className={styles.scrollContainer}>
 						<Select.Viewport>
-							{normalizedDifficulties.map(
-								(difficulty): JSX.Element => (
-									<Select.Item
-										className={styles.bossItem}
-										key={difficulty.name}
-										value={difficulty.name}
-									>
-										<div className={styles.itemContent}>
-											<p className={clsx(styles.button, styles[difficulty.name.toLowerCase()])}>
-												{difficulty.name}
-											</p>
+							{normalizedDifficulties.map((difficulty): JSX.Element => (
+								<Select.Item className={styles.bossItem} key={difficulty.name} value={difficulty.name}>
+									<div className={styles.itemContent}>
+										<p className={clsx(styles.button, styles[difficulty.name.toLowerCase()])}>
+											{difficulty.name}
+										</p>
 
-											<DifficultyValue difficulty={difficulty} type={type} />
+										<DifficultyValue difficulty={difficulty} type={type} />
 
-											{selectedEntry.name === difficulty.name && (
-												<div className={styles.iconsDiv}>
-													<CheckIcon className={styles.icon} />
-												</div>
-											)}
-										</div>
-									</Select.Item>
-								),
-							)}
+										{selectedEntry.name === difficulty.name && (
+											<div className={styles.iconsDiv}>
+												<CheckIcon className={styles.icon} />
+											</div>
+										)}
+									</div>
+								</Select.Item>
+							))}
 						</Select.Viewport>
 					</div>
 				</Select.Content>

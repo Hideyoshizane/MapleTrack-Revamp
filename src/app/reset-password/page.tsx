@@ -4,9 +4,7 @@ import ResetPasswordClient from './ResetPasswordClient';
 
 import type { JSX } from 'react';
 
-type Props = {
-	searchParams: Promise<{ token?: string }>;
-};
+type Props = { searchParams: Promise<{ token?: string }> };
 
 const ResetPasswordPage = ({ searchParams }: Props): JSX.Element => {
 	const params = use(searchParams);

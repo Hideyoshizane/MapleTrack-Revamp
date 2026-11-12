@@ -16,23 +16,26 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 	try {
 		const parseResult = signupRequestSchema.safeParse(await request.json());
 		if (!parseResult.success) {
-			logZodError(parseResult.error, { route: route });
+			logZodError(parseResult.error, { route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'Invalid request body' }, 400);
 		}
-		const { username, email, password } = parseResult.data;
+
+		const { username: name, password } = parseResult.data;
+		const email = parseResult.data.email.trim().toLowerCase();
 
 		const existingUser = await prisma.user.findFirst({
-			where: { OR: [{ username }, { email }] },
-			select: { id: true, username: true, email: true },
+			where: { OR: [{ name }, { email }] },
+			select: { name: true, email: true },
 		});
 
 		if (existingUser) {
-			const isUsernameTaken = existingUser.username === username;
+			const isNameTaken = existingUser.name === name;
+
 			return createResponse<ApiResponse>(
 				{
 					success: false,
-					message: isUsernameTaken ? 'This username is already taken.' : 'This e-mail already in use.',
+					message: isNameTaken ? 'This name is already taken.' : 'This e-mail is already in use.',
 				},
 				409,
 			);
@@ -42,14 +45,12 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
 		await prisma.$transaction(async (tx) => {
 			const newUser = await tx.user.create({
-				data: {
-					username,
-					email,
-					password: hashedPassword,
-					version: LASTVERSION,
-					liberationLastUpdate: nowInUtc(),
-				},
+				data: { name, email, version: LASTVERSION, liberationLastUpdate: nowInUtc() },
 				select: { id: true },
+			});
+
+			await tx.account.create({
+				data: { accountId: newUser.id, providerId: 'credential', userId: newUser.id, password: hashedPassword },
 			});
 
 			await createBossList(tx, newUser.id);
@@ -57,7 +58,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
 		return createResponse<ApiResponse>({ success: true, message: 'User created successfully' }, 201);
 	} catch (error) {
-		logError(error, { route: route });
+		logError(error, { route });
 
 		return createResponse<ApiResponse>({ success: false, message: 'An error occurred during signup' }, 500);
 	}

@@ -2,7 +2,6 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { usePathname } from 'next/navigation';
-import { SessionProvider } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
 import { ThemeProvider } from '@context/ThemeProvider';
@@ -11,9 +10,7 @@ import { isPublicPath } from '@lib/config/access';
 
 import type { JSX, ReactNode } from 'react';
 
-type ProvidersProps = {
-	children: ReactNode;
-};
+type ProvidersProps = { children: ReactNode };
 
 const RouteThemeHandler = (): JSX.Element | null => {
 	const pathname = usePathname();
@@ -41,14 +38,12 @@ const Providers = ({ children }: ProvidersProps): JSX.Element => {
 			}),
 	);
 	return (
-		<SessionProvider>
-			<QueryClientProvider client={queryClient}>
-				<ThemeProvider>
-					<RouteThemeHandler />
-					{children}
-				</ThemeProvider>
-			</QueryClientProvider>
-		</SessionProvider>
+		<QueryClientProvider client={queryClient}>
+			<ThemeProvider>
+				<RouteThemeHandler />
+				{children}
+			</ThemeProvider>
+		</QueryClientProvider>
 	);
 };
 

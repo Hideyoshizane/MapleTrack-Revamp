@@ -1,8 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 
+import Image from '@components/Image/Image';
 import Timer from '@components/Timer/Timer';
 import { APP_VERSION } from '@lib/config/version';
 
@@ -12,15 +12,13 @@ import SearchBar from './SearchBar/SearchBar';
 
 import type { JSX } from 'react';
 
-type Props = {
-	username: string;
-};
+type Props = { username: string };
 
 const Navbar = ({ username }: Props): JSX.Element => {
 	return (
 		<nav className={styles.navBody}>
 			<Link className={styles.logoDiv} aria-label="Go to home" href="/home">
-				<Image alt="MapleTrack Logo" fill priority sizes="312px" src="/assets/logo/logo-nav.webp" />
+				<Image alt="MapleTrack Logo" fill preload sizes="312px" src="/assets/logo/logo-nav.webp" />
 				<p className={styles.version}>{APP_VERSION}</p>
 			</Link>
 

@@ -11,9 +11,9 @@ import { nowInUtc, addMinutesToDate } from '@utils/time';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextRequest, NextResponse } from 'next/server';
 
-const BASE_URL = process.env.NEXTAUTH_URL;
+const BASE_URL = process.env.BETTER_AUTH_URL;
 if (!BASE_URL) {
-	throw new Error('NEXTAUTH_URL is not defined');
+	throw new Error('BETTER_AUTH_URL is not defined');
 }
 
 const route = '/api/auth/forgot-password';
@@ -30,7 +30,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		const email = parseResult.data.email;
 
 		// search for user by the email
-		const user = await prisma.user.findUnique({ where: { email }, select: { id: true, username: true } });
+		const user = await prisma.user.findUnique({ where: { email }, select: { id: true, name: true } });
 		if (!user) {
 			logApiFailure('User not found for forgot password', { route: route, additional: { email } });
 
@@ -54,7 +54,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 		});
 
 		const resetUrl = `${BASE_URL}/reset-password?token=${rawToken}`;
-		const html = getForgotPasswordTemplate(resetUrl, user.username);
+		const html = getForgotPasswordTemplate(resetUrl, user.name);
 
 		try {
 			await sendEmail({ to: email, subject: 'Reset Your Password', html });

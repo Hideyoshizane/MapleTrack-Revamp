@@ -4,20 +4,8 @@ import type { NextConfig } from 'next';
 import type { RemotePattern } from 'next/dist/shared/lib/image-config';
 
 const patterns: RemotePattern[] = [
-	{
-		hostname: 'www.nexon.com',
-		pathname: '/api/maplestory/**',
-		port: '',
-		protocol: 'https',
-		search: '',
-	},
-	{
-		hostname: 'msavatar1.nexon.net',
-		pathname: '/Character/**',
-		port: '',
-		protocol: 'https',
-		search: '',
-	},
+	{ hostname: 'www.nexon.com', pathname: '/api/maplestory/**', port: '', protocol: 'https', search: '' },
+	{ hostname: 'msavatar1.nexon.net', pathname: '/Character/**', port: '', protocol: 'https', search: '' },
 ];
 
 const nextConfig: NextConfig = {
@@ -42,6 +30,4 @@ const nextConfig: NextConfig = {
 	},
 };
 
-export default withBundleAnalyzer({
-	enabled: process.env.ANALYZE === 'true',
-})(nextConfig);
+export default withBundleAnalyzer({ enabled: process.env.ANALYZE === 'true' })(nextConfig);

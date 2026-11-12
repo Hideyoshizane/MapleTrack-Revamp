@@ -1,14 +1,14 @@
 'use client';
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import Image from 'next/image';
-import { Fragment } from 'react';
-import { toast } from 'react-toastify';
+import { Fragment, useEffect } from 'react';
+import { toast } from 'sonner';
 
 import BossCheckedIcon from '@assets/svg/check-boss.svg';
 import NoBossIcon from '@assets/svg/circle-x.svg';
 import MenuIcon from '@assets/svg/menu.svg';
-import { compareBossOrder } from '@data/bosses/bosses';
+import Image from '@components/Image/Image';
+import { compareBossOrder, getBossImage } from '@data/bosses/bosses';
 import { generateClassCode } from '@data/classes/classes';
 
 import CharacterBossItem from './BossItem/CharacterBossItem';
@@ -19,11 +19,7 @@ import type { JSX } from 'react';
 
 type HandleBossToggle = (bossMosterId: string) => void | Promise<void>;
 
-type Props = {
-	character: getBossListCharacterResponseBody;
-	server: string;
-	handleBossToggle: HandleBossToggle;
-};
+type Props = { character: getBossListCharacterResponseBody; server: string; handleBossToggle: HandleBossToggle };
 
 const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX.Element => {
 	const totalBosses = character.bosses.length;
@@ -34,6 +30,15 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX
 
 	const code = generateClassCode(character.class);
 	const sortedBosses = [...character.bosses].sort(compareBossOrder);
+
+	useEffect(() => {
+		character.bosses.forEach((boss) => {
+			const img = new window.Image();
+			const src = getBossImage(boss.name);
+
+			img.src = `/_next/image?url=${encodeURIComponent(src)}&w=64&q=100`;
+		});
+	}, [character.bosses]);
 
 	return (
 		<DropdownMenu.Root>
@@ -71,7 +76,7 @@ const WeeklyBossDropdown = ({ character, server, handleBossToggle }: Props): JSX
 						className={styles.classIcon}
 						alt={character.name}
 						height={80}
-						priority
+						loading="eager"
 						src={`/assets/buttom_profile/${code}.webp`}
 						width={480}
 					/>

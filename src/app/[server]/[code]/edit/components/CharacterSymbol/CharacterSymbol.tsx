@@ -4,7 +4,7 @@ import EditPageSymbolGrid from './EditPageSymbolGrid/EditPageSymbolGrid';
 
 import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { getEditCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
-import type { SymbolCategory } from '@prisma/client';
+import type { SymbolCategory } from '@generated/prisma/client';
 import type { JSX } from 'react';
 
 type Props = {
@@ -14,10 +14,7 @@ type Props = {
 	updateCharacter: (recipe: (draft: getEditCharacterDataResponseBody) => void) => void;
 };
 
-type SymbolSectionConfig = {
-	type: SymbolCategory;
-	title: string;
-};
+type SymbolSectionConfig = { type: SymbolCategory; title: string };
 
 const SYMBOL_SECTIONS: readonly SymbolSectionConfig[] = [
 	{ type: 'arcane', title: 'Arcane Symbols' },

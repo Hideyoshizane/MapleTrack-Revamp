@@ -1,31 +1,67 @@
-.toasterContainer {
-	--toastify-toast-width: auto;
-	--toastify-container-width: auto;
-}
+$iconSize: 24px !important;
+$closeSize: 16px !important;
 
 .toaster {
-	--toastify-color-dark: var(--default-button-text);
-	--toastify-font-family: roboto, sans-serif;
-
+	position: relative;
+	min-width: 400px !important;
 	border-radius: 6px;
-	font-size: 1rem;
+
+	background: var(--default-button-text) !important;
+
+	font-size: 14px !important;
+
+	color: var(--default-white) !important;
+	padding-right: 36px !important;
+
 	white-space: pre-line;
 }
 
-/* stylelint-disable selector-class-pattern */
-.Toastify__toast--success .Toastify__progress-bar {
-	background: var(--icon-cta-color);
+.toaster [data-close-button] {
+	position: absolute !important;
+	top: 50% !important;
+	right: 16px !important;
+	left: auto !important;
+	border: none !important;
+	background-color: var(--default-button-text) !important;
+	transform: translateY(-50%) !important;
 }
 
-.Toastify__toast--success .Toastify__toast-icon svg {
-	fill: var(--icon-cta-color);
+.toaster [data-icon] {
+	width: $iconSize;
+	height: $iconSize;
 }
 
-.Toastify__toast--error .Toastify__progress-bar {
-	background: var(--icon-danger-color);
+.toaster [data-icon] svg {
+	width: 100% !important;
+	height: 100% !important;
 }
 
-.Toastify__toast--error .Toastify__toast-icon svg {
-	fill: var(--icon-danger-color);
+.toaster [data-close-button] {
+	width: $closeSize;
+	height: $closeSize;
 }
-/* stylelint-enable selector-class-pattern */
+
+.toaster [data-close-button] svg {
+	width: 100% !important;
+	height: 100% !important;
+}
+
+.toaster[data-type='success'] [data-icon] svg {
+	color: var(--icon-cta-color) !important;
+	border-color: var(--icon-cta-color) !important;
+}
+
+.toaster[data-type='success'] {
+	border-color: var(--icon-cta-color) !important;
+	border-width: 1px !important;
+}
+
+.toaster[data-type='error'] [data-icon] svg {
+	color: var(--icon-danger-color) !important;
+	border-color: var(--icon-danger-color) !important;
+}
+
+.toaster[data-type='error'] {
+	border-color: var(--icon-danger-color) !important;
+	border-width: 1px !important;
+}

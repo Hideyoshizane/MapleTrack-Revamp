@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 
@@ -8,6 +7,7 @@ import LockIcon from '@assets/svg/lock.svg';
 import Button from '@components/Button/Button';
 import FooterOutside from '@components/FooterOutside/FooterOutside';
 import FormInput from '@components/FormInput/FormInput';
+import Image from '@components/Image/Image';
 import { emailFieldSchema } from '@features/user/schemas/user.schema';
 import { zodValidator } from '@utils/validators';
 
@@ -34,7 +34,6 @@ const ForgotPasswordPage = (): JSX.Element => {
 					<Image
 						alt="MapleTrack Logo"
 						fill
-						priority
 						sizes="(max-width: 1024px) 100vw, 880px"
 						src="/assets/logo/logo.webp"
 					/>

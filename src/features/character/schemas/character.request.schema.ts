@@ -14,31 +14,22 @@ import {
 	jobClassSchema,
 } from './character.schema';
 
+const characterIdRequestSchema = characterIdRawSchema.or(z.literal(''));
+const symbolIdRequestSchema = symbolIdRawSchema.or(z.literal(''));
+
 // Home Page
-export const getAllCharactersRequestSchema = z
-	.object({
-		server: serverSchema,
-	})
-	.strict();
+export const getAllCharactersRequestSchema = z.object({ server: serverSchema }).strict();
 
 export type GetAllCharactersRequestBody = z.infer<typeof getAllCharactersRequestSchema>;
 
 // Character Page & Edit Character Page
-export const getCharacterDataRequestSchema = z
-	.object({
-		server: serverSchema,
-		className: jobClassSchema,
-	})
-	.strict();
+export const getCharacterDataRequestSchema = z.object({ server: serverSchema, className: jobClassSchema }).strict();
 
 export type getCharacterDataRequestBody = z.infer<typeof getCharacterDataRequestSchema>;
 
 // character Data from API
 export const getCharacterDataFromAPIRequestSchema = z
-	.object({
-		characterName: characterNameRawSchema,
-		server: serverSchema,
-	})
+	.object({ characterName: characterNameRawSchema, server: serverSchema })
 	.strict();
 
 export type getCharacterDataFromAPIRequestBody = z.infer<typeof getCharacterDataFromAPIRequestSchema>;
@@ -46,7 +37,7 @@ export type getCharacterDataFromAPIRequestBody = z.infer<typeof getCharacterData
 // Update character
 export const updateCharacterRequestSchema = z
 	.object({
-		id: characterIdRawSchema,
+		id: characterIdRequestSchema,
 		name: characterNameRawSchema,
 		server: serverSchema,
 		level: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
@@ -77,7 +68,7 @@ export const updateCharacterDailyRequestSchema = z
 	.object({
 		server: serverSchema,
 		className: z.enum(JOB_CLASSES),
-		id: symbolIdRawSchema,
+		id: symbolIdRequestSchema,
 		bonus: z.number().int().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
 	})
 	.strict();
@@ -87,11 +78,7 @@ export type updateCharacterDailyRequestBody = z.infer<typeof updateCharacterDail
 // Update weekly
 
 export const updateCharacterWeeklyRequestSchema = z
-	.object({
-		server: serverSchema,
-		className: z.enum(JOB_CLASSES),
-		id: symbolIdRawSchema,
-	})
+	.object({ server: serverSchema, className: z.enum(JOB_CLASSES), id: symbolIdRequestSchema })
 	.strict();
 
 export type updateCharacterWeeklyRequestBody = z.infer<typeof updateCharacterWeeklyRequestSchema>;
@@ -102,7 +89,7 @@ export const updateCharacterAllDailyRequestSchema = z
 	.object({
 		server: serverSchema,
 		className: z.enum(JOB_CLASSES),
-		id: symbolIdRawSchema,
+		id: symbolIdRequestSchema,
 		arcaneBonus: z.number().int().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
 		sacredBonus: z.number().int().min(MIN_VALUE_BONUS_COOKIE).max(MAX_VALUE_BONUS_COOKIE),
 	})

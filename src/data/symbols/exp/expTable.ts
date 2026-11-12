@@ -7,11 +7,7 @@ type ExpData = { level: Record<string, ExpLevel> };
 
 type ForceType = 'arcane' | 'sacred' | 'grand';
 
-type ExpDataNumeric = {
-	level: Record<number, ExpLevel>;
-	lastLevel: number;
-	cumulativeExp: number[];
-};
+type ExpDataNumeric = { level: Record<number, ExpLevel>; lastLevel: number; cumulativeExp: number[] };
 
 const buildExpData = (data: ExpData): ExpDataNumeric => {
 	const numericLevel: Record<number, ExpLevel> = {};

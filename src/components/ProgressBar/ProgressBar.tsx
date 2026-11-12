@@ -44,11 +44,32 @@ type Props = {
 	jobType: JobType;
 	width: number;
 	height: number;
+	minPercent?: number;
 	forceFull?: boolean;
 	disabled?: boolean;
 };
 
 type IndicatorStyle = React.CSSProperties & { '--progress-value'?: string | number };
+
+const getPercentage = (
+	value: number,
+	maxValue: number,
+	minPercent: number,
+	forceFull: boolean,
+	disabled: boolean,
+): number => {
+	if (forceFull) {
+		return 100;
+	}
+
+	if (maxValue <= 0 || value <= 0 || disabled) {
+		return 0;
+	}
+
+	const rawPercent = (value / maxValue) * 100;
+
+	return Math.min(Math.max(rawPercent, minPercent), 100);
+};
 
 const ProgressBar = ({
 	value,
@@ -56,18 +77,11 @@ const ProgressBar = ({
 	jobType,
 	width,
 	height,
+	minPercent = 5.35,
 	forceFull = false,
 	disabled = false,
 }: Props): JSX.Element => {
-	let percentage = 0;
-
-	if (forceFull) {
-		percentage = 100;
-	} else if (maxValue > 0 && value > 0 && !disabled) {
-		const rawPercent = (value / maxValue) * 100;
-
-		percentage = Math.min(Math.max(rawPercent, 5.35), 100);
-	}
+	const percentage = getPercentage(value, maxValue, minPercent, forceFull, disabled);
 
 	const indicatorStyle: IndicatorStyle = { '--progress-value': percentage };
 

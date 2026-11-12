@@ -1,10 +1,6 @@
 import sacredAreasJson from './astraDaily.json';
 
-type SacredArea = {
-	name: string;
-	img: string;
-	erion: number;
-};
+type SacredArea = { name: string; img: string; erion: number };
 
 const sacredAreas: SacredArea[] = sacredAreasJson;
 

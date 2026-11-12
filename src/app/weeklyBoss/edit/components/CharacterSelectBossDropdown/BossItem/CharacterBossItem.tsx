@@ -1,8 +1,7 @@
 'use client';
 
-import Image from 'next/image';
-
 import CheckIcon from '@assets/svg/check.svg';
+import Image from '@components/Image/Image';
 import { generateClassCode } from '@data/classes/classes';
 
 import styles from './CharacterBossItem.module.scss';
@@ -10,11 +9,7 @@ import styles from './CharacterBossItem.module.scss';
 import type { getEditBossListCharacterResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX, KeyboardEvent } from 'react';
 
-type Props = {
-	character: getEditBossListCharacterResponseBody;
-	isSelected: boolean;
-	onClick?: () => void;
-};
+type Props = { character: getEditBossListCharacterResponseBody; isSelected: boolean; onClick?: () => void };
 
 const CharacterBossItem = ({ character, isSelected, onClick }: Props): JSX.Element => {
 	const handleKey = (event: KeyboardEvent<HTMLDivElement>): void => {
@@ -39,7 +34,6 @@ const CharacterBossItem = ({ character, isSelected, onClick }: Props): JSX.Eleme
 				className={styles.classIcon}
 				alt={character.name}
 				height={80}
-				priority
 				src={`/assets/buttom_profile/${code}.webp`}
 				width={480}
 			/>

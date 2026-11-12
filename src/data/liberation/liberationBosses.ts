@@ -10,31 +10,15 @@ import type { checkedBossResponseBody } from '@features/liberation/schemas/liber
 export const BOSS_TYPES = ['genesis', 'destiny', 'astra'] as const;
 export type BossType = (typeof BOSS_TYPES)[number];
 
-export type PointsBossDifficulty = {
-	name: string;
-	reset: string;
-	points: number;
-};
+export type PointsBossDifficulty = { name: string; reset: string; points: number };
 
-export type AstraBossDifficulty = {
-	name: string;
-	reset: string;
-	erion: number;
-	battle: number;
-};
+export type AstraBossDifficulty = { name: string; reset: string; erion: number; battle: number };
 
 export type BossDifficulty = PointsBossDifficulty | AstraBossDifficulty;
 
-export type RawBoss = {
-	name: string;
-	img: string;
-	maxPartySize: number;
-	difficulties: BossDifficulty[];
-};
+export type RawBoss = { name: string; img: string; maxPartySize: number; difficulties: BossDifficulty[] };
 
-export type Boss = RawBoss & {
-	type: BossType;
-};
+export type Boss = RawBoss & { type: BossType };
 
 type BossValue = { points: number; reset: string } | { erion: number; battle: number; reset: string };
 
@@ -173,6 +157,9 @@ export const isValidBossDifficultyOrSkip = (bossName: BossName, difficultyName: 
 };
 
 export const createNormalizedEmptyBossList = (type: string): checkedBossResponseBody[] =>
-	getBossesByType(type).map(
-		(boss): checkedBossResponseBody => ({ name: boss.name, type: 'Skip', partySize: 1, cleared: false }),
-	);
+	getBossesByType(type).map((boss): checkedBossResponseBody => ({
+		name: boss.name,
+		type: 'Skip',
+		partySize: 1,
+		cleared: false,
+	}));

@@ -8,7 +8,7 @@
 			"contents": [
 				{ "name": "Daily Quest", "value": 20, "type": "daily" },
 				{ "name": "Reverse City", "value": 20, "minLevel": 205, "type": "daily" },
-				{ "name": "Erda Spectrum", "value": 80, "type": "weekly" }
+				{ "name": "Erda Spectrum", "value": 240, "type": "weekly" }
 			]
 		},
 		{
@@ -19,7 +19,7 @@
 			"contents": [
 				{ "name": "Daily Quest", "value": 20, "type": "daily" },
 				{ "name": "Yum Yum Island", "value": 20, "type": "daily", "minLevel": 215 },
-				{ "name": "Hungry Muto", "value": 80, "type": "weekly" }
+				{ "name": "Hungry Muto", "value": 240, "type": "weekly" }
 			]
 		},
 		{
@@ -29,7 +29,7 @@
 			"maxLevel": 20,
 			"contents": [
 				{ "name": "Daily Quest", "value": 40, "type": "daily" },
-				{ "name": "Midnight Chaser", "value": 80, "type": "weekly" }
+				{ "name": "Midnight Chaser", "value": 240, "type": "weekly" }
 			]
 		},
 		{
@@ -39,7 +39,7 @@
 			"maxLevel": 20,
 			"contents": [
 				{ "name": "Daily Quest", "value": 40, "type": "daily" },
-				{ "name": "Spirit Savior", "value": 80, "type": "weekly" }
+				{ "name": "Spirit Savior", "value": 240, "type": "weekly" }
 			]
 		},
 		{
@@ -49,7 +49,7 @@
 			"maxLevel": 20,
 			"contents": [
 				{ "name": "Daily Quest", "value": 40, "type": "daily" },
-				{ "name": "Ranheim Defense", "value": 80, "type": "weekly" }
+				{ "name": "Ranheim Defense", "value": 240, "type": "weekly" }
 			]
 		},
 		{
@@ -59,7 +59,7 @@
 			"maxLevel": 20,
 			"contents": [
 				{ "name": "Daily Quest", "value": 40, "type": "daily" },
-				{ "name": "Esfera Guardian", "value": 80, "type": "weekly" }
+				{ "name": "Esfera Guardian", "value": 240, "type": "weekly" }
 			]
 		},
 		{

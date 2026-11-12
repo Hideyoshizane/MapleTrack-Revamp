@@ -1,4 +1,3 @@
-import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 import { prisma } from '@lib/prisma';
 import { sanitizeInput } from '@utils/sanitizeInput';
 import { hasWeeklyResetOccurred, hasDailyResetOccurred } from '@utils/time';
@@ -6,8 +5,10 @@ import { hasWeeklyResetOccurred, hasDailyResetOccurred } from '@utils/time';
 import { fetchCharacterDataFromApi } from './fetchCharacterDataFromApi';
 
 import type { getCharacterDataFromAPIResponseBody } from '@features/character/schemas/character.response.schema';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@generated/prisma/client';
 import type { ServerOption } from '@utils/serverCookie';
+
+const DAILY_CONTENT_TYPES = ['Daily Quest', 'Reverse City', 'Yum Yum Island'] as const;
 
 const sanitizeString = (input: unknown): string | null => {
 	if (typeof input !== 'string') {
@@ -17,11 +18,7 @@ const sanitizeString = (input: unknown): string | null => {
 	return sanitizeInput(input) || null;
 };
 
-type SyncCharacterInfoParams = {
-	authenticatedUserId: string;
-	server: ServerOption;
-	className: string;
-};
+type SyncCharacterInfoParams = { authenticatedUserId: string; server: ServerOption; className: string };
 
 const unlockArcaneContent = async (
 	tx: Prisma.TransactionClient,
@@ -33,7 +30,6 @@ const unlockArcaneContent = async (
 		where: { characterId, name: symbolName, category: 'arcane' },
 		select: { id: true },
 	});
-
 	if (!symbol) {
 		return;
 	}
@@ -43,12 +39,12 @@ const unlockArcaneContent = async (
 		data: { checked: true },
 	});
 };
+
 export const syncCharacterInfo = async ({
 	authenticatedUserId,
 	server,
 	className,
 }: SyncCharacterInfoParams): Promise<void> => {
-	// Validate that the properties are strings
 	const cleanUserId = sanitizeString(authenticatedUserId);
 	const cleanServer = sanitizeString(server);
 	const cleanCode = sanitizeString(className);
@@ -71,7 +67,7 @@ export const syncCharacterInfo = async ({
 	await prisma.$transaction(async (tx): Promise<void> => {
 		const symbolData = await tx.characterSymbol.findMany({
 			where: { characterId: character.id },
-			select: { id: true, contents: { select: { id: true, contentType: true, date: true, tries: true } } },
+			select: { id: true, contents: { select: { id: true, contentType: true, date: true } } },
 		});
 
 		const dailyQuestIdsToReset: string[] = [];
@@ -85,7 +81,10 @@ export const syncCharacterInfo = async ({
 					shouldResetLastSymbolDaily = true;
 				}
 
-				if (content.tries != null && hasWeeklyResetOccurred(content.date)) {
+				if (
+					!DAILY_CONTENT_TYPES.includes(content.contentType as (typeof DAILY_CONTENT_TYPES)[number]) &&
+					hasWeeklyResetOccurred(content.date)
+				) {
 					weeklyQuestIdsToReset.push(content.id);
 				}
 			}
@@ -112,12 +111,13 @@ export const syncCharacterInfo = async ({
 			transactionPromises.push(
 				tx.characterContent.updateMany({
 					where: { id: { in: weeklyQuestIdsToReset } },
-					data: { tries: DEFAULT_WEEKLY_TRIES, cleared: false },
+					data: { cleared: false },
 				}),
 			);
 		}
 
 		let externalData: getCharacterDataFromAPIResponseBody | null = null;
+
 		if (externalDataPromise !== null) {
 			externalData = await externalDataPromise;
 		}

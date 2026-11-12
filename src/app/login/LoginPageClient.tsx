@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -8,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import Button from '@components/Button/Button';
 import FooterOutside from '@components/FooterOutside/FooterOutside';
 import FormInput from '@components/FormInput/FormInput';
+import Image from '@components/Image/Image';
 import { usernameRawSchema, passwordRawSchema } from '@features/user/schemas/user.raw.schema';
 import { zodValidator } from '@utils/validators';
 
@@ -36,7 +36,7 @@ const LoginPageClient = (): JSX.Element => {
 	return (
 		<div className={styles.container}>
 			<div className={styles.logoDiv}>
-				<Image alt="MapleTrack Logo" fill priority sizes="750px" src="/assets/logo/logo.webp" />
+				<Image alt="MapleTrack Logo" fill sizes="750px" src="/assets/logo/logo.webp" />
 			</div>
 
 			<form noValidate onSubmit={(e): undefined => void handleSubmit(submitLogin)(e)}>

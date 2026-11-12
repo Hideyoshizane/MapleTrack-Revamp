@@ -9,11 +9,7 @@ import type { JSX } from 'react';
 
 type HandleBossToggle = (bossMosterId: string) => void | Promise<void>;
 
-type Props = {
-	server: string;
-	characterList: getBossListCharacterResponseBody[];
-	handleBossToggle: HandleBossToggle;
-};
+type Props = { server: string; characterList: getBossListCharacterResponseBody[]; handleBossToggle: HandleBossToggle };
 
 const CharactersBossGrid = ({ server, characterList, handleBossToggle }: Props): JSX.Element => {
 	return (

@@ -10,12 +10,7 @@ import type {
 	getCharacterDataResponseBody,
 } from '@features/character/schemas/character.response.schema';
 
-type Props = {
-	server: string;
-	className: string;
-	nameOverride?: string;
-	syncEnabled: boolean;
-};
+type Props = { server: string; className: string; nameOverride?: string; syncEnabled: boolean };
 
 type UseCharacterPageDataReturn = {
 	character: getCharacterDataResponseBody | null;
@@ -41,7 +36,6 @@ export const useCharacterPageData = ({
 	const updateCharacter = (recipe: (draft: getCharacterDataResponseBody) => void): void => {
 		setEditableCharacter((previous) => {
 			const currentCharacter = previous ?? serverCharacter;
-
 			if (!currentCharacter) {
 				return null;
 			}
@@ -56,8 +50,11 @@ export const useCharacterPageData = ({
 	const {
 		data: extraData,
 		isLoading: extraLoading,
-		isError: CharacterDataFromAPIFailed,
+		isError: externalQueryFailed,
 	} = useCharacterExternalQuery({ name: resolvedName, server, enabled: syncEnabled && !!resolvedName });
+
+	const CharacterDataFromAPIFailed =
+		externalQueryFailed || (extraData?.characterImgURL === '' && extraData?.level === 0);
 
 	return {
 		character,

@@ -1,11 +1,11 @@
 'use client';
 
 import * as Select from '@radix-ui/react-select';
-import Image from 'next/image';
 
 import CheckIcon from '@assets/svg/check.svg';
 import NoIcon from '@assets/svg/circle-x.svg';
 import MenuIcon from '@assets/svg/menu.svg';
+import Image from '@components/Image/Image';
 import { getSacredAreas } from '@data/liberation/astraDaily';
 import { weaponQuestsImagesSrc } from '@data/liberation/liberationQuests';
 
@@ -13,10 +13,7 @@ import styles from './DailySelectDropdown.module.scss';
 
 import type { JSX } from 'react';
 
-type Props = {
-	selectedDailyPreview: number;
-	onSelectArea: (dailyValue: number) => void;
-};
+type Props = { selectedDailyPreview: number; onSelectArea: (dailyValue: number) => void };
 
 const IMAGE_SIZE = 40;
 const ERION_SIZE = 24;
@@ -46,7 +43,6 @@ const DailySelectDropdown = ({ selectedDailyPreview, onSelectArea }: Props): JSX
 								<Image
 									alt={selectedArea.name}
 									height={IMAGE_SIZE}
-									priority
 									src={selectedArea.img}
 									width={IMAGE_SIZE}
 								/>

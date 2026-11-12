@@ -9,11 +9,7 @@ import {
 	destinyBossNameSchema,
 } from './liberation.response.schema';
 
-export const getLiberationListRequestSchema = z
-	.object({
-		server: serverSchema,
-	})
-	.strict();
+export const getLiberationListRequestSchema = z.object({ server: serverSchema }).strict();
 
 export type getLiberationListRequestBody = z.infer<typeof getLiberationListRequestSchema>;
 

@@ -10,18 +10,9 @@ import { QUEST_TYPE } from '../GenesisProgression';
 
 import type { checkedBossResponseBody } from '@features/liberation/schemas/liberation.response.schema';
 
-type Props = {
-	characterId: string;
-	server: string;
-	currentDate: Date;
-	selectedDate: Date;
-	type: string;
-};
+type Props = { characterId: string; server: string; currentDate: Date; selectedDate: Date; type: string };
 
-type CacheEntry = {
-	characterId: string;
-	data: checkedBossResponseBody[];
-};
+type CacheEntry = { characterId: string; data: checkedBossResponseBody[] };
 
 export const useCheckedBosses = ({
 	characterId,

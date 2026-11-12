@@ -11,32 +11,16 @@ import styles from './CheckedIcon.module.scss';
 
 import type { JSX } from 'react';
 
-type Props = {
-	cleared: boolean;
-	isSkip: boolean;
-	isIncluded: boolean;
-	disabled: boolean;
-	onToggle: () => void;
-};
+type Props = { cleared: boolean; isSkip: boolean; isIncluded: boolean; disabled: boolean; onToggle: () => void };
 
 const CheckedIcon = ({ cleared, isSkip, isIncluded, disabled, onToggle }: Props): JSX.Element => {
-	const isLocked = cleared;
-
-	let IconComponent;
-
-	if (isLocked) {
-		IconComponent = CheckIcon;
-	} else if (isSkip) {
-		IconComponent = CircleX;
-	} else {
-		IconComponent = isIncluded ? CircleIcon : CheckIcon;
-	}
+	const IconComponent = cleared ? CheckIcon : isSkip ? CircleX : isIncluded ? CircleIcon : CheckIcon;
 
 	return (
-		<Tooltip content="Boss already cleared this week." enabled={isLocked} placement="top">
+		<Tooltip content="Boss already cleared this week." enabled={cleared} placement="top">
 			<div className={styles.checkDiv}>
 				<IconComponent
-					className={clsx(styles.checkIcon, (isLocked || isSkip) && styles.cleared)}
+					className={clsx(styles.checkIcon, (cleared || isSkip) && styles.cleared)}
 					onClick={disabled ? undefined : onToggle}
 				/>
 			</div>

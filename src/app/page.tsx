@@ -1,9 +1,9 @@
-import Image from 'next/image';
 import Link from 'next/link';
 
 import FasterIcon from '@assets/svg/chevrons-up.svg';
 import LightBulbIcon from '@assets/svg/lightbulb.svg';
 import UnifiedIcon from '@assets/svg/squares-unite.svg';
+import Image from '@components/Image/Image';
 import LandingSection from '@components/LandingSection/LandingSection';
 import LandingShowcase from '@components/LandingShowcase/LandingShowcase';
 
@@ -15,7 +15,7 @@ const LandingPage = (): JSX.Element => {
 	return (
 		<div className={styles.mainDiv}>
 			<div className={styles.topBar}>
-				<Image alt="MapleTrack Logo" height={128} priority src="/assets/logo/logo.webp" width={384} />
+				<Image alt="MapleTrack Logo" height={128} src="/assets/logo/logo.webp" width={384} />
 
 				<div className={styles.buttonDiv}>
 					<Link className={styles.signInButton} href="/login">
@@ -40,7 +40,6 @@ const LandingPage = (): JSX.Element => {
 					className={styles.backgroundImage}
 					alt="First Background"
 					fill
-					priority
 					quality={100}
 					src="/assets/landing/background1.webp"
 				/>

@@ -4,14 +4,14 @@ import { updateCharacterWeeklyResponseSchema } from '@features/character/schemas
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
-import { logError, logApiFailure, logZodError } from '@utils/logger';
+import { logZodError, logApiFailure, logError } from '@utils/logger';
 import { nowInUtc } from '@utils/time';
 
 import type { LevelUpResult } from '@data/symbols/symbolMappings';
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
-const route = 'api/characters/updateCharacterDaily';
+const route = 'api/characters/updateCharacterWeekly';
 
 const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
 	try {
@@ -25,7 +25,6 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		const { id } = parseResult.data;
 
-		// Search for the symbol
 		const symbol = await prisma.characterSymbol.findFirst({
 			where: { id, character: { userId: authenticatedUserId } },
 			select: {
@@ -35,69 +34,62 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				exp: true,
 				category: true,
 				character: { select: { level: true } },
-				contents: { select: { contentType: true, tries: true, cleared: true } },
+				contents: { select: { contentType: true, cleared: true }, take: 1 },
 			},
 		});
 		if (!symbol) {
 			logApiFailure('Symbol not found', { route });
 
-			return createResponse<ApiResponse>({ success: true, message: 'Character not found.' }, 200);
+			return createResponse<ApiResponse>({ success: false, message: 'Symbol not found' }, 404);
 		}
 
-		let weeklyContent: (typeof symbol.contents)[number] | undefined;
-
-		for (const content of symbol.contents) {
-			if (content.tries !== null) {
-				weeklyContent = content;
-
-				break;
-			}
-		}
+		const weeklyContent = symbol.contents[0];
 		if (!weeklyContent) {
 			logApiFailure('Weekly not found', { route });
 
-			return createResponse<ApiResponse>(
-				{ success: false, message: 'Weekly content not found for symbol.' },
-				404,
-			);
+			return createResponse<ApiResponse>({ success: false, message: 'Weekly content not found for symbol' }, 404);
 		}
-		if (weeklyContent.cleared) {
-			logApiFailure('Weekly already cleared', { route });
+
+		const transactionData = await prisma.$transaction(async (tx) => {
+			// Prevent concurrent requests from claiming the same weekly reward.
+			const updatedContent = await tx.characterContent.updateMany({
+				where: { symbolId: symbol.id, contentType: weeklyContent.contentType, cleared: false },
+				data: { cleared: true, date: nowInUtc() },
+			});
+			if (updatedContent.count === 0) {
+				return null;
+			}
+
+			const weeklyValue = getContentValue(toSymbolName(symbol.name), 'Weekly', symbol.character.level);
+
+			// Update symbol exp and level
+			const updatedExp = symbol.exp + weeklyValue;
+			const newValues = calculateNewLevelFromExp(symbol.category, symbol.level, updatedExp);
+
+			await tx.characterSymbol.update({
+				where: { id: symbol.id },
+				data: { level: newValues.currentLevel, exp: newValues.currentExp },
+			});
+
+			return { id, currentExp: newValues.currentExp, currentLevel: newValues.currentLevel };
+		});
+
+		if (!transactionData) {
+			logApiFailure('Weekly already cleared.', { route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'Weekly already cleared.' }, 409);
 		}
 
-		// Find Symbol weekly Value
-		const weeklyValue = getContentValue(toSymbolName(symbol.name), 'Weekly', symbol.character.level);
-
-		// Update symbol exp and level
-		const updatedExp = symbol.exp + weeklyValue;
-		const newValues = calculateNewLevelFromExp(symbol.category, symbol.level, updatedExp);
-
-		const remainingTries = Math.max((weeklyContent.tries ?? 1) - 1, 0);
-		const isCleared = remainingTries === 0;
-
-		await prisma.$transaction([
-			prisma.characterSymbol.update({
-				where: { id: symbol.id },
-				data: { level: newValues.currentLevel, exp: newValues.currentExp },
-			}),
-			prisma.characterContent.update({
-				where: { symbolId_contentType: { symbolId: symbol.id, contentType: weeklyContent.contentType } },
-				data: { tries: remainingTries, cleared: isCleared, date: nowInUtc() },
-			}),
-		]);
-
-		const responseData = { id, currentExp: newValues.currentExp, currentLevel: newValues.currentLevel };
-		const validation = updateCharacterWeeklyResponseSchema.safeParse(responseData);
+		const validation = updateCharacterWeeklyResponseSchema.safeParse(transactionData);
 		if (!validation.success) {
 			logZodError(validation.error, { route: route });
 
 			return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 		}
 
+		// Return value
 		return createResponse<ApiResponse<LevelUpResult>>(
-			{ success: true, message: 'Character updated successfully.', data: responseData },
+			{ success: true, message: 'Character updated successfully.', data: transactionData },
 			200,
 		);
 	} catch (error) {

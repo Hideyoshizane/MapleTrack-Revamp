@@ -8,9 +8,7 @@ import { BonusContext } from './BonusContext';
 
 import type { ReactNode, JSX } from 'react';
 
-type BonusProviderProps = {
-	children: ReactNode;
-};
+type BonusProviderProps = { children: ReactNode };
 
 export const BonusProvider = ({ children }: BonusProviderProps): JSX.Element => {
 	const [arcaneBonus, setArcaneBonusState] = useState<number>(0);

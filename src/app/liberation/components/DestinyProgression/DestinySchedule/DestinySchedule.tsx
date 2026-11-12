@@ -35,11 +35,7 @@ const DestinySchedule = ({
 	});
 
 	const firstLiberationSchedule = isFirstLiberation
-		? calculatePointsSchedule({
-				selectedDate,
-				remainingTotalPoints: firstLiberationPoints,
-				weeklyMonthlyPoints,
-			})
+		? calculatePointsSchedule({ selectedDate, remainingTotalPoints: firstLiberationPoints, weeklyMonthlyPoints })
 		: null;
 
 	const secondLiberationSchedule = calculatePointsSchedule({

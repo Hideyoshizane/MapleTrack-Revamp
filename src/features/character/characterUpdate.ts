@@ -1,8 +1,7 @@
-import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 import { SYMBOL_MAP } from '@data/symbols/symbolMappings';
 import { prisma } from '@lib/prisma';
 
-import type { SymbolCategory } from '@prisma/client';
+import type { SymbolCategory } from '@generated/prisma/client';
 
 const DAILY = 'Daily Quest';
 
@@ -20,7 +19,11 @@ const buildTemplatesByCategory = (): Record<
 	for (const [name, info] of Object.entries(SYMBOL_MAP)) {
 		grouped[info.category].push({
 			name,
-			contents: info.contents.map((c) => ({ contentType: c.name, checked: c.name === DAILY, cleared: false })),
+			contents: info.contents.map((content) => ({
+				contentType: content.name,
+				checked: content.name === DAILY,
+				cleared: false,
+			})),
 		});
 	}
 
@@ -36,35 +39,25 @@ export const updateMissingSymbolsForCharacters = async (userId: string): Promise
 	const templatesByCategory = buildTemplatesByCategory();
 
 	for (const character of characters) {
-		const existingNames = new Set(character.symbols.map((s) => s.name));
+		const existingNames = new Set(character.symbols.map((symbol) => symbol.name));
 
 		await prisma.$transaction(async (tx) => {
-			// Iterate over each category and template directly
 			for (const category of SYMBOL_CATEGORIES) {
 				for (const template of templatesByCategory[category]) {
-					if (!existingNames.has(template.name)) {
-						// Create missing symbol
-						const symbolRecord = await tx.characterSymbol.create({
-							data: { name: template.name, level: 1, exp: 1, category, characterId: character.id },
-						});
+					if (existingNames.has(template.name)) continue;
 
-						for (const content of template.contents) {
-							const shouldSetTries =
-								content.contentType !== 'Daily Quest' &&
-								content.contentType !== 'Reverse City' &&
-								content.contentType !== 'Yum Yum Island';
+					const symbolRecord = await tx.characterSymbol.create({
+						data: { name: template.name, level: 1, exp: 1, category, characterId: character.id },
+					});
 
-							await tx.characterContent.create({
-								data: {
-									contentType: content.contentType,
-									checked: content.checked,
-									cleared: content.cleared,
-									tries: shouldSetTries ? DEFAULT_WEEKLY_TRIES : undefined,
-									symbolId: symbolRecord.id,
-								},
-							});
-						}
-					}
+					await tx.characterContent.createMany({
+						data: template.contents.map((content) => ({
+							contentType: content.contentType,
+							checked: content.checked,
+							cleared: content.cleared,
+							symbolId: symbolRecord.id,
+						})),
+					});
 				}
 			}
 		});

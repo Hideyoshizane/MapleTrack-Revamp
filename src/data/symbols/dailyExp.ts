@@ -4,12 +4,7 @@ export const SYMBOL_CATEGORIES = ['arcane', 'sacred', 'grand'] as const;
 
 export type SymbolCategory = (typeof SYMBOL_CATEGORIES)[number];
 
-export type SymbolContent = {
-	name: string;
-	value: number;
-	minLevel?: number;
-	type?: 'daily' | 'weekly';
-};
+export type SymbolContent = { name: string; value: number; minLevel?: number; type?: 'daily' | 'weekly' };
 
 export type SymbolData = {
 	name: string;
@@ -19,10 +14,7 @@ export type SymbolData = {
 	contents: SymbolContent[];
 };
 
-export type SymbolsData = {
-	symbols: SymbolData[];
-	weekly: { value: number };
-};
+export type SymbolsData = { symbols: SymbolData[]; weekly: { value: number } };
 
 const symbolsData = raw as SymbolsData;
 

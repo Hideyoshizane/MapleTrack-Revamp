@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { CHARACTER_MAX_LEVEL, DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
+import { CHARACTER_MAX_LEVEL } from '@data/character/constants';
 import { JOB_CLASSES, LINK_SKILL, JOB_TYPE, LEGION_TYPE } from '@data/classes/classes';
 import { ASTRA_DAILY_AREAS } from '@data/liberation/astraDaily';
 
@@ -14,6 +14,9 @@ import {
 	symbolCategoriesSchema,
 	symbolNameSchema,
 } from './character.schema';
+
+const characterIdResponseSchema = characterIdRawSchema.or(z.literal(''));
+const symbolIdResponseSchema = symbolIdRawSchema.or(z.literal(''));
 
 // Home Page
 const getAllCharactersSymbolsResponseSchema = z.object({
@@ -46,17 +49,12 @@ export type getAllCharactersResponseBody = z.infer<typeof getAllCharactersRespon
 //Character Page
 
 const getCharacterContentSchema = z
-	.object({
-		contentType: z.enum(CONTENT_TYPES),
-		checked: z.boolean().optional(),
-		cleared: z.boolean().optional(),
-		tries: z.number().int().min(0).max(DEFAULT_WEEKLY_TRIES).optional(),
-	})
+	.object({ contentType: z.enum(CONTENT_TYPES), checked: z.boolean().optional(), cleared: z.boolean().optional() })
 	.strict();
 
 export const getCharacterDataSymbolsResponseSchema = z
 	.object({
-		id: symbolIdRawSchema,
+		id: symbolIdResponseSchema,
 		name: z.enum(symbolNames),
 		level: z.number().int().min(1),
 		exp: z.number().int().min(0),
@@ -69,7 +67,7 @@ export type getCharacterDataSymbolsResponseBody = z.infer<typeof getCharacterDat
 
 export const getCharacterDataResponseSchema = z
 	.object({
-		id: characterIdRawSchema,
+		id: characterIdResponseSchema,
 		name: characterNameRawSchema,
 		level: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
 		targetLevel: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
@@ -96,19 +94,14 @@ export type getCharacterDataResponseBody = z.infer<typeof getCharacterDataRespon
 //Edit Character Page
 
 export const getEditCharacterContentSchema = z
-	.object({
-		contentType: z.enum(CONTENT_TYPES),
-		checked: z.boolean().optional(),
-		cleared: z.boolean().optional(),
-		tries: z.number().int().min(0).max(DEFAULT_WEEKLY_TRIES).optional(),
-	})
+	.object({ contentType: z.enum(CONTENT_TYPES), checked: z.boolean().optional(), cleared: z.boolean().optional() })
 	.strict();
 
 export type getEditCharacterContentResponseBody = z.infer<typeof getEditCharacterContentSchema>;
 
 export const getEditCharacterDataSymbolsResponseSchema = z
 	.object({
-		id: symbolIdRawSchema,
+		id: symbolIdResponseSchema,
 		name: symbolNameSchema,
 		level: z.number().int().min(1),
 		exp: z.number().int().min(0),
@@ -121,7 +114,7 @@ export type getEditCharacterDataSymbolsResponseBody = z.infer<typeof getEditChar
 
 export const getEditCharacterDataResponseSchema = z
 	.object({
-		id: characterIdRawSchema,
+		id: characterIdResponseSchema,
 		name: characterNameRawSchema,
 		level: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
 		targetLevel: z.number().int().min(0).max(CHARACTER_MAX_LEVEL),
@@ -148,10 +141,7 @@ export type getEditCharacterDataResponseBody = z.infer<typeof getEditCharacterDa
 //Character Data from API
 
 export const getCharacterDataFromAPIResponseSchema = z
-	.object({
-		level: z.number().int().min(0),
-		characterImgURL: z.url(),
-	})
+	.object({ level: z.number().int().min(0), characterImgURL: z.url() })
 	.strict();
 
 export type getCharacterDataFromAPIResponseBody = z.infer<typeof getCharacterDataFromAPIResponseSchema>;
@@ -160,7 +150,7 @@ export type getCharacterDataFromAPIResponseBody = z.infer<typeof getCharacterDat
 
 export const updateCharacterDailyResponseSchema = z
 	.object({
-		id: symbolIdRawSchema,
+		id: symbolIdResponseSchema,
 		currentExp: z.number().int().min(0),
 		currentLevel: z.number().int().min(0),
 		erionPoints: z.number().int().min(0).nullable(),
@@ -172,27 +162,17 @@ export type updateCharacterDailyResponseBody = z.infer<typeof updateCharacterDai
 //Update Character Weekly
 
 export const updateCharacterWeeklyResponseSchema = z
-	.object({
-		id: symbolIdRawSchema,
-		currentExp: z.number().int().min(0),
-		currentLevel: z.number().int().min(0),
-	})
+	.object({ id: symbolIdResponseSchema, currentExp: z.number().int().min(0), currentLevel: z.number().int().min(0) })
 	.strict();
 
 export type updateCharacterWeeklyResponseBody = z.infer<typeof updateCharacterWeeklyResponseSchema>;
 
 //Update All Daily
 
-const levelUpResultSchema = z.object({
-	currentLevel: z.number().int().min(0),
-	currentExp: z.number().int().min(0),
-});
+const levelUpResultSchema = z.object({ currentLevel: z.number().int().min(0), currentExp: z.number().int().min(0) });
 
 export const updateCharacterAllDailyResponseSchema = z
-	.object({
-		results: z.record(z.string(), levelUpResultSchema),
-		erionPoints: z.number().int().nullable(),
-	})
+	.object({ results: z.record(z.string(), levelUpResultSchema), erionPoints: z.number().int().nullable() })
 	.nullable();
 
 export type updateCharacterAllDailyResponseBody = z.infer<typeof updateCharacterAllDailyResponseSchema>;

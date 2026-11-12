@@ -1,10 +1,10 @@
 'use client';
 
 import * as Checkbox from '@radix-ui/react-checkbox';
-import Image from 'next/image';
 
 import CheckIcon from '@assets/svg/check.svg';
 import CrossIcon from '@assets/svg/cross-2.svg';
+import Image from '@components/Image/Image';
 import ProgressBar from '@components/ProgressBar/ProgressBar';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { getExpForLevel } from '@data/symbols/exp/expTable';
@@ -26,7 +26,7 @@ import type {
 	getEditCharacterDataResponseBody,
 	getEditCharacterContentResponseBody,
 } from '@features/character/schemas/character.response.schema';
-import type { CharacterContent, SymbolCategory } from '@prisma/client';
+import type { CharacterContent, SymbolCategory } from '@generated/prisma/client';
 import type { JSX } from 'react';
 
 type LevelExpInputProps = {
@@ -64,12 +64,7 @@ function LevelExpInput({ level, exp, maxLevel, expRequired, onLevelBlur, onExpBl
 	);
 }
 
-type SymbolImageProps = {
-	src: string;
-	size: number;
-	computedValue: number;
-	usable: boolean;
-};
+type SymbolImageProps = { src: string; size: number; computedValue: number; usable: boolean };
 
 function SymbolImage({ src, size, computedValue, usable }: SymbolImageProps): JSX.Element {
 	const tooltipMessage = computedValue === 0 ? 'Symbol at Max level.' : `Days to max Level: ${computedValue}`;
@@ -128,9 +123,7 @@ type SymbolUpdatePayload =
 	| { type: 'exp'; value: number; category: SymbolCategory; name: string }
 	| { type: 'content'; index: number; checked: boolean; category: SymbolCategory; name: string };
 
-type CharacterContentUI = CharacterContent & {
-	type: 'daily' | 'weekly';
-};
+type CharacterContentUI = CharacterContent & { type: 'daily' | 'weekly' };
 
 function EditPageSymbolObject({
 	type,
@@ -158,7 +151,7 @@ function EditPageSymbolObject({
 		type,
 		symbol.level,
 		symbol.exp,
-		symbol.contents.at(-1)?.tries || 0,
+		symbol.contents.at(-1)?.cleared || false,
 		symbol.contents[0].cleared || false,
 	);
 

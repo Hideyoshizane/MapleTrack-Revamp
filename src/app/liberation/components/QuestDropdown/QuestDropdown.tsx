@@ -1,10 +1,10 @@
 'use client';
 
 import * as Select from '@radix-ui/react-select';
-import Image from 'next/image';
 
 import CheckIcon from '@assets/svg/check.svg';
 import MenuIcon from '@assets/svg/menu.svg';
+import Image from '@components/Image/Image';
 
 import styles from './QuestDropdown.module.scss';
 
@@ -50,7 +50,6 @@ const QuestDropdown = ({ type, quest, selectedQuest, onSelectBoss }: Props): JSX
 							<Image
 								alt={safeSelectedQuest}
 								height={IMAGE_SIZE}
-								priority
 								src={selectedEntry.img}
 								width={IMAGE_SIZE}
 							/>

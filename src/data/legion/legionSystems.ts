@@ -1,15 +1,8 @@
 import legionSystemsJson from './legionSystems.json';
 
-type LegionBonusRank = {
-	rank: string;
-	description: string;
-};
+type LegionBonusRank = { rank: string; description: string };
 
-type LegionBonus = {
-	name: string;
-	jobType: string;
-	ranking: LegionBonusRank[];
-};
+type LegionBonus = { name: string; jobType: string; ranking: LegionBonusRank[] };
 
 type LegionRank = 'rank_b' | 'rank_a' | 'rank_s' | 'rank_ss' | 'rank_sss' | 'no_rank';
 type LegionThresholdSetCode = 'zero' | 'default';

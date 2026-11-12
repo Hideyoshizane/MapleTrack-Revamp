@@ -90,9 +90,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		const validation = searchCharacterResponseSchema.safeParse(responseData);
 		if (!validation.success) {
-			logZodError(validation.error, {
-				route,
-			});
+			logZodError(validation.error, { route });
 
 			throw new Error('Invalid search response');
 		}

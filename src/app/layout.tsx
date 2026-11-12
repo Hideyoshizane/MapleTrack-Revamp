@@ -23,7 +23,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>): JSX.
 		<html lang="en">
 			<body className={clsx(roboto.className)}>
 				<Providers>
-					<ClientToaster position="bottom-right" rtl={false} theme="dark" />
+					<ClientToaster position="bottom-right" theme="dark" />
 
 					<main>{children}</main>
 				</Providers>

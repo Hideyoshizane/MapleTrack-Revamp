@@ -1,9 +1,11 @@
-import { SymbolCategory } from '@prisma/client';
 import { z } from 'zod';
 
 import { JOB_CLASSES } from '@data/classes/classes';
 import { SERVER_NAMES } from '@data/servers/servers';
+import { allSymbols } from '@data/symbols/dailyExp';
 import { SYMBOL_MAP } from '@data/symbols/symbolMappings';
+
+import type { SymbolCategory } from '@data/symbols/dailyExp';
 
 // Server validation
 export const serverSchema = z.enum(SERVER_NAMES, { message: 'Invalid server selected' });
@@ -33,16 +35,15 @@ export const characterNameRawSchema = z
 	.regex(/^[a-zA-Z0-9_-]+$/, 'Name can only contain letters, numbers, underscores, or dashes.')
 	.refine((value): boolean => value !== 'Character Name', { message: 'This name is not allowed.' });
 
-export const symbolIdRawSchema = z
-	.string()
-	.regex(/^[a-fA-F0-9]{24}$/, 'Invalid MongoDB ObjectId')
-	.or(z.literal(''));
+export const symbolIdRawSchema = z.uuid();
 
-export const characterIdRawSchema = z
-	.string()
-	.regex(/^[a-fA-F0-9]{24}$/, 'Invalid MongoDB ObjectId')
-	.or(z.literal(''));
+export const characterIdRawSchema = z.uuid();
 
 export const symbolNameSchema = z.enum(Object.values(symbolNames) as [string, ...string[]]);
 
-export const symbolCategoriesSchema = z.enum(Object.values(SymbolCategory) as [SymbolCategory, ...SymbolCategory[]]);
+const symbolCategories = [...new Set(allSymbols.map((symbol) => symbol.category))] as [
+	SymbolCategory,
+	...SymbolCategory[],
+];
+
+export const symbolCategoriesSchema = z.enum(symbolCategories);

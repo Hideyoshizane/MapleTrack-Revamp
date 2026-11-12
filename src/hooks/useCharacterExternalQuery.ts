@@ -6,11 +6,7 @@ import { characterApi } from '@features/character/characterApi';
 import type { getCharacterDataFromAPIResponseBody } from '@features/character/schemas/character.response.schema';
 import type { UseQueryResult } from '@tanstack/react-query';
 
-type Params = {
-	name?: string;
-	server: string;
-	enabled: boolean;
-};
+type Params = { name?: string; server: string; enabled: boolean };
 
 export const useCharacterExternalQuery = ({
 	name,
@@ -25,6 +21,7 @@ export const useCharacterExternalQuery = ({
 			}
 
 			const payload = { characterName: name, server };
+
 			const res = await characterApi.getCharacterDataFromAPI(payload);
 			if (!res.success || !res.data) {
 				throw new Error('Failed to fetch external data');

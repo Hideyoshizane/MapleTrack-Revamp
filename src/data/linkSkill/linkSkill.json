@@ -39,18 +39,9 @@
 		"name": "Adventurer's Curiosity",
 		"image": "/assets/link_skill/bowman.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Chance to add monsters to Monster Collection: +10%, \nCritical Rate: +3%."
-			},
-			{
-				"level": 2,
-				"description": "Chance to add monsters to Monster Collection: +15%, \nCritical Rate: +4%."
-			},
-			{
-				"level": 3,
-				"description": "Chance to add monsters to Monster Collection: +20%, \nCritical Rate: +6%."
-			}
+			{ "level": 1, "description": "Chance to add monsters to Monster Collection: +10%, \nCritical Rate: +3%." },
+			{ "level": 2, "description": "Chance to add monsters to Monster Collection: +15%, \nCritical Rate: +4%." },
+			{ "level": 3, "description": "Chance to add monsters to Monster Collection: +20%, \nCritical Rate: +6%." }
 		]
 	},
 	{
@@ -65,10 +56,7 @@
 				"level": 2,
 				"description": "Upon debuffing an enemy, Damage: +6%. Duration: 10 sec. \nCooldown: 20 sec."
 			},
-			{
-				"level": 3,
-				"description": "Upon debuffing an enemy, Damage: +9%. Duration: 10 sec. \nCooldown: 20 sec."
-			}
+			{ "level": 3, "description": "Upon debuffing an enemy, Damage: +9%. Duration: 10 sec. \nCooldown: 20 sec." }
 		]
 	},
 	{
@@ -111,14 +99,8 @@
 		"name": "Knight's Watch",
 		"image": "/assets/link_skill/mihile.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Duration: 10 sec. \nStatus Resistance: +100. \nCooldown: 120 sec."
-			},
-			{
-				"level": 2,
-				"description": "Duration: 15 sec. \nStatus Resistance: +100. \nCooldown: 120 sec."
-			},
+			{ "level": 1, "description": "Duration: 10 sec. \nStatus Resistance: +100. \nCooldown: 120 sec." },
+			{ "level": 2, "description": "Duration: 15 sec. \nStatus Resistance: +100. \nCooldown: 120 sec." },
 			{
 				"level": 3,
 				"description": "[Mihile] Creates a shield for 30 sec that absorbs up to 9 hits, Damage +25%. \nHowever, damage from attacks that deal a percentage of Max HP is reduced by 30%. \nCooldown: 120 sec. \nPassive Effect: Damage +3%. \n\n[Other Classes] Status Resistance +100 for 20 sec. Cooldown: 120 sec."
@@ -129,14 +111,8 @@
 		"name": "Combo Kill Blessing",
 		"image": "/assets/link_skill/aran.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Permanently increases Combo Kill Orb EXP by +400%."
-			},
-			{
-				"level": 2,
-				"description": "Permanently increases Combo Kill Orb EXP by +650%."
-			},
+			{ "level": 1, "description": "Permanently increases Combo Kill Orb EXP by +400%." },
+			{ "level": 2, "description": "Permanently increases Combo Kill Orb EXP by +650%." },
 			{
 				"level": 3,
 				"description": "[Aran] Permanently increases Combo Kill Orb EXP by 900%. Passive Effect: Damage +5%. \n\n[Other Classes] Permanently increases Combo Kill Orb EXP by 900%."
@@ -147,14 +123,8 @@
 		"name": "Rune Persistence",
 		"image": "/assets/link_skill/evan.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Liberated Rune Power Duration: +30%."
-			},
-			{
-				"level": 2,
-				"description": "Liberated Rune Power Duration: +50%."
-			},
+			{ "level": 1, "description": "Liberated Rune Power Duration: +30%." },
+			{ "level": 2, "description": "Liberated Rune Power Duration: +50%." },
 			{
 				"level": 3,
 				"description": "[Evan] Liberated Rune Power Duration +70%. Passive Effect: Damage +5%. \n\n[Other Classes] Liberated Rune Power Duration +70%"
@@ -183,14 +153,8 @@
 		"name": "Phantom Instinct",
 		"image": "/assets/link_skill/phantom.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Critical Rate +10%."
-			},
-			{
-				"level": 2,
-				"description": "Critical Rate +15%."
-			},
+			{ "level": 1, "description": "Critical Rate +10%." },
+			{ "level": 2, "description": "Critical Rate +15%." },
 			{
 				"level": 3,
 				"description": "[Phantom] Critical Rate +20%. Passive Effect: Damage +5%. \n\n[Other Classes] Critical Rate +20%."
@@ -201,14 +165,8 @@
 		"name": "Light Wash",
 		"image": "/assets/link_skill/luminous.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Ignores 10% of enemy Defense when attacking."
-			},
-			{
-				"level": 2,
-				"description": "Ignores 15% of enemy Defense when attacking."
-			},
+			{ "level": 1, "description": "Ignores 10% of enemy Defense when attacking." },
+			{ "level": 2, "description": "Ignores 15% of enemy Defense when attacking." },
 			{
 				"level": 3,
 				"description": "[Luminous] Ignores 20% of enemy Defense when attacking. Passive Effect: Damage +4%.\n\n[Other Classes] Ignores 20% of enemy Defense when attacking."
@@ -219,14 +177,8 @@
 		"name": "Close Call",
 		"image": "/assets/link_skill/shade.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "5% chance to survive a Fatal Attack."
-			},
-			{
-				"level": 2,
-				"description": "10% chance to survive a Fatal Attack."
-			},
+			{ "level": 1, "description": "5% chance to survive a Fatal Attack." },
+			{ "level": 2, "description": "10% chance to survive a Fatal Attack." },
 			{
 				"level": 3,
 				"description": "[Shade] 15% chance to survive a Fatal Attack. Passive Effect: Damage +5%.\n\n[Other Classes] 15% chance to survive a Fatal Attack."
@@ -255,68 +207,35 @@
 		"name": "Wild Rage",
 		"image": "/assets/link_skill/demon_avenger.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Damage: +5%."
-			},
-			{
-				"level": 2,
-				"description": "Damage: +10%."
-			},
-			{
-				"level": 3,
-				"description": "Damage: +15%."
-			}
+			{ "level": 1, "description": "Damage: +5%." },
+			{ "level": 2, "description": "Damage: +10%." },
+			{ "level": 3, "description": "Damage: +15%." }
 		]
 	},
 	{
 		"name": "Fury Unleashed",
 		"image": "/assets/link_skill/demon_slayer.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Boss Damage: +10%."
-			},
-			{
-				"level": 2,
-				"description": "Boss Damage: +15%."
-			},
-			{
-				"level": 3,
-				"description": "Boss Damage: +20%."
-			}
+			{ "level": 1, "description": "Boss Damage: +10%." },
+			{ "level": 2, "description": "Boss Damage: +15%." },
+			{ "level": 3, "description": "Boss Damage: +20%." }
 		]
 	},
 	{
 		"name": "Hybrid Logic",
 		"image": "/assets/link_skill/xenon.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "All Stats: +5%."
-			},
-			{
-				"level": 2,
-				"description": "All Stats: +10%."
-			},
-			{
-				"level": 3,
-				"description": "All Stats: +15%."
-			}
+			{ "level": 1, "description": "All Stats: +5%." },
+			{ "level": 2, "description": "All Stats: +10%." },
+			{ "level": 3, "description": "All Stats: +15%." }
 		]
 	},
 	{
 		"name": "Iron Will",
 		"image": "/assets/link_skill/kaiser.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Max HP: +10%."
-			},
-			{
-				"level": 2,
-				"description": "Max HP: +15%."
-			},
+			{ "level": 1, "description": "Max HP: +10%." },
+			{ "level": 2, "description": "Max HP: +15%." },
 			{
 				"level": 3,
 				"description": "[Kaiser] Max HP +15%, Damage +5% per Morph Gauge stage.\n\n[Other Classes] Max HP +20%."
@@ -363,18 +282,9 @@
 		"name": "Terms and Conditions",
 		"image": "/assets/link_skill/angelic_buster.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Duration: 10 sec, Damage: +30%. \nCooldown: 90 sec."
-			},
-			{
-				"level": 2,
-				"description": "Duration: 10 sec, Damage: +45%. \nCooldown: 60 sec."
-			},
-			{
-				"level": 3,
-				"description": "Duration: 10 sec, Damage: +60%. \nCooldown: 60 sec."
-			}
+			{ "level": 1, "description": "Duration: 10 sec, Damage: +30%. \nCooldown: 90 sec." },
+			{ "level": 2, "description": "Duration: 10 sec, Damage: +45%. \nCooldown: 60 sec." },
+			{ "level": 3, "description": "Duration: 10 sec, Damage: +60%. \nCooldown: 60 sec." }
 		]
 	},
 	{
@@ -435,18 +345,9 @@
 		"name": "Moonlit Blade Learnings",
 		"image": "/assets/link_skill/hayato.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "If Critical Rate: 100%+ and Critical Damage: 50%, Critical Damage: +3%."
-			},
-			{
-				"level": 2,
-				"description": "If Critical Rate: 100%+ and Critical Damage: 50%, Critical Damage: +5%."
-			},
-			{
-				"level": 3,
-				"description": "If Critical Rate: 100%+ and Critical Damage: 50%, Critical Damage: +7%."
-			}
+			{ "level": 1, "description": "If Critical Rate: 100%+ and Critical Damage: 50%, Critical Damage: +3%." },
+			{ "level": 2, "description": "If Critical Rate: 100%+ and Critical Damage: 50%, Critical Damage: +5%." },
+			{ "level": 3, "description": "If Critical Rate: 100%+ and Critical Damage: 50%, Critical Damage: +7%." }
 		]
 	},
 	{
@@ -489,14 +390,8 @@
 		"name": "Bravado",
 		"image": "/assets/link_skill/hoyoung.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Enemy DEF Ignored: +5%, \nDamage: +9% against enemies with 100% HP."
-			},
-			{
-				"level": 2,
-				"description": "Enemy DEF Ignored: +10%, \nDamage: +14% against enemies with 100% HP."
-			},
+			{ "level": 1, "description": "Enemy DEF Ignored: +5%, \nDamage: +9% against enemies with 100% HP." },
+			{ "level": 2, "description": "Enemy DEF Ignored: +10%, \nDamage: +14% against enemies with 100% HP." },
 			{
 				"level": 3,
 				"description": "[Hoyoung] Enemy DEF Ignored: +15%, Damage: +19% against enemies with 100% HP. Passive Effect: Damage +4%\n\n[Other Classes] Enemy DEF Ignored: +15%, Damage: +19% against enemies with 100% HP."
@@ -507,36 +402,18 @@
 		"name": "Spirit Guide Blessing",
 		"image": "/assets/link_skill/lynn.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Boss Damage: +4%. \nCritical Rate: +4%. \nMax HP +3%. \nMax MP: +3%."
-			},
-			{
-				"level": 2,
-				"description": "Boss Damage: +7%. \nCritical Rate: +7%. \nMax HP +4%. \nMax MP: +4%."
-			},
-			{
-				"level": 3,
-				"description": "Boss Damage: +11%. \nCritical Rate: +10%. \nMax HP +5%. \nMax MP: +5%."
-			}
+			{ "level": 1, "description": "Boss Damage: +4%. \nCritical Rate: +4%. \nMax HP +3%. \nMax MP: +3%." },
+			{ "level": 2, "description": "Boss Damage: +7%. \nCritical Rate: +7%. \nMax HP +4%. \nMax MP: +4%." },
+			{ "level": 3, "description": "Boss Damage: +11%. \nCritical Rate: +10%. \nMax HP +5%. \nMax MP: +5%." }
 		]
 	},
 	{
 		"name": "Rhinne's Blessing",
 		"image": "/assets/link_skill/zero.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Reduces damage taken by 3% and ignores 2% of enemy Defense when attacking."
-			},
-			{
-				"level": 2,
-				"description": "Reduces damage taken by 6% and ignores 4% of enemy Defense when attacking."
-			},
-			{
-				"level": 3,
-				"description": "Reduces damage taken by 9% and ignores 6% of enemy Defense when attacking."
-			},
+			{ "level": 1, "description": "Reduces damage taken by 3% and ignores 2% of enemy Defense when attacking." },
+			{ "level": 2, "description": "Reduces damage taken by 6% and ignores 4% of enemy Defense when attacking." },
+			{ "level": 3, "description": "Reduces damage taken by 9% and ignores 6% of enemy Defense when attacking." },
 			{
 				"level": 4,
 				"description": "Reduces damage taken by 12% and ignores 8% of enemy Defense when attacking."
@@ -555,18 +432,9 @@
 		"name": "Judgment",
 		"image": "/assets/link_skill/kinesis.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Critical Damage: +2%."
-			},
-			{
-				"level": 2,
-				"description": "Critical Damage: +4%."
-			},
-			{
-				"level": 3,
-				"description": "Critical Damage: +6%."
-			}
+			{ "level": 1, "description": "Critical Damage: +2%." },
+			{ "level": 2, "description": "Critical Damage: +4%." },
+			{ "level": 3, "description": "Critical Damage: +6%." }
 		]
 	},
 	{
@@ -609,18 +477,9 @@
 		"name": "Guiding Stars",
 		"image": "/assets/link_skill/sia_astelle.webp",
 		"levels": [
-			{
-				"level": 1,
-				"description": "Buff Duration: +4%, Critical Damage: +1%."
-			},
-			{
-				"level": 2,
-				"description": "Buff Duration: +7%, Critical Damage: +2%."
-			},
-			{
-				"level": 3,
-				"description": "Buff Duration: +10%, Critical Damage: +3%."
-			}
+			{ "level": 1, "description": "Buff Duration: +4%, Critical Damage: +1%." },
+			{ "level": 2, "description": "Buff Duration: +7%, Critical Damage: +2%." },
+			{ "level": 3, "description": "Buff Duration: +10%, Critical Damage: +3%." }
 		]
 	},
 	{
@@ -639,6 +498,15 @@
 				"level": 3,
 				"description": "[Ren] Reduces damage taken by 6%, including attacks that inflict damage as a percentage of Max HP. Passive Effect: Damage +5%\n\n[Other Classes] Reduces damage taken by 6%, including attacks that inflict damage as a percentage of Max HP."
 			}
+		]
+	},
+	{
+		"name": "Covenant",
+		"image": "/assets/link_skill/lethe.webp",
+		"levels": [
+			{ "level": 1, "description": "Damage While a Summon is Active: 4%." },
+			{ "level": 2, "description": "Damage While a Summon is Active: 8%." },
+			{ "level": 3, "description": "Damage While a Summon is Active: 12%." }
 		]
 	}
 ]

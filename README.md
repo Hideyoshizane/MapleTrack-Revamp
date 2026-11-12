@@ -13,12 +13,12 @@
   <img src="https://img.shields.io/static/v1?label=nextJS&message=16.2.11&color=blue&style=for-the-badge&logo=nextdotjs"/>
   <img src="https://img.shields.io/static/v1?label=react&message=19.2.8&color=blue&style=for-the-badge&logo=react"/>
   <img src="https://img.shields.io/static/v1?label=node.JS&message=24.15.0&color=blue&style=for-the-badge&logo=nodedotjs"/>
-  <img src="https://img.shields.io/static/v1?label=release&message=2.4.0&color=darkgreen&style=for-the-badge"/>
+  <img src="https://img.shields.io/static/v1?label=release&message=2.5.0&color=darkgreen&style=for-the-badge"/>
 </p>
 
 ## Status
 
-### Updated up to MapleStory x Frieren: Beyond Journey's End (v271).
+### Updated up to Maplayer One (v272).
 
 ## Demo
 
@@ -87,7 +87,7 @@ Built with the following tools:
 - [NextAuth.js](https://next-auth.js.org/)
 - [Nodemailer](https://nodemailer.com/)
 - [Prisma](https://www.prisma.io/orm)
-- [React Toastify](https://fkhadra.github.io/react-toastify/introduction/)
+- [Sonner](https://sonner.emilkowal.ski/)
 - [reserved-usernames](https://github.com/mvila/reserved-usernames)
 - [Sass](https://sass-lang.com/)
 - [Zod](https://zod.dev/)

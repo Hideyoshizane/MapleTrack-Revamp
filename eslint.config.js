@@ -27,11 +27,7 @@ export default [
 
 	// React / Next.js recommended
 	{
-		plugins: {
-			'@next/next': nextPlugin,
-			'jsx-a11y': jsxA11yPlugin,
-			'react-hooks': reactHooksPlugin,
-		},
+		plugins: { '@next/next': nextPlugin, 'jsx-a11y': jsxA11yPlugin, 'react-hooks': reactHooksPlugin },
 		rules: {
 			...nextPlugin.configs.recommended.rules,
 			...nextPlugin.configs['core-web-vitals'].rules,

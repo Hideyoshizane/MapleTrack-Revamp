@@ -2,12 +2,7 @@ import Fuse from 'fuse.js';
 
 import classesJson from './classes.json';
 
-type Classes = {
-	linkSkill: string;
-	legionType: string;
-	className: string;
-	jobType: string;
-};
+type Classes = { linkSkill: string; legionType: string; className: string; jobType: string };
 
 export const JobClasses: Classes[] = classesJson;
 
@@ -37,11 +32,7 @@ const classCodeToNameMap: ReadonlyMap<string, string> = new Map(
 
 export const getClassNameByCode = (code: string): string | null => classCodeToNameMap.get(code) ?? null;
 
-const options = {
-	keys: ['className'],
-	threshold: 0.4,
-	includeScore: true,
-};
+const options = { keys: ['className'], threshold: 0.4, includeScore: true };
 
 const fuse = new Fuse(JobClasses, options);
 

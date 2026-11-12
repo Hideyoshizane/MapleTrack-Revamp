@@ -5,10 +5,7 @@ import { getNextWeeklyResetDate, getNextMonthFirstDay, getNextMidnight, createUt
 
 import type { WeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
 
-type ScheduleResult = {
-	weeksRequired: number;
-	completionDate: Date;
-};
+type ScheduleResult = { weeksRequired: number; completionDate: Date };
 
 type CalculatePointsScheduleParams = {
 	selectedDate: Date | string;

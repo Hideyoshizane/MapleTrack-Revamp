@@ -6,10 +6,7 @@ import styles from './ProgressPrevision.module.scss';
 
 import type { JSX, ChangeEvent } from 'react';
 
-type Props = {
-	selectedDate: Date;
-	onChangeDate: (value: string) => void;
-};
+type Props = { selectedDate: Date; onChangeDate: (value: string) => void };
 
 const ProgressPrevision = ({ selectedDate, onChangeDate }: Props): JSX.Element => {
 	return (

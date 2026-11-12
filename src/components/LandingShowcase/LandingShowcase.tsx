@@ -1,15 +1,10 @@
-import Image from 'next/image';
+import Image from '@components/Image/Image';
 
 import styles from '../../styles/Root.module.scss';
 
 import type { JSX } from 'react';
 
-type Props = {
-	title: string;
-	descriptions: string[];
-	imageSrc: string;
-	reverse?: boolean;
-};
+type Props = { title: string; descriptions: string[]; imageSrc: string; reverse?: boolean };
 
 const LandingShowcase = ({ title, descriptions, imageSrc, reverse = false }: Props): JSX.Element => {
 	return (

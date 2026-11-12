@@ -56,22 +56,21 @@ export const hasMonthlyResetOccurred = (date: Date | null): boolean => {
 	return hasResetPassed(getNextMonthFirstDay(date));
 };
 
-export const isSameDay = (date1: Date, date2: Date): boolean => {
-	return (
-		date1.getUTCFullYear() === date2.getUTCFullYear() &&
-		date1.getUTCMonth() === date2.getUTCMonth() &&
-		date1.getUTCDate() === date2.getUTCDate()
-	);
+export const isSameMonth = (date1: Date, date2: Date): boolean =>
+	date1.getUTCFullYear() === date2.getUTCFullYear() && date1.getUTCMonth() === date2.getUTCMonth();
+
+const getThursdayWeekStart = (date: Date): Date => {
+	const daysSinceThursday = (date.getUTCDay() - THURSDAY + 7) % 7;
+
+	return createUtcDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() - daysSinceThursday);
 };
+
+export const isSameThursdayWeek = (date1: Date, date2: Date): boolean =>
+	getThursdayWeekStart(date1).getTime() === getThursdayWeekStart(date2).getTime();
 
 export const addMinutesToDate = (date: Date, minutes: number): Date => addMinutes(date, minutes);
 
-export type remainingTime = {
-	days?: number;
-	hours: number;
-	minutes: number;
-	seconds: number;
-};
+export type remainingTime = { days?: number; hours: number; minutes: number; seconds: number };
 
 export const getRemainingTime = (target: Date, now: Date): remainingTime => {
 	const totalSeconds = Math.max(0, differenceInSeconds(target, now));

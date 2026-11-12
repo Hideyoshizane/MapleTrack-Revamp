@@ -8,10 +8,7 @@ import styles from './PartySizeSelector.module.scss';
 
 import type { JSX } from 'react';
 
-type PartySize = {
-	label: string;
-	multiplier: number;
-};
+type PartySize = { label: string; multiplier: number };
 
 const buildPartySizes = (maxPartySize: number): PartySize[] =>
 	Array.from({ length: maxPartySize }, (_, index): PartySize => {
@@ -29,11 +26,7 @@ const buildPartySizeMap = (partySizes: PartySize[]): Record<number, PartySize> =
 	return map;
 };
 
-type Props = {
-	selectedPartySize: number | null;
-	onChangePartySize: (partySize: number) => void;
-	maxPartySize: number;
-};
+type Props = { selectedPartySize: number | null; onChangePartySize: (partySize: number) => void; maxPartySize: number };
 
 const DEFAULT_MULTIPLIER = 1;
 
@@ -65,19 +58,17 @@ const PartySizeSelector = ({ selectedPartySize, onChangePartySize, maxPartySize 
 				<Select.Content className={styles.bossList} position="popper">
 					<div className={styles.scrollContainer}>
 						<Select.Viewport>
-							{partySizes.map(
-								(entry): JSX.Element => (
-									<Select.Item
-										className={styles.bossItem}
-										key={entry.multiplier}
-										value={String(entry.multiplier)}
-									>
-										<div className={styles.itemContent}>
-											<p className={styles.partySize}>{entry.label}</p>
-										</div>
-									</Select.Item>
-								),
-							)}
+							{partySizes.map((entry): JSX.Element => (
+								<Select.Item
+									className={styles.bossItem}
+									key={entry.multiplier}
+									value={String(entry.multiplier)}
+								>
+									<div className={styles.itemContent}>
+										<p className={styles.partySize}>{entry.label}</p>
+									</div>
+								</Select.Item>
+							))}
 						</Select.Viewport>
 					</div>
 				</Select.Content>

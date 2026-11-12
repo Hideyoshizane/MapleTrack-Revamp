@@ -1,137 +1,78 @@
-import NextAuth from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
+import { betterAuth } from 'better-auth';
+import { prismaAdapter } from 'better-auth/adapters/prisma';
 
 import { LASTVERSION } from '@data/user/constants';
-import { credentialsSchema } from '@features/user/schemas/user.schema';
 import { updateLastLogin, updateUserVersion } from '@features/user/userService';
 import { prisma } from '@lib/prisma';
-import { verifyPassword, DUMMY_HASH } from '@lib/security/password';
+import { hashPassword, verifyPassword } from '@lib/security/password';
 
+import { removeInvalidBosses } from './features/boss/removeInvalidBosses';
 import { updateMissingSymbolsForCharacters } from './features/character/characterUpdate';
 
-type AppUser = {
-	id: string;
-	username: string;
-	version: number;
-};
+// 60 days
+const SESSION_MAX_AGE = 60 * 60 * 24 * 60;
 
-function isAppUser(user: unknown): user is AppUser {
-	return (
-		typeof user === 'object' &&
-		user !== null &&
-		typeof (user as AppUser).id === 'string' &&
-		typeof (user as AppUser).username === 'string' &&
-		typeof (user as AppUser).version === 'number'
-	);
-}
-type AppJWT = {
-	id: string;
-	username: string;
-	version: number;
-	[key: string]: unknown;
-};
+export const auth = betterAuth({
+	baseURL: process.env.BETTER_AUTH_URL,
+	secret: process.env.BETTER_AUTH_SECRET,
 
-export const { auth, handlers } = NextAuth({
-	trustHost: true,
-	providers: [
-		CredentialsProvider({
-			name: 'Credentials',
-			credentials: {
-				username: { label: 'Username', type: 'text' },
-				password: { label: 'Password', type: 'password' },
-			},
+	database: prismaAdapter(prisma, { provider: 'postgresql' }),
 
-			authorize: async (credentials) => {
-				try {
-					const parsedResult = credentialsSchema.safeParse(credentials);
-					if (!parsedResult.success) {
-						return null;
-					}
+	emailAndPassword: {
+		enabled: true,
+		disableSignUp: true,
+		password: { hash: hashPassword, verify: async ({ hash, password }) => verifyPassword(hash, password) },
+	},
 
-					const { username, password } = parsedResult.data;
+	user: { additionalFields: { version: { type: 'number', required: true, input: false } } },
 
-					const user = await prisma.user.findUnique({ where: { username } });
-					if (!user) {
-						await verifyPassword(DUMMY_HASH, password);
-						return null;
-					}
+	session: { expiresIn: SESSION_MAX_AGE },
 
-					const isValid = await verifyPassword(user.password, password);
-					if (!isValid) {
-						return null;
-					}
-
-					const nextVersion = user.version < LASTVERSION ? LASTVERSION : user.version;
-
-					await Promise.all([
-						updateLastLogin(user.id),
-						updateMissingSymbolsForCharacters(user.id),
-						user.version < LASTVERSION ? updateUserVersion(user.id) : Promise.resolve(),
-					]);
-
-					return { id: user.id, username: user.username, version: nextVersion };
-				} catch (err) {
-					console.error('Authorize error:', err);
-					return null;
-				}
-			},
-		}),
-	],
-	logger: {
-		error: (...args) => {
-			console.error('[NextAuth ERROR]', ...args);
-		},
-		warn: (...args) => {
-			console.warn('[NextAuth WARN]', ...args);
-		},
-		debug: (...args) => {
-			console.warn('[NextAuth DEBUG]', ...args);
+	advanced: {
+		database: { generateId: 'uuid' },
+		useSecureCookies: process.env.NODE_ENV === 'production',
+		defaultCookieAttributes: {
+			httpOnly: true,
+			sameSite: 'lax',
+			secure: process.env.NODE_ENV === 'production',
+			path: '/',
 		},
 	},
-	session: { strategy: 'jwt', maxAge: 60 * 60 * 24 * 60 },
-	jwt: { maxAge: 60 * 60 * 24 * 60 },
-	cookies: {
-		sessionToken: {
-			options: { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', path: '/' },
-		},
-	},
-	callbacks: {
-		jwt: ({ token, user }) => {
-			if (user && isAppUser(user)) {
-				(token as AppJWT).id = user.id;
-				(token as AppJWT).username = user.username;
-				(token as AppJWT).version = user.version ?? 0;
-			}
-			return token;
-		},
-		session: ({ session, token }) => {
-			const tokenData = token as AppJWT;
 
-			if (!tokenData?.id) {
-				return session;
-			}
+	rateLimit: { enabled: true, window: 60, max: 100, customRules: { '/sign-in/email': { window: 60, max: 10 } } },
 
-			return {
-				...session,
-				user: {
-					...session.user,
-					id: tokenData.id,
-					username: tokenData.username,
-					version: tokenData.version ?? 0,
+	databaseHooks: {
+		session: {
+			create: {
+				before: async (session) => {
+					try {
+						const user = await prisma.user.findUnique({
+							where: { id: session.userId },
+							select: { id: true, version: true },
+						});
+						if (!user) {
+							throw new Error(`User ${session.userId} was not found while creating a session.`);
+						}
+
+						const tasks: Promise<unknown>[] = [updateLastLogin(user.id)];
+
+						if (user.version < LASTVERSION) {
+							tasks.push(updateUserVersion(user.id));
+							tasks.push(updateMissingSymbolsForCharacters(user.id));
+							tasks.push(removeInvalidBosses(user.id));
+						}
+
+						await Promise.all(tasks);
+
+						return { data: session };
+					} catch (error) {
+						console.error('[Better Auth] Session creation hook failed:', error);
+						throw error;
+					}
 				},
-			};
-		},
-		redirect: ({ url, baseUrl }) => {
-			if (url.startsWith('/')) {
-				return `${baseUrl}${url}`;
-			}
-			if (url.startsWith(baseUrl)) {
-				return url;
-			}
-
-			return baseUrl;
+			},
 		},
 	},
-	pages: { signIn: '/login', error: '/login' },
-	secret: process.env.NEXTAUTH_SECRET,
+
+	logger: { level: process.env.NODE_ENV === 'development' ? 'debug' : 'error' },
 });

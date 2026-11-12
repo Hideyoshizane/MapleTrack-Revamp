@@ -43,6 +43,8 @@ const calculateOverallProgress = (
 	return Math.min(100, Math.max(0, roundedProgress));
 };
 
+const MIN_PERCENTAGE_BAR = 2;
+
 const ProgressionBarDiv = ({
 	currentVestiges,
 	currentTraces,
@@ -74,6 +76,7 @@ const ProgressionBarDiv = ({
 					jobType="astra_erion"
 					maxValue={vestigesQuestPoints}
 					value={currentVestiges}
+					minPercent={MIN_PERCENTAGE_BAR}
 					width={1488}
 				/>
 			</div>
@@ -89,6 +92,7 @@ const ProgressionBarDiv = ({
 					height={32}
 					jobType="astra_battle"
 					maxValue={tracesQuestPoints}
+					minPercent={MIN_PERCENTAGE_BAR}
 					value={currentTraces}
 					width={1488}
 				/>
@@ -101,7 +105,14 @@ const ProgressionBarDiv = ({
 						{overallProgress}%/{100}%
 					</p>
 				</div>
-				<ProgressBar height={32} jobType="astra_overall" maxValue={100} value={overallProgress} width={1488} />
+				<ProgressBar
+					height={32}
+					jobType="astra_overall"
+					maxValue={100}
+					minPercent={MIN_PERCENTAGE_BAR}
+					value={overallProgress}
+					width={1488}
+				/>
 			</div>
 		</div>
 	);

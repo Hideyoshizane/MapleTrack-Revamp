@@ -29,19 +29,17 @@ const EditPageSymbolGrid = ({
 }: Props): JSX.Element => {
 	return (
 		<div className={styles.symbolGrid}>
-			{symbols.map(
-				(symbol): JSX.Element => (
-					<EditPageSymbolObject
-						characterJobType={characterJobType}
-						characterLevel={characterLevel}
-						key={symbol.name}
-						size={size}
-						symbol={symbol}
-						type={type}
-						updateCharacter={updateCharacter}
-					/>
-				),
-			)}
+			{symbols.map((symbol): JSX.Element => (
+				<EditPageSymbolObject
+					characterJobType={characterJobType}
+					characterLevel={characterLevel}
+					key={symbol.name}
+					size={size}
+					symbol={symbol}
+					type={type}
+					updateCharacter={updateCharacter}
+				/>
+			))}
 		</div>
 	);
 };

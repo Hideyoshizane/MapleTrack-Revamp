@@ -15,6 +15,8 @@ type Props = {
 	totalPoints: number;
 };
 
+const MIN_PERCENTAGE_BAR = 2;
+
 const ProgressionBarDiv = ({
 	type,
 	currentPoints,
@@ -31,7 +33,14 @@ const ProgressionBarDiv = ({
 						{currentPoints}/{questPoints}
 					</p>
 				</div>
-				<ProgressBar height={32} jobType={type} maxValue={questPoints} value={currentPoints} width={1488} />
+				<ProgressBar
+					height={32}
+					jobType={type}
+					maxValue={questPoints}
+					minPercent={MIN_PERCENTAGE_BAR}
+					value={currentPoints}
+					width={1488}
+				/>
 			</div>
 
 			<div>
@@ -45,6 +54,7 @@ const ProgressionBarDiv = ({
 					height={32}
 					jobType={type}
 					maxValue={totalPoints}
+					minPercent={MIN_PERCENTAGE_BAR}
 					value={cumulativeTracesPoints}
 					width={1488}
 				/>

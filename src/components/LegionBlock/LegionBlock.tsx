@@ -1,7 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-
+import Image from '@components/Image/Image';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { getLegionData, getRank, codeToLegionThresholdSet } from '@data/legion/legionSystems';
 
@@ -57,10 +56,7 @@ const LegionBlock = ({
 	const legionData = getLegionData(characterLegionType);
 	const tooltipContent = getTooltipContent(legionRank, legionData);
 
-	const imageSrc =
-		legionRank === 'no_rank'
-			? '/assets/legion/no_rank.webp'
-			: `/assets/legion/${characterJobType === 'xenon' ? 'xenon' : characterJobType}/${legionRank}.webp`;
+	const imageSrc = legionRank === 'no_rank' ? '/assets/legion/no_rank.webp' : `/assets/legion/${legionRank}.webp`;
 
 	const content = (
 		<div className={styles.iconDiv}>

@@ -1,13 +1,13 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import Image from 'next/image';
 import { useRouter, useSearchParams, redirect } from 'next/navigation';
 import { useEffect } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 import ErrorPage from '@components/ErrorPage/ErrorPage';
 import FullPageLoader from '@components/FullPageLoader/FullPageLoader';
+import Image from '@components/Image/Image';
 import { getClassNameByCode } from '@data/classes/classes';
 import { isValidServerName } from '@data/servers/servers';
 import { characterQueryKeys } from '@features/character/character.queryKeys';
@@ -25,10 +25,7 @@ import { useBonusContext } from './useBonusContext';
 import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { JSX } from 'react';
 
-type Props = {
-	server: string;
-	code: string;
-};
+type Props = { server: string; code: string };
 
 const CharacterPage = ({ server, code }: Props): JSX.Element => {
 	const router = useRouter();
@@ -111,7 +108,7 @@ const CharacterPage = ({ server, code }: Props): JSX.Element => {
 				<Image
 					alt={`${character.class} class profile Icon`}
 					height={827}
-					priority
+					loading="eager"
 					src={`/assets/profile/${code}.webp`}
 					width={650}
 				/>

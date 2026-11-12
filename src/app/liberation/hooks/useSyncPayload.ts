@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 import { liberationApi } from '@features/liberation/liberationApi';
 
@@ -17,10 +17,7 @@ type useLiberationSyncPayloadParams = {
 	onServerSyncAction: (updatedCharacter: updateLiberationCharacterResponseBody) => void;
 };
 
-type useLiberationSyncPayloadReturn = {
-	isSyncing: boolean;
-	scheduleSync: (characterId: string) => void;
-};
+type useLiberationSyncPayloadReturn = { isSyncing: boolean; scheduleSync: (characterId: string) => void };
 
 export const useLiberationSyncPayload = ({
 	liberationList,
@@ -169,17 +166,18 @@ export const useLiberationSyncPayload = ({
 						currentAstraTracesPoints: latestCharacter.currentAstraTracesPoints,
 					});
 
-					if (response.success && response.data) {
-						const mergedCharacter = { ...latestCharacter, ...response.data };
-
-						currentCacheRef.current.set(latestCharacter.characterId, serializeCharacter(mergedCharacter));
-
-						currentOnServerSync(response.data);
-
-						toast.success(response.message);
-					} else {
+					if (!response.success || !response.data) {
 						toast.error(response.message || 'Update error');
+						return;
 					}
+
+					const mergedCharacter = { ...latestCharacter, ...response.data };
+
+					currentCacheRef.current.set(latestCharacter.characterId, serializeCharacter(mergedCharacter));
+
+					currentOnServerSync(response.data);
+
+					toast.success(response.message);
 				} catch (error) {
 					console.error('Sync failed:', error);
 					toast.error('Failed to sync character data');

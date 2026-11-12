@@ -1,9 +1,9 @@
 'use client';
 
 import * as Select from '@radix-ui/react-select';
-import Image from 'next/image';
 
 import MenuIcon from '@assets/svg/menu.svg';
+import Image from '@components/Image/Image';
 import { generateClassCode } from '@data/classes/classes';
 
 import CharacterLiberationItem from './CharacterLiberationItem/CharacterLiberationItem';
@@ -54,7 +54,6 @@ const CharacterSelectLiberationDropdown = ({
 					className={styles.classIcon}
 					alt={selectedCharacter.name}
 					height={80}
-					priority
 					src={`/assets/buttom_profile/${code}.webp`}
 					width={480}
 				/>

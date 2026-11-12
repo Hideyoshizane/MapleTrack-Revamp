@@ -1,11 +1,10 @@
-import { DEFAULT_WEEKLY_TRIES } from '@data/character/constants';
 import { calculateNewLevelFromExp } from '@data/symbols/symbolMappings';
 import { characterToBossList } from '@features/boss/bossListService';
 import { updateCharacterRequestSchema } from '@features/character/schemas/character.request.schema';
 import { prisma } from '@lib/prisma';
 import { routeGuard } from '@lib/security/routeGuard';
 import { createResponse } from '@utils/createResponse';
-import { logZodError } from '@utils/logger';
+import { logZodError, logError } from '@utils/logger';
 import { nowInUtc } from '@utils/time';
 
 import type { ApiResponse } from '@sharedTypes/api';
@@ -13,8 +12,6 @@ import type { NextResponse, NextRequest } from 'next/server';
 
 type SymbolCategoryKey = 'arcane' | 'sacred' | 'grand';
 const symbolCategoryKeys: SymbolCategoryKey[] = ['arcane', 'sacred', 'grand'];
-
-const TRIES_ATTRIBUTE_EXCLUDE = new Set(['Daily Quest', 'Reverse City', 'Yum Yum Island']);
 
 const isValidObjectId = (value: string): boolean => value.length === 24;
 
@@ -83,11 +80,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 			const symbolUpsertPromises: Promise<{ id: string }>[] = [];
 
-			type ContentPayload = {
-				symbolName: string;
-				contentType: string;
-				checked: boolean;
-			};
+			type ContentPayload = { symbolName: string; contentType: string; checked: boolean };
 
 			const pendingContents: ContentPayload[] = [];
 
@@ -137,7 +130,11 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 			for (const categoryKey of symbolCategoryKeys) {
 				for (const symbol of data.symbols[categoryKey]) {
 					const symbolRecord = symbolRecords[symbolIndex];
-					symbolIdMap.set(symbol.name, symbolRecord.id);
+
+					if (symbolRecord) {
+						symbolIdMap.set(symbol.name, symbolRecord.id);
+					}
+
 					symbolIndex += 1;
 				}
 			}
@@ -156,7 +153,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 						create: {
 							contentType: content.contentType,
 							checked: content.checked,
-							...(!TRIES_ATTRIBUTE_EXCLUDE.has(content.contentType) && { tries: DEFAULT_WEEKLY_TRIES }),
+							cleared: false,
 							symbolId,
 						},
 						update: { checked: content.checked },
@@ -175,7 +172,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 		return createResponse<ApiResponse>({ success: true, message: 'Character updated successfully.' }, 200);
 	} catch (error) {
-		console.error('Search error:', error);
+		logError(error, { route });
 
 		return createResponse<ApiResponse>({ success: false, message: 'Internal Server Error' }, 500);
 	}

@@ -9,12 +9,7 @@ import styles from './BossButton.module.scss';
 
 import type { JSX } from 'react';
 
-type Difficulty = {
-	minLevel: number;
-	name: string;
-	reset: string;
-	value: number;
-};
+type Difficulty = { minLevel: number; name: string; reset: string; value: number };
 
 const DIFFICULTY_CLASS_MAP: Record<string, string> = {
 	Easy: styles.easy,

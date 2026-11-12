@@ -1,25 +1,15 @@
 import { getRemainingExp, getExpForLevel, getLastLevel } from '@data/symbols/exp/expTable';
-import { nowInUtc, getNextMidnight } from '@utils/time';
+import { nowInUtc } from '@utils/time';
 
 import { allSymbols } from './dailyExp';
 
 import type { SymbolCategory, SymbolName } from './dailyExp';
 
-type CharacterSymbol = {
-	name: string;
-	level: number;
-	exp: number;
-	category: SymbolCategory;
-};
+type CharacterSymbol = { name: string; level: number; exp: number; category: SymbolCategory };
 
 type SymbolContent = (typeof allSymbols)[number]['contents'][number];
 
-type SymbolInfo = {
-	category: SymbolCategory;
-	minLevel: number;
-	maxLevel: number;
-	contents: readonly SymbolContent[];
-};
+type SymbolInfo = { category: SymbolCategory; minLevel: number; maxLevel: number; contents: readonly SymbolContent[] };
 
 const SYMBOL_CATEGORY_FOLDER_MAP: Record<SymbolCategory, string> = {
 	arcane: 'arcaneforce',
@@ -30,12 +20,7 @@ const SYMBOL_CATEGORY_FOLDER_MAP: Record<SymbolCategory, string> = {
 export const SYMBOL_MAP = Object.fromEntries(
 	allSymbols.map((symbol) => [
 		symbol.name,
-		{
-			category: symbol.category,
-			minLevel: symbol.minLevel,
-			maxLevel: symbol.maxLevel,
-			contents: symbol.contents,
-		},
+		{ category: symbol.category, minLevel: symbol.minLevel, maxLevel: symbol.maxLevel, contents: symbol.contents },
 	]),
 ) as Record<string, SymbolInfo>;
 
@@ -76,7 +61,6 @@ export const getContentValue = (symbolName: SymbolName | null, contentType: stri
 	}
 
 	const symbol = getSymbolInfo(symbolName);
-
 	if (!symbol) {
 		return 0;
 	}
@@ -96,7 +80,6 @@ export const sortSymbolsByMinLevel = <TSymbol extends { name: string }>(symbols:
 	return [...symbols].sort((left, right) => {
 		const leftSymbol = toSymbolName(left.name);
 		const rightSymbol = toSymbolName(right.name);
-
 		if (!leftSymbol || !rightSymbol) {
 			return 0;
 		}
@@ -105,16 +88,13 @@ export const sortSymbolsByMinLevel = <TSymbol extends { name: string }>(symbols:
 	});
 };
 
-type SortableContent = {
-	contentType: string;
-};
+type SortableContent = { contentType: string };
 
 export const sortSymbolContents = <TContent extends SortableContent>(
 	symbolName: string,
 	contents: TContent[],
 ): TContent[] => {
 	const symbol = getSymbolInfo(symbolName);
-
 	if (!symbol) {
 		return contents;
 	}
@@ -131,12 +111,7 @@ export const sortSymbolContents = <TContent extends SortableContent>(
 	});
 };
 
-type CharacterContent = {
-	contentType: string;
-	checked: boolean;
-	cleared: boolean;
-	type: 'daily' | 'weekly';
-};
+type CharacterContent = { contentType: string; checked: boolean; cleared: boolean; type: 'daily' | 'weekly' };
 
 export const computeDailyWeeklyValues = (
 	symbol: CharacterSymbol,
@@ -144,7 +119,6 @@ export const computeDailyWeeklyValues = (
 	characterLevel: number,
 ): { dailyValue: number; weeklyValue: number } => {
 	const symbolName = toSymbolName(symbol.name);
-
 	if (!symbolName) {
 		return { dailyValue: 0, weeklyValue: 0 };
 	}
@@ -156,17 +130,16 @@ export const computeDailyWeeklyValues = (
 			}
 
 			const matchedContent = findSymbolContent(symbolName, currentContent.contentType, characterLevel);
-
 			if (!matchedContent) {
 				return result;
 			}
 
 			if (matchedContent.type === 'weekly') {
 				result.weeklyValue += matchedContent.value;
-			} else {
-				result.dailyValue += matchedContent.value;
+				return result;
 			}
 
+			result.dailyValue += matchedContent.value;
 			return result;
 		},
 		{ dailyValue: 0, weeklyValue: 0 },
@@ -179,59 +152,73 @@ export const calculateDaysToCompleteSymbol = (
 	type: SymbolCategory,
 	symbolLevel: number,
 	symbolExp: number,
-	remainingWeeklyTries: number,
+	weeklyCleared: boolean,
 	dailyCleared: boolean,
 ): number => {
-	let remainingExp = getRemainingExp(type, symbolLevel, symbolExp);
+	const remainingExp = getRemainingExp(type, symbolLevel, symbolExp);
 
 	if (remainingExp <= 0) {
 		return 0;
 	}
 
-	if (daily <= 0 && weekly <= 0) {
+	const dailyGain = Math.max(0, daily);
+	const weeklyGain = Math.max(0, weekly);
+
+	if (dailyGain === 0 && weeklyGain === 0) {
 		return Infinity;
 	}
 
-	let currentDate = nowInUtc();
-	let daysElapsed = 0;
-	let weeklyTries = remainingWeeklyTries;
-	let canDoDailyToday = !dailyCleared;
+	const currentDate = nowInUtc();
+	const currentDay = currentDate.getUTCDay();
 
-	while (remainingExp > 0) {
-		if (canDoDailyToday && daily > 0) {
-			remainingExp -= daily;
+	// The first daily opportunity is tomorrow if today's reward was already claimed.
+	const firstDayOffset = dailyCleared ? 1 : 0;
 
-			if (remainingExp <= 0) {
-				break;
-			}
+	// Find the next Thursday, excluding today.
+	const daysUntilThursday = (4 - currentDay + 7) % 7 || 7;
+
+	const getTotalGain = (totalDays: number): number => {
+		const dailyTotal = totalDays * dailyGain;
+
+		const lastDayOffset = firstDayOffset + totalDays - 1;
+
+		// Count Thursday resets within the remaining daily opportunities.
+		const futureThursdays =
+			lastDayOffset >= daysUntilThursday ? Math.floor((lastDayOffset - daysUntilThursday) / 7) + 1 : 0;
+
+		const availableWeeklyRewards = futureThursdays + (weeklyCleared ? 0 : 1);
+		const weeklyTotal = availableWeeklyRewards * weeklyGain;
+
+		return dailyTotal + weeklyTotal;
+	};
+
+	let high = 1;
+
+	while (getTotalGain(high) < remainingExp) {
+		high *= 2;
+
+		if (!Number.isSafeInteger(high)) {
+			return Infinity;
 		}
-
-		while (weekly > 0 && weeklyTries > 0 && remainingExp > 0) {
-			remainingExp -= weekly;
-			weeklyTries--;
-		}
-
-		if (remainingExp <= 0) {
-			break;
-		}
-
-		currentDate = getNextMidnight(currentDate);
-		daysElapsed++;
-
-		if (currentDate.getUTCDay() === 4) {
-			weeklyTries = 3;
-		}
-
-		canDoDailyToday = true;
 	}
 
-	return daysElapsed;
+	let low = 1;
+
+	while (low < high) {
+		const mid = Math.floor((low + high) / 2);
+
+		if (getTotalGain(mid) >= remainingExp) {
+			high = mid;
+			continue;
+		}
+
+		low = mid + 1;
+	}
+
+	return low;
 };
 
-export type LevelUpResult = {
-	currentLevel: number;
-	currentExp: number;
-};
+export type LevelUpResult = { currentLevel: number; currentExp: number };
 
 export const calculateNewLevelFromExp = (
 	type: SymbolCategory,
@@ -245,7 +232,6 @@ export const calculateNewLevelFromExp = (
 
 	while (level < maxLevel) {
 		const expForNext = getExpForLevel(type, level);
-
 		if (exp < expForNext) {
 			break;
 		}

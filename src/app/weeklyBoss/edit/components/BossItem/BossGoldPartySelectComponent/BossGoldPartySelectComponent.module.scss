@@ -64,11 +64,11 @@ $fontSize: 16px;
 	color: var(--default-white);
 	will-change: opacity, transform;
 
-	&[data-state="open"] {
+	&[data-state='open'] {
 		animation: fade-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
-	&[data-state="closed"] {
+	&[data-state='closed'] {
 		animation: fade-out 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 }

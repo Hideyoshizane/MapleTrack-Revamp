@@ -1,8 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import { useState } from 'react';
 
+import Image from '@components/Image/Image';
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import { normalizeBossType } from '@data/liberation/liberationBosses';
 
@@ -25,12 +25,7 @@ type Props = {
 
 type BossSelectionState = Record<
 	string,
-	{
-		difficulty: BossDifficulty | null;
-		partySize: number;
-		excludedWeek: boolean;
-		excludedMonth: boolean;
-	}
+	{ difficulty: BossDifficulty | null; partySize: number; excludedWeek: boolean; excludedMonth: boolean }
 >;
 
 const buildCheckedMap = (checkedBosses: checkedBossResponseBody[]): Record<string, checkedBossResponseBody> => {

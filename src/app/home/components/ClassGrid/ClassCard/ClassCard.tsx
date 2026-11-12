@@ -1,10 +1,10 @@
 'use client';
 import { clsx } from 'clsx';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import BossIcon from '@assets/svg/boss_slayer.svg';
+import Image from '@components/Image/Image';
 import LegionBlock from '@components/LegionBlock/LegionBlock';
 import LinkSkillBlock from '@components/LinkSkillBlock/LinkSkillBlock';
 import ProgressBar from '@components/ProgressBar/ProgressBar';
@@ -87,10 +87,7 @@ const IconSection = ({
 	</div>
 );
 
-type Props = {
-	character: getAllCharactersResponseBody;
-	serverCookie: string | undefined;
-};
+type Props = { character: getAllCharactersResponseBody; serverCookie: string | undefined };
 
 const SYMBOL_SIZE = 20;
 const BOSS_ICON_SIZE = 48;
@@ -144,8 +141,8 @@ const ClassCard = ({ character, serverCookie }: Props): JSX.Element | null => {
 						className={clsx(styles.classImg, level === 0 && styles.cardOff)}
 						alt={`${className} class Icon`}
 						height={213}
-						priority
 						src={`/assets/cards/${code}.webp`}
+						loading="eager"
 						width={355}
 					/>
 				</div>

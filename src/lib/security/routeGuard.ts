@@ -32,8 +32,7 @@ export const routeGuard =
 			}
 		}
 
-		const session = await auth();
-
+		const session = await auth.api.getSession({ headers: request.headers });
 		if (!session?.user?.id) {
 			return createResponse<ApiResponse>({ success: false, message: 'Unauthorized' }, 401);
 		}

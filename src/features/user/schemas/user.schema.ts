@@ -5,28 +5,20 @@ import { canonicalizeUsername, canonicalizeEmail, isReservedUsername } from './u
 
 export const usernameFieldSchema = usernameRawSchema
 	.transform(canonicalizeUsername)
-	.refine((value) => !isReservedUsername(value), {
-		message: 'This username is reserved and cannot be used.',
-	});
+	.refine((value) => !isReservedUsername(value), { message: 'This username is reserved and cannot be used.' });
 
 export const emailFieldSchema = emailRawSchema.transform(canonicalizeEmail);
 
 export const passwordFieldSchema = passwordRawSchema;
 
 // Login
-export const credentialsSchema = z.object({
-	username: usernameFieldSchema,
-	password: passwordFieldSchema,
-});
+export const credentialsSchema = z.object({ username: usernameFieldSchema, password: passwordFieldSchema });
 
 export type Credentials = z.infer<typeof credentialsSchema>;
 
 // Signup
 export const signupRequestSchema = credentialsSchema
-	.extend({
-		email: emailRawSchema,
-		confirmPassword: z.string(),
-	})
+	.extend({ email: emailRawSchema, confirmPassword: z.string() })
 	.refine((data) => data.password === data.confirmPassword, {
 		path: ['confirmPassword'],
 		message: 'Passwords do not match.',
@@ -46,18 +38,13 @@ export const resetPasswordRequestSchema = z.object({
 export type ResetPasswordRequestBody = z.infer<typeof resetPasswordRequestSchema>;
 
 // Forgot password
-export const forgotPasswordRequestSchema = z.object({
-	email: emailRawSchema,
-});
+export const forgotPasswordRequestSchema = z.object({ email: emailRawSchema });
 
 export type ForgotPasswordRequestBody = z.infer<typeof forgotPasswordRequestSchema>;
 
 // Change password
 export const changePasswordRequestSchema = z
-	.object({
-		currentPassword: z.string(),
-		newPassword: passwordFieldSchema,
-	})
+	.object({ currentPassword: z.string(), newPassword: passwordFieldSchema })
 	.refine((data) => data.currentPassword !== data.newPassword, {
 		path: ['newPassword'],
 		message: 'New password must be different from current password.',

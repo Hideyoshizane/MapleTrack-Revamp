@@ -4,24 +4,9 @@
 		"img": "/assets/boss/zakum.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Easy",
-				"value": 200000,
-				"reset": "Daily",
-				"minLevel": 50
-			},
-			{
-				"name": "Normal",
-				"value": 612500,
-				"reset": "Daily",
-				"minLevel": 90
-			},
-			{
-				"name": "Chaos",
-				"value": 16200000,
-				"reset": "Weekly",
-				"minLevel": 90
-			}
+			{ "name": "Easy", "value": 200000, "reset": "Daily", "minLevel": 50 },
+			{ "name": "Normal", "value": 612500, "reset": "Daily", "minLevel": 90 },
+			{ "name": "Chaos", "value": 16200000, "reset": "Weekly", "minLevel": 90 }
 		]
 	},
 	{
@@ -29,24 +14,9 @@
 		"img": "/assets/boss/magnus.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Easy",
-				"value": 722000,
-				"reset": "Daily",
-				"minLevel": 115
-			},
-			{
-				"name": "Normal",
-				"value": 2592000,
-				"reset": "Daily",
-				"minLevel": 155
-			},
-			{
-				"name": "Hard",
-				"value": 19012500,
-				"reset": "Weekly",
-				"minLevel": 175
-			}
+			{ "name": "Easy", "value": 722000, "reset": "Daily", "minLevel": 115 },
+			{ "name": "Normal", "value": 2073600, "reset": "Daily", "minLevel": 155 },
+			{ "name": "Hard", "value": 19012500, "reset": "Weekly", "minLevel": 175 }
 		]
 	},
 	{
@@ -54,56 +24,24 @@
 		"img": "/assets/boss/hilla.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 800000,
-				"reset": "Daily",
-				"minLevel": 120
-			},
-			{
-				"name": "Hard",
-				"value": 11250000,
-				"reset": "Weekly",
-				"minLevel": 170
-			}
+			{ "name": "Normal", "value": 800000, "reset": "Daily", "minLevel": 120 },
+			{ "name": "Hard", "value": 2250000, "reset": "Daily", "minLevel": 170 }
 		]
 	},
 	{
 		"name": "OMNI-CLN",
 		"img": "/assets/boss/omni_cln.webp",
 		"maxPartySize": 6,
-		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 1250000,
-				"reset": "Daily",
-				"minLevel": 180
-			}
-		]
+		"difficulties": [{ "name": "Normal", "value": 1250000, "reset": "Daily", "minLevel": 180 }]
 	},
 	{
 		"name": "Papulatus",
 		"img": "/assets/boss/papulatus.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Easy",
-				"value": 684500,
-				"reset": "Daily",
-				"minLevel": 115
-			},
-			{
-				"name": "Normal",
-				"value": 2664500,
-				"reset": "Daily",
-				"minLevel": 155
-			},
-			{
-				"name": "Chaos",
-				"value": 26450000,
-				"reset": "Weekly",
-				"minLevel": 190
-			}
+			{ "name": "Easy", "value": 684500, "reset": "Daily", "minLevel": 115 },
+			{ "name": "Normal", "value": 2131600, "reset": "Daily", "minLevel": 155 },
+			{ "name": "Chaos", "value": 26450000, "reset": "Weekly", "minLevel": 190 }
 		]
 	},
 	{
@@ -111,18 +49,8 @@
 		"img": "/assets/boss/pierre.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 968000,
-				"reset": "Daily",
-				"minLevel": 125
-			},
-			{
-				"name": "Chaos",
-				"value": 16200000,
-				"reset": "Weekly",
-				"minLevel": 180
-			}
+			{ "name": "Normal", "value": 968000, "reset": "Daily", "minLevel": 125 },
+			{ "name": "Chaos", "value": 16200000, "reset": "Weekly", "minLevel": 180 }
 		]
 	},
 	{
@@ -130,18 +58,8 @@
 		"img": "/assets/boss/von_bon.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 968000,
-				"reset": "Daily",
-				"minLevel": 125
-			},
-			{
-				"name": "Chaos",
-				"value": 16200000,
-				"reset": "Weekly",
-				"minLevel": 180
-			}
+			{ "name": "Normal", "value": 968000, "reset": "Daily", "minLevel": 125 },
+			{ "name": "Chaos", "value": 16200000, "reset": "Weekly", "minLevel": 180 }
 		]
 	},
 	{
@@ -149,18 +67,8 @@
 		"img": "/assets/boss/crimson_queen.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 968000,
-				"reset": "Daily",
-				"minLevel": 125
-			},
-			{
-				"name": "Chaos",
-				"value": 16200000,
-				"reset": "Weekly",
-				"minLevel": 180
-			}
+			{ "name": "Normal", "value": 968000, "reset": "Daily", "minLevel": 125 },
+			{ "name": "Chaos", "value": 16200000, "reset": "Weekly", "minLevel": 180 }
 		]
 	},
 	{
@@ -168,18 +76,8 @@
 		"img": "/assets/boss/vellum.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 968000,
-				"reset": "Daily",
-				"minLevel": 125
-			},
-			{
-				"name": "Chaos",
-				"value": 21012500,
-				"reset": "Weekly",
-				"minLevel": 180
-			}
+			{ "name": "Normal", "value": 968000, "reset": "Daily", "minLevel": 125 },
+			{ "name": "Chaos", "value": 21012500, "reset": "Weekly", "minLevel": 180 }
 		]
 	},
 	{
@@ -187,24 +85,9 @@
 		"img": "/assets/boss/von_leon.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Easy",
-				"value": 1058000,
-				"reset": "Daily",
-				"minLevel": 125
-			},
-			{
-				"name": "Normal",
-				"value": 1458000,
-				"reset": "Daily",
-				"minLevel": 125
-			},
-			{
-				"name": "Hard",
-				"value": 2450000,
-				"reset": "Daily",
-				"minLevel": 125
-			}
+			{ "name": "Easy", "value": 1058000, "reset": "Daily", "minLevel": 125 },
+			{ "name": "Normal", "value": 1458000, "reset": "Daily", "minLevel": 125 },
+			{ "name": "Hard", "value": 1960000, "reset": "Daily", "minLevel": 125 }
 		]
 	},
 	{
@@ -212,24 +95,9 @@
 		"img": "/assets/boss/horntail.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Easy",
-				"value": 882000,
-				"reset": "Daily",
-				"minLevel": 130
-			},
-			{
-				"name": "Normal",
-				"value": 1012500,
-				"reset": "Daily",
-				"minLevel": 130
-			},
-			{
-				"name": "Chaos",
-				"value": 1352000,
-				"reset": "Daily",
-				"minLevel": 135
-			}
+			{ "name": "Easy", "value": 882000, "reset": "Daily", "minLevel": 130 },
+			{ "name": "Normal", "value": 1012500, "reset": "Daily", "minLevel": 130 },
+			{ "name": "Chaos", "value": 1352000, "reset": "Daily", "minLevel": 135 }
 		]
 	},
 	{
@@ -237,18 +105,8 @@
 		"img": "/assets/boss/arkarium.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Easy",
-				"value": 1152000,
-				"reset": "Daily",
-				"minLevel": 140
-			},
-			{
-				"name": "Normal",
-				"value": 2520500,
-				"reset": "Daily",
-				"minLevel": 140
-			}
+			{ "name": "Easy", "value": 1152000, "reset": "Daily", "minLevel": 140 },
+			{ "name": "Normal", "value": 2016400, "reset": "Daily", "minLevel": 140 }
 		]
 	},
 	{
@@ -256,18 +114,8 @@
 		"img": "/assets/boss/pink_bean.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 1404500,
-				"reset": "Daily",
-				"minLevel": 160
-			},
-			{
-				"name": "Chaos",
-				"value": 12800000,
-				"reset": "Weekly",
-				"minLevel": 170
-			}
+			{ "name": "Normal", "value": 1404500, "reset": "Daily", "minLevel": 160 },
+			{ "name": "Chaos", "value": 2560000, "reset": "Daily", "minLevel": 170 }
 		]
 	},
 	{
@@ -275,88 +123,36 @@
 		"img": "/assets/boss/ranmaru.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 840500,
-				"reset": "Daily",
-				"minLevel": 120
-			},
-			{
-				"name": "Hard",
-				"value": 2664500,
-				"reset": "Daily",
-				"minLevel": 180
-			}
+			{ "name": "Normal", "value": 840500, "reset": "Daily", "minLevel": 120 },
+			{ "name": "Hard", "value": 2664500, "reset": "Daily", "minLevel": 180 }
 		]
 	},
 	{
 		"name": "Cygnus",
 		"img": "/assets/boss/cygnus.webp",
 		"maxPartySize": 6,
-		"difficulties": [
-			{
-				"name": "Easy",
-				"value": 9112500,
-				"reset": "Weekly",
-				"minLevel": 165
-			},
-			{
-				"name": "Normal",
-				"value": 14450000,
-				"reset": "Weekly",
-				"minLevel": 165
-			}
-		]
+		"difficulties": [{ "name": "Normal", "value": 2890000, "reset": "Daily", "minLevel": 165 }]
 	},
 	{
 		"name": "Princess No",
 		"img": "/assets/boss/princess_no.webp",
 		"maxPartySize": 6,
-		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 16200000,
-				"reset": "Weekly",
-				"minLevel": 180
-			}
-		]
+		"difficulties": [{ "name": "Normal", "value": 16200000, "reset": "Weekly", "minLevel": 180 }]
 	},
 	{
 		"name": "Akechi",
 		"img": "/assets/boss/akechi.webp",
 		"maxPartySize": 6,
-		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 28800000,
-				"reset": "Weekly",
-				"minLevel": 200
-			}
-		]
+		"difficulties": [{ "name": "Normal", "value": 28800000, "reset": "Weekly", "minLevel": 200 }]
 	},
 	{
 		"name": "Lotus",
 		"img": "/assets/boss/lotus.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 32512500,
-				"reset": "Weekly",
-				"minLevel": 190
-			},
-			{
-				"name": "Hard",
-				"value": 88935000,
-				"reset": "Weekly",
-				"minLevel": 190
-			},
-			{
-				"name": "Extreme",
-				"value": 279500000,
-				"reset": "Weekly",
-				"minLevel": 190
-			}
+			{ "name": "Normal", "value": 32512500, "reset": "Weekly", "minLevel": 190 },
+			{ "name": "Hard", "value": 88935000, "reset": "Weekly", "minLevel": 190 },
+			{ "name": "Extreme", "value": 279500000, "reset": "Weekly", "minLevel": 190 }
 		]
 	},
 	{
@@ -364,18 +160,8 @@
 		"img": "/assets/boss/damien.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 33800000,
-				"reset": "Weekly",
-				"minLevel": 190
-			},
-			{
-				"name": "Hard",
-				"value": 84375000,
-				"reset": "Weekly",
-				"minLevel": 190
-			}
+			{ "name": "Normal", "value": 33800000, "reset": "Weekly", "minLevel": 190 },
+			{ "name": "Hard", "value": 84375000, "reset": "Weekly", "minLevel": 190 }
 		]
 	},
 	{
@@ -383,18 +169,8 @@
 		"img": "/assets/boss/angel_smile.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 46334700,
-				"reset": "Weekly",
-				"minLevel": 210
-			},
-			{
-				"name": "Chaos",
-				"value": 120115625,
-				"reset": "Weekly",
-				"minLevel": 210
-			}
+			{ "name": "Normal", "value": 46334700, "reset": "Weekly", "minLevel": 210 },
+			{ "name": "Chaos", "value": 120115625, "reset": "Weekly", "minLevel": 210 }
 		]
 	},
 	{
@@ -402,24 +178,9 @@
 		"img": "/assets/boss/lucid.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Easy",
-				"value": 47401875,
-				"reset": "Weekly",
-				"minLevel": 220
-			},
-			{
-				"name": "Normal",
-				"value": 50765625,
-				"reset": "Weekly",
-				"minLevel": 220
-			},
-			{
-				"name": "Hard",
-				"value": 100800000,
-				"reset": "Weekly",
-				"minLevel": 220
-			}
+			{ "name": "Easy", "value": 47401875, "reset": "Weekly", "minLevel": 220 },
+			{ "name": "Normal", "value": 50765625, "reset": "Weekly", "minLevel": 220 },
+			{ "name": "Hard", "value": 100800000, "reset": "Weekly", "minLevel": 220 }
 		]
 	},
 	{
@@ -427,24 +188,9 @@
 		"img": "/assets/boss/will.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Easy",
-				"value": 49348950,
-				"reset": "Weekly",
-				"minLevel": 235
-			},
-			{
-				"name": "Normal",
-				"value": 55815000,
-				"reset": "Weekly",
-				"minLevel": 235
-			},
-			{
-				"name": "Hard",
-				"value": 124362000,
-				"reset": "Weekly",
-				"minLevel": 235
-			}
+			{ "name": "Easy", "value": 49348950, "reset": "Weekly", "minLevel": 235 },
+			{ "name": "Normal", "value": 55815000, "reset": "Weekly", "minLevel": 235 },
+			{ "name": "Hard", "value": 124362000, "reset": "Weekly", "minLevel": 235 }
 		]
 	},
 	{
@@ -452,18 +198,8 @@
 		"img": "/assets/boss/gloom.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 59535000,
-				"reset": "Weekly",
-				"minLevel": 245
-			},
-			{
-				"name": "Chaos",
-				"value": 112789000,
-				"reset": "Weekly",
-				"minLevel": 245
-			}
+			{ "name": "Normal", "value": 59535000, "reset": "Weekly", "minLevel": 245 },
+			{ "name": "Chaos", "value": 112789000, "reset": "Weekly", "minLevel": 245 }
 		]
 	},
 	{
@@ -471,18 +207,8 @@
 		"img": "/assets/boss/verus_hilla.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 116376000,
-				"reset": "Weekly",
-				"minLevel": 250
-			},
-			{
-				"name": "Hard",
-				"value": 152421000,
-				"reset": "Weekly",
-				"minLevel": 250
-			}
+			{ "name": "Normal", "value": 116376000, "reset": "Weekly", "minLevel": 250 },
+			{ "name": "Hard", "value": 152421000, "reset": "Weekly", "minLevel": 250 }
 		]
 	},
 	{
@@ -490,18 +216,8 @@
 		"img": "/assets/boss/darknell.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 63375000,
-				"reset": "Weekly",
-				"minLevel": 255
-			},
-			{
-				"name": "Hard",
-				"value": 133584000,
-				"reset": "Weekly",
-				"minLevel": 255
-			}
+			{ "name": "Normal", "value": 63375000, "reset": "Weekly", "minLevel": 255 },
+			{ "name": "Hard", "value": 133584000, "reset": "Weekly", "minLevel": 255 }
 		]
 	},
 	{
@@ -509,18 +225,8 @@
 		"img": "/assets/boss/black_mage.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Hard",
-				"value": 900000000,
-				"reset": "Monthly",
-				"minLevel": 255
-			},
-			{
-				"name": "Extreme",
-				"value": 3600000000,
-				"reset": "Monthly",
-				"minLevel": 255
-			}
+			{ "name": "Hard", "value": 900000000, "reset": "Monthly", "minLevel": 255 },
+			{ "name": "Extreme", "value": 3600000000, "reset": "Monthly", "minLevel": 255 }
 		]
 	},
 	{
@@ -528,24 +234,9 @@
 		"img": "/assets/boss/seren.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 177804375,
-				"reset": "Weekly",
-				"minLevel": 260
-			},
-			{
-				"name": "Hard",
-				"value": 219312500,
-				"reset": "Weekly",
-				"minLevel": 260
-			},
-			{
-				"name": "Extreme",
-				"value": 847000000,
-				"reset": "Weekly",
-				"minLevel": 260
-			}
+			{ "name": "Normal", "value": 177804375, "reset": "Weekly", "minLevel": 260 },
+			{ "name": "Hard", "value": 219312500, "reset": "Weekly", "minLevel": 260 },
+			{ "name": "Extreme", "value": 847000000, "reset": "Weekly", "minLevel": 260 }
 		]
 	},
 	{
@@ -553,30 +244,10 @@
 		"img": "/assets/boss/kalos.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Easy",
-				"value": 187500000,
-				"reset": "Weekly",
-				"minLevel": 265
-			},
-			{
-				"name": "Normal",
-				"value": 260000000,
-				"reset": "Weekly",
-				"minLevel": 265
-			},
-			{
-				"name": "Chaos",
-				"value": 520000000,
-				"reset": "Weekly",
-				"minLevel": 265
-			},
-			{
-				"name": "Extreme",
-				"value": 1040000000,
-				"reset": "Weekly",
-				"minLevel": 265
-			}
+			{ "name": "Easy", "value": 187500000, "reset": "Weekly", "minLevel": 265 },
+			{ "name": "Normal", "value": 260000000, "reset": "Weekly", "minLevel": 265 },
+			{ "name": "Chaos", "value": 520000000, "reset": "Weekly", "minLevel": 265 },
+			{ "name": "Extreme", "value": 1040000000, "reset": "Weekly", "minLevel": 265 }
 		]
 	},
 	{
@@ -584,30 +255,10 @@
 		"img": "/assets/boss/first_adversary.webp",
 		"maxPartySize": 3,
 		"difficulties": [
-			{
-				"name": "Easy",
-				"value": 197000000,
-				"reset": "Weekly",
-				"minLevel": 270
-			},
-			{
-				"name": "Normal",
-				"value": 273000000,
-				"reset": "Weekly",
-				"minLevel": 270
-			},
-			{
-				"name": "Hard",
-				"value": 588000000,
-				"reset": "Weekly",
-				"minLevel": 270
-			},
-			{
-				"name": "Extreme",
-				"value": 1176000000,
-				"reset": "Weekly",
-				"minLevel": 270
-			}
+			{ "name": "Easy", "value": 197000000, "reset": "Weekly", "minLevel": 270 },
+			{ "name": "Normal", "value": 273000000, "reset": "Weekly", "minLevel": 270 },
+			{ "name": "Hard", "value": 588000000, "reset": "Weekly", "minLevel": 270 },
+			{ "name": "Extreme", "value": 1176000000, "reset": "Weekly", "minLevel": 270 }
 		]
 	},
 	{
@@ -615,30 +266,10 @@
 		"img": "/assets/boss/kaling.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Easy",
-				"value": 206250000,
-				"reset": "Weekly",
-				"minLevel": 275
-			},
-			{
-				"name": "Normal",
-				"value": 301300000,
-				"reset": "Weekly",
-				"minLevel": 275
-			},
-			{
-				"name": "Hard",
-				"value": 598000000,
-				"reset": "Weekly",
-				"minLevel": 275
-			},
-			{
-				"name": "Extreme",
-				"value": 1205200000,
-				"reset": "Weekly",
-				"minLevel": 275
-			}
+			{ "name": "Easy", "value": 206250000, "reset": "Weekly", "minLevel": 275 },
+			{ "name": "Normal", "value": 301300000, "reset": "Weekly", "minLevel": 275 },
+			{ "name": "Hard", "value": 598000000, "reset": "Weekly", "minLevel": 275 },
+			{ "name": "Extreme", "value": 1205200000, "reset": "Weekly", "minLevel": 275 }
 		]
 	},
 	{
@@ -646,18 +277,8 @@
 		"img": "/assets/boss/malefic_star.webp",
 		"maxPartySize": 3,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 290400000,
-				"reset": "Weekly",
-				"minLevel": 280
-			},
-			{
-				"name": "Hard",
-				"value": 798000000,
-				"reset": "Weekly",
-				"minLevel": 280
-			}
+			{ "name": "Normal", "value": 290400000, "reset": "Weekly", "minLevel": 280 },
+			{ "name": "Hard", "value": 798000000, "reset": "Weekly", "minLevel": 280 }
 		]
 	},
 	{
@@ -665,18 +286,8 @@
 		"img": "/assets/boss/limbo.webp",
 		"maxPartySize": 3,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 420000000,
-				"reset": "Weekly",
-				"minLevel": 285
-			},
-			{
-				"name": "Hard",
-				"value": 749000000,
-				"reset": "Weekly",
-				"minLevel": 285
-			}
+			{ "name": "Normal", "value": 420000000, "reset": "Weekly", "minLevel": 285 },
+			{ "name": "Hard", "value": 749000000, "reset": "Weekly", "minLevel": 285 }
 		]
 	},
 	{
@@ -684,18 +295,8 @@
 		"img": "/assets/boss/baldrix.webp",
 		"maxPartySize": 3,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 560000000,
-				"reset": "Weekly",
-				"minLevel": 290
-			},
-			{
-				"name": "Hard",
-				"value": 840000000,
-				"reset": "Weekly",
-				"minLevel": 290
-			}
+			{ "name": "Normal", "value": 560000000, "reset": "Weekly", "minLevel": 290 },
+			{ "name": "Hard", "value": 840000000, "reset": "Weekly", "minLevel": 290 }
 		]
 	},
 	{
@@ -703,18 +304,8 @@
 		"img": "/assets/boss/jupiter.webp",
 		"maxPartySize": 3,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"value": 593000000,
-				"reset": "Weekly",
-				"minLevel": 295
-			},
-			{
-				"name": "Hard",
-				"value": 1190600000,
-				"reset": "Weekly",
-				"minLevel": 295
-			}
+			{ "name": "Normal", "value": 593000000, "reset": "Weekly", "minLevel": 295 },
+			{ "name": "Hard", "value": 1190600000, "reset": "Weekly", "minLevel": 295 }
 		]
 	}
 ]

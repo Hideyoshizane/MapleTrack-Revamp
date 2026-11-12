@@ -12,9 +12,7 @@ import LogoutButton from './DropdownMenuButton/LogoutButton';
 
 import type { JSX } from 'react';
 
-type Props = {
-	username: string;
-};
+type Props = { username: string };
 const MENU_ITEMS = [{ text: 'Classes' }, { text: 'Weekly' }, { text: 'Liberation' }, { text: 'Account' }] as const;
 
 const ICON_SIZE = 48;
@@ -40,15 +38,13 @@ const CustomDropdownMenu = ({ username }: Props): JSX.Element => {
 
 			<DropdownMenu.Portal>
 				<DropdownMenu.Content className={styles.dropdownContent} align="end" side="bottom" sideOffset={5}>
-					{MENU_ITEMS.map(
-						(item): JSX.Element => (
-							<Fragment key={item.text}>
-								<DropdownMenuButton text={item.text} />
+					{MENU_ITEMS.map((item): JSX.Element => (
+						<Fragment key={item.text}>
+							<DropdownMenuButton text={item.text} />
 
-								<DropdownMenu.Separator className={styles.separator} />
-							</Fragment>
-						),
-					)}
+							<DropdownMenu.Separator className={styles.separator} />
+						</Fragment>
+					))}
 					<LogoutButton />
 				</DropdownMenu.Content>
 			</DropdownMenu.Portal>

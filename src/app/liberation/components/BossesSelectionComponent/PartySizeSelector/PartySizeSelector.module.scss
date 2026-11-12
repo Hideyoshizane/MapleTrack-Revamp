@@ -26,11 +26,7 @@ $iconSize: 32px;
 	outline: none;
 
 	&:hover {
-		background-color: color-mix(
-			in srgb,
-			var(--background-white) 90%,
-			black
-		);
+		background-color: color-mix(in srgb, var(--background-white) 90%, black);
 	}
 
 	.bossDiv {
@@ -98,11 +94,7 @@ $iconSize: 32px;
 	}
 
 	&:hover {
-		background-color: color-mix(
-			in srgb,
-			var(--background-white) 90%,
-			black
-		);
+		background-color: color-mix(in srgb, var(--background-white) 90%, black);
 	}
 
 	&:not(:last-child) {

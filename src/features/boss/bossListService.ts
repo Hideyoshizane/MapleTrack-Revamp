@@ -1,14 +1,21 @@
 import { prisma } from '@lib/prisma';
 import { hasDailyResetOccurred, hasWeeklyResetOccurred, hasMonthlyResetOccurred, nowInUtc } from '@utils/time';
 
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@generated/prisma/client';
 
 type TransactionClient = Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>;
 
 // Creates a BossList object ready to be stored in the database.
 export const createBossList = async (tx: TransactionClient, authenticatedUserId: string): Promise<void> => {
 	try {
-		await tx.bossList.create({ data: { userId: authenticatedUserId, lastUpdate: nowInUtc() } });
+		await tx.bossList.create({
+			data: {
+				userId: authenticatedUserId,
+				lastUpdateDaily: nowInUtc(),
+				lastUpdateWeekly: nowInUtc(),
+				lastUpdateMonthly: nowInUtc(),
+			},
+		});
 	} catch (error) {
 		console.error('Error creating BossList:', error);
 
@@ -96,20 +103,82 @@ export const characterToBossList = async (
 	await tx.user.update({ where: { id: authenticatedUserId }, data: { liberationLastUpdate: nowInUtc() } });
 };
 
+type ResetFlags = { daily: boolean; weekly: boolean; monthly: boolean };
+
+type BossResetState = { cleared: boolean; locked: boolean; dailyCleared: number };
+
+type BossResetData = {
+	id: string;
+	reset: string;
+	cleared: boolean | null;
+	dailyCleared: number | null;
+	dailyTotal: number | null;
+	locked: boolean | null;
+};
+
+const getNextBossResetState = (boss: BossResetData, resets: ResetFlags): BossResetState => {
+	let cleared = boss.cleared ?? false;
+	let locked = boss.locked ?? false;
+	let dailyCleared = boss.dailyCleared ?? 0;
+
+	if (boss.reset === 'Daily') {
+		if (resets.daily) {
+			cleared = false;
+			locked = dailyCleared >= (boss.dailyTotal ?? 0);
+		}
+
+		if (resets.weekly) {
+			dailyCleared = 0;
+			locked = false;
+		}
+	}
+
+	if (boss.reset === 'Weekly' && resets.weekly) {
+		cleared = false;
+	}
+
+	if (boss.reset === 'Monthly') {
+		if (resets.weekly) {
+			cleared = false;
+			locked = true;
+		}
+
+		if (resets.monthly) {
+			locked = false;
+		}
+	}
+
+	return { cleared, locked, dailyCleared };
+};
+
 export const resetBossList = async (authenticatedUserId: string): Promise<void> => {
-	const bossList = await prisma.bossList.findUnique({
+	// Fetch only reset timestamps.
+	const resetTimestamps = await prisma.bossList.findUnique({
 		where: { userId: authenticatedUserId },
+		select: { id: true, lastUpdateDaily: true, lastUpdateWeekly: true, lastUpdateMonthly: true },
+	});
+	if (!resetTimestamps) {
+		return;
+	}
+
+	const resets: ResetFlags = {
+		daily: hasDailyResetOccurred(resetTimestamps.lastUpdateDaily),
+		weekly: hasWeeklyResetOccurred(resetTimestamps.lastUpdateWeekly),
+		monthly: hasMonthlyResetOccurred(resetTimestamps.lastUpdateMonthly),
+	};
+	if (!resets.daily && !resets.weekly && !resets.monthly) {
+		return;
+	}
+
+	// Fetch boss data only when a reset is necessary.
+	const bossList = await prisma.bossList.findUnique({
+		where: { id: resetTimestamps.id },
 		select: {
-			id: true,
-			lastUpdate: true,
 			servers: {
 				select: {
 					id: true,
-					weeklyBosses: true,
-					totalGains: true,
 					characters: {
 						select: {
-							characterId: true,
 							bosses: {
 								select: {
 									id: true,
@@ -130,85 +199,51 @@ export const resetBossList = async (authenticatedUserId: string): Promise<void> 
 		return;
 	}
 
-	const isDailyReset = hasDailyResetOccurred(bossList.lastUpdate);
-	const isWeeklyReset = hasWeeklyResetOccurred(bossList.lastUpdate);
-	const isMonthlyReset = hasMonthlyResetOccurred(bossList.lastUpdate);
-	if (!isDailyReset && !isWeeklyReset && !isMonthlyReset) {
-		return;
-	}
-
+	// Apply the required changes transactionally.
 	await prisma.$transaction(async (tx) => {
-		const bossUpdatePromises: Promise<unknown>[] = [];
-		const serverUpdatePromises: Promise<unknown>[] = [];
+		const bossUpdates: Promise<unknown>[] = [];
+		const serverUpdates: Promise<unknown>[] = [];
 
 		for (const server of bossList.servers) {
 			for (const character of server.characters) {
 				for (const boss of character.bosses) {
-					let nextCleared = boss.cleared ?? false;
-					let nextLocked = boss.locked ?? false;
-					let nextDailyCleared = boss.dailyCleared ?? 0;
+					const next = getNextBossResetState(boss, resets);
 
-					if (isDailyReset && boss.reset === 'Daily') {
-						nextCleared = false;
-
-						if (boss.reset === 'Daily') {
-							nextLocked = (boss.dailyCleared ?? 0) >= (boss.dailyTotal ?? 0);
-						}
+					if (resets.monthly && boss.reset === 'Monthly') {
+						next.cleared = false;
+						next.locked = false;
 					}
 
-					if (isWeeklyReset && boss.reset === 'Daily') {
-						nextDailyCleared = 0;
-						nextLocked = false;
-					}
-
-					if (isWeeklyReset && boss.reset === 'Weekly') {
-						nextCleared = false;
-					}
-
-					if (boss.reset === 'Monthly') {
-						if (isWeeklyReset) {
-							nextCleared = false;
-							nextLocked = true;
-						}
-
-						if (isMonthlyReset) {
-							nextLocked = false;
-						}
-					}
-
-					const hasStateChanged =
-						nextCleared !== (boss.cleared ?? false) ||
-						nextLocked !== (boss.locked ?? false) ||
-						nextDailyCleared !== (boss.dailyCleared ?? 0);
-
-					if (!hasStateChanged) {
+					const changed =
+						next.cleared !== (boss.cleared ?? false) ||
+						next.locked !== (boss.locked ?? false) ||
+						next.dailyCleared !== (boss.dailyCleared ?? 0);
+					if (!changed) {
 						continue;
 					}
 
-					bossUpdatePromises.push(
-						tx.boss.update({
-							where: { id: boss.id },
-							data: { cleared: nextCleared, locked: nextLocked, dailyCleared: nextDailyCleared },
-						}),
-					);
+					bossUpdates.push(tx.boss.update({ where: { id: boss.id }, data: next }));
 				}
 			}
 
-			if (isWeeklyReset) {
-				serverUpdatePromises.push(
+			if (resets.weekly) {
+				serverUpdates.push(
 					tx.bossServer.update({ where: { id: server.id }, data: { weeklyBosses: 0, totalGains: 0 } }),
 				);
 			}
 		}
 
-		if (bossUpdatePromises.length > 0) {
-			await Promise.all(bossUpdatePromises);
-		}
+		await Promise.all([...bossUpdates, ...serverUpdates]);
 
-		if (serverUpdatePromises.length > 0) {
-			await Promise.all(serverUpdatePromises);
-		}
+		const now = nowInUtc();
 
-		await tx.bossList.update({ where: { userId: authenticatedUserId }, data: { lastUpdate: nowInUtc() } });
+		await tx.bossList.update({
+			where: { id: resetTimestamps.id },
+			data: {
+				...(resets.daily && { lastUpdateDaily: now }),
+				...(resets.weekly && { lastUpdateWeekly: now }),
+				...(resets.monthly && { lastUpdateMonthly: now }),
+			},
+		});
 	});
 };

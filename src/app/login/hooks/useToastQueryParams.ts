@@ -1,6 +1,6 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 type ToastMessages = { [key: string]: { message: string; type: 'success' | 'error' } };
 
@@ -24,20 +24,24 @@ export const useToastQueryParams = (): void => {
 		}
 
 		for (const [param, { message, type: toastType }] of Object.entries(TOAST_MESSAGES)) {
-			if (searchParams.get(param) === '1') {
-				if (toastType === 'success') {
-					toast.success(message);
-				} else {
-					toast.error(message);
-				}
-
-				queueMicrotask(() => {
-					setHasShownToast(true);
-				});
-				router.replace('/login');
-
-				break;
+			if (searchParams.get(param) !== '1') {
+				continue;
 			}
+
+			if (toastType === 'success') {
+				toast.success(message);
+			}
+
+			if (toastType === 'error') {
+				toast.error(message);
+			}
+
+			queueMicrotask(() => {
+				setHasShownToast(true);
+			});
+
+			router.replace('/login');
+			break;
 		}
 	}, [searchParams, hasShownToast, router]);
 };

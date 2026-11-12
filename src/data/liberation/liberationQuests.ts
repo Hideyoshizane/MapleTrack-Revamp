@@ -1,37 +1,16 @@
 import liberationQuestsJson from './liberationQuests.json';
 
-type LiberationEntry = {
-	img: string;
-	points: number;
-};
+type LiberationEntry = { img: string; points: number };
 
-type AstraEntry = {
-	img: string;
-	vestiges: number;
-	traces: number;
-};
+type AstraEntry = { img: string; vestiges: number; traces: number };
 
-type RawLiberationQuest = {
-	total: number;
-	[key: string]: number | LiberationEntry;
-};
+type RawLiberationQuest = { total: number; [key: string]: number | LiberationEntry };
 
-type RawAstraQuest = {
-	totalVestiges: number;
-	totalTraces: number;
-	[key: string]: number | AstraEntry;
-};
+type RawAstraQuest = { totalVestiges: number; totalTraces: number; [key: string]: number | AstraEntry };
 
-export type LiberationQuest = {
-	total: number;
-	bosses: Record<string, LiberationEntry>;
-};
+export type LiberationQuest = { total: number; bosses: Record<string, LiberationEntry> };
 
-export type AstraQuest = {
-	totalVestiges: number;
-	totalTraces: number;
-	bosses: Record<string, AstraEntry>;
-};
+export type AstraQuest = { totalVestiges: number; totalTraces: number; bosses: Record<string, AstraEntry> };
 
 type LiberationMilestones = Record<string, LiberationQuest>;
 
@@ -86,19 +65,26 @@ const extractBossNamesByQuest = (): {
 	const destinyBosses: string[] = [];
 	const astraQuests: string[] = [];
 
+	const questCollections: Record<string, string[]> = {
+		Genesis: genesisBosses,
+		Destiny: destinyBosses,
+		Astra: astraQuests,
+	};
+
+	const excludedKeys = new Set(['total', 'totalVestiges', 'totalTraces']);
+
 	for (const [questType, quest] of Object.entries(liberationQuestsJson)) {
+		const collection = questCollections[questType];
+		if (!collection) {
+			continue;
+		}
+
 		for (const key of Object.keys(quest)) {
-			if (key === 'total' || key === 'totalVestiges' || key === 'totalTraces') {
+			if (excludedKeys.has(key)) {
 				continue;
 			}
 
-			if (questType === 'Genesis') {
-				genesisBosses.push(key);
-			} else if (questType === 'Destiny') {
-				destinyBosses.push(key);
-			} else if (questType === 'Astra') {
-				astraQuests.push(key);
-			}
+			collection.push(key);
 		}
 	}
 
@@ -126,10 +112,7 @@ export const getAstraPoints = (questName: string): { vestiges: number; traces: n
 	return { vestiges: rewards?.vestiges ?? 0, traces: rewards?.traces ?? 0 };
 };
 
-type AstraCumulative = {
-	vestiges: number;
-	traces: number;
-};
+type AstraCumulative = { vestiges: number; traces: number };
 
 const accumulateUntil = <TEntry, TResult>(
 	entries: readonly [string, TEntry][],
@@ -186,10 +169,7 @@ export const getCumulativeAstraPoints = (bossName: string, includeTargetBoss = f
 		Object.entries(astraMilestone.bosses),
 		bossName,
 		includeTargetBoss,
-		(): AstraCumulative => ({
-			vestiges: 0,
-			traces: 0,
-		}),
+		(): AstraCumulative => ({ vestiges: 0, traces: 0 }),
 		(accumulator, entry) => {
 			accumulator.vestiges += entry.vestiges;
 			accumulator.traces += entry.traces;
@@ -207,78 +187,84 @@ export const getAstraTotals = (): { totalVestiges: number; totalTraces: number }
 	return { totalVestiges: astraMilestone.totalVestiges, totalTraces: astraMilestone.totalTraces };
 };
 
-type ResolveNextLiberationStateResult = {
-	questName: string;
-	points: number;
-	liberated: boolean;
-};
+type ResolveNextLiberationStateResult = { questName: string; points: number; liberated: boolean };
 
 export const resolveNextLiberationState = (
 	questType: string,
 	questName: string,
 	points: number,
 ): ResolveNextLiberationStateResult => {
-	const quests = getQuestsByType(questType);
+	const normalizedQuestType = questType.charAt(0).toUpperCase() + questType.slice(1).toLowerCase();
+	const isGenesis = normalizedQuestType === 'Genesis';
+	const isDestiny = normalizedQuestType === 'Destiny';
 
-	const defaultResult: ResolveNextLiberationStateResult = { questName, points, liberated: questType === 'Destiny' };
+	const quests = getQuestsByType(normalizedQuestType);
 
-	if (!quests) {
-		return defaultResult;
-	}
-
-	const bossEntries = Object.entries(quests.bosses);
-
-	if (bossEntries.length === 0) {
-		return defaultResult;
-	}
+	const bossEntries = quests ? Object.entries(quests.bosses) : [];
 
 	const currentIndex = bossEntries.findIndex(([bossName]) => bossName === questName);
-
 	if (currentIndex === -1) {
-		return defaultResult;
+		return { questName, points, liberated: isDestiny };
 	}
 
-	const hillaThreshold = questType === 'Genesis' ? getLiberationPoints('Genesis', 'Verus Hilla') : 0;
+	const hillaThreshold = isGenesis ? getLiberationPoints('Genesis', 'Verus Hilla') : 0;
 
-	const resolveState = (bossName: string, rawPoints: number): ResolveNextLiberationStateResult => {
-		const isGenesisHilla = questType === 'Genesis' && bossName === 'Verus Hilla';
+	const getRequiredPoints = (index: number): number => {
+		const entry = bossEntries[index];
+		if (!entry) {
+			return 0;
+		}
 
-		const normalizedPoints = isGenesisHilla ? Math.min(rawPoints, hillaThreshold) : rawPoints;
+		const [bossName, bossData] = entry;
 
-		const liberated = questType === 'Destiny' || (isGenesisHilla && normalizedPoints === hillaThreshold);
-
-		return { questName: bossName, points: normalizedPoints, liberated };
+		return isGenesis && bossName === 'Verus Hilla' ? hillaThreshold : bossData.points;
 	};
 
+	let currentBossIndex = currentIndex;
 	let remainingPoints = points;
 
-	for (let index = currentIndex; index < bossEntries.length; index += 1) {
-		const [bossName, bossData] = bossEntries[index];
-
-		if (remainingPoints < bossData.points) {
-			return resolveState(bossName, remainingPoints);
-		}
-
-		const isLastBoss = index === bossEntries.length - 1;
-
-		if (isLastBoss) {
-			return resolveState(bossName, bossData.points);
-		}
-
-		remainingPoints -= bossData.points;
+	// Move backward when removing points.
+	while (remainingPoints < 0 && currentBossIndex > 0) {
+		currentBossIndex -= 1;
+		remainingPoints += getRequiredPoints(currentBossIndex);
 	}
 
-	const [lastBossName, lastBossData] = bossEntries[bossEntries.length - 1];
+	if (remainingPoints < 0) {
+		remainingPoints = 0;
+		currentBossIndex = 0;
+	}
 
-	return resolveState(lastBossName, lastBossData.points);
+	// Advance through completed quests.
+	while (currentBossIndex < bossEntries.length - 1) {
+		const requiredPoints = getRequiredPoints(currentBossIndex);
+
+		if (remainingPoints < requiredPoints) {
+			break;
+		}
+
+		remainingPoints -= requiredPoints;
+		currentBossIndex += 1;
+	}
+
+	const currentEntry = bossEntries[currentBossIndex];
+	if (!currentEntry) {
+		return { questName, points, liberated: isDestiny };
+	}
+
+	const [nextQuestName] = currentEntry;
+	const requiredPoints = getRequiredPoints(currentBossIndex);
+	const normalizedPoints = Math.min(remainingPoints, requiredPoints);
+
+	const isGenesisHilla = isGenesis && nextQuestName === 'Verus Hilla';
+
+	return {
+		questName: nextQuestName,
+		points: normalizedPoints,
+		liberated: isDestiny || (isGenesisHilla && normalizedPoints >= hillaThreshold),
+	};
 };
 
-type ResolveNextAstraStateResult = {
-	questName: string;
-	vestiges: number;
-	traces: number;
-	liberated: boolean;
-};
+type ResolveNextAstraStateResult = { questName: string; vestiges: number; traces: number; liberated: boolean };
 
 export const resolveNextAstraState = (
 	questName: string,
@@ -295,32 +281,62 @@ export const resolveNextAstraState = (
 	}
 
 	const currentIndex = bossEntries.findIndex(([bossName]) => bossName === questName);
-
 	if (currentIndex === -1) {
 		return defaultResult;
 	}
 
+	let currentBossIndex = currentIndex;
 	let remainingVestiges = vestiges;
 	let remainingTraces = traces;
 
-	for (let index = currentIndex; index < bossEntries.length; index += 1) {
-		const [bossName, bossData] = bossEntries[index];
+	// Move backward when removing more currency than the current quest contains.
+	while ((remainingVestiges < 0 || remainingTraces < 0) && currentBossIndex > 0) {
+		currentBossIndex -= 1;
+
+		const previousBoss = bossEntries[currentBossIndex];
+		if (!previousBoss) {
+			break;
+		}
+
+		const [, previousBossData] = previousBoss;
+
+		remainingVestiges += previousBossData.vestiges;
+		remainingTraces += previousBossData.traces;
+	}
+
+	// Prevent negative currency values when the removal exceeds all previous progress.
+	if (remainingVestiges < 0 || remainingTraces < 0) {
+		return { ...defaultResult, questName: bossEntries[0][0], vestiges: 0, traces: 0 };
+	}
+
+	// Move forward when enough currency is available to complete the current quest.
+	for (let index = currentBossIndex; index < bossEntries.length; index += 1) {
+		const entry = bossEntries[index];
+		if (!entry) {
+			break;
+		}
+
+		const [bossName, bossData] = entry;
 
 		if (remainingVestiges < bossData.vestiges || remainingTraces < bossData.traces) {
 			return { questName: bossName, vestiges: remainingVestiges, traces: remainingTraces, liberated: true };
 		}
 
 		const isLastBoss = index === bossEntries.length - 1;
-
 		if (isLastBoss) {
 			return { questName: bossName, vestiges: bossData.vestiges, traces: bossData.traces, liberated: true };
 		}
 
-		remainingVestiges = Math.min(Math.max(remainingVestiges - bossData.vestiges, 0), CURRENCY_LIMIT_CAP);
-		remainingTraces = Math.min(Math.max(remainingTraces - bossData.traces, 0), CURRENCY_LIMIT_CAP);
+		remainingVestiges = Math.min(remainingVestiges - bossData.vestiges, CURRENCY_LIMIT_CAP);
+		remainingTraces = Math.min(remainingTraces - bossData.traces, CURRENCY_LIMIT_CAP);
 	}
 
-	const [lastBossName, lastBossData] = bossEntries[bossEntries.length - 1];
+	const lastBoss = bossEntries[bossEntries.length - 1];
+	if (!lastBoss) {
+		return defaultResult;
+	}
+
+	const [lastBossName, lastBossData] = lastBoss;
 
 	return { questName: lastBossName, vestiges: lastBossData.vestiges, traces: lastBossData.traces, liberated: true };
 };

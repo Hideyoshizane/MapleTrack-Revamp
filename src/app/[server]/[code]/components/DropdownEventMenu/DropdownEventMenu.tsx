@@ -56,16 +56,14 @@ const DropdownEventMenu = (): JSX.Element => {
 							Sacred
 						</div>
 
-						{rows.map(
-							(value): JSX.Element => (
-								<React.Fragment key={value}>
-									<div className={styles.leftColumn}>
-										{renderBonusItem(value, arcaneBonus, setArcaneBonus)}
-									</div>
-									<div>{renderBonusItem(value, sacredBonus, setSacredBonus)}</div>
-								</React.Fragment>
-							),
-						)}
+						{rows.map((value): JSX.Element => (
+							<React.Fragment key={value}>
+								<div className={styles.leftColumn}>
+									{renderBonusItem(value, arcaneBonus, setArcaneBonus)}
+								</div>
+								<div>{renderBonusItem(value, sacredBonus, setSacredBonus)}</div>
+							</React.Fragment>
+						))}
 					</div>
 					<DropdownMenu.Arrow className={styles.arrow} height={10} width={15} />
 				</DropdownMenu.Content>

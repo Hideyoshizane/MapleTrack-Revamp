@@ -11,10 +11,7 @@ import { CHARACTER_MAX_LEVEL } from '@data/character/constants';
 import { JOB_CLASSES } from '@data/classes/classes';
 import { characterIdRawSchema, characterNameRawSchema } from '@features/character/schemas/character.schema';
 
-export const IdRawSchema = z
-	.string()
-	.regex(/^[a-fA-F0-9]{24}$/, 'Invalid MongoDB ObjectId')
-	.or(z.literal(''));
+export const IdRawSchema = z.uuid().or(z.literal(''));
 
 // Weekly boss page
 
@@ -33,11 +30,7 @@ const getBossListBossesSchema = z
 	})
 	.superRefine((data, ctx): void => {
 		if (!isValidBossDifficulty(data.name, data.difficulty)) {
-			ctx.addIssue({
-				code: 'custom',
-				path: ['difficulty'],
-				message: 'Invalid difficulty.',
-			});
+			ctx.addIssue({ code: 'custom', path: ['difficulty'], message: 'Invalid difficulty.' });
 		}
 
 		const maxPartySize = getBossMaxPartySize(data.name);

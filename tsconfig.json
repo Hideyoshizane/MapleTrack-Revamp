@@ -32,7 +32,8 @@
 			"@schemas/*": ["./src/schemas/*"],
 			"@sharedTypes/*": ["./src/shared/types/*"],
 			"@store/*": ["./src/store/*"],
-			"@utils/*": ["./src/utils/*"]
+			"@utils/*": ["./src/utils/*"],
+			"@generated/*": ["./src/generated/*"]
 		},
 		"allowJs": true
 	},

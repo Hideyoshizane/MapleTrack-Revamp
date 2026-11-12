@@ -1,8 +1,8 @@
 'use client';
 
 import { clsx } from 'clsx';
-import Image from 'next/image';
 
+import Image from '@components/Image/Image';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { getLinkSkillByName, getLinkSkillDescription } from '@data/linkSkill/linkSkill';
 
@@ -10,12 +10,7 @@ import styles from './LinkSkillBlock.module.scss';
 
 import type { JSX } from 'react';
 
-type Props = {
-	characterLevel: number;
-	characterLinkSkill: string;
-	iconSize?: number;
-	showTooltip?: boolean;
-};
+type Props = { characterLevel: number; characterLinkSkill: string; iconSize?: number; showTooltip?: boolean };
 
 const LinkSkillBlock = ({
 	characterLevel,

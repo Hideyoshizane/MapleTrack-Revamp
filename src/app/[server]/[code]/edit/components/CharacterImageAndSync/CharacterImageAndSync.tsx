@@ -1,7 +1,6 @@
 'use client';
-import Image from 'next/image';
-
 import ErrorIcon from '@assets/svg/circle-x.svg';
+import Image from '@components/Image/Image';
 import { SkeletonWrapper } from '@components/SkeletonWrapper/SkeletonWrapper';
 import Switch from '@components/Switch/Switch';
 import Tooltip from '@components/Tooltip/Tooltip';

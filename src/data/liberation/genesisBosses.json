@@ -4,21 +4,9 @@
 		"img": "/assets/boss/lotus.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"reset": "Weekly",
-				"points": 10
-			},
-			{
-				"name": "Hard",
-				"reset": "Weekly",
-				"points": 50
-			},
-			{
-				"name": "Extreme",
-				"reset": "Weekly",
-				"points": 50
-			}
+			{ "name": "Normal", "reset": "Weekly", "points": 10 },
+			{ "name": "Hard", "reset": "Weekly", "points": 50 },
+			{ "name": "Extreme", "reset": "Weekly", "points": 50 }
 		]
 	},
 	{
@@ -26,16 +14,8 @@
 		"img": "/assets/boss/damien.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"reset": "Weekly",
-				"points": 10
-			},
-			{
-				"name": "Hard",
-				"reset": "Weekly",
-				"points": 50
-			}
+			{ "name": "Normal", "reset": "Weekly", "points": 10 },
+			{ "name": "Hard", "reset": "Weekly", "points": 50 }
 		]
 	},
 	{
@@ -43,21 +23,9 @@
 		"img": "/assets/boss/lucid.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Easy",
-				"reset": "Weekly",
-				"points": 15
-			},
-			{
-				"name": "Normal",
-				"reset": "Weekly",
-				"points": 20
-			},
-			{
-				"name": "Hard",
-				"reset": "Weekly",
-				"points": 65
-			}
+			{ "name": "Easy", "reset": "Weekly", "points": 15 },
+			{ "name": "Normal", "reset": "Weekly", "points": 20 },
+			{ "name": "Hard", "reset": "Weekly", "points": 65 }
 		]
 	},
 	{
@@ -65,21 +33,9 @@
 		"img": "/assets/boss/will.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Easy",
-				"reset": "Weekly",
-				"points": 15
-			},
-			{
-				"name": "Normal",
-				"reset": "Weekly",
-				"points": 25
-			},
-			{
-				"name": "Hard",
-				"reset": "Weekly",
-				"points": 75
-			}
+			{ "name": "Easy", "reset": "Weekly", "points": 15 },
+			{ "name": "Normal", "reset": "Weekly", "points": 25 },
+			{ "name": "Hard", "reset": "Weekly", "points": 75 }
 		]
 	},
 	{
@@ -87,16 +43,8 @@
 		"img": "/assets/boss/gloom.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"reset": "Weekly",
-				"points": 20
-			},
-			{
-				"name": "Chaos",
-				"reset": "Weekly",
-				"points": 65
-			}
+			{ "name": "Normal", "reset": "Weekly", "points": 20 },
+			{ "name": "Chaos", "reset": "Weekly", "points": 65 }
 		]
 	},
 	{
@@ -104,16 +52,8 @@
 		"img": "/assets/boss/verus_hilla.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"reset": "Weekly",
-				"points": 45
-			},
-			{
-				"name": "Hard",
-				"reset": "Weekly",
-				"points": 90
-			}
+			{ "name": "Normal", "reset": "Weekly", "points": 45 },
+			{ "name": "Hard", "reset": "Weekly", "points": 90 }
 		]
 	},
 	{
@@ -121,16 +61,8 @@
 		"img": "/assets/boss/darknell.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Normal",
-				"reset": "Weekly",
-				"points": 25
-			},
-			{
-				"name": "Hard",
-				"reset": "Weekly",
-				"points": 75
-			}
+			{ "name": "Normal", "reset": "Weekly", "points": 25 },
+			{ "name": "Hard", "reset": "Weekly", "points": 75 }
 		]
 	},
 	{
@@ -138,16 +70,8 @@
 		"img": "/assets/boss/black_mage.webp",
 		"maxPartySize": 6,
 		"difficulties": [
-			{
-				"name": "Hard",
-				"reset": "Monthly",
-				"points": 600
-			},
-			{
-				"name": "Extreme",
-				"reset": "Monthly",
-				"points": 600
-			}
+			{ "name": "Hard", "reset": "Monthly", "points": 600 },
+			{ "name": "Extreme", "reset": "Monthly", "points": 600 }
 		]
 	}
 ]

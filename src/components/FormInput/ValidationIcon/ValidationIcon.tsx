@@ -11,10 +11,7 @@ import styles from './ValidationIcon.module.scss';
 
 import type { FC, SVGProps, JSX } from 'react';
 
-const ICONS: Record<'invalid' | 'info', FC<SVGProps<SVGSVGElement>>> = {
-	invalid: ErrorIcon,
-	info: InfoIcon,
-};
+const ICONS: Record<'invalid' | 'info', FC<SVGProps<SVGSVGElement>>> = { invalid: ErrorIcon, info: InfoIcon };
 
 type Props = {
 	showValid: boolean;

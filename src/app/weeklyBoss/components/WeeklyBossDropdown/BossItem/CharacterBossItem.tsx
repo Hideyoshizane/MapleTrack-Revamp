@@ -1,12 +1,12 @@
 'use client';
 
 import { clsx } from 'clsx';
-import Image from 'next/image';
 
 import BossCheckedIcon from '@assets/svg/check-boss.svg';
 import CircleBossIcon from '@assets/svg/circle-boss.svg';
 import SwordIcon from '@assets/svg/sword.svg';
 import PartyIcon from '@assets/svg/user-round.svg';
+import Image from '@components/Image/Image';
 import ResponsiveText from '@components/ResponsiveText/ResponsiveText';
 import { getBossImage, getBossDifficultyValue } from '@data/bosses/bosses';
 
@@ -15,12 +15,7 @@ import styles from './CharacterBossItem.module.scss';
 import type { getBossListBossResponseBody } from '@features/boss/schemas/bossList.response.schema';
 import type { JSX, KeyboardEvent } from 'react';
 
-type Props = {
-	boss: getBossListBossResponseBody;
-	server: string;
-	isSelected: boolean;
-	onClick?: () => void;
-};
+type Props = { boss: getBossListBossResponseBody; server: string; isSelected: boolean; onClick?: () => void };
 
 const CharacterBossItem = ({ boss, server, isSelected, onClick }: Props): JSX.Element => {
 	const handleKey = (event: KeyboardEvent<HTMLDivElement>): void => {
@@ -49,7 +44,6 @@ const CharacterBossItem = ({ boss, server, isSelected, onClick }: Props): JSX.El
 				className={styles.bossIcon}
 				alt={`${boss.difficulty} ${boss.name}`}
 				height={64}
-				priority
 				src={bossImg}
 				width={64}
 			/>

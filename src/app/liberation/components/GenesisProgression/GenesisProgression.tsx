@@ -2,13 +2,13 @@
 
 import { clsx } from 'clsx';
 import { startOfDay } from 'date-fns';
-import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { useState } from 'react';
 
 import CheckedIcon from '@assets/svg/check-boss.svg';
 import CircleIcon from '@assets/svg/circle-boss.svg';
 import LockIcon from '@assets/svg/lock.svg';
+import Image from '@components/Image/Image';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { GENESIS_MIN_LEVEL } from '@data/liberation/constant';
 import { getBossesByType, createEmptyWeeklyMonthlyPoints } from '@data/liberation/liberationBosses';

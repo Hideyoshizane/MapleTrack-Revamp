@@ -1,7 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-
+import Image from '@components/Image/Image';
 import { weaponQuestsImagesSrc } from '@data/liberation/liberationQuests';
 
 import styles from './WeeklyBreakdown.module.scss';
@@ -9,11 +8,7 @@ import styles from './WeeklyBreakdown.module.scss';
 import type { Boss, WeeklyMonthlyPoints } from '@data/liberation/liberationBosses';
 import type { JSX } from 'react';
 
-type Props = {
-	bosses: Boss[];
-	weeklyMonthlyPoints: WeeklyMonthlyPoints;
-	type: string;
-};
+type Props = { bosses: Boss[]; weeklyMonthlyPoints: WeeklyMonthlyPoints; type: string };
 
 const hasPoints = (
 	value: WeeklyMonthlyPoints['bosses'][string] | undefined,
@@ -42,7 +37,7 @@ const WeeklyBreakdown = ({ bosses, weeklyMonthlyPoints, type }: Props): JSX.Elem
 
 				return (
 					<div className={styles.line} key={boss.name}>
-						<Image alt={`${boss.name} image`} height={56} priority src={boss.img} width={56} />
+						<Image alt={`${boss.name} image`} height={56} src={boss.img} width={56} />
 
 						<div className={styles.text}>
 							<p>{boss.name}</p>

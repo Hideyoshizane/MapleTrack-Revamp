@@ -1,6 +1,7 @@
 {
 	"extends": ["stylelint-config-standard-scss", "stylelint-config-css-modules"],
 	"plugins": ["stylelint-order"],
+	"ignoreFiles": ["coverage/**/*.css", "dist/**/*", ".next/**/*"],
 	"rules": {
 		"scss/percent-placeholder-pattern": "^[a-z][a-zA-Z0-9]+$",
 		"scss/dollar-variable-pattern": "^[a-z][a-zA-Z0-9]+$",

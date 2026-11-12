@@ -12,11 +12,7 @@ import type { JobType } from '@components/ProgressBar/ProgressBar';
 import type { getCharacterDataResponseBody } from '@features/character/schemas/character.response.schema';
 import type { JSX } from 'react';
 
-type Props = {
-	character: getCharacterDataResponseBody;
-	job: string;
-	jobType: JobType;
-};
+type Props = { character: getCharacterDataResponseBody; job: string; jobType: JobType };
 
 const BOSS_ICON_SIZE = 90;
 const ICON_SIZE = 64;

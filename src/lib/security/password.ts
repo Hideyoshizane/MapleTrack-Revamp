@@ -14,21 +14,7 @@ type StoredPasswordHash = {
 	tagLength: number;
 };
 
-const DEFAULT_CONFIG = {
-	memory: 192 * 1024,
-	passes: 3,
-	parallelism: 4,
-	tagLength: 32,
-};
-
-export const DUMMY_HASH = JSON.stringify({
-	salt: 'w6hQhJt7ZV0Vx8p2W0Q3nQ==',
-	hash: 'l6dH0l...',
-	memory: 192 * 1024,
-	passes: 3,
-	parallelism: 4,
-	tagLength: 32,
-});
+const DEFAULT_CONFIG = { memory: 192 * 1024, passes: 3, parallelism: 4, tagLength: 32 };
 
 const runArgon2 = (params: { password: string; salt: Buffer; config: typeof DEFAULT_CONFIG }): Promise<Buffer> => {
 	return new Promise((resolve, reject) => {
@@ -43,12 +29,12 @@ const runArgon2 = (params: { password: string; salt: Buffer; config: typeof DEFA
 				memory: params.config.memory,
 				passes: params.config.passes,
 			},
-			(err, derivedKey) => {
-				if (err) {
-					reject(err);
-
+			(error, derivedKey) => {
+				if (error) {
+					reject(error);
 					return;
 				}
+
 				resolve(Buffer.from(derivedKey));
 			},
 		);
@@ -85,7 +71,6 @@ export const verifyPassword = async (stored: string, plainPassword: string): Pro
 		});
 
 		const storedKey = Buffer.from(parsed.hash, 'base64');
-
 		if (storedKey.length !== derivedKey.length) {
 			return false;
 		}

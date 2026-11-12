@@ -14,26 +14,24 @@ const axiosInstance: AxiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
 	(response) => response,
 	(error: unknown): never => {
-		if (axios.isAxiosError<ApiErrorResponse>(error)) {
-			if (error.code === 'ECONNABORTED') {
-				console.error('[Axios] Request timeout', { method: error.config?.method, url: error.config?.url });
-			} else if (!error.response) {
-				console.error('[Axios] Network error', {
-					method: error.config?.method,
-					url: error.config?.url,
-					message: error.message,
-				});
-			} else {
-				console.error('[Axios] API error', {
-					method: error.config?.method,
-					url: error.config?.url,
-					status: error.response.status,
-					data: error.response.data,
-				});
-			}
-		} else {
+		if (!axios.isAxiosError<ApiErrorResponse>(error)) {
 			console.error('[Axios] Unknown error', error);
+			throw error;
 		}
+
+		const { method, url } = error.config ?? {};
+
+		if (error.code === 'ECONNABORTED') {
+			console.error('[Axios] Request timeout', { method, url });
+			throw error;
+		}
+
+		if (!error.response) {
+			console.error('[Axios] Network error', { method, url, message: error.message });
+			throw error;
+		}
+
+		console.error('[Axios] API error', { method, url, status: error.response.status, data: error.response.data });
 
 		throw error;
 	},

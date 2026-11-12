@@ -1,35 +1,86 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
 }
 
-model HealthCheck {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  expiresAt DateTime @db.Timestamptz(3)
+  token     String   @unique
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  ipAddress String?
+  userAgent String?
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(uuid()) @db.Uuid
+  accountId             String
+  providerId            String
+  userId                String    @db.Uuid
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @db.Timestamptz(3)
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(uuid()) @db.Uuid
+  identifier String
+  value      String
+  expiresAt  DateTime @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([identifier])
 }
 
 model User {
-  id                   String       @id @default(auto()) @map("_id") @db.ObjectId
-  username             String       @unique
-  email                String       @unique
-  password             String
-  version              Int
-  lastLogin            DateTime     @default(now())
-  characters           Character[]
-  bossList             BossList?
-  resetPasswordToken   String?
-  resetPasswordExpires DateTime?
-  liberations          Liberation[]
-  liberationLastUpdate DateTime
+  id            String  @id @default(uuid()) @db.Uuid
+  name          String  @unique
+  email         String  @unique
+  emailVerified Boolean @default(false)
+  image         String?
 
-  @@index([resetPasswordToken, resetPasswordExpires])
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  version   Int      @default(1)
+  lastLogin DateTime @default(now()) @db.Timestamptz(3)
+
+  characters Character[]
+  bossList   BossList?
+
+  resetPasswordToken   String?   @unique
+  resetPasswordExpires DateTime? @db.Timestamptz(3)
+
+  liberations          Liberation[]
+  liberationLastUpdate DateTime?    @db.Timestamptz(3)
+
+  sessions Session[]
+  accounts Account[]
+
+  @@index([resetPasswordExpires])
 }
 
 model Character {
-  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  id              String            @id @default(uuid()) @db.Uuid
   name            String
   level           Int
   targetLevel     Int
@@ -38,11 +89,11 @@ model Character {
   legion          String
   linkSkill       String
   server          String
-  lastUpdate      DateTime
+  lastUpdate      DateTime          @db.Timestamptz(3)
   lastSymbolDaily String?
   bossing         Boolean           @default(false)
   syncing         Boolean           @default(false)
-  userId          String            @db.ObjectId
+  userId          String            @db.Uuid
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   symbols         CharacterSymbol[]
   bossCharacters  BossCharacter[]
@@ -60,12 +111,12 @@ enum SymbolCategory {
 }
 
 model CharacterSymbol {
-  id          String             @id @default(auto()) @map("_id") @db.ObjectId
+  id          String             @id @default(uuid()) @db.Uuid
   name        String
   level       Int
   exp         Int
   category    SymbolCategory
-  characterId String             @db.ObjectId
+  characterId String             @db.Uuid
   character   Character          @relation(fields: [characterId], references: [id], onDelete: Cascade)
   contents    CharacterContent[]
 
@@ -73,13 +124,12 @@ model CharacterSymbol {
 }
 
 model CharacterContent {
-  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  id          String          @id @default(uuid()) @db.Uuid
   contentType String
   checked     Boolean         @default(false)
   cleared     Boolean         @default(false)
-  date        DateTime?
-  tries       Int?
-  symbolId    String          @db.ObjectId
+  date        DateTime?       @db.Timestamptz(3)
+  symbolId    String          @db.Uuid
   symbol      CharacterSymbol @relation(fields: [symbolId], references: [id], onDelete: Cascade)
 
   @@unique([symbolId, contentType])
@@ -92,28 +142,30 @@ enum BossReset {
 }
 
 model BossList {
-  id         String       @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String       @unique @db.ObjectId
-  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lastUpdate DateTime?
-  servers    BossServer[]
+  id                String       @id @default(uuid()) @db.Uuid
+  userId            String       @unique @db.Uuid
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastUpdateDaily   DateTime?    @db.Timestamptz(3)
+  lastUpdateWeekly  DateTime?    @db.Timestamptz(3)
+  lastUpdateMonthly DateTime?    @db.Timestamptz(3)
+  servers           BossServer[]
 }
 
 model BossServer {
-  id           String          @id @default(auto()) @map("_id") @db.ObjectId
+  id           String          @id @default(uuid()) @db.Uuid
   serverName   String
   weeklyBosses Int             @default(0)
   totalGains   Int             @default(0)
-  bossListId   String          @db.ObjectId
+  bossListId   String          @db.Uuid
   bossList     BossList        @relation(fields: [bossListId], references: [id], onDelete: Cascade)
   characters   BossCharacter[]
 }
 
 model BossCharacter {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  characterId String     @db.ObjectId
+  id          String     @id @default(uuid()) @db.Uuid
+  characterId String     @db.Uuid
   character   Character  @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  serverId    String     @db.ObjectId
+  serverId    String     @db.Uuid
   server      BossServer @relation(fields: [serverId], references: [id], onDelete: Cascade)
   bosses      Boss[]
 
@@ -121,24 +173,24 @@ model BossCharacter {
 }
 
 model Boss {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  difficulty   String
-  reset        BossReset
-  partySize    Int           @default(1)
-  dailyTotal   Int?          @default(1)
-  dailyCleared Int?          @default(0)
-  cleared      Boolean       @default(false)
-  locked       Boolean?      @default(false)
-  characterId  String        @db.ObjectId
-  character    BossCharacter @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  id              String        @id @default(uuid()) @db.Uuid
+  name            String
+  difficulty      String
+  reset           BossReset
+  partySize       Int           @default(1)
+  dailyTotal      Int?          @default(1)
+  dailyCleared    Int?          @default(0)
+  cleared         Boolean       @default(false)
+  locked          Boolean?      @default(false)
+  bossCharacterId String        @db.Uuid
+  bossCharacter   BossCharacter @relation(fields: [bossCharacterId], references: [id], onDelete: Cascade)
 }
 
 model Liberation {
-  id                         String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId                     String    @db.ObjectId
+  id                         String    @id @default(uuid()) @db.Uuid
+  userId                     String    @db.Uuid
   user                       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  characterId                String    @db.ObjectId
+  characterId                String    @db.Uuid
   character                  Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
   server                     String
   currentGenesisQuest        String

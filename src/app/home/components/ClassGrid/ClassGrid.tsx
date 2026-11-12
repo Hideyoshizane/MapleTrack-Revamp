@@ -67,13 +67,11 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Pr
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 
-	const skeletons: JSX.Element[] = JobClasses.map(
-		(job): JSX.Element => (
-			<div className={styles.skeletonWrapper} key={job.className}>
-				<SkeletonWrapper color="light" height={368} variant="rounded" width={502} />
-			</div>
-		),
-	);
+	const skeletons: JSX.Element[] = JobClasses.map((job): JSX.Element => (
+		<div className={styles.skeletonWrapper} key={job.className}>
+			<SkeletonWrapper color="light" height={368} variant="rounded" width={502} />
+		</div>
+	));
 
 	useEffect((): (() => void) | undefined => {
 		if (!serverCookie) {
@@ -87,9 +85,7 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Pr
 				setLoading(true);
 				setError(null);
 
-				const payload: GetAllCharactersRequestBody = {
-					server: serverCookie,
-				};
+				const payload: GetAllCharactersRequestBody = { server: serverCookie };
 
 				const response = await characterApi.getAllCharacters(payload);
 
@@ -147,11 +143,9 @@ const ClassGrid = ({ serverCookie, selectedClasses, selectedClassesLoading }: Pr
 		<div className={styles.classGrid}>
 			{loading || selectedClassesLoading
 				? skeletons
-				: jobResults.map(
-						(char): JSX.Element => (
-							<ClassCard character={char} key={char.class} serverCookie={serverCookie} />
-						),
-					)}
+				: jobResults.map((char): JSX.Element => (
+						<ClassCard character={char} key={char.class} serverCookie={serverCookie} />
+					))}
 		</div>
 	);
 };

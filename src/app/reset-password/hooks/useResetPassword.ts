@@ -1,13 +1,12 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useForm, type Control, type UseFormHandleSubmit, type UseFormGetValues } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 import { resetPasswordRequestSchema } from '@features/user/schemas/user.schema';
 import { userApi } from '@features/user/userApi';
 
 import type { ResetPasswordFormData } from '@sharedTypes/form';
-import type { Id } from 'react-toastify';
 
 type UseResetPasswordReturn = {
 	control: Control<ResetPasswordFormData>;
@@ -19,7 +18,7 @@ type UseResetPasswordReturn = {
 };
 
 // helper to avoid repeated toast calls
-const showResetError = (msg?: string): Id => toast.error(msg ?? 'Failed to reset the password');
+const showResetError = (msg?: string): string | number => toast.error(msg ?? 'Failed to reset the password');
 
 export const useResetPassword = (rawToken: string): UseResetPasswordReturn => {
 	const router = useRouter();
@@ -60,10 +59,11 @@ export const useResetPassword = (rawToken: string): UseResetPasswordReturn => {
 		} catch (error: unknown) {
 			if (error instanceof DOMException && error.name === 'AbortError') {
 				toast.error('Request timed out. Please try again.');
-			} else {
-				showResetError('Unexpected error occurred');
-				console.error('[ResetPasswordPage] Unexpected error:', error);
+				return;
 			}
+
+			showResetError('Unexpected error occurred');
+			console.error('[ResetPasswordPage] Unexpected error:', error);
 		}
 	};
 

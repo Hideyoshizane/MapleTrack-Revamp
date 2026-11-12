@@ -1,11 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 
 import Button from '@components/Button/Button';
 import FooterOutside from '@components/FooterOutside/FooterOutside';
 import FormInput from '@components/FormInput/FormInput';
+import Image from '@components/Image/Image';
 import { usernameFieldSchema, emailFieldSchema, passwordFieldSchema } from '@features/user/schemas/user.schema';
 import { zodValidator, confirmPasswordValidator } from '@utils/validators';
 
@@ -24,7 +24,7 @@ const SignupPage = (): JSX.Element => {
 		<div className={styles.container}>
 			<Link aria-label="Go to login page" href="/login">
 				<div className={styles.logoDiv}>
-					<Image alt="MapleTrack Logo" fill priority sizes="750px" src="/assets/logo/logo.webp" />
+					<Image alt="MapleTrack Logo" fill sizes="750px" src="/assets/logo/logo.webp" />
 				</div>
 			</Link>
 

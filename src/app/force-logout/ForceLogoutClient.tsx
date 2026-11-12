@@ -1,10 +1,11 @@
 'use client';
-
-import { useSearchParams } from 'next/navigation';
-import { signOut } from 'next-auth/react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
+import { authClient } from '@lib/authClient';
+
 const ForceLogoutPage = (): null => {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 
 	useEffect((): void => {
@@ -12,8 +13,17 @@ const ForceLogoutPage = (): null => {
 
 		const callbackUrl = reason === 'version_update' ? '/login?version_update=1' : '/login';
 
-		void signOut({ callbackUrl });
-	}, [searchParams]);
+		void authClient.signOut({
+			fetchOptions: {
+				onSuccess: () => {
+					router.replace(callbackUrl);
+				},
+				onError: () => {
+					router.replace(callbackUrl);
+				},
+			},
+		});
+	}, [router, searchParams]);
 
 	return null;
 };

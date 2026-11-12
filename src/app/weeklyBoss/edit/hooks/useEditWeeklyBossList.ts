@@ -2,12 +2,12 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 import { bossListApi } from '@features/boss/bossListApi';
 import {
 	updateCharacterBoss,
-	countCharacterBosses,
+	countWeeklyBosses,
 	countCharacterIncome,
 	countMonthlyBosses,
 	countServerBosses,
@@ -87,7 +87,7 @@ export const useEditWeeklyBossList = (server: ServerName): UseEditWeeklyBossList
 
 	const characterWeeklyIncome = selectedCharacter ? countCharacterIncome(selectedCharacter, server) : 0;
 
-	const characterWeeklyBossAmount = selectedCharacter ? countCharacterBosses(selectedCharacter, false) : 0;
+	const characterWeeklyBossAmount = selectedCharacter ? countWeeklyBosses(selectedCharacter) : 0;
 	const characterMonthlyBossAmount = selectedCharacter ? countMonthlyBosses(selectedCharacter) : 0;
 
 	const handleBossUpdate = (
@@ -131,13 +131,13 @@ export const useEditWeeklyBossList = (server: ServerName): UseEditWeeklyBossList
 
 		try {
 			const result = await bossListApi.updateBossList(serverData);
-
-			if (result.success) {
-				const basePath = pathname.replace(/\/edit$/, '');
-				router.push(`${basePath}?success=1`);
-			} else {
+			if (!result.success) {
 				toast.error(result.message || 'Failed to update Boss List.');
+				return;
 			}
+
+			const basePath = pathname.replace(/\/edit$/, '');
+			router.push(`${basePath}?success=1`);
 		} catch {
 			toast.error('Failed to save changes');
 		}
