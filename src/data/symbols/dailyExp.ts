@@ -21,3 +21,10 @@ const symbolsData = raw as SymbolsData;
 export const allSymbols = symbolsData.symbols;
 
 export type SymbolName = SymbolData['name'];
+
+const symbolContentTypes = new Map(
+	allSymbols.flatMap((symbol) => symbol.contents.map((content) => [content.name, content.type] as const)),
+);
+
+export const getSymbolContentType = (contentName: string): 'daily' | 'weekly' | undefined =>
+	symbolContentTypes.get(contentName);

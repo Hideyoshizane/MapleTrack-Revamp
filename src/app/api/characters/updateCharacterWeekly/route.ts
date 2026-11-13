@@ -1,3 +1,4 @@
+import { getSymbolContentType } from '@data/symbols/dailyExp';
 import { getContentValue, calculateNewLevelFromExp, toSymbolName } from '@data/symbols/symbolMappings';
 import { updateCharacterWeeklyRequestSchema } from '@features/character/schemas/character.request.schema';
 import { updateCharacterWeeklyResponseSchema } from '@features/character/schemas/character.response.schema';
@@ -34,7 +35,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 				exp: true,
 				category: true,
 				character: { select: { level: true } },
-				contents: { select: { contentType: true, cleared: true }, take: 1 },
+				contents: { select: { contentType: true, cleared: true } },
 			},
 		});
 		if (!symbol) {
@@ -42,8 +43,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 			return createResponse<ApiResponse>({ success: false, message: 'Symbol not found' }, 404);
 		}
-
-		const weeklyContent = symbol.contents[0];
+		const weeklyContent = symbol.contents.find((content) => getSymbolContentType(content.contentType) === 'weekly');
 		if (!weeklyContent) {
 			logApiFailure('Weekly not found', { route });
 

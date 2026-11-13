@@ -44,7 +44,7 @@ const SymbolButtons = ({
 	const weeklyContent = symbol.contents.length > 1 ? symbol.contents.at(-1) : undefined;
 
 	const isDailyUpdating = isDailyLoading || isBulkUpdating;
-	const isWeeklyUpdating = isWeeklyLoading || isBulkUpdating;
+	const isWeeklyUpdating = isWeeklyLoading;
 
 	const isDailyDisabled = !dailyContent?.checked;
 	const isDailyDone = optimisticDailyCleared ?? dailyContent?.cleared ?? false;
