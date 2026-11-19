@@ -107,7 +107,7 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 		const serverData: getBossListResponseBody = {
 			id: serverDataRaw.id,
 			weeklyBosses: serverDataRaw.weeklyBosses,
-			totalGains: serverDataRaw.totalGains,
+			totalGains: Number(serverDataRaw.totalGains),
 			characters,
 		};
 
