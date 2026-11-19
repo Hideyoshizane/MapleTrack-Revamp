@@ -11,7 +11,7 @@ import type { toggleBossListResponseBody } from '@features/boss/schemas/bossList
 import type { ApiResponse } from '@sharedTypes/api';
 import type { NextResponse, NextRequest } from 'next/server';
 
-const route = 'api/bossList/toggleBossList';
+const route = 'api/bossList/toggleBoss';
 
 const handler = async (request: NextRequest, authenticatedUserId: string): Promise<NextResponse> => {
 	try {
@@ -44,7 +44,6 @@ const handler = async (request: NextRequest, authenticatedUserId: string): Promi
 
 			return createResponse<ApiResponse>({ success: false, message: 'Boss data not found' }, 404);
 		}
-
 		if (bossData.locked) {
 			return createResponse<ApiResponse>({ success: false, message: 'Boss is locked' }, 403);
 		}

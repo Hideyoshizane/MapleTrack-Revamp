@@ -155,7 +155,7 @@ model BossServer {
   id           String          @id @default(uuid()) @db.Uuid
   serverName   String
   weeklyBosses Int             @default(0)
-  totalGains   Int             @default(0)
+  totalGains   BigInt          @default(0)
   bossListId   String          @db.Uuid
   bossList     BossList        @relation(fields: [bossListId], references: [id], onDelete: Cascade)
   characters   BossCharacter[]
