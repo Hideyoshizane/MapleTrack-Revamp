@@ -138,12 +138,13 @@ const getNextBossResetState = (boss: BossResetData, resets: ResetFlags): BossRes
 	}
 
 	if (boss.reset === 'Monthly') {
-		if (resets.weekly) {
-			cleared = false;
+		if (resets.weekly && cleared) {
+			cleared = true;
 			locked = true;
 		}
 
 		if (resets.monthly) {
+			cleared = false;
 			locked = false;
 		}
 	}
