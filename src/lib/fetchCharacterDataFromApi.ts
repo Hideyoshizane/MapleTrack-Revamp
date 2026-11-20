@@ -22,16 +22,9 @@ export const fetchCharacterDataFromApi = async (
 
 	try {
 		const { data } = await axiosInstance.get<NexonRankingResponse>(
-			`https://www.nexon.com/api/maplestory/no-auth/ranking/v2/${serverLocation}`,
+			`https://www.nexon.com/api/maplestory/ranking/v1/no-auth/${serverLocation}/overall`,
 			{
-				params: {
-					type: 'overall',
-					id: 'weekly',
-					reboot_index: rebootIndex,
-					page_index: 41,
-					character_name: characterName,
-				},
-
+				params: { id: 'weekly', reboot_index: rebootIndex, page_index: 1, character_name: characterName },
 				headers: { 'Cache-Control': 'no-store' },
 			},
 		);
